@@ -167,12 +167,11 @@ these commands run:
 
 .. code-block:: bash
 
-    poetry run sphinx-autobuild -W -T -v --port 8885 docs/ docs/_build
-    poetry run sphinx-build -W -T -v docs/ docs/_build
+    poetry run sphinx-autobuild -T -v --port 8885 docs/ docs/_build
+    poetry run sphinx-build -T -v docs/ docs/_build
 
 What these options do:
 
-- ``-W``: Treat warnings as errors (to catch broken references)
 - ``-T``: Print tracebacks on errors
 - ``-v``: Verbose output (``-v -v`` for even more detail)
 

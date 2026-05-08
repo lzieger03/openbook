@@ -2,25 +2,12 @@
 API Reference
 =============
 
-This page lists all machine-readable API contracts and generated Python module
-documentation available during development.
+OpenBook exposes two HTTP APIs: a REST API for application data and an authentication API powered by
+Django Allauth. Both are described by machine-readable OpenAPI schemas and come with an interactive
+ReDoc browser you can use to explore endpoints and try requests during local development.
 
 .. contents:: Page Content
    :local:
-
-
----------------
-Python API Docs
----------------
-
-The following module-level documentation is generated automatically from docstrings using
-`Sphinx AutoAPI <https://sphinx-autoapi.readthedocs.io/>`_. Here you can browse all modules,
-classes, methods, constants etc. of the code base.
-
-.. toctree::
-   :maxdepth: 3
-
-   ./autoapi/openbook/index
 
 
 --------
