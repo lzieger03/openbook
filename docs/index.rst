@@ -112,7 +112,3 @@ download, install, and use **without restrictions**.
    developers/howto-guides
    developers/api-reference
    developers/repository-setup
-
-
-
-

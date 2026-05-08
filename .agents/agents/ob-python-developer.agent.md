@@ -94,6 +94,7 @@ Follow PEP 257:
 - One-line summary in imperative mood, ending with a period.
 - Add details only when necessary (args, returns, side effects).
 - Do not repeat the function signature.
+- Use RST syntax
 
 Docstrings may be omitted for trivial functions.
 

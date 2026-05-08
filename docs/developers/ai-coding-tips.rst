@@ -174,7 +174,7 @@ that apply. Treat re-anchoring as a standard step, not a workaround.
 
 
 .. code-block:: text
-      :caption: **Example** --- Re-anchoring at the start of a new session
+   :caption: **Example** --- Re-anchoring at the start of a new session
 
    New session. I am adding REST API endpoints for the Assignment model.
    The model is in openbook/assignments/models.py.

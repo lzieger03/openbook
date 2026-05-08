@@ -14,11 +14,28 @@ author = "Dennis Schulmeister-Zimolong and contributors"
 copyright = "OpenBook contributors"
 
 extensions = [
+    "autoapi.extension",
     "sphinx.ext.graphviz",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
     "sphinx_llm.txt",
 ]
+
+autoapi_keep_files = True           # To speed up build
+autoapi_add_toctree_entry = False   # No extra index page for AutoAPI
+autoapi_root = "developers/autoapi"
+autoapi_dirs = ["../src/openbook"]
+autoapi_ignore = ["*/migrations/*", "*/tests/*", "*/test_*.py"]
+autoapi_options = [
+    "members",
+    "undoc-members",
+    "show-inheritance",
+    "show-inheritance-diagram",
+    "show-module-summary",
+]
+
+llms_txt_build_parallel = False     # Don't spawn subprocess to avoid race-conditions
+autodoc_typehints = "description"   # Include type-hints in API docs
 
 html_theme = "sphinx_rtd_theme"
 html_theme_options = {
