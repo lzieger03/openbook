@@ -34,5 +34,10 @@
     },
     "chat.agentFilesLocations": {
         ".agents/agents": true
-    }
+    },
+
+    // Disable automatic insertion of "Co-authored-by: Copilot <copilot@github.com>"
+    // in git commit messages when using the git UI in VS Code. Holy cow, why is this
+    // opt-out and not opt-in. :-)
+    "git.addAICoAuthor": "off"
 }
