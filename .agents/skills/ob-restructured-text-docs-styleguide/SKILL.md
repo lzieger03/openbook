@@ -1,5 +1,5 @@
 ---
-name: restructured-text-docs-styleguide
+name: ob-restructured-text-docs-styleguide
 description: 'Style guide for writing and editing documentation pages in RST (ReStructured Text) format in the `docs/` directory'
 user-invocable: true
 ---
