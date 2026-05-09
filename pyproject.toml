@@ -8,9 +8,9 @@ repository = "https://github.com/openbook-education/openbook"
 license = "AGPL-3.0"
 readme = "README.md"
 
-# # Use poetry for dependency management but not for packaging, since at least
-# # for now we are not publishing a python packages on PyPI. Maybe we want to do
-# # in future, in which case we need to reconsider some of the project structure.
+# Use poetry for dependency management but not for packaging, since at least
+# for now we are not publishing a python package on PyPI. Maybe we want to do
+# in future, in which case we need to reconsider some of the project structure.
 package-mode = false
 
 [tool.poetry.dependencies]

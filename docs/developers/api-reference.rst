@@ -16,21 +16,25 @@ REST API
 
 The OpenBook REST API contains machine-readable OpenAPI descriptions for clients to generate
 typesafe remote stubs. Additionally, an interactive API browser using ReDoc is included.
-The access the API, start the server with ``npm run start`` from the project root and open the
-following URLs in a browser or API client:
+The following URLs expose the API schema on your running OpenBook installation. Or you can
+preview the latest version included in this manual.
 
 .. list-table::
    :header-rows: 1
-   :widths: 25 75
+   :width: 100%
 
    * - Format
-     - URL
+     - Online
+     - Local Installation
    * - YAML schema
-     - `http://localhost:8000/api/schema/ <http://localhost:8000/api/schema/>`_
+     - :download:`Download </_static/openapi/openbook.yaml>`
+     - ``https://<your-openbook-host>/api/schema/``
    * - JSON schema
-     - `http://localhost:8000/api/schema/?format=json <http://localhost:8000/api/schema/?format=json>`_
+     - :download:`Download </_static/openapi/openbook.json>`
+     - ``https://<your-openbook-host>/api/schema/?format=json``
    * - Interactive ReDoc UI
-     - `http://localhost:8000/api/schema/redoc/ <http://localhost:8000/api/schema/redoc/>`_
+     - `Open </_static/openapi/openbook.html>`_
+     - ``https://<your-openbook-host>/api/schema/redoc/``
 
 
 ------------------
@@ -38,18 +42,27 @@ Authentication API
 ------------------
 
 All things user management are handled by Django Allauth, which implements its own REST API.
-The access the API, start the server with ``npm run start`` from the project root and open the
-following URLs in a browser or API client:
+The following URLs expose the API schema on your running OpenBook installation:
 
 .. list-table::
    :header-rows: 1
-   :widths: 25 75
+   :width: 100%
 
    * - Format
-     - URL
+     - Online
+     - Local Installation
    * - YAML schema
-     - `http://localhost:8000/auth-api/openapi.yaml <http://localhost:8000/auth-api/openapi.yaml>`_
+     - :download:`Download </_static/openapi/auth.yaml>`
+     - ``https://<your-openbook-host>/auth-api/openapi.yaml``
    * - JSON schema
-     - `http://localhost:8000/auth-api/openapi.json <http://localhost:8000/auth-api/openapi.json>`_
+     - :download:`Download </_static/openapi/auth.json>`
+     - ``https://<your-openbook-host>/auth-api/openapi.json``
    * - Interactive ReDoc UI
-     - `http://localhost:8000/auth-api/openapi.html <http://localhost:8000/auth-api/openapi.html>`_
+     - `Open </_static/openapi/auth.html>`_
+     - ``https://<your-openbook-host>/auth-api/openapi.html``
+
+.. hint::
+
+   We recommend using the API schema shipped with your OpenBook installation. During
+   development you can run ``npm start`` and substitute ``<your-openbook-host>`` with
+   ``localhost:8000`` in the URLs above.

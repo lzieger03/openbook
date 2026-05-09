@@ -188,11 +188,29 @@ REST_FRAMEWORK = {
     "PAGE_SIZE_PARAM": "_page_size",
 }
 
+# Read the OpenBook version to include it in the OpenAPIs. Try the following order:
+#
+#   1. Installed version via importlib
+#   2. Parsing pyproject.toml
+#   3. Using dummy string as fallback
+try:
+    from importlib.metadata import version
+    OPENBOOK_VERSION = version("openbook")
+except Exception:
+    try:
+        import tomllib
+
+        with open(BASE_DIR.parent / "pyproject.toml", "rb") as f:
+            pyproject_data = tomllib.load(f)
+            OPENBOOK_VERSION = pyproject_data["tool"]["poetry"]["version"]
+    except Exception:
+        OPENBOOK_VERSION = "0.0.0"
+
 # See: https://drf-spectacular.readthedocs.io/
 SPECTACULAR_SETTINGS = {
     "TITLE": "OpenBook API",
     "DESCRIPTION": "Beautiful and Engaging Learning Materials",
-    "VERSION": "1.0.0",
+    "VERSION": OPENBOOK_VERSION,
     "LICENSE": {
         "name": "GNU Affero General Public License, Version 3 (or later)",
         "url": "https://www.gnu.org/licenses/agpl-3.0.html.en",
@@ -292,8 +310,8 @@ CRISPY_TEMPLATE_PACK = "unfold_crispy"
 CRISPY_ALLOWED_TEMPLATE_PACKS = ["unfold_crispy"]
 
 UNFOLD = {
-    "SITE_TITLE":  _("OpenBook: Admin"),
-    "SITE_HEADER": _("OpenBook: Admin"),
+    "SITE_TITLE":  _(f"OpenBook {OPENBOOK_VERSION}: Admin"),
+    "SITE_HEADER": _(f"OpenBook {OPENBOOK_VERSION}: Admin"),
     "STYLES": [
         lambda request: static("openbook/admin/bundle.css"),
     ],
@@ -543,7 +561,6 @@ STATIC_ROOT = BASE_DIR / "_static"
 
 STATICFILES_DIRS = [
     BASE_DIR / "frontend" / "admin" / "dist",
-    BASE_DIR / "frontend" / "allauth" / "dist",
     BASE_DIR / "frontend" / "app" / "dist",
 ]
 
