@@ -31,7 +31,7 @@ The OpenBook Server is built with the following technology:
    * - **Django Channels**
      - WebSocket support
    * - **Celery**
-     - Background tasks
+     - Background task queue
 
 The idea is to keep the technical requirements lean to enable easy deployment in custom environments.
 Therefore, the choice of Django might be considered "conservative", but in fact it contains all

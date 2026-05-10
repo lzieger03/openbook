@@ -1793,3 +1793,26 @@ Before committing the new feature, verify that:
 
    Django REST Framework testing guide:
    https://www.django-rest-framework.org/api-guide/testing/
+
+-------------------------------
+# Adding New Websocket Channels
+-------------------------------
+
+TODO: Step-by-step tutorial for adding websocket communication in the backend.
+
+- What are WebSockets? Differences to regular synchronous Django? What is Django Channels?
+- Foundation on Django Channels (what a developer must need to know)
+- Definition and implementation of new channels / websocket handlers
+- Consumption in the UI (Svelte 5)
+
+-----------------------------
+# Adding New Background Tasks
+-----------------------------
+
+TODO: Step-by-step tutorial for implementing new background tasks with Celery.
+
+- What are Tasks? Task Queues? Celery?
+- Foundation on Celery (what a developer must need to know)
+- Definition and implementation of new tasks, step-by-step
+- Starting background tasks e.g. in a REST API custom action
+- Monitoring task progress in real-time on the UI (via websockets + Svelte5)
