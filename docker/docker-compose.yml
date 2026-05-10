@@ -1,0 +1,105 @@
+# OpenBook: Interactive Online Textbooks - Docker Compose Example
+# © 2024 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+
+services:
+    #---------------------------------------------------------------------------
+    # Postgres Database
+    # https://github.com/docker-library/docs/blob/master/postgres/README.md
+    #---------------------------------------------------------------------------
+    postgres:
+        # NOTE: This uses PostgreSQL 18. If you previously ran this stack with
+        # PostgreSQL 17 using the `openbook_postgres` volume, you must either
+        # migrate the data (for example via `pg_upgrade` or dump/restore) or
+        # delete and recreate the `openbook_postgres` volume for a clean start
+        # before running `docker compose up`.
+        image: postgres:18-alpine@sha256:4da1a4828be12604092fa55311276f08f9224a74a62dcb4708bd7439e2a03911
+        restart: unless-stopped
+        shm_size: 256mb
+        environment:
+            # NOTE: Delete the postgres volume, when you are changing the superuser
+            # credentials here. Otherwise the change has no effect, if the service
+            # has been started before.
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: openbook
+        volumes:
+          - openbook_postgres:/var/lib/postgresql/data
+
+    #---------------------------------------------------------------------------
+    # Redis Key/Value Storage - Used by Django Channels
+    # https://hub.docker.com/_/redis
+    #---------------------------------------------------------------------------
+    redis:
+        image: redis:8-alpine@sha256:c5e375abb885e6b2021c0377879e4890bf76f9065b8922ffc113f2b226b9fc17
+        restart: unless-stopped
+        volumes:
+            - openbook_redis:/data
+
+    #---------------------------------------------------------------------------
+    # OpenBook Server
+    #---------------------------------------------------------------------------
+    openbook:
+        build:
+            context: ".."
+            dockerfile: docker/openbook/Dockerfile
+        restart: unless-stopped
+        #ports:
+        #    - 127.0.0.1:8000:8000
+        depends_on:
+            - postgres
+            - redis
+        volumes:
+            - ./openbook/local_settings.py:/app/src/openbook/local_settings.py
+            - openbook_static:/app/src/_static.volume
+            - openbook_media:/app/src/_media.volume
+            - openbook_backup:/app/src/_backup.volume
+        environment:
+            DJANGO_SETTINGS_MODULE: openbook.settings
+            OB_LOAD_INITIAL_DATA: 1
+
+    #---------------------------------------------------------------------------
+    # Caddy Frontend Web Server - Serves static files and media uploads and
+    # forwards everything else to the OpenBook server.
+    #
+    # https://hub.docker.com/_/caddy
+    #
+    # NOTE: You might want to run your own frontend server not in Docker, e.g.
+    # when deploying on a host that already has a frontend web server running.
+    # In that case create a volume that maps the following directories to the
+    # host filesystem and serve them with your web server.
+    #
+    #   - /openbook/_static.volume
+    #   - /openbook/_media.volume
+    #
+    # Make sure to forward all other HTTP requests to the OpenBook server.
+    #---------------------------------------------------------------------------
+    webserver:
+        image: caddy:2-alpine@sha256:834468128c7696cec0ceea6172f7d692daf645ae51983ca76e39da54a97c570d
+        restart: unless-stopped
+        cap_add:
+            - NET_ADMIN
+        ports:
+            - 127.0.0.1:8000:80
+            #- 127.0.0.1:443:443
+            #- 127.0.0.1:443:443/udp
+        volumes:
+            - ./webserver/Caddyfile:/etc/caddy/Caddyfile
+            - openbook_caddy_config:/config
+            - openbook_caddy_data:/data
+            - openbook_static:/srv/www/static.volume
+            - openbook_media:/srv/www/media.volume
+            - ./webserver/server.url:/srv/www/static.volume/openbook/app/server.url
+
+volumes:
+    openbook_postgres:
+    openbook_redis:
+    openbook_static:
+    openbook_media:
+    openbook_backup:
+    openbook_caddy_config:
+    openbook_caddy_data:

@@ -4,11 +4,14 @@
 
 TODO
 
+.coverage
+.nox
+
 # Node.js
 node_modules/
 
-*.rdb
 # Redis
+*.rdb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -22,6 +25,7 @@ __pycache__/
 .Python
 build/
 develop-eggs/
+/dist/
 
 ## Needed for typescript output
 #dist/
@@ -85,6 +89,11 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+docs/_static/openapi/
+
+# SystemD service templates
+openbook.service
+openbook-worker.service
 
 # PyBuilder
 .pybuilder/
