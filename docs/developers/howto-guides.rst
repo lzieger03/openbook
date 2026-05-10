@@ -1794,35 +1794,1002 @@ Before committing the new feature, verify that:
    Django REST Framework testing guide:
    https://www.django-rest-framework.org/api-guide/testing/
 
--------------------------------
-# Adding New Websocket Channels
--------------------------------
 
-.. note::
+-----------------------------
+Adding New Websocket Channels
+-----------------------------
+
+.. important::
 
    This tutorial is still in flux. It will be updated as we figure the details
    with regard to the OpenBook architecture out.
 
-TODO: Step-by-step tutorial for adding websocket communication in the backend.
+   As it stands now, we will likely integrate `chanx <https://chanx.readthedocs.io/>`_
+   to simplify all this and add automated AsyncAPI generation and schema validation
+   similar to how we do in the REST API. See
+   `issue 69 <https://github.com/openbook-education/openbook/issues/69>`_
+   on GitHub.
 
-- What are WebSockets? Differences to regular synchronous Django? What is Django Channels?
-- Foundation on Django Channels (what a developer must need to know)
-- Definition and implementation of new channels / websocket handlers
-- Consumption in the UI (Svelte 5)
+.. TODO: Migrate to chnx to reduce effort and get automatic AsyncAPI documentation and
+.. server-side message validation. → Also add client-side stub generation from AsyncAPI.
 
------------------------------
-# Adding New Background Tasks
------------------------------
+WebSocket channels add a bidirectional, long-lived connection between browser and server.
+Unlike regular HTTP requests, the server can push updates at any time after the connection
+is accepted. This pattern is useful for live progress updates, collaborative editing signals,
+notifications, or any UI state that should change without polling. In Django projects, this
+is commonly implemented with Django Channels. Channels extends the ASGI stack and introduces
+consumers, channel layers, and routing for WebSocket endpoints. The tutorial below describes
+the recommended implementation flow for OpenBook, independent of the final concrete app integration.
+
+Understand the Building Blocks
+..............................
+
+Before implementing a new channel, align on the responsibilities of each component.
+:class:`AsyncJsonWebsocketConsumer` (or :class:`AsyncWebsocketConsumer`) handles one
+WebSocket connection. Routing maps URL paths to consumer classes. The channel layer handles
+fan-out and cross-process message delivery using named groups. The browser client subscribes
+to a URL and reacts to JSON messages.
+
+Compared to REST endpoints, there is no request/response lifecycle per update. Instead, a
+connection is established once, then messages flow both ways until the socket closes.
+Authentication and authorization still apply, but they are checked at connect-time and,
+for sensitive operations, again per message.
+
+Define the Event Contract First
+...............................
+
+Start by designing the message schema before writing code. A stable message contract keeps
+backend consumers and Svelte clients aligned.
+
+Use JSON envelopes with explicit type names and a small shared metadata shape.
+For example:
+
+.. code-block:: json
+
+   {
+      "type": "learning_goal.updated",
+      "version": 1,
+      "payload": {
+         "id": "8b7f2a2b-8b7f-4bce-a620-1f1c8666f522",
+         "name": "Understand mixins",
+         "is_active": true
+      }
+   }
+
+Keep event names domain-specific (for example ``learning_goal.updated``) and introduce a
+``version`` field from day one. This avoids breaking clients when payloads evolve.
 
 .. note::
 
-   This tutorial is still in flux. It will be updated as we figure the details
-   with regard to the OpenBook architecture out.
+   For now, simply document the contract via examples (like the one above) in the source
+   code. Use docstrings or comments to collect the samples. Later we will define a process
+   to properly document the event contracts in the manual.
 
-TODO: Step-by-step tutorial for implementing new background tasks with Celery.
+Add Backend Routing and a Consumer
+..................................
 
-- What are Tasks? Task Queues? Celery?
-- Foundation on Celery (what a developer must need to know)
-- Definition and implementation of new tasks, step-by-step
-- Starting background tasks e.g. in a REST API custom action
-- Monitoring task progress in real-time on the UI (via websockets + Svelte5)
+Create a dedicated module for WebSocket consumers in the owning app, for example
+:file:`src/openbook/learning_progress/consumers/learning_goal.py`. Then create a routing
+module that maps URL paths to these consumers. A minimal example looks like this:
+
+.. code-block:: python
+
+   import json
+
+   from channels.generic.websocket import AsyncJsonWebsocketConsumer
+
+
+   class LearningGoalConsumer(AsyncJsonWebsocketConsumer):
+      """Websocket handler for real-time monitoring of learning goals."""
+
+      async def connect(self):
+         """Accept a new client connection and join it to the group."""
+         self.course_id = self.scope["url_route"]["kwargs"]["course_id"]
+         self.group_name = f"course_{self.course_id}_learning_goals"
+
+         await self.channel_layer.group_add(self.group_name, self.channel_name)
+         await self.accept()
+
+      async def disconnect(self, close_code):
+         """Remove this client from the group when it disconnects."""
+         await self.channel_layer.group_discard(self.group_name, self.channel_name)
+
+      async def receive_json(self, content, **kwargs):
+         """Handle incoming messages from this connected client."""
+         # Keep incoming handling strict and explicit.
+         if content.get("type") == "ping":
+            await self.send_json({"type": "pong", "version": 1, "payload": {}})
+
+      async def learning_goal_updated(self, event):
+         """Forward a learning_goal_updated group message to this client's connection."""
+         await self.send_json(event["message"])
+
+.. note::
+
+   Each client connection receives its own consumer instance. In development, all
+   instances run in a single process. In production with multiple worker processes,
+   connections may be distributed across different processes, each with its own instances.
+   The channel layer (via ``CHANNEL_LAYERS`` in settings, typically Redis) coordinates
+   group messaging across all processes and instances. This is why ``group_add()`` and
+   ``group_send()`` work reliably for broadcasting: the channel layer ensures that messages
+   sent to a group reach all subscribed clients, regardless of which process handles their
+   connection.
+
+Matching routing example:
+
+.. code-block:: python
+
+   from django.urls import re_path
+
+   from .consumers.learning_goal import LearningGoalConsumer
+
+
+   websocket_urlpatterns = [
+      re_path(
+         r"^ws/learning-progress/courses/(?P<course_id>[0-9a-f-]+)/goals/$",
+         LearningGoalConsumer.as_asgi(),
+      ),
+   ]
+
+At project level, include app-specific patterns in the ASGI WebSocket router so Django Channels
+can dispatch incoming connections to the correct consumer.
+
+Group Communication Between Clients
+...................................
+
+In the consumer code above, we used two important operations: ``group_add()`` and ``group_discard()``.
+These are the foundation for broadcasting messages to multiple clients at once.
+
+**What are groups?** --- A group is a named channel that multiple consumers can subscribe to.
+When a message is sent to a group, all subscribed consumers receive it. Groups exist within
+the channel layer (your Redis instance or in-memory broker) and allow communication across
+different ASGI worker processes. Without groups, you can only send messages directly to one
+consumer's channel; with groups, you broadcast to many.
+
+.. note::
+
+   Use groups when you need to broadcast the same event to multiple connected clients simultaneously.
+   For example, when a learning goal is updated, all clients viewing that course should receive the
+   notification. However, if you only need to exchange data between one client and the server
+   (e.g., file uploads, form submissions, or personalized progress updates), groups are unnecessary.
+   In those cases, simply send messages directly to the client via :meth:`send_json` without involving
+   the channel layer. Groups would only add latency and complexity that serve no purpose for simple
+   one-to-one communication.
+
+**Joining and leaving groups** --- In the consumer's :meth:`connect` method, we add the current
+connection to a group:
+
+.. code-block:: python
+
+   await self.channel_layer.group_add(self.group_name, self.channel_name)
+
+The first argument is the group name (a string like ``"course_123_learning_goals"``), and the
+second is the channel name of *this specific connection* (provided by Django Channels). When
+the client disconnects, we remove them:
+
+.. code-block:: python
+
+   await self.channel_layer.group_discard(self.group_name, self.channel_name)
+
+**Sending to groups** --- Outside the consumer (for example in a view or signal handler), send
+a message to all members of a group using :meth:`group_send`. The message is a dictionary with
+at minimum a ``type`` key:
+
+.. code-block:: python
+
+   await channel_layer.group_send(
+       "course_123_learning_goals",
+       {
+           "type": "goal_updated",        # Maps to learning_goal_updated() method
+           "goal_id": "abc123",           # Additional data for the handler
+           "name": "New Goal Name",
+       }
+   )
+
+**Type-to-method mapping** --- The ``type`` field in the message dictionary is special. Django
+Channels converts dots to underscores and calls the matching consumer method. So a message with
+``"type": "goal_updated"`` invokes the :meth:`goal_updated` method. A message with ``"type": "learning.goal.updated"``
+invokes :meth:`learning_goal_updated`. This allows one consumer to handle multiple message
+types by defining multiple handler methods.
+
+**Complete example with multiple message types** --- Here is an extended consumer that handles
+two different event types:
+
+.. code-block:: python
+
+   import json
+   from channels.generic.websocket import AsyncJsonWebsocketConsumer
+
+
+   class LearningGoalConsumer(AsyncJsonWebsocketConsumer):
+       """Websocket handler for real-time monitoring of learning goals."""
+
+       async def connect(self):
+           """Accept a new client connection and join it to the group."""
+           self.course_id = self.scope["url_route"]["kwargs"]["course_id"]
+           self.group_name = f"course_{self.course_id}_learning_goals"
+
+           await self.channel_layer.group_add(self.group_name, self.channel_name)
+           await self.accept()
+
+       async def disconnect(self, close_code):
+           """Remove this client from the group when it disconnects."""
+           await self.channel_layer.group_discard(self.group_name, self.channel_name)
+
+       async def receive_json(self, content, **kwargs):
+           """Handle incoming messages from this connected client."""
+           if content.get("type") == "ping":
+               await self.send_json({
+                   "type": "pong",
+                   "version": 1,
+                   "payload": {}
+               })
+
+       async def goal_created(self, event):
+           """Handle goal_created messages from the group."""
+           await self.send_json({
+               "type": "learning_goal.created",
+               "version": 1,
+               "payload": event["payload"],
+           })
+
+       async def goal_updated(self, event):
+           """Handle goal_updated messages from the group."""
+           await self.send_json({
+               "type": "learning_goal.updated",
+               "version": 1,
+               "payload": event["payload"],
+           })
+
+And from a view or signal handler, publish to the group:
+
+.. code-block:: python
+
+   from asgiref.sync import async_to_sync
+   from channels.layers import get_channel_layer
+
+
+   def create_learning_goal(request):
+       # Create the goal in the database...
+       goal = LearningGoal.objects.create(name="New Goal")
+
+       # Notify all clients in the group
+       channel_layer = get_channel_layer()
+       async_to_sync(channel_layer.group_send)(
+           f"course_{goal.course_id}_learning_goals",
+           {
+               "type": "goal_created",
+               "payload": {
+                   "id": str(goal.id),
+                   "name": goal.name,
+               },
+           }
+       )
+
+       return JsonResponse({"status": "created"})
+
+Each connected client in the group receives the message, and their consumer's :meth:`goal_created`
+method is invoked, which then sends the formatted message to that client's WebSocket connection.
+
+**Key points** --- Groups bridge synchronous and asynchronous code through the channel layer.
+When you call :meth:`group_send` from a synchronous view, the channel layer queues the message
+and delivers it asynchronously to all group members. Each member's consumer instance receives
+the message independently, ensuring that broadcasting works correctly even with multiple
+worker processes. The type-to-method mapping keeps message handling organized and extensible
+as you add new event types over time.
+
+Publish Events From Domain Logic
+................................
+
+Publishing should happen where state changes are authoritative, usually in service methods,
+signals, or custom action handlers. The publisher sends a typed message to the group; the
+consumer then forwards it to connected clients.
+
+Example publisher call:
+
+.. code-block:: python
+
+   from asgiref.sync import async_to_sync
+
+
+   async_to_sync(channel_layer.group_send)(
+      f"course_{course_id}_learning_goals", {
+         "type": "learning_goal_updated",
+         "message": {
+            "type": "learning_goal.updated",
+            "version": 1,
+            "payload": {
+               "id": str(goal.id),
+               "name": goal.name,
+               "is_active": goal.is_active,
+            },
+         },
+      },
+   )
+
+The ``type`` passed to :meth:`group_send` maps to a consumer method name where dots are
+translated to underscores. For that reason, ``learning_goal_updated`` is handled by
+:meth:`learning_goal_updated` in the consumer.
+
+Consume Events in Svelte 5
+..........................
+
+In Svelte, create one small client module that owns connection setup, reconnect behavior,
+and event dispatching to stores or callbacks. Keep this logic centralized to avoid duplicate
+socket handling in multiple components.
+
+Start with a socket module that handles connection, disconnection, and error recovery:
+
+.. code-block:: javascript
+
+   // src/lib/learningGoalsSocket.js
+   /**
+    * WebSocket connection manager for learning goals real-time updates.
+    * Handles connection lifecycle, reconnection logic, and message validation.
+    */
+
+   import { writable } from "svelte/store";
+
+   let socket = null;
+   let reconnectAttempts = 0;
+   const MAX_RECONNECT_ATTEMPTS = 5;
+   const RECONNECT_DELAY = 2000;
+
+   /** Reactive store indicating whether the WebSocket is currently connected. */
+   export const isConnected = writable(false);
+
+   /** Reactive store holding the last connection error message, or null if none. */
+   export const connectionError = writable(null);
+
+   /**
+    * Constructs the WebSocket URL for the given course ID.
+    * Uses secure (wss) or insecure (ws) protocol based on the current page protocol.
+    * @param {string} courseId - The course identifier.
+    * @returns {string} The WebSocket URL.
+    */
+   function buildSocketUrl(courseId) {
+      const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+      return `${protocol}://${window.location.host}/ws/learning-progress/courses/${courseId}/goals/`;
+   }
+
+   /**
+    * Validates and processes an incoming WebSocket message.
+    * Messages must have a type and version field; others are logged as warnings.
+    * @param {Object} message - The parsed JSON message from the server.
+    * @param {string} message.type - The event type (e.g., "learning_goal.updated").
+    * @param {number} message.version - The message contract version.
+    * @param {Function} onEvent - Callback to dispatch valid messages.
+    */
+   function handleMessage(message, onEvent) {
+      // Validate message shape before processing
+      if (!message.type || !message.version) {
+         console.warn("Invalid message format:", message);
+         return;
+      }
+
+      // Dispatch to handler or application logic
+      onEvent(message);
+   }
+
+   /**
+    * Attempts to reconnect to the WebSocket after a delay.
+    * Gives up after MAX_RECONNECT_ATTEMPTS and sets an error message.
+    * @param {string} courseId - The course identifier.
+    * @param {Function} onEvent - The event handler callback.
+    */
+   function attemptReconnect(courseId, onEvent) {
+      if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+         connectionError.set("Failed to reconnect after multiple attempts");
+         return;
+      }
+
+      reconnectAttempts += 1;
+      setTimeout(() => {
+         connect(courseId, onEvent);
+      }, RECONNECT_DELAY);
+   }
+
+   /**
+    * Establishes a WebSocket connection to the learning goals channel for the given course.
+    * Sets up event listeners for open, message, error, and close events.
+    * @param {string} courseId - The course identifier.
+    * @param {Function} onEvent - Callback invoked with each valid incoming message.
+    */
+   export function connect(courseId, onEvent) {
+      const url = buildSocketUrl(courseId);
+
+      socket = new WebSocket(url);
+
+      socket.addEventListener("open", () => {
+         isConnected.set(true);
+         connectionError.set(null);
+         reconnectAttempts = 0;
+      });
+
+      socket.addEventListener("message", (event) => {
+         try {
+            const message = JSON.parse(event.data);
+            handleMessage(message, onEvent);
+         } catch (error) {
+            console.error("Failed to parse WebSocket message:", error);
+         }
+      });
+
+      socket.addEventListener("error", (error) => {
+         console.error("WebSocket error:", error);
+         connectionError.set("Connection error");
+      });
+
+      socket.addEventListener("close", () => {
+         isConnected.set(false);
+         attemptReconnect(courseId, onEvent);
+      });
+   }
+
+   /**
+    * Closes the WebSocket connection and resets the internal state.
+    * Updates isConnected store to false.
+    */
+   export function disconnect() {
+      if (socket) {
+         socket.close();
+         socket = null;
+      }
+      isConnected.set(false);
+   }
+
+   /**
+    * Sends a message to the server via the WebSocket.
+    * Does nothing if the socket is not connected; logs a warning.
+    * @param {Object} message - The message object to send (will be JSON-stringified).
+    * @param {string} message.type - The event type (e.g., "ping").
+    * @param {number} message.version - The message contract version.
+    */
+   export function sendMessage(message) {
+      if (socket && socket.readyState === WebSocket.OPEN) {
+         socket.send(JSON.stringify(message));
+      } else {
+         console.warn("Socket not connected, message not sent:", message);
+      }
+   }
+
+Now create a store for managing learning goals:
+
+.. code-block:: javascript
+
+   // src/lib/learningGoalsStore.js
+   /**
+    * Svelte store for managing the list of learning goals.
+    * Provides reactive operations: add, update, delete, and set goals.
+    */
+
+   import { writable } from "svelte/store";
+
+   /**
+    * Creates a custom Svelte store for learning goals.
+    * @returns {Object} Store with subscribe, addGoal, updateGoal, deleteGoal, and setGoals methods.
+    */
+   function createLearningGoalsStore() {
+      const { subscribe, set, update } = writable([]);
+
+      return {
+         subscribe,
+
+         /**
+          * Adds a new goal to the list.
+          * @param {Object} goal - The goal object to add.
+          */
+         addGoal: (goal) => update((goals) => [...goals, goal]),
+
+         /**
+          * Updates an existing goal by ID with new property values.
+          * @param {string} goalId - The goal's unique identifier.
+          * @param {Object} updates - Partial object with properties to merge.
+          */
+         updateGoal: (goalId, updates) => update((goals) =>
+            goals.map((g) => (g.id === goalId ? { ...g, ...updates } : g))
+         ),
+
+         /**
+          * Removes a goal from the list by ID.
+          * @param {string} goalId - The goal's unique identifier.
+          */
+         deleteGoal: (goalId) => update((goals) =>
+            goals.filter((g) => g.id !== goalId)
+         ),
+
+         /**
+          * Replaces the entire goals list with a new array.
+          * @param {Array} goals - The new goals array.
+          */
+         setGoals: (goals) => set(goals),
+      };
+   }
+
+   /** Exported store instance for use in components. */
+   export const learningGoals = createLearningGoalsStore();
+
+Finally, use the socket and store together in a component:
+
+.. code-block:: html
+
+   <!-- src/frontend/app/src/components/pages/learning-goals/LearningGoalsPage.svelte -->
+
+   <script>
+      import { onMount, onDestroy } from "svelte";
+      import { learningGoals } from "../../stores/learningGoalsStore.js";
+      import { connect, disconnect, isConnected, connectionError, sendMessage } from "../../sockets/learningGoalsSocket.js";
+
+      /** @type {string | number} */
+      export let courseId;
+
+      /**
+       * Handles incoming WebSocket messages and updates the store accordingly.
+       * Dispatches messages by type: created, updated, or deleted events.
+       * Unknown message types are logged as warnings.
+       * @param {Object} message - The incoming WebSocket message.
+       * @param {string} message.type - The event type (e.g., "learning_goal.created").
+       * @param {Object} message.payload - The event payload containing goal data.
+       */
+      function handleSocketEvent(message) {
+         switch (message.type) {
+            case "learning_goal.created":
+               learningGoals.addGoal(message.payload);
+               break;
+
+            case "learning_goal.updated":
+               learningGoals.updateGoal(message.payload.id, message.payload);
+               break;
+
+            case "learning_goal.deleted":
+               learningGoals.deleteGoal(message.payload.id);
+               break;
+
+            default:
+               console.warn("Unknown message type:", message.type);
+         }
+      }
+
+      /**
+       * Lifecycle hook: runs when the component mounts.
+       * Fetches initial goals from the REST API and establishes the WebSocket connection.
+       */
+      onMount(async () => {
+         // Fetch initial goals from REST API
+         const response = await fetch(`/api/learning_progress/learning_goals/?course=${courseId}`);
+         const data = await response.json();
+         learningGoals.setGoals(data.results);
+
+         // Connect WebSocket for real-time updates
+         connect(courseId, handleSocketEvent);
+      });
+
+      /**
+       * Lifecycle hook: runs when the component is destroyed.
+       * Closes the WebSocket connection to release resources.
+       */
+      onDestroy(() => {
+         disconnect();
+      });
+
+      /**
+       * Sends a ping message to the server to test the connection.
+       * Useful for debugging or keeping the connection alive.
+       */
+      function sendPing() {
+         sendMessage({ type: "ping", version: 1, payload: {} });
+      }
+   </script>
+
+   <div class="goals-container">
+      <h2>Learning Goals</h2>
+
+      {#if $connectionError}
+         <div class="error">
+            WebSocket connection failed: {$connectionError}
+         </div>
+      {/if}
+
+      <div class="status">
+         Status: {$isConnected ? "Connected" : "Disconnected"}
+         <button on:click={sendPing} disabled={!$isConnected}>
+            Test Connection
+         </button>
+      </div>
+
+      <ul class="goals-list">
+         {#each $learningGoals as goal (goal.id)}
+            <li class="goal-item" class:inactive={!goal.is_active}>
+               <strong>{goal.name}</strong>
+               <p>{goal.description}</p>
+               <span class="level">{goal.level}</span>
+            </li>
+         {/each}
+      </ul>
+   </div>
+
+   <style>
+      .goals-container {
+         padding: 1rem;
+      }
+
+      .error {
+         background: #fee;
+         border: 1px solid #f44;
+         padding: 0.5rem;
+         border-radius: 4px;
+         color: #c00;
+         margin-bottom: 1rem;
+      }
+
+      .status {
+         margin-bottom: 1rem;
+         padding: 0.5rem;
+         background: #eee;
+         border-radius: 4px;
+      }
+
+      .goals-list {
+         list-style: none;
+         padding: 0;
+      }
+
+      .goal-item {
+         padding: 1rem;
+         margin-bottom: 0.5rem;
+         border: 1px solid #ddd;
+         border-radius: 4px;
+         background: white;
+      }
+
+      .goal-item.inactive {
+         opacity: 0.6;
+      }
+
+      .level {
+         display: inline-block;
+         background: #0066cc;
+         color: white;
+         padding: 0.25rem 0.5rem;
+         border-radius: 3px;
+         font-size: 0.85rem;
+         margin-top: 0.5rem;
+      }
+   </style>
+
+This end-to-end example shows:
+
+1. **Socket module** with reconnection logic, error handling, and message validation
+2. **Store** for reactive state management of goals
+3. **Component** that initializes the connection, handles incoming events, and renders the UI
+4. **Error handling** throughout: invalid message formats, connection failures, and recovery
+
+The WebSocket events update the Svelte store reactively, which automatically updates the UI
+whenever a goal is created, updated, or deleted by any client in the group.
+
+.. important::
+
+   Validate access on connect before joining any group. Do not trust ``course_id`` from the URL
+   without permission checks against the authenticated user. Also validate incoming message
+   types and payload shape before processing to avoid unsafe side effects. In the socket module
+   above, we validate ``message.type`` and ``message.version`` before dispatching; in the
+   component, the switch statement safely ignores unknown message types.
+
+Checklist Before Moving On
+..........................
+
+Before opening a pull request, verify that:
+
+1. The event schema is documented and versioned.
+2. URL routing and consumer registration are wired in the ASGI application.
+3. The consumer joins and leaves groups correctly in :meth:`connect` and :meth:`disconnect`.
+4. Publish points are close to authoritative state changes.
+5. Sensitive channels perform explicit permission checks.
+6. The Svelte client handles reconnects and unknown message types gracefully.
+7. Manual testing covers connect, receive, push update, and disconnect paths.
+
+.. seealso::
+
+   Django Channels documentation:
+   https://channels.readthedocs.io/en/stable/
+
+   ASGI specification:
+   https://asgi.readthedocs.io/en/latest/
+
+   Svelte documentation:
+   https://svelte.dev/docs
+
+
+---------------------------
+Adding New Background Tasks
+---------------------------
+
+.. important::
+
+   This tutorial is still in flux. It will be updated as we refine the details
+   around the final OpenBook architecture. See
+   `issue 70 <https://github.com/openbook-education/openbook/issues/70>`_
+   on GitHub.
+
+.. TODO: Add end-to-end example that also shows how to monitor task progress in the UI.
+
+Background tasks move slow, expensive, or failure-prone work out of the HTTP request/response
+path. Instead of blocking a user request while a long operation runs, the server enqueues a task,
+returns quickly, and processes the work asynchronously in a worker process. In Django projects,
+this is typically implemented with a task queue such as Celery. The patterns below describe a
+recommended implementation flow for OpenBook. Because this area is still evolving, consider the
+guidance here a stable starting point, not yet a final project-wide contract.
+
+Understand the Building Blocks
+..............................
+
+Before implementing anything, align on four terms:
+
+.. rst-class:: spaced-list
+
+- **Task** --- A Python function that can run outside the request lifecycle, often retried on
+  transient errors.
+
+- **Broker** --- The queue transport (for example Redis or RabbitMQ) that receives enqueued tasks
+  from Django and delivers them to workers.
+
+- **Worker** --- A background process that consumes queued tasks and executes task functions.
+
+- **Result backend** --- Optional persistence for task state and results so clients can query
+  ``PENDING``, ``STARTED``, ``SUCCESS``, or ``FAILURE``.
+
+Compared to synchronous view logic, task execution has different guarantees. A task may run later,
+be retried, run more than once, or fail after partial progress. For that reason, task code should
+be idempotent where possible and explicit about retry behavior.
+
+Decide Whether Work Belongs in a Task
+.....................................
+
+Use a background task when at least one of the following applies:
+
+1. The operation is slow enough to hurt API response time.
+2. The operation depends on external services that may be temporarily unavailable.
+3. The operation can be retried safely without user interaction.
+4. The operation is triggered by an event and does not need an immediate response body.
+
+Examples of good candidates include exporting a large dataset, synchronizing with an external
+service, sending bulk notifications, or generating a report after a long-running import.
+Keep operations synchronous when the result is immediately required to render the next UI state,
+or when consistency rules demand one atomic database transaction across all steps.
+
+Define the Task Contract First
+..............................
+
+Before writing the task function, define a small contract for input, output, and state reporting.
+This keeps API endpoints, workers, and frontend polling/websocket handlers aligned.
+
+At minimum, decide:
+
+1. Which identifier(s) the task receives (for example one model UUID).
+2. Which states are visible to clients (for example ``queued``, ``running``, ``done``, ``failed``).
+3. Which progress payload is exposed (for example percentage and current step label).
+4. Which errors are retried versus surfaced as terminal failures.
+
+Prefer passing primitive identifiers into the task instead of full serialized objects. The task can
+then load fresh database state at execution time and avoid stale payload assumptions.
+
+.. note::
+
+   Document the contract as docstrings in the code.
+
+Implement the Task Function
+...........................
+
+Place task functions in a dedicated module inside the owning app, for example
+:file:`src/openbook/learning_progress/tasks/goal_sync.py`. Keep each task focused on one workflow,
+and keep reusable domain logic in ordinary service functions that can be tested independently of
+Celery.
+
+Minimal task example:
+
+.. code-block:: python
+
+   from celery import shared_task
+
+
+   @shared_task(
+       bind=True,
+       autoretry_for=(ConnectionError, TimeoutError),
+       retry_backoff=True,
+       retry_jitter=True,
+       max_retries=5,
+   )
+   def sync_learning_goal(self, goal_id):
+      """Synchronize one learning goal with an external system in the background.
+
+      Contract:
+         Input:
+            - ``goal_id`` (str): UUID of the learning goal.
+
+         Progress states reported via ``update_state``:
+            - ``PROGRESS`` with ``{"step": "loading", "percent": 10}``
+            - ``PROGRESS`` with ``{"step": "synchronizing", "percent": 70}``
+            - ``PROGRESS`` with ``{"step": "finalizing", "percent": 95}``
+
+         Terminal outcomes:
+            - ``SUCCESS`` returns a dict with ``goal_id``, ``status``, and
+              ``external_reference``.
+            - transient ``ConnectionError`` and ``TimeoutError`` are retried
+              automatically (up to ``max_retries=5``).
+      """
+      self.update_state(
+         state="PROGRESS",
+         meta={"step": "loading", "percent": 10},
+      )
+
+      # Load model state lazily from the database.
+      goal = LearningGoal.objects.get(pk=goal_id)
+
+      self.update_state(
+         state="PROGRESS",
+         meta={"step": "synchronizing", "percent": 70},
+      )
+
+      result = synchronize_goal_with_external_system(goal)
+
+      self.update_state(
+         state="PROGRESS",
+         meta={"step": "finalizing", "percent": 95},
+      )
+
+      return {
+         "goal_id": str(goal.id),
+         "status": "done",
+         "external_reference": result.reference,
+      }
+
+The :func:`shared_task` decorator makes the function discoverable by workers.
+``bind=True`` gives access to the task instance as ``self``, which is required for
+:meth:`update_state` and retry control.
+
+.. important::
+
+   Keep task functions idempotent whenever possible. If a task retries or is delivered twice,
+   running it again should not corrupt data or duplicate side effects.
+
+Trigger Tasks From REST API Actions
+...................................
+
+A common pattern is to enqueue the task in a custom :class:`ViewSet`` action and return a tracking payload
+immediately. This keeps request latency low while still giving the client enough data to monitor
+progress.
+
+Example custom action:
+
+.. code-block:: python
+
+   from drf_spectacular.utils      import extend_schema
+   from rest_framework.decorators  import action
+   from rest_framework.response    import Response
+
+
+   class LearningGoalViewSet(ModelViewSetMixin, ModelViewSet):
+      """REST endpoints for creating, reading, and synchronizing learning goals."""
+      # Existing configuration ...
+
+      @extend_schema(summary="Start Learning Goal Synchronization")
+      @action(detail=True, methods=["post"], url_path="sync")
+      def sync(self, request, pk=None):
+         """Enqueue synchronization and return the HTTP task contract.
+
+         Contract:
+            - Returns ``202 Accepted`` when the task is queued.
+            - Response payload includes:
+              ``task_id`` (str), ``state`` ("queued"), and ``goal_id`` (str).
+            - Clients use ``task_id`` to poll or subscribe for progress updates.
+         """
+         goal = self.get_object()
+         async_result = sync_learning_goal.delay(str(goal.id))
+
+         return Response(
+            {
+               "task_id": async_result.id,
+               "state": "queued",
+               "goal_id": str(goal.id),
+            },
+            status=202,
+         )
+
+Returning HTTP 202 indicates that the request was accepted for asynchronous processing and has not
+completed yet. Include at least ``task_id`` and a stable object reference so the frontend can bind
+UI state to the right task.
+
+Expose Task Status to Clients
+.............................
+
+Clients need one read endpoint for task status. A minimal shape can include state, progress, and
+error information. Keep the response contract stable and explicit.
+
+Example status payload:
+
+.. code-block:: json
+
+   {
+      "task_id": "77a8c1c7-faf8-454f-bab6-bf7f6c95c2f8",
+      "state": "PROGRESS",
+      "progress": {
+         "step": "synchronizing",
+         "percent": 70
+      },
+      "result": null,
+      "error": null
+   }
+
+When the task succeeds, ``result`` contains the returned payload. On terminal failure, keep
+``state`` and ``error`` explicit so the frontend can show actionable feedback.
+
+Push Progress Updates to the UI
+...............................
+
+Polling works as a baseline, but WebSocket push gives better responsiveness for long-running jobs.
+The event flow is similar to the WebSocket tutorial above:
+
+1. Task execution updates state (for example via :meth:`update_state`).
+2. A publisher emits typed progress events to a channel layer group.
+3. The WebSocket consumer forwards events to connected clients.
+4. Svelte components update local stores based on event ``type`` and ``task_id``.
+
+Use a typed envelope and version field from day one:
+
+.. code-block:: json
+
+   {
+      "type": "task.progress.updated",
+      "version": 1,
+      "payload": {
+         "task_id": "77a8c1c7-faf8-454f-bab6-bf7f6c95c2f8",
+         "state": "PROGRESS",
+         "percent": 70,
+         "step": "synchronizing"
+      }
+   }
+
+Keep WebSocket subscriptions scoped. Clients should only receive events for tasks they are
+authorized to observe.
+
+Handle Reliability and Operations
+.................................
+
+Background processing is an operational concern, not only an implementation detail. Define explicit
+settings for retries, time limits, and visibility into failures.
+
+At minimum, configure and document:
+
+1. Retry policy per task type.
+2. Hard and soft execution time limits.
+3. Dead-letter or failure handling strategy.
+4. Worker concurrency and queue routing.
+5. Metrics and logs for task success rate and latency.
+
+During development, inspect worker logs and task state transitions for every new task before
+opening a pull request.
+
+Checklist Before Moving On
+..........................
+
+Before opening a pull request, verify that:
+
+1. The task contract (input, output, state) is documented.
+2. The task function is idempotent or has explicit duplicate protection.
+3. Retry rules cover transient failures only.
+4. A REST endpoint starts the task and returns HTTP 202 with ``task_id``.
+5. A status endpoint exposes stable state, progress, and error fields.
+6. UI updates work via polling or WebSocket events.
+7. Permission checks prevent cross-user visibility of task progress.
+8. Failure paths are tested and visible in logs.
+
+.. seealso::
+
+   Celery documentation:
+   https://docs.celeryq.dev/en/stable/
+
+   Django REST Framework actions:
+   https://www.django-rest-framework.org/api-guide/viewsets/#marking-extra-actions-for-routing
+
+   Django Channels documentation:
+   https://channels.readthedocs.io/en/stable/
