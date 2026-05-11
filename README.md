@@ -1,4 +1,4 @@
-OpenBook: Interactive Online Textbooks
+ElisaAI-Gruppe -- OpenBook: Interactive Online Textbooks
 ======================================
 
 [![Test Suite](https://github.com/DennisSchulmeister/openbook/actions/workflows/run-tests.yml/badge.svg)](https://github.com/DennisSchulmeister/openbook/actions/workflows/run-tests.yml)
