@@ -42,7 +42,7 @@ jobs:
             - name: "Install documentation dependencies"
               run: |
                 poetry install --no-interaction --with docs
-                sudo apt-get install --yes dot
+                sudo apt-get install --yes graphviz
 
             # Sphinx options:
             #   -W Treat warnings as errors (to catch broken references)
