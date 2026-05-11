@@ -86,6 +86,10 @@ class StatusChoices(models.TextChoices):
     LIVE  = "live", _("Live")
 ```
 
+### Foreign Keys
+
+When there is a strict parent-child relationship, name the FK `parent`.
+
 ## Meta Class Requirements
 
 Every model must define a `Meta` class with at least:
@@ -112,7 +116,9 @@ class Meta(TranslatableMixin.Meta):
 
 ## `__str__` Rules
 
+* Each model must have a `__str__` method.
 * Always provide a concise human-readable representation.
+* Never expose raw UUIDs or raw PKs.
 * Do not override `NameDescriptionMixin.__str__()` unless needed.
 * Compose `ActiveInactiveMixin.__str__()` into richer strings when useful.
 
@@ -211,7 +217,8 @@ DO NOT:
 * Business logic calling `save()` internally.
 * Translation fields mixed into the parent model.
 * Global uniqueness where scoped uniqueness is intended.
-* Overusing mixins without domain justification.
+* Overuse mixins without domain justification.
+* Create backfill migrations for brand-new models just created.
 
 ## Reference Skeleton
 

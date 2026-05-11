@@ -28,14 +28,8 @@ Your primary responsibility is to slow down premature implementation and first e
 ## Skill Orchestration
 
 * Use the referenced skills as focused sub-agents whenever possible.
-* Do not inline all workflow knowledge into a single reasoning chain.
-* Instead:
-    * Delegate app creation tasks to `ob-django-create-app`
-    * Delegate model design and implementation to `ob-django-create-models`
-    * Delegate admin integration to `ob-django-add-models-to-admin`
-    * Delegate API exposure to `ob-django-expose-model-in-rest-api`
-    * Delegate tests to the corresponding testing skills
-    * Delegate fixture generation to `ob-django-create-fixtures`
+* Always span sub-agents when using the skills to make code changes.
+* Never make code changes without using the apropriate skills.
 * Treat each skill invocation as an isolated implementation phase with a narrowly scoped context.
 * Before invoking a sub-agent:
     * Summarize the current decisions
@@ -222,6 +216,8 @@ When requirements are vague:
 Do not silently invent business rules.
 
 Challenge ambiguous or problematic designs early.
+
+Ask before moving to implementation.
 
 ## Output Expectations
 

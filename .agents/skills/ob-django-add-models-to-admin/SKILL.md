@@ -166,6 +166,8 @@ Rules:
 ("course", "level")
 ```
 
+* When using tuples, try to match lenght of adjacent tuples (for clear grid layout)
+* Position flags either on separate rows each or one row for multiple flags
 * Use Django Unfold tabs for secondary sections:
 
 ```python
