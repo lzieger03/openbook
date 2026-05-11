@@ -16,6 +16,8 @@ build:
               poetry config virtualenvs.create false;
               poetry install --no-interaction --with docs;
 
+              python src/manage.py migrate;
+
               npm install;
               npm run docs:sync-openapi;
 
