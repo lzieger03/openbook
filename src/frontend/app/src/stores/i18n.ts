@@ -8,67 +8,47 @@
  * License, or (at your option) any later version.
  */
 
-import type {I18N}        from "../i18n/index.js";
+import type {I18N}         from "../i18n/index.js";
+import type {LanguageCode} from "../i18n/index.js";
 
-import {fallbackLanguage} from "../i18n/index.js";
-import {defaultLanguage}  from "../i18n/index.js";
-import {writable}         from "svelte/store";
-import {readable}         from "svelte/store";
-import {get}              from "svelte/store";
+import {fallbackLanguage}  from "../i18n/index.js";
+import {defaultLanguage}   from "../i18n/index.js";
+import {ReadableStore}     from "../utils/store.js";
+import {WritableStore}     from "../utils/store.js";
 
-export {languages}        from "../i18n/index.js";
-export {defaultLanguage}  from "../i18n/index.js";
-export {fallbackLanguage} from "../i18n/index.js";
+export {languages}         from "../i18n/index.js";
+export {defaultLanguage}   from "../i18n/index.js";
+export {fallbackLanguage}  from "../i18n/index.js";
 
-let setTranslations: (value: I18N) => void;
-let customLanguages: any = {};
+const i18nDefault = await createTranslations(defaultLanguage);
 
-const _i18n = readable(await createTranslations(defaultLanguage), function(set) {
-    setTranslations = set;
-});
+class I18nStore extends ReadableStore<I18N> {
+    constructor() {
+        super(i18nDefault);
 
-const _language = writable(defaultLanguage);
+        language.subscribe(async newLanguage => {
+            this.set(await createTranslations(newLanguage));
+        });
+    }
+}
 
-_language.subscribe(async function(newLanguage: string) {
-    if (!setTranslations) return;
-    setTranslations(await createTranslations(newLanguage));
-});
+/**
+ * The current UI language. To change the language simple assign a new value.
+ * The UI will rerender accordingly.
+ */
+export const language = new WritableStore<LanguageCode>(defaultLanguage);
 
 /**
  * Message catalogue with all translations of the currently active language.
  * This is just a deeply structured key/value object, that can be directly
  * accessed with `$i18n.someKey` in the UI components.
  */
-export const i18n = {
-    subscribe: _i18n.subscribe,
-
-    get value() {
-        return get(_i18n);
-    }
-}
-
-/**
- * Currently active language.
- */
-export const language = {
-    subscribe: _language.subscribe,
-    set:       _language.set,
-    update:    _language.update,
-
-    get value() {
-        return get(_language);
-    },
-
-    set value(value) {
-        _language.set(value);
-    },
-};
-
+export const i18n = new I18nStore();
 
 /**
  * Utility function to replace placeholders in the form of `$key$` in the given
  * text with the property of the object given in the second parameter.
- * 
+ *
  * @param text Original text
  * @param values Key/values to insert
  * @return Text with replaced placeholders
@@ -82,19 +62,8 @@ export function _(text: string, values: any): string {
 }
 
 /**
- * Utility function for study book authors to translate the application
- * into a custom language.
- * 
- * @param language 
- * @param translations 
- */
-export function addCustomLanguage(language: string, translations: I18N) {
-    customLanguages[language] = translations;
-}
-
-/**
  * Create a new message catalogue from the given langauge and the fallback language.
- * 
+ *
  * @param newLanguage Language code
  * @returns New message catalogue
  */
@@ -107,10 +76,6 @@ async function createTranslations(newLanguage: string): Promise<I18N> {
         deepCopy(translations, i18n.default);
     }
 
-    if (newLanguage in customLanguages) {
-        deepCopy(translations, customLanguages[newLanguage]);
-    }
-
     return translations;
 }
 
@@ -119,10 +84,10 @@ async function createTranslations(newLanguage: string): Promise<I18N> {
  * Note that the object properties must be strings or nested translation objects.
  * If a property is an object, the function will copy its content by recursively
  * calling itself. All other values are copied via a simple assignment.
- * 
+ *
  * Properties of the target object that are missing in the source object remain
  * unmodified.
- * 
+ *
  * @param target Target object
  * @param source Source object
  * @returns Target object

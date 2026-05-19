@@ -8,7 +8,7 @@
  * License, or (at your option) any later version.
  */
 
-// This is the master language. Therefor no type import here.
+// This is the master language. Therefore no type import here.
 export default {
     Placeholder: {
         Title: "OpenBook",

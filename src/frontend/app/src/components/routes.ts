@@ -8,10 +8,8 @@
  * License, or (at your option) any later version.
  */
 
-import {wrap}       from "svelte-spa-router/wrap";
-import Placeholder  from "./app-frame/Placeholder.svelte";
-import NotFoundPage from "./pages/errors/NotFoundPage.svelte";
-// import {currentPage}      from "../stores/book.js";
+import {wrap} from "svelte-spa-router/wrap";
+// import {currentPage} from "../stores/book.js";
 
 // /**
 //  * Update page number in the global store before the router renders the
@@ -26,14 +24,16 @@ import NotFoundPage from "./pages/errors/NotFoundPage.svelte";
 
 export default {
     "/": wrap({
-        component: Placeholder,
+        asyncComponent: () => import("./app-frame/Placeholder.svelte"),
         // conditions: [setPageNumber],
     }),
-    
+
     // "/book/page/:pageNumber": wrap({
-    //     component: BookContentPage,
+    //     asyncComponent: () => import("./pages/book/BookContentPage.svelte"),
     //     conditions: [setPageNumber],
     // }),
 
-    "*": NotFoundPage,
+    "*": wrap({
+        asyncComponent: () => import("./pages/errors/NotFoundPage.svelte")
+    }),
 };

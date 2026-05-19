@@ -23,7 +23,7 @@ SECRET_KEY = "django-insecure-jeo+.}_}9(Q.t_IU$WJ!%eL=b:MDbAL.~NY_=a:>D@:W[XPh4[
 DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
-OB_ROOT_REDIRECT = "/app/index.html"
+OB_ROOT_REDIRECT = "/app/"
 
 # Application definition
 #
@@ -287,16 +287,20 @@ SOCIALACCOUNT_ADAPTER = "openbook.auth.allauth.adapter.SocialAccountAdapter"
 
 # Allauth - Headless API
 # See: https://docs.allauth.org/en/latest/headless/configuration.html
-HEADLESS_ONLY = False
+HEADLESS_ONLY = True
 HEADLESS_ADAPTER = "allauth.headless.adapter.DefaultHeadlessAdapter"
 HEADLESS_SERVE_SPECIFICATION = True
 HEADLESS_FRONTEND_URLS = {
-    #"account_confirm_email": "https://app.project.org/account/verify-email/{key}",
-    #"account_reset_password": "https://app.project.org/account/password/reset",
-    #"account_reset_password_from_key": "https://app.project.org/account/password/reset/key/{key}",
-    #"account_signup": "https://app.project.org/account/signup",
-    #"socialaccount_login_error": "https://app.project.org/account/provider/callback",
+    "account_confirm_email":           f"{OB_ROOT_REDIRECT}#/account/verify-email/{{key}}",
+    "account_reset_password":          f"{OB_ROOT_REDIRECT}#/account/password/reset",
+    "account_reset_password_from_key": f"{OB_ROOT_REDIRECT}#/account/password/reset/key/{{key}}",
+    "account_signup":                  f"{OB_ROOT_REDIRECT}#/account/signup",
+    "socialaccount_login_error":       f"{OB_ROOT_REDIRECT}#/account/provider/callback",
 }
+
+LOGIN_URL           = f"{OB_ROOT_REDIRECT}#/account/login"
+LOGIN_REDIRECT_URL  = OB_ROOT_REDIRECT
+LOGOUT_REDIRECT_URL = OB_ROOT_REDIRECT
 
 # Recommended settings for SAML behind a reverse proxy
 # See: https://django-allauth.readthedocs.io/en/latest/socialaccount/providers/saml.html#guidelines

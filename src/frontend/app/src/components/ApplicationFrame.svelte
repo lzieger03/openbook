@@ -1,6 +1,6 @@
 <!--
 OpenBook: Interactive Online Textbooks - Server
-© 2024 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
+© 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
@@ -14,19 +14,18 @@ Root component of the application which defines the global application UI.
 -->
 
 <script lang="ts">
-    import Router from "svelte-spa-router";
-    import routes from "./routes.js";
+    import Router  from "svelte-spa-router";
+    import routes  from "./routes.js";
+    import {error} from "../stores/error.js";
+
+    /**
+     * Hidden previously shown error message, when navigating to a new page.
+     */
+    function onRouteLoaded() {
+        error.hide();
+    }
 </script>
 
-<main>
-    <Router {routes} />
+<main class="flex flex-1 flex-col">
+    <Router {routes} {onRouteLoaded}/>
 </main>
-
-<style>
-    main {
-        flex: 1;
-
-        display: flex;
-        flex-direction: column;
-    }
-</style>

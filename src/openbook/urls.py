@@ -8,9 +8,11 @@
 
 from django.conf                     import settings
 from django.conf.urls.static         import static
-from django.views.generic.base       import RedirectView
 from django.urls                     import include
 from django.urls                     import path
+from django.urls                     import re_path
+from django.views.generic.base       import RedirectView
+from django.views.static             import serve
 from drf_spectacular.views           import SpectacularAPIView
 from drf_spectacular.views           import SpectacularRedocView
 from rest_framework.permissions      import IsAuthenticatedOrReadOnly
@@ -55,4 +57,9 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
     # Frontend SPA
+    urlpatterns += [re_path(r"^app/$", serve, kwargs={
+        "path":          "index.html",
+        "document_root": f"{settings.BASE_DIR}/frontend/app/dist/openbook/app"
+    })]
+
     urlpatterns += static("app/", document_root=f"{settings.BASE_DIR}/frontend/app/dist/openbook/app")
