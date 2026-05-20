@@ -11,7 +11,7 @@
 import {wrap}       from "svelte-spa-router/wrap";
 import Placeholder  from "./app-frame/Placeholder.svelte";
 import NotFoundPage from "./pages/errors/NotFoundPage.svelte";
-import GamificationPage from "./pages/gamification/GamificationPage.svelte";
+import GamificationManualTestPage from "./pages/gamification/GamificationManualTestPage.svelte";
 // import {currentPage}      from "../stores/book.js";
 
 // /**
@@ -30,11 +30,11 @@ export default {
         component: Placeholder,
         // conditions: [setPageNumber],
     }),
-    
-    "/gamification": wrap({
-        component: GamificationPage,
+
+    "/gamification-test": wrap({
+        component: GamificationManualTestPage,
     }),
-    
+
     // "/book/page/:pageNumber": wrap({
     //     component: BookContentPage,
     //     conditions: [setPageNumber],

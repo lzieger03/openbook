@@ -1,9 +1,10 @@
 # OpenBook: Interactive Online Textbooks - Server
 # © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 
+from django.contrib.auth      import get_user_model
+from django.db.models         import F
 from django.db.models.signals import post_save
-from django.dispatch import receiver
-from django.contrib.auth import get_user_model
+from django.dispatch          import receiver
 
 from .models import AccountPoints, RewardEvent
 
@@ -28,6 +29,11 @@ def update_account_points_on_reward_event(sender, instance, created, **kwargs):
     Automatically update AccountPoints.point_total when a RewardEvent is created.
     """
     if created:
-        account_points = AccountPoints.objects.get(account=instance.account)
-        account_points.point_total += instance.points_delta
-        account_points.save()
+        account_points, _ = AccountPoints.objects.get_or_create(
+            account=instance.account,
+            defaults={"point_total": 0}
+        )
+
+        AccountPoints.objects.filter(pk=account_points.pk).update(
+            point_total=F("point_total") + instance.points_delta,
+        )

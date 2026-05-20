@@ -38,8 +38,8 @@ Placeholder for the start page until we have proper content to show.
 
     setInterval(checkBackendStatus, 3000);
 
-    function goToGamification() {
-        push("/gamification");
+    function goToGamificationTest() {
+        push("/gamification-test");
     }
 </script>
 
@@ -55,8 +55,8 @@ Placeholder for the start page until we have proper content to show.
     </p>
 
     <div class="mt-6">
-        <button class="btn btn-primary" on:click={goToGamification}>
-            🎮 Go to Gamification
+        <button class="btn btn-primary" onclick={goToGamificationTest}>
+            🎮 Open Gamification Test Page
         </button>
     </div>
 
