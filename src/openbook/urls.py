@@ -9,8 +9,10 @@
 from django.conf                     import settings
 from django.conf.urls.static         import static
 from django.views.generic.base       import RedirectView
+from django.views.static             import serve
 from django.urls                     import include
 from django.urls                     import path
+from django.urls                     import re_path
 from drf_spectacular.views           import SpectacularAPIView
 from drf_spectacular.views           import SpectacularRedocView
 from rest_framework.permissions      import IsAuthenticatedOrReadOnly
@@ -20,6 +22,19 @@ from .admin                          import admin_site
 from .auth.routes                    import register_api_routes as register_auth_api_routes
 from .core.routes                    import register_api_routes as register_core_api_routes
 from .content.routes                 import register_api_routes as register_course_api_routes
+from .gamification.routes            import register_api_routes as register_gamification_api_routes
+
+
+def serve_spa_index(request, path=""):
+    """Serve index.html for all routes under /app/ to support SPA routing."""
+    spa_dir = f"{settings.BASE_DIR}/frontend/app/dist/openbook/app"
+    
+    # Check if the request is for a file (has a file extension)
+    if "." in path.split("/")[-1]:
+        return serve(request, path, document_root=spa_dir)
+    
+    # Otherwise, serve index.html for SPA routing
+    return serve(request, "index.html", document_root=spa_dir)
 
 # Overwrite permission class for API root view, since it uses the default from settings.py,
 # which would only allow authenticated users to see the API documentation.
@@ -29,6 +44,7 @@ api_router = DRFDefaultRouter()
 register_auth_api_routes(api_router, "auth")
 register_core_api_routes(api_router, "core")
 register_course_api_routes(api_router, "content")
+register_gamification_api_routes(api_router, "gamification")
 
 urlpatterns = [
     # REST API
@@ -43,7 +59,10 @@ urlpatterns = [
     path("accounts/",         include("allauth.urls")),
     path("auth-api/",         include("allauth.headless.urls")),
 
-    # Single Page App
+    # Single Page App - Handle all app routes with index.html
+    re_path(r"^app(?:/(?P<path>.*))?$", serve_spa_index, name="spa"),
+
+    # Root redirect
     path("",                  RedirectView.as_view(url=settings.OB_ROOT_REDIRECT)),
 ]
 
@@ -53,6 +72,3 @@ if settings.DEBUG:
 
     # Media files
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-    # Frontend SPA
-    urlpatterns += static("app/", document_root=f"{settings.BASE_DIR}/frontend/app/dist/openbook/app")

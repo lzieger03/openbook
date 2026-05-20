@@ -1,0 +1,16 @@
+# OpenBook: Interactive Online Textbooks - Server
+# © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
+
+from openbook.admin import CustomModelAdmin
+
+from ..models.reward_event import RewardEvent
+
+
+class RewardEventAdmin(CustomModelAdmin):
+    model          = RewardEvent
+    list_display    = ["account", "reward", "event_type", "points_delta", "created_at"]
+    list_filter     = ["event_type", "created_at"]
+    search_fields   = ["account__username", "account__email", "reward__reward_type", "event_type"]
+    readonly_fields = ["created_at"]
+    raw_id_fields = ["account", "reward"]
+    list_select_related = ["account", "reward"]

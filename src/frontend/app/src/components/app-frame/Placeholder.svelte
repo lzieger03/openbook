@@ -15,6 +15,7 @@ Placeholder for the start page until we have proper content to show.
 <script lang="ts">
     import {i18n}    from "../../stores/i18n.js";    
     import backend   from "../../backend.js";
+    import {push}    from "svelte-spa-router";
 
     // Check backend status every three seconds
     let backendStatusText  = $state(i18n.value.Placeholder.BackendStatus.Checking);
@@ -36,6 +37,10 @@ Placeholder for the start page until we have proper content to show.
     }
 
     setInterval(checkBackendStatus, 3000);
+
+    function goToGamification() {
+        push("/gamification");
+    }
 </script>
 
 <div>
@@ -48,6 +53,12 @@ Placeholder for the start page until we have proper content to show.
     <p>
         Backend Status: <span style:color={backendStatusColor}>{backendStatusText}</span>
     </p>
+
+    <div class="mt-6">
+        <button class="btn btn-primary" on:click={goToGamification}>
+            🎮 Go to Gamification
+        </button>
+    </div>
 
     <img src="placeholder.svg" alt="">
 </div>
