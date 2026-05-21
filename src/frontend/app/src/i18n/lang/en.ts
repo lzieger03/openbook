@@ -21,9 +21,16 @@ export default {
         },
     },
 
-    Error404: {
-        Title:    "Page not found",
-        Message1: "We are terribly sorry, but the requested page <b>$url$</b> cannot be found.",
-        Message2: 'Maybe go back to the <a href="#/">home page</a> and grab some other cheese, instead?',
-    },
+    Error: {
+        PageNotFound: {
+            Title:    "Page not found",
+            Message1: "We are terribly sorry, but the requested page <b>$url$</b> cannot be found.",
+            Message2: 'Maybe go back to the <a href="#/">home page</a> and grab some other cheese, instead?',
+        },
+
+        RequestFailed: {
+            Retry:  "Retrying request: $n$ from $m$",
+            Failed: "Request failed!",
+        }
+    }
 };

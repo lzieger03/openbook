@@ -30,6 +30,10 @@ now using the following frontend tools and frameworks.
      - Styling and theming
    * - **DaisyUI**
      - Pre-defined UI components
+   * - **openapi-typescript**
+     - Auto-generated types for REST API
+   * - **openapi-fetch**
+     - Typesafe REST API calls
 
 .. note::
 

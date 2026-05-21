@@ -8,10 +8,12 @@
  * License, or (at your option) any later version.
  */
 
-// Wrapper for all REST API calls
-//  - Centralize error handling (by updating nearby stores like Toast/Error Store)
-//  - Caching and SWR pattern:
-//      - Cache all responses with bounded LRU strategy and key strings
-//      - Eagerly return cached responses
-//      - Refetch data in background
-//  - Rerender affected views after data fetch/mutations
+import csrfMiddleware  from "./csrf";
+import dedupMiddleware from "./dedup";
+import errorMiddleware from "./dedup";
+
+export default [
+    csrfMiddleware,
+    dedupMiddleware,
+    errorMiddleware,
+];

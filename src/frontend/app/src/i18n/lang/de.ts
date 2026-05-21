@@ -22,10 +22,17 @@ const i18n: I18N = {
         },
     },
 
-    Error404: {
-        Title:    "Seite nicht gefunden",
-        Message1: "Es tut uns fürchterlich Leid, aber die angeforderte Seite <b>$url$</b> wurde nicht gefunden.",
-        Message2: 'Wollen Sie stattdessen zur <a href="#/">Startseite</a> zurückgehen und sich einen anderen Käse schnappen?',
+    Error: {
+        PageNotFound: {
+            Title:    "Seite nicht gefunden",
+            Message1: "Es tut uns fürchterlich Leid, aber die angeforderte Seite <b>$url$</b> wurde nicht gefunden.",
+            Message2: 'Wollen Sie stattdessen zur <a href="#/">Startseite</a> zurückgehen und sich einen anderen Käse schnappen?',
+        },
+
+        RequestFailed: {
+            Retry:  "Wiederhole Anfrage: $n$ von $m$",
+            Failed: "Anfrage fehlgeschlagen!",
+        },
     },
 };
 
