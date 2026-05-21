@@ -11,4 +11,7 @@ class GamificationApp(AppConfig):
     verbose_name = _("Gamification")
 
     def ready(self):
-        from . import signals  # noqa
+        """
+        Load gamification signal handlers.
+        """
+        from . import signals  # noqa: F401
