@@ -19,8 +19,10 @@ class Reward(UUIDMixin):
         db_index     = True,
     )
 
-    value = models.IntegerField(
+    value = models.DecimalField(
         verbose_name = _("Value"),
+        max_digits   = 12,
+        decimal_places = 2,
     )
 
     description = models.TextField(
