@@ -13,7 +13,7 @@ License, or (at your option) any later version.
 Placeholder for the start page until we have proper content to show.
  -->
 <script lang="ts">
-    import {i18n}    from "../../stores/i18n.js";    
+    import {i18n}    from "../../stores/i18n.js";
     import backend   from "../../backend.js";
     import {push}    from "svelte-spa-router";
 
@@ -25,7 +25,7 @@ Placeholder for the start page until we have proper content to show.
         try {
             let health = await backend.core.websites.coreSitesHealthRetrieve();
             console.log("Received backend health status", health.status);
-    
+
             backendStatusText  = i18n.value.Placeholder.BackendStatus.Online;
             backendStatusColor = "green";
         } catch (error) {
@@ -78,6 +78,6 @@ Placeholder for the start page until we have proper content to show.
     }
 
     .underConstruction {
-        color: darkred; 
+        color: darkred;
     }
 </style>

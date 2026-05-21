@@ -12,5 +12,3 @@ class RewardEventAdmin(CustomModelAdmin):
     list_filter     = ["event_type", "created_at"]
     search_fields   = ["account__username", "account__email", "reward__reward_type", "event_type"]
     readonly_fields = ["created_at"]
-    raw_id_fields = ["account", "reward"]
-    list_select_related = ["account", "reward"]

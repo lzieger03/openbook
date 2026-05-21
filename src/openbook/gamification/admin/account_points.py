@@ -12,5 +12,3 @@ class AccountPointsAdmin(CustomModelAdmin):
     list_filter     = ["updated_at"]
     search_fields   = ["account__username", "account__email"]
     readonly_fields = ["updated_at"]
-    raw_id_fields = ["account"]
-    list_select_related = ["account"]

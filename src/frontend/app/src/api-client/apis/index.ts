@@ -1,6 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './AccessRequestsApi';
+export * from './AccountPointsApi';
 export * from './AllowedRolePermissionsApi';
 export * from './AuthenticationTokensApi';
 export * from './AvailableLanguagesApi';
@@ -17,6 +18,8 @@ export * from './HTMLLibraryVersionsApi';
 export * from './LibraryGroupsApi';
 export * from './LibraryLinksApi';
 export * from './MediaFilesApi';
+export * from './RewardEventsApi';
+export * from './RewardsApi';
 export * from './RoleAssignmentsApi';
 export * from './RolesApi';
 export * from './ScopeTypesApi';

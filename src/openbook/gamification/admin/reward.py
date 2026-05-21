@@ -11,5 +11,3 @@ class RewardAdmin(CustomModelAdmin):
     list_display  = ["reward_type", "value"]
     list_filter   = ["reward_type"]
     search_fields = ["reward_type", "description"]
-    list_editable = ["value"]
-    ordering = ["reward_type", "-value"]

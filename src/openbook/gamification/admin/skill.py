@@ -11,5 +11,3 @@ class SkillAdmin(CustomModelAdmin):
     list_display  = ["account", "name", "level", "progress"]
     list_filter   = ["level"]
     search_fields = ["account__username", "account__email", "name"]
-    raw_id_fields = ["account"]
-    list_select_related = ["account"]
