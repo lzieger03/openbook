@@ -7,15 +7,15 @@ from django.urls               import reverse
 from openbook.auth.models.user import User
 from openbook.auth.utils       import permission_for_perm_string
 from openbook.test             import ModelViewSetTestMixin
-from ..models                  import AccountPoints
+from ..models                  import AccountProgress
 from ..models                  import Reward
-from ..models                  import RewardEvent
+from ..models                  import RewardEventLog
 
-class RewardEvent_ViewSet_Tests(ModelViewSetTestMixin, TestCase):
-    """Test the RewardEventViewSet REST API including trigger action."""
+class RewardEventLog_ViewSet_Tests(ModelViewSetTestMixin, TestCase):
+    """Test the RewardEventLogViewSet REST API including trigger action."""
 
-    base_name         = "reward_event"
-    model             = RewardEvent
+    base_name         = "reward_event_log"
+    model             = RewardEventLog
     search_string     = "quiz_complete"
     search_count      = 1
     sort_field        = "points_delta"
@@ -61,7 +61,7 @@ class RewardEvent_ViewSet_Tests(ModelViewSetTestMixin, TestCase):
             description = "Question answered correctly",
         )
 
-        self.event_user1 = RewardEvent.objects.create(
+        self.event_user1 = RewardEventLog.objects.create(
             account      = self.user1,
             reward       = self.reward_quiz,
             event_type   = "quiz_complete",
@@ -69,7 +69,7 @@ class RewardEvent_ViewSet_Tests(ModelViewSetTestMixin, TestCase):
             context      = {"quiz_id": "quiz-1"},
         )
 
-        self.event_user2 = RewardEvent.objects.create(
+        self.event_user2 = RewardEventLog.objects.create(
             account      = self.user2,
             reward       = self.reward_question,
             event_type   = "question_correct",
@@ -81,13 +81,13 @@ class RewardEvent_ViewSet_Tests(ModelViewSetTestMixin, TestCase):
         return self.event_user1.id
 
     def test_trigger_creates_reward_event_and_updates_points(self):
-        """Trigger endpoint creates a RewardEvent and increments AccountPoints."""
+        """Trigger endpoint creates a RewardEventLog entry and increments AccountProgress."""
         self.login("user1", "password")
 
-        old_points = AccountPoints.objects.get(account=self.user1).point_total
+        old_points = AccountProgress.objects.get(account=self.user1).point_total
 
         response = self.client.post(
-            reverse("reward_event-trigger"),
+            reverse("reward_event_log-trigger"),
             {
                 "reward": str(self.reward_question.id),
                 "context": {"question_id": "q-2"},
@@ -96,8 +96,8 @@ class RewardEvent_ViewSet_Tests(ModelViewSetTestMixin, TestCase):
         )
 
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.data["reward_event"]["event_type"], "question_correct")
-        self.assertEqual(response.data["reward_event"]["points_delta"], 10)
+        self.assertEqual(response.data["reward_event_log"]["event_type"], "question_correct")
+        self.assertEqual(response.data["reward_event_log"]["points_delta"], 10)
         self.assertEqual(response.data["point_total"], old_points + 10)
 
     def test_trigger_uses_explicit_event_type(self):
@@ -105,7 +105,7 @@ class RewardEvent_ViewSet_Tests(ModelViewSetTestMixin, TestCase):
         self.login("user1", "password")
 
         response = self.client.post(
-            reverse("reward_event-trigger"),
+            reverse("reward_event_log-trigger"),
             {
                 "reward": str(self.reward_question.id),
                 "event_type": "bonus_event",
@@ -115,14 +115,14 @@ class RewardEvent_ViewSet_Tests(ModelViewSetTestMixin, TestCase):
         )
 
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.data["reward_event"]["event_type"], "bonus_event")
+        self.assertEqual(response.data["reward_event_log"]["event_type"], "bonus_event")
 
     def test_trigger_requires_authentication(self):
         """Trigger endpoint rejects unauthenticated requests."""
         self.logout()
 
         response = self.client.post(
-            reverse("reward_event-trigger"),
+            reverse("reward_event_log-trigger"),
             {"reward": str(self.reward_question.id)},
             format="json",
         )
@@ -134,7 +134,7 @@ class RewardEvent_ViewSet_Tests(ModelViewSetTestMixin, TestCase):
         self.login("user1", "password")
 
         response = self.client.post(
-            reverse("reward_event-trigger"),
+            reverse("reward_event_log-trigger"),
             {
                 "account": self.user2.username,
                 "reward": str(self.reward_question.id),
@@ -149,10 +149,10 @@ class RewardEvent_ViewSet_Tests(ModelViewSetTestMixin, TestCase):
         """Staff users can trigger rewards for another account."""
         self.login("admin", "password")
 
-        old_points = AccountPoints.objects.get(account=self.user2).point_total
+        old_points = AccountProgress.objects.get(account=self.user2).point_total
 
         response = self.client.post(
-            reverse("reward_event-trigger"),
+            reverse("reward_event_log-trigger"),
             {
                 "account": self.user2.username,
                 "reward": str(self.reward_question.id),
@@ -162,16 +162,17 @@ class RewardEvent_ViewSet_Tests(ModelViewSetTestMixin, TestCase):
 
         self.assertEqual(response.status_code, 201)
 
-        new_points = AccountPoints.objects.get(account=self.user2).point_total
+        new_points = AccountProgress.objects.get(account=self.user2).point_total
         self.assertEqual(new_points, old_points + 10)
 
     def test_non_staff_list_only_contains_own_events(self):
-        """Non-staff users can only list their own reward events."""
-        self.user1.user_permissions.add(permission_for_perm_string("openbook_gamification.view_rewardevent"))
+        """Non-staff users can only list their own reward event log entries."""
+        self.user1.user_permissions.add(permission_for_perm_string("openbook_gamification.view_rewardeventlog"))
         self.login("user1", "password")
 
-        response = self.client.get(reverse("reward_event-list"))
+        response = self.client.get(reverse("reward_event_log-list"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["count"], 1)
-        self.assertEqual(response.data["results"][0]["account"], "user1")
+        self.assertGreaterEqual(response.data["count"], 1)
+        for row in response.data["results"]:
+            self.assertEqual(row["account"], "user1")

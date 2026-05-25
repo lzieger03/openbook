@@ -8,21 +8,26 @@ from django.utils.translation   import gettext_lazy as _
 from openbook.core.models.mixins.uuid import UUIDMixin
 
 
-class AccountPoints(UUIDMixin):
+class AccountProgress(UUIDMixin):
     """
-    Store the current point total for a user account.
+    Store the current point total and level for a user account.
     """
 
     account = models.OneToOneField(
         to           = settings.AUTH_USER_MODEL,
         verbose_name = _("Account"),
         on_delete    = models.CASCADE,
-        related_name = "account_points",
+        related_name = "account_progress",
     )
 
     point_total = models.IntegerField(
         verbose_name = _("Point Total"),
         default      = 0,
+    )
+
+    level = models.PositiveIntegerField(
+        verbose_name = _("Level"),
+        default      = 1,
     )
 
     updated_at = models.DateTimeField(
@@ -32,9 +37,9 @@ class AccountPoints(UUIDMixin):
     )
 
     class Meta:
-        verbose_name        = _("Account Points")
-        verbose_name_plural = _("Account Points")
+        verbose_name        = _("Account Progress")
+        verbose_name_plural = _("Account Progress")
         ordering            = ["account"]
 
     def __str__(self):
-        return f"{self.account} ({self.point_total})"
+        return f"{self.account} (Level {self.level}, {self.point_total} pts)"

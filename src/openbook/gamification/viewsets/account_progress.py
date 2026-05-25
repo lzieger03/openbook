@@ -13,32 +13,34 @@ from rest_framework.viewsets        import ReadOnlyModelViewSet
 from openbook.auth.serializers.user import UserField
 from openbook.drf.flex_serializers  import FlexFieldsModelSerializer
 from openbook.drf.viewsets          import with_flex_fields_parameters
-from ..models.account_points        import AccountPoints
+from ..models.account_progress      import AccountProgress
 
-class AccountPointsSerializer(FlexFieldsModelSerializer):
-    __doc__ = "Account Points"
+class AccountProgressSerializer(FlexFieldsModelSerializer):
+    __doc__ = "Account Progress"
 
     account = UserField()
 
     class Meta:
-        model  = AccountPoints
-        fields = ["id", "account", "point_total", "updated_at"]
+        model  = AccountProgress
+        fields = ["id", "account", "point_total", "level", "updated_at"]
         read_only_fields = ["id", "updated_at"]
         expandable_fields = {
             "account": "openbook.auth.viewsets.user.UserSerializer",
         }
 
-class AccountPointsMeSerializer(Serializer):
+class AccountProgressMeSerializer(Serializer):
     point_total = IntegerField()
+    level       = IntegerField()
 
-class AccountPointsFilter(FilterSet):
+class AccountProgressFilter(FilterSet):
     account = CharFilter(method="account_filter")
 
     class Meta:
-        model  = AccountPoints
+        model  = AccountProgress
         fields = {
             "account":     [],
             "point_total": ["exact", "lte", "gte"],
+            "level":       ["exact", "lte", "gte"],
             "updated_at":  ["exact", "lte", "gte"],
         }
 
@@ -48,16 +50,16 @@ class AccountPointsFilter(FilterSet):
 @extend_schema(
     extensions={
         "x-app-name":   "Gamification",
-        "x-model-name": "Account Points",
+        "x-model-name": "Account Progress",
     }
 )
 @with_flex_fields_parameters()
-class AccountPointsViewSet(ReadOnlyModelViewSet):
-    __doc__ = "Current point balances per account"
+class AccountProgressViewSet(ReadOnlyModelViewSet):
+    __doc__ = "Current progress (points and level) per account"
 
-    queryset         = AccountPoints.objects.select_related("account")
-    serializer_class = AccountPointsSerializer
-    filterset_class  = AccountPointsFilter
+    queryset         = AccountProgress.objects.select_related("account")
+    serializer_class = AccountProgressSerializer
+    filterset_class  = AccountProgressFilter
     ordering         = ["account__username"]
     search_fields    = ["account__username", "account__email"]
 
@@ -74,15 +76,18 @@ class AccountPointsViewSet(ReadOnlyModelViewSet):
         return queryset.filter(account=user)
 
     @extend_schema(
-        operation_id = "gamification_account_points_me",
-        summary      = "Current User Point Total",
-        responses    = AccountPointsMeSerializer,
+        operation_id = "gamification_account_progress_me",
+        summary      = "Current User Progress",
+        responses    = AccountProgressMeSerializer,
     )
     @action(detail=False, methods=["get"], url_path="me")
     def me(self, request):
-        account_points = AccountPoints.objects.get_or_create(
+        account_progress = AccountProgress.objects.get_or_create(
             account=request.user,
-            defaults={"point_total": 0},
+            defaults={"point_total": 0, "level": 1},
         )[0]
 
-        return Response({"point_total": account_points.point_total})
+        return Response({
+            "point_total": account_progress.point_total,
+            "level":       account_progress.level,
+        })

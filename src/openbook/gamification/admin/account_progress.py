@@ -3,12 +3,12 @@
 
 from openbook.admin import CustomModelAdmin
 
-from ..models.account_points import AccountPoints
+from ..models.account_progress import AccountProgress
 
 
-class AccountPointsAdmin(CustomModelAdmin):
-    model          = AccountPoints
-    list_display    = ["account", "point_total", "updated_at"]
+class AccountProgressAdmin(CustomModelAdmin):
+    model           = AccountProgress
+    list_display    = ["account", "point_total", "level", "updated_at"]
     list_filter     = ["updated_at"]
     search_fields   = ["account__username", "account__email"]
     readonly_fields = ["updated_at"]

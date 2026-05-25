@@ -15,20 +15,20 @@
 
 import * as runtime from '../runtime';
 import type {
-  AccountPoints,
-  AccountPointsMe,
-  PaginatedAccountPointsList,
+  AccountProgress,
+  AccountProgressMe,
+  PaginatedAccountProgressList,
 } from '../models/index';
 import {
-    AccountPointsFromJSON,
-    AccountPointsToJSON,
-    AccountPointsMeFromJSON,
-    AccountPointsMeToJSON,
-    PaginatedAccountPointsListFromJSON,
-    PaginatedAccountPointsListToJSON,
+    AccountProgressFromJSON,
+    AccountProgressToJSON,
+    AccountProgressMeFromJSON,
+    AccountProgressMeToJSON,
+    PaginatedAccountProgressListFromJSON,
+    PaginatedAccountProgressListToJSON,
 } from '../models/index';
 
-export interface GamificationAccountPointsListRequest {
+export interface GamificationAccountProgressListRequest {
     expand?: string;
     fields?: string;
     omit?: string;
@@ -37,6 +37,9 @@ export interface GamificationAccountPointsListRequest {
     search?: string;
     sort?: string;
     account?: string;
+    level?: number;
+    levelGte?: number;
+    levelLte?: number;
     pointTotal?: number;
     pointTotalGte?: number;
     pointTotalLte?: number;
@@ -45,13 +48,13 @@ export interface GamificationAccountPointsListRequest {
     updatedAtLte?: Date;
 }
 
-export interface GamificationAccountPointsMeRequest {
+export interface GamificationAccountProgressMeRequest {
     expand?: string;
     fields?: string;
     omit?: string;
 }
 
-export interface GamificationAccountPointsRetrieveRequest {
+export interface GamificationAccountProgressRetrieveRequest {
     id: string;
     expand?: string;
     fields?: string;
@@ -61,13 +64,13 @@ export interface GamificationAccountPointsRetrieveRequest {
 /**
  * 
  */
-export class AccountPointsApi extends runtime.BaseAPI {
+export class AccountProgressApi extends runtime.BaseAPI {
 
     /**
-     * Current point balances per account
+     * Current progress (points and level) per account
      * List
      */
-    async gamificationAccountPointsListRaw(requestParameters: GamificationAccountPointsListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginatedAccountPointsList>> {
+    async gamificationAccountProgressListRaw(requestParameters: GamificationAccountProgressListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginatedAccountProgressList>> {
         const queryParameters: any = {};
 
         if (requestParameters['expand'] != null) {
@@ -102,6 +105,18 @@ export class AccountPointsApi extends runtime.BaseAPI {
             queryParameters['account'] = requestParameters['account'];
         }
 
+        if (requestParameters['level'] != null) {
+            queryParameters['level'] = requestParameters['level'];
+        }
+
+        if (requestParameters['levelGte'] != null) {
+            queryParameters['level__gte'] = requestParameters['levelGte'];
+        }
+
+        if (requestParameters['levelLte'] != null) {
+            queryParameters['level__lte'] = requestParameters['levelLte'];
+        }
+
         if (requestParameters['pointTotal'] != null) {
             queryParameters['point_total'] = requestParameters['pointTotal'];
         }
@@ -133,29 +148,29 @@ export class AccountPointsApi extends runtime.BaseAPI {
         }
 
         const response = await this.request({
-            path: `/api/gamification/account_points/`,
+            path: `/api/gamification/account_progress/`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => PaginatedAccountPointsListFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => PaginatedAccountProgressListFromJSON(jsonValue));
     }
 
     /**
-     * Current point balances per account
+     * Current progress (points and level) per account
      * List
      */
-    async gamificationAccountPointsList(requestParameters: GamificationAccountPointsListRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginatedAccountPointsList> {
-        const response = await this.gamificationAccountPointsListRaw(requestParameters, initOverrides);
+    async gamificationAccountProgressList(requestParameters: GamificationAccountProgressListRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginatedAccountProgressList> {
+        const response = await this.gamificationAccountProgressListRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Current point balances per account
-     * Current User Point Total
+     * Current progress (points and level) per account
+     * Current User Progress
      */
-    async gamificationAccountPointsMeRaw(requestParameters: GamificationAccountPointsMeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountPointsMe>> {
+    async gamificationAccountProgressMeRaw(requestParameters: GamificationAccountProgressMeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountProgressMe>> {
         const queryParameters: any = {};
 
         if (requestParameters['expand'] != null) {
@@ -177,33 +192,33 @@ export class AccountPointsApi extends runtime.BaseAPI {
         }
 
         const response = await this.request({
-            path: `/api/gamification/account_points/me/`,
+            path: `/api/gamification/account_progress/me/`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => AccountPointsMeFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => AccountProgressMeFromJSON(jsonValue));
     }
 
     /**
-     * Current point balances per account
-     * Current User Point Total
+     * Current progress (points and level) per account
+     * Current User Progress
      */
-    async gamificationAccountPointsMe(requestParameters: GamificationAccountPointsMeRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccountPointsMe> {
-        const response = await this.gamificationAccountPointsMeRaw(requestParameters, initOverrides);
+    async gamificationAccountProgressMe(requestParameters: GamificationAccountProgressMeRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccountProgressMe> {
+        const response = await this.gamificationAccountProgressMeRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Current point balances per account
+     * Current progress (points and level) per account
      * Retrieve
      */
-    async gamificationAccountPointsRetrieveRaw(requestParameters: GamificationAccountPointsRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountPoints>> {
+    async gamificationAccountProgressRetrieveRaw(requestParameters: GamificationAccountProgressRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountProgress>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling gamificationAccountPointsRetrieve().'
+                'Required parameter "id" was null or undefined when calling gamificationAccountProgressRetrieve().'
             );
         }
 
@@ -228,21 +243,21 @@ export class AccountPointsApi extends runtime.BaseAPI {
         }
 
         const response = await this.request({
-            path: `/api/gamification/account_points/{id}/`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: `/api/gamification/account_progress/{id}/`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => AccountPointsFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => AccountProgressFromJSON(jsonValue));
     }
 
     /**
-     * Current point balances per account
+     * Current progress (points and level) per account
      * Retrieve
      */
-    async gamificationAccountPointsRetrieve(requestParameters: GamificationAccountPointsRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccountPoints> {
-        const response = await this.gamificationAccountPointsRetrieveRaw(requestParameters, initOverrides);
+    async gamificationAccountProgressRetrieve(requestParameters: GamificationAccountProgressRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccountProgress> {
+        const response = await this.gamificationAccountProgressRetrieveRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

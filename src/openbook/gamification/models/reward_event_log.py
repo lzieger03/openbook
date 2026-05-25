@@ -10,16 +10,17 @@ from openbook.core.models.mixins.uuid import UUIDMixin
 from .reward import Reward
 
 
-class RewardEvent(UUIDMixin):
+class RewardEventLog(UUIDMixin):
     """
-    Store reward-related account events.
+    Append-only audit log of reward-related account events. Each row records a
+    single reward event and its point delta.
     """
 
     account = models.ForeignKey(
         to           = settings.AUTH_USER_MODEL,
         verbose_name = _("Account"),
         on_delete    = models.CASCADE,
-        related_name = "reward_events",
+        related_name = "reward_event_logs",
     )
 
     reward = models.ForeignKey(
@@ -27,6 +28,8 @@ class RewardEvent(UUIDMixin):
         verbose_name = _("Reward"),
         on_delete    = models.CASCADE,
         related_name = "events",
+        null         = True,
+        blank        = True,
     )
 
     event_type = models.CharField(
@@ -37,6 +40,7 @@ class RewardEvent(UUIDMixin):
 
     points_delta = models.IntegerField(
         verbose_name = _("Points Delta"),
+        default      = 0,
     )
 
     created_at = models.DateTimeField(
@@ -53,8 +57,9 @@ class RewardEvent(UUIDMixin):
     )
 
     class Meta:
-        verbose_name        = _("Reward Event")
-        verbose_name_plural = _("Reward Events")
+        db_table            = "openbook_gamification_reward_event_log"
+        verbose_name        = _("Reward Event Log")
+        verbose_name_plural = _("Reward Event Log")
         ordering            = ["-created_at"]
 
     def __str__(self):

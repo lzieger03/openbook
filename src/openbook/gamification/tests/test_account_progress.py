@@ -7,13 +7,13 @@ from django.urls              import reverse
 from openbook.auth.utils      import permission_for_perm_string
 from openbook.test            import ModelViewSetTestMixin
 from openbook.auth.models.user import User
-from ..models                 import AccountPoints
+from ..models                 import AccountProgress
 
-class AccountPoints_ViewSet_Tests(ModelViewSetTestMixin, TestCase):
-    """Test the AccountPointsViewSet REST API."""
+class AccountProgress_ViewSet_Tests(ModelViewSetTestMixin, TestCase):
+    """Test the AccountProgressViewSet REST API."""
 
-    base_name         = "account_points"
-    model             = AccountPoints
+    base_name         = "account_progress"
+    model             = AccountProgress
     search_string     = "user2"
     search_count      = 1
     sort_field        = "point_total"
@@ -47,9 +47,9 @@ class AccountPoints_ViewSet_Tests(ModelViewSetTestMixin, TestCase):
             is_superuser= True,
         )
 
-        self.ap_user1 = AccountPoints.objects.get(account=self.user1)
-        self.ap_user2 = AccountPoints.objects.get(account=self.user2)
-        self.ap_admin = AccountPoints.objects.get(account=self.admin)
+        self.ap_user1 = AccountProgress.objects.get(account=self.user1)
+        self.ap_user2 = AccountProgress.objects.get(account=self.user2)
+        self.ap_admin = AccountProgress.objects.get(account=self.admin)
 
         self.ap_user1.point_total = 30
         self.ap_user2.point_total = 10
@@ -62,42 +62,44 @@ class AccountPoints_ViewSet_Tests(ModelViewSetTestMixin, TestCase):
     def pk_found(self):
         return self.ap_user1.id
 
-    def test_me_returns_current_users_total(self):
-        """The /me endpoint returns the currently authenticated user's point total."""
+    def test_me_returns_current_users_progress(self):
+        """The /me endpoint returns the currently authenticated user's point total and level."""
         self.login("user1", "password")
 
-        response = self.client.get(reverse("account_points-me"))
+        response = self.client.get(reverse("account_progress-me"))
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["point_total"], 30)
+        self.assertIn("level", response.data)
 
-    def test_me_recreates_missing_account_points(self):
-        """The /me endpoint recreates missing AccountPoints rows with 0 points."""
+    def test_me_recreates_missing_account_progress(self):
+        """The /me endpoint recreates missing AccountProgress rows at level 1 with 0 points."""
         self.login("user1", "password")
-        AccountPoints.objects.filter(account=self.user1).delete()
+        AccountProgress.objects.filter(account=self.user1).delete()
 
-        response = self.client.get(reverse("account_points-me"))
+        response = self.client.get(reverse("account_progress-me"))
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["point_total"], 0)
-        self.assertTrue(AccountPoints.objects.filter(account=self.user1).exists())
+        self.assertEqual(response.data["level"], 1)
+        self.assertTrue(AccountProgress.objects.filter(account=self.user1).exists())
 
-    def test_non_staff_list_only_contains_own_points(self):
-        """Non-staff users can only list their own AccountPoints row."""
-        self.user1.user_permissions.add(permission_for_perm_string("openbook_gamification.view_accountpoints"))
+    def test_non_staff_list_only_contains_own_progress(self):
+        """Non-staff users can only list their own AccountProgress row."""
+        self.user1.user_permissions.add(permission_for_perm_string("openbook_gamification.view_accountprogress"))
         self.login("user1", "password")
 
-        response = self.client.get(reverse("account_points-list"))
+        response = self.client.get(reverse("account_progress-list"))
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["count"], 1)
         self.assertEqual(response.data["results"][0]["account"], "user1")
 
-    def test_non_staff_cannot_retrieve_other_account_points(self):
-        """Non-staff users cannot retrieve another user's AccountPoints row."""
-        self.user1.user_permissions.add(permission_for_perm_string("openbook_gamification.view_accountpoints"))
+    def test_non_staff_cannot_retrieve_other_account_progress(self):
+        """Non-staff users cannot retrieve another user's AccountProgress row."""
+        self.user1.user_permissions.add(permission_for_perm_string("openbook_gamification.view_accountprogress"))
         self.login("user1", "password")
 
-        response = self.client.get(reverse("account_points-detail", args=[str(self.ap_user2.id)]))
+        response = self.client.get(reverse("account_progress-detail", args=[str(self.ap_user2.id)]))
 
         self.assertEqual(response.status_code, 404)

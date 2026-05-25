@@ -4,9 +4,9 @@
 from django.contrib.auth import get_user_model
 from django.test         import TestCase
 
-from ..models            import AccountPoints
+from ..models            import AccountProgress
 from ..models            import Reward
-from ..models            import RewardEvent
+from ..models            import RewardEventLog
 
 User = get_user_model()
 
@@ -14,18 +14,18 @@ class Gamification_Signal_Tests(TestCase):
     """Tests for gamification signal handlers."""
 
     def test_account_points_created_for_new_user(self):
-        """A new user automatically gets an AccountPoints row with 0 points."""
+        """A new user automatically gets an AccountProgress row with 0 points."""
         user = User.objects.create_user(
             username = "signal-user-1",
             email    = "signal-user-1@test.com",
             password = "password",
         )
 
-        self.assertTrue(AccountPoints.objects.filter(account=user).exists())
-        self.assertEqual(AccountPoints.objects.get(account=user).point_total, 0)
+        self.assertTrue(AccountProgress.objects.filter(account=user).exists())
+        self.assertEqual(AccountProgress.objects.get(account=user).point_total, 0)
 
     def test_reward_event_updates_point_total(self):
-        """Creating a RewardEvent increments the current account point total."""
+        """Creating a RewardEventLog entry increments the current account point total."""
         user = User.objects.create_user(
             username = "signal-user-2",
             email    = "signal-user-2@test.com",
@@ -37,7 +37,7 @@ class Gamification_Signal_Tests(TestCase):
             value       = 10,
         )
 
-        RewardEvent.objects.create(
+        RewardEventLog.objects.create(
             account      = user,
             reward       = reward,
             event_type   = "question_correct",
@@ -45,11 +45,11 @@ class Gamification_Signal_Tests(TestCase):
             context      = {"question_id": "q-1"},
         )
 
-        account_points = AccountPoints.objects.get(account=user)
+        account_points = AccountProgress.objects.get(account=user)
         self.assertEqual(account_points.point_total, 10)
 
     def test_reward_event_recreates_missing_account_points(self):
-        """If AccountPoints was deleted, RewardEvent creation recreates it and applies delta."""
+        """If AccountProgress was deleted, RewardEventLog creation recreates it and applies delta."""
         user = User.objects.create_user(
             username = "signal-user-3",
             email    = "signal-user-3@test.com",
@@ -61,10 +61,10 @@ class Gamification_Signal_Tests(TestCase):
             value       = 50,
         )
 
-        AccountPoints.objects.filter(account=user).delete()
-        self.assertFalse(AccountPoints.objects.filter(account=user).exists())
+        AccountProgress.objects.filter(account=user).delete()
+        self.assertFalse(AccountProgress.objects.filter(account=user).exists())
 
-        RewardEvent.objects.create(
+        RewardEventLog.objects.create(
             account      = user,
             reward       = reward,
             event_type   = "quiz_complete",
@@ -72,5 +72,5 @@ class Gamification_Signal_Tests(TestCase):
             context      = {"quiz_id": "quiz-1"},
         )
 
-        account_points = AccountPoints.objects.get(account=user)
+        account_points = AccountProgress.objects.get(account=user)
         self.assertEqual(account_points.point_total, 50)

@@ -3,11 +3,11 @@
 
 from openbook.admin import CustomModelAdmin
 
-from ..models.reward_event import RewardEvent
+from ..models.reward_event_log import RewardEventLog
 
 
-class RewardEventAdmin(CustomModelAdmin):
-    model          = RewardEvent
+class RewardEventLogAdmin(CustomModelAdmin):
+    model          = RewardEventLog
     list_display    = ["account", "reward", "event_type", "points_delta", "created_at"]
     list_filter     = ["event_type", "created_at"]
     search_fields   = ["account__username", "account__email", "reward__reward_type", "event_type"]

@@ -6,34 +6,53 @@ from django.db.models         import F
 from django.db.models.signals import post_save
 from django.dispatch          import receiver
 
-from .models import AccountPoints, RewardEvent
+from .constants               import StreakEventType
+from .models                  import AccountProgress, LevelThreshold, RewardEventLog
+from .services.streak         import update_streak_for_points
 
 User = get_user_model()
 
 
 @receiver(post_save, sender=User)
-def create_account_points(sender, instance, created, **kwargs):
+def create_account_progress(sender, instance, created, **kwargs):
     """
-    Automatically create an AccountPoints entry when a new user is created.
+    Automatically create an AccountProgress entry when a new user is created.
+    Accounts start at level 1.
     """
     if created:
-        AccountPoints.objects.get_or_create(
+        AccountProgress.objects.get_or_create(
             account=instance,
-            defaults={"point_total": 0}
+            defaults={"point_total": 0, "level": 1}
         )
 
 
-@receiver(post_save, sender=RewardEvent)
-def update_account_points_on_reward_event(sender, instance, created, **kwargs):
+@receiver(post_save, sender=RewardEventLog)
+def update_account_progress_on_reward_event(sender, instance, created, **kwargs):
     """
-    Automatically update AccountPoints.point_total when a RewardEvent is created.
+    Automatically update AccountProgress.point_total when a RewardEventLog entry is
+    created, recompute the level from the configured LevelThreshold table and
+    advance the daily streak whenever the account actually earns points.
     """
-    if created:
-        account_points, _ = AccountPoints.objects.get_or_create(
-            account=instance.account,
-            defaults={"point_total": 0}
-        )
+    if not created:
+        return
 
-        AccountPoints.objects.filter(pk=account_points.pk).update(
-            point_total=F("point_total") + instance.points_delta,
-        )
+    account_progress, _ = AccountProgress.objects.get_or_create(
+        account=instance.account,
+        defaults={"point_total": 0, "level": 1}
+    )
+
+    AccountProgress.objects.filter(pk=account_progress.pk).update(
+        point_total=F("point_total") + instance.points_delta,
+    )
+
+    account_progress.refresh_from_db()
+
+    new_level = LevelThreshold.level_for_points(account_progress.point_total)
+
+    if new_level != account_progress.level:
+        AccountProgress.objects.filter(pk=account_progress.pk).update(level=new_level)
+
+    # Recompute the streak only for genuine point-earning events. Streak bookkeeping
+    # entries carry a zero delta, so this also prevents the signal from recursing.
+    if instance.points_delta != 0 and instance.event_type not in StreakEventType.values:
+        update_streak_for_points(instance.account_id, instance.created_at)

@@ -14,73 +14,71 @@
 
 import { mapValues } from '../runtime';
 /**
- * Reward Event
+ * Reward Event Log
  * @export
- * @interface RewardEvent
+ * @interface RewardEventLog
  */
-export interface RewardEvent {
+export interface RewardEventLog {
     /**
      * 
      * @type {string}
-     * @memberof RewardEvent
+     * @memberof RewardEventLog
      */
     readonly id: string;
     /**
      * 
      * @type {string}
-     * @memberof RewardEvent
+     * @memberof RewardEventLog
      */
     account: string;
     /**
      * 
      * @type {string}
-     * @memberof RewardEvent
+     * @memberof RewardEventLog
      */
-    reward: string;
+    reward?: string | null;
     /**
      * 
      * @type {string}
-     * @memberof RewardEvent
+     * @memberof RewardEventLog
      */
     eventType: string;
     /**
      * 
      * @type {number}
-     * @memberof RewardEvent
+     * @memberof RewardEventLog
      */
-    pointsDelta: number;
+    pointsDelta?: number;
     /**
      * 
      * @type {Date}
-     * @memberof RewardEvent
+     * @memberof RewardEventLog
      */
     readonly createdAt: Date;
     /**
      * 
      * @type {any}
-     * @memberof RewardEvent
+     * @memberof RewardEventLog
      */
     context?: any | null;
 }
 
 /**
- * Check if a given object implements the RewardEvent interface.
+ * Check if a given object implements the RewardEventLog interface.
  */
-export function instanceOfRewardEvent(value: object): value is RewardEvent {
+export function instanceOfRewardEventLog(value: object): value is RewardEventLog {
     if (!('id' in value) || value['id'] === undefined) return false;
     if (!('account' in value) || value['account'] === undefined) return false;
-    if (!('reward' in value) || value['reward'] === undefined) return false;
     if (!('eventType' in value) || value['eventType'] === undefined) return false;
-    if (!('pointsDelta' in value) || value['pointsDelta'] === undefined) return false;
     if (!('createdAt' in value) || value['createdAt'] === undefined) return false;
     return true;
 }
 
-export function RewardEventFromJSON(json: any): RewardEvent {
-    return RewardEventFromJSONTyped(json, false);
+export function RewardEventLogFromJSON(json: any): RewardEventLog {
+    return RewardEventLogFromJSONTyped(json, false);
 }
 
-export function RewardEventFromJSONTyped(json: any, ignoreDiscriminator: boolean): RewardEvent {
+export function RewardEventLogFromJSONTyped(json: any, ignoreDiscriminator: boolean): RewardEventLog {
     if (json == null) {
         return json;
     }
@@ -88,19 +86,19 @@ export function RewardEventFromJSONTyped(json: any, ignoreDiscriminator: boolean
         
         'id': json['id'],
         'account': json['account'],
-        'reward': json['reward'],
+        'reward': json['reward'] == null ? undefined : json['reward'],
         'eventType': json['event_type'],
-        'pointsDelta': json['points_delta'],
+        'pointsDelta': json['points_delta'] == null ? undefined : json['points_delta'],
         'createdAt': (new Date(json['created_at'])),
         'context': json['context'] == null ? undefined : json['context'],
     };
 }
 
-export function RewardEventToJSON(json: any): RewardEvent {
-    return RewardEventToJSONTyped(json, false);
+export function RewardEventLogToJSON(json: any): RewardEventLog {
+    return RewardEventLogToJSONTyped(json, false);
 }
 
-export function RewardEventToJSONTyped(value?: Omit<RewardEvent, 'id'|'created_at'> | null, ignoreDiscriminator: boolean = false): any {
+export function RewardEventLogToJSONTyped(value?: Omit<RewardEventLog, 'id'|'created_at'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

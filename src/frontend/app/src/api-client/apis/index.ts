@@ -1,7 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './AccessRequestsApi';
-export * from './AccountPointsApi';
+export * from './AccountProgressApi';
+export * from './ActivityApi';
 export * from './AllowedRolePermissionsApi';
 export * from './AuthenticationTokensApi';
 export * from './AvailableLanguagesApi';
@@ -18,11 +19,12 @@ export * from './HTMLLibraryVersionsApi';
 export * from './LibraryGroupsApi';
 export * from './LibraryLinksApi';
 export * from './MediaFilesApi';
-export * from './RewardEventsApi';
+export * from './RewardEventLogApi';
 export * from './RewardsApi';
 export * from './RoleAssignmentsApi';
 export * from './RolesApi';
 export * from './ScopeTypesApi';
+export * from './StreakApi';
 export * from './TextbookPagesApi';
 export * from './TextbooksApi';
 export * from './TranslatedPermissionsApi';

@@ -16,48 +16,48 @@ import { mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface TriggerRewardEventRequest
+ * @interface TriggerRewardEventLogRequest
  */
-export interface TriggerRewardEventRequest {
+export interface TriggerRewardEventLogRequest {
     /**
      * 
      * @type {string}
-     * @memberof TriggerRewardEventRequest
+     * @memberof TriggerRewardEventLogRequest
      */
     account?: string;
     /**
      * 
      * @type {string}
-     * @memberof TriggerRewardEventRequest
+     * @memberof TriggerRewardEventLogRequest
      */
     reward: string;
     /**
      * 
      * @type {string}
-     * @memberof TriggerRewardEventRequest
+     * @memberof TriggerRewardEventLogRequest
      */
     eventType?: string;
     /**
      * 
      * @type {any}
-     * @memberof TriggerRewardEventRequest
+     * @memberof TriggerRewardEventLogRequest
      */
     context?: any | null;
 }
 
 /**
- * Check if a given object implements the TriggerRewardEventRequest interface.
+ * Check if a given object implements the TriggerRewardEventLogRequest interface.
  */
-export function instanceOfTriggerRewardEventRequest(value: object): value is TriggerRewardEventRequest {
+export function instanceOfTriggerRewardEventLogRequest(value: object): value is TriggerRewardEventLogRequest {
     if (!('reward' in value) || value['reward'] === undefined) return false;
     return true;
 }
 
-export function TriggerRewardEventRequestFromJSON(json: any): TriggerRewardEventRequest {
-    return TriggerRewardEventRequestFromJSONTyped(json, false);
+export function TriggerRewardEventLogRequestFromJSON(json: any): TriggerRewardEventLogRequest {
+    return TriggerRewardEventLogRequestFromJSONTyped(json, false);
 }
 
-export function TriggerRewardEventRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): TriggerRewardEventRequest {
+export function TriggerRewardEventLogRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): TriggerRewardEventLogRequest {
     if (json == null) {
         return json;
     }
@@ -70,11 +70,11 @@ export function TriggerRewardEventRequestFromJSONTyped(json: any, ignoreDiscrimi
     };
 }
 
-export function TriggerRewardEventRequestToJSON(json: any): TriggerRewardEventRequest {
-    return TriggerRewardEventRequestToJSONTyped(json, false);
+export function TriggerRewardEventLogRequestToJSON(json: any): TriggerRewardEventLogRequest {
+    return TriggerRewardEventLogRequestToJSONTyped(json, false);
 }
 
-export function TriggerRewardEventRequestToJSONTyped(value?: TriggerRewardEventRequest | null, ignoreDiscriminator: boolean = false): any {
+export function TriggerRewardEventLogRequestToJSONTyped(value?: TriggerRewardEventLogRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

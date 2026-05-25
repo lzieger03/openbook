@@ -14,52 +14,58 @@
 
 import { mapValues } from '../runtime';
 /**
- * Account Points
+ * Account Progress
  * @export
- * @interface AccountPoints
+ * @interface AccountProgress
  */
-export interface AccountPoints {
+export interface AccountProgress {
     /**
      * 
      * @type {string}
-     * @memberof AccountPoints
+     * @memberof AccountProgress
      */
     readonly id: string;
     /**
      * 
      * @type {string}
-     * @memberof AccountPoints
+     * @memberof AccountProgress
      */
     account: string;
     /**
      * 
      * @type {number}
-     * @memberof AccountPoints
+     * @memberof AccountProgress
      */
     pointTotal?: number;
     /**
      * 
+     * @type {number}
+     * @memberof AccountProgress
+     */
+    level?: number;
+    /**
+     * 
      * @type {Date}
-     * @memberof AccountPoints
+     * @memberof AccountProgress
      */
     readonly updatedAt: Date;
 }
 
 /**
- * Check if a given object implements the AccountPoints interface.
+ * Check if a given object implements the AccountProgress interface.
  */
-export function instanceOfAccountPoints(value: object): value is AccountPoints {
+export function instanceOfAccountProgress(value: object): value is AccountProgress {
     if (!('id' in value) || value['id'] === undefined) return false;
     if (!('account' in value) || value['account'] === undefined) return false;
     if (!('updatedAt' in value) || value['updatedAt'] === undefined) return false;
     return true;
 }
 
-export function AccountPointsFromJSON(json: any): AccountPoints {
-    return AccountPointsFromJSONTyped(json, false);
+export function AccountProgressFromJSON(json: any): AccountProgress {
+    return AccountProgressFromJSONTyped(json, false);
 }
 
-export function AccountPointsFromJSONTyped(json: any, ignoreDiscriminator: boolean): AccountPoints {
+export function AccountProgressFromJSONTyped(json: any, ignoreDiscriminator: boolean): AccountProgress {
     if (json == null) {
         return json;
     }
@@ -68,15 +74,16 @@ export function AccountPointsFromJSONTyped(json: any, ignoreDiscriminator: boole
         'id': json['id'],
         'account': json['account'],
         'pointTotal': json['point_total'] == null ? undefined : json['point_total'],
+        'level': json['level'] == null ? undefined : json['level'],
         'updatedAt': (new Date(json['updated_at'])),
     };
 }
 
-export function AccountPointsToJSON(json: any): AccountPoints {
-    return AccountPointsToJSONTyped(json, false);
+export function AccountProgressToJSON(json: any): AccountProgress {
+    return AccountProgressToJSONTyped(json, false);
 }
 
-export function AccountPointsToJSONTyped(value?: Omit<AccountPoints, 'id'|'updated_at'> | null, ignoreDiscriminator: boolean = false): any {
+export function AccountProgressToJSONTyped(value?: Omit<AccountProgress, 'id'|'updated_at'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -85,6 +92,7 @@ export function AccountPointsToJSONTyped(value?: Omit<AccountPoints, 'id'|'updat
         
         'account': value['account'],
         'point_total': value['pointTotal'],
+        'level': value['level'],
     };
 }
 

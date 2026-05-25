@@ -53,6 +53,10 @@ Manual test page for gamification reward triggering and live user-impact checks.
     let contextJson = $state(JSON.stringify({source: "manual-gamification-test-page"}, null, 2));
 
     let currentPointTotal = $state<number | null>(null);
+    let currentLevel = $state<number | null>(null);
+    let currentStreak = $state<number | null>(null);
+    let longestStreak = $state<number | null>(null);
+    let lastActiveDate = $state<string | null>(null);
     let recentEvents = $state([] as RewardEventRecord[]);
 
     let beforePoints = $state<number | null>(null);
@@ -154,14 +158,14 @@ Manual test page for gamification reward triggering and live user-impact checks.
         }
     }
 
-    async function loadPointTotalForTarget(): Promise<number | null> {
+    async function loadProgressForTarget(): Promise<{ points: number; level: number } | null> {
         if (!targetUsername.trim()) {
             return null;
         }
 
         if (!isStaff || targetUsername === currentUsername) {
-            const meData = await requestJson("/api/gamification/account_points/me/");
-            return Number(meData?.point_total ?? 0);
+            const meData = await requestJson("/api/gamification/account_progress/me/");
+            return { points: Number(meData?.point_total ?? 0), level: Number(meData?.level ?? 1) };
         }
 
         const params = new URLSearchParams({
@@ -169,14 +173,30 @@ Manual test page for gamification reward triggering and live user-impact checks.
             _page_size: "1",
         });
 
-        const listData = await requestJson(`/api/gamification/account_points/?${params.toString()}`);
+        const listData = await requestJson(`/api/gamification/account_progress/?${params.toString()}`);
         const row = listData?.results?.[0];
 
         if (!row) {
             return null;
         }
 
-        return Number(row.point_total ?? 0);
+        return { points: Number(row.point_total ?? 0), level: Number(row.level ?? 1) };
+    }
+
+    async function loadStreakForTarget(): Promise<{ current: number; longest: number; lastActive: string | null } | null> {
+        // The streak endpoint always returns the logged-in user's streak, so it is
+        // only meaningful when the target is the current user.
+        if (isStaff && targetUsername !== currentUsername) {
+            return null;
+        }
+
+        const data = await requestJson("/api/gamification/streak/");
+
+        return {
+            current:    Number(data?.current_streak ?? 0),
+            longest:    Number(data?.longest_streak ?? 0),
+            lastActive: data?.last_active_date ?? null,
+        };
     }
 
     async function loadEventsForTarget(): Promise<void> {
@@ -191,7 +211,7 @@ Manual test page for gamification reward triggering and live user-impact checks.
             _sort: "-created_at",
         });
 
-        const listData = await requestJson(`/api/gamification/reward_events/?${params.toString()}`);
+        const listData = await requestJson(`/api/gamification/reward_event_log/?${params.toString()}`);
         recentEvents = Array.isArray(listData?.results) ? listData.results : [];
     }
 
@@ -200,7 +220,15 @@ Manual test page for gamification reward triggering and live user-impact checks.
         errorMessage = "";
 
         try {
-            currentPointTotal = await loadPointTotalForTarget();
+            const progress = await loadProgressForTarget();
+            currentPointTotal = progress?.points ?? null;
+            currentLevel = progress?.level ?? null;
+
+            const streak = await loadStreakForTarget();
+            currentStreak = streak?.current ?? null;
+            longestStreak = streak?.longest ?? null;
+            lastActiveDate = streak?.lastActive ?? null;
+
             await loadEventsForTarget();
         } catch (error) {
             errorMessage = toErrorMessage(error);
@@ -267,7 +295,7 @@ Manual test page for gamification reward triggering and live user-impact checks.
         isTriggering = true;
 
         try {
-            beforePoints = await loadPointTotalForTarget();
+            beforePoints = (await loadProgressForTarget())?.points ?? null;
 
             const body: Record<string, unknown> = {
                 reward: selectedRewardId,
@@ -282,7 +310,7 @@ Manual test page for gamification reward triggering and live user-impact checks.
                 body.account = targetUsername;
             }
 
-            const response = await requestJson("/api/gamification/reward_events/trigger/", {
+            const response = await requestJson("/api/gamification/reward_event_log/trigger/", {
                 method: "POST",
                 body: JSON.stringify(body),
             });
@@ -416,6 +444,10 @@ Manual test page for gamification reward triggering and live user-impact checks.
             <section class="panel">
                 <h2>3) Direkte Auswirkung</h2>
                 <p><strong>Aktueller Punktestand:</strong> {currentPointTotal ?? "—"}</p>
+                <p><strong>Aktuelles Level:</strong> {currentLevel ?? "—"}</p>
+                <p><strong>Streak (aktuell):</strong> {currentStreak ?? "—"}</p>
+                <p><strong>Streak (Rekord):</strong> {longestStreak ?? "—"}</p>
+                <p><strong>Zuletzt aktiv:</strong> {lastActiveDate ?? "—"}</p>
 
                 {#if testPassed !== null}
                     <div class="result" class:pass={testPassed} class:fail={!testPassed}>

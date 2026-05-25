@@ -15,30 +15,23 @@
 
 import * as runtime from '../runtime';
 import type {
-  PaginatedRewardEventList,
-  RewardEvent,
-  TriggerRewardEventRequest,
-  TriggerRewardEventResponse,
+  PaginatedRewardEventLogList,
+  RewardEventLog,
+  TriggerRewardEventLogRequest,
+  TriggerRewardEventLogResponse,
 } from '../models/index';
 import {
-    PaginatedRewardEventListFromJSON,
-    PaginatedRewardEventListToJSON,
-    RewardEventFromJSON,
-    RewardEventToJSON,
-    TriggerRewardEventRequestFromJSON,
-    TriggerRewardEventRequestToJSON,
-    TriggerRewardEventResponseFromJSON,
-    TriggerRewardEventResponseToJSON,
+    PaginatedRewardEventLogListFromJSON,
+    PaginatedRewardEventLogListToJSON,
+    RewardEventLogFromJSON,
+    RewardEventLogToJSON,
+    TriggerRewardEventLogRequestFromJSON,
+    TriggerRewardEventLogRequestToJSON,
+    TriggerRewardEventLogResponseFromJSON,
+    TriggerRewardEventLogResponseToJSON,
 } from '../models/index';
 
-export interface GamificationRewardEventTriggerRequest {
-    triggerRewardEventRequest: TriggerRewardEventRequest;
-    expand?: string;
-    fields?: string;
-    omit?: string;
-}
-
-export interface GamificationRewardEventsListRequest {
+export interface GamificationRewardEventLogListRequest {
     expand?: string;
     fields?: string;
     omit?: string;
@@ -58,8 +51,15 @@ export interface GamificationRewardEventsListRequest {
     reward?: string;
 }
 
-export interface GamificationRewardEventsRetrieveRequest {
+export interface GamificationRewardEventLogRetrieveRequest {
     id: string;
+    expand?: string;
+    fields?: string;
+    omit?: string;
+}
+
+export interface GamificationRewardEventLogTriggerRequest {
+    triggerRewardEventLogRequest: TriggerRewardEventLogRequest;
     expand?: string;
     fields?: string;
     omit?: string;
@@ -68,67 +68,13 @@ export interface GamificationRewardEventsRetrieveRequest {
 /**
  * 
  */
-export class RewardEventsApi extends runtime.BaseAPI {
+export class RewardEventLogApi extends runtime.BaseAPI {
 
     /**
-     * Reward events (audit log)
-     * Trigger Reward Event
-     */
-    async gamificationRewardEventTriggerRaw(requestParameters: GamificationRewardEventTriggerRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TriggerRewardEventResponse>> {
-        if (requestParameters['triggerRewardEventRequest'] == null) {
-            throw new runtime.RequiredError(
-                'triggerRewardEventRequest',
-                'Required parameter "triggerRewardEventRequest" was null or undefined when calling gamificationRewardEventTrigger().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        if (requestParameters['expand'] != null) {
-            queryParameters['_expand'] = requestParameters['expand'];
-        }
-
-        if (requestParameters['fields'] != null) {
-            queryParameters['_fields'] = requestParameters['fields'];
-        }
-
-        if (requestParameters['omit'] != null) {
-            queryParameters['_omit'] = requestParameters['omit'];
-        }
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        if (this.configuration && this.configuration.apiKey) {
-            headerParameters["sessionId"] = await this.configuration.apiKey("sessionId"); // SessionAuthentication authentication
-        }
-
-        const response = await this.request({
-            path: `/api/gamification/reward_events/trigger/`,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: TriggerRewardEventRequestToJSON(requestParameters['triggerRewardEventRequest']),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => TriggerRewardEventResponseFromJSON(jsonValue));
-    }
-
-    /**
-     * Reward events (audit log)
-     * Trigger Reward Event
-     */
-    async gamificationRewardEventTrigger(requestParameters: GamificationRewardEventTriggerRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TriggerRewardEventResponse> {
-        const response = await this.gamificationRewardEventTriggerRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Reward events (audit log)
+     * Reward event log (audit log)
      * List
      */
-    async gamificationRewardEventsListRaw(requestParameters: GamificationRewardEventsListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginatedRewardEventList>> {
+    async gamificationRewardEventLogListRaw(requestParameters: GamificationRewardEventLogListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginatedRewardEventLogList>> {
         const queryParameters: any = {};
 
         if (requestParameters['expand'] != null) {
@@ -206,33 +152,33 @@ export class RewardEventsApi extends runtime.BaseAPI {
         }
 
         const response = await this.request({
-            path: `/api/gamification/reward_events/`,
+            path: `/api/gamification/reward_event_log/`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => PaginatedRewardEventListFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => PaginatedRewardEventLogListFromJSON(jsonValue));
     }
 
     /**
-     * Reward events (audit log)
+     * Reward event log (audit log)
      * List
      */
-    async gamificationRewardEventsList(requestParameters: GamificationRewardEventsListRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginatedRewardEventList> {
-        const response = await this.gamificationRewardEventsListRaw(requestParameters, initOverrides);
+    async gamificationRewardEventLogList(requestParameters: GamificationRewardEventLogListRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginatedRewardEventLogList> {
+        const response = await this.gamificationRewardEventLogListRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Reward events (audit log)
+     * Reward event log (audit log)
      * Retrieve
      */
-    async gamificationRewardEventsRetrieveRaw(requestParameters: GamificationRewardEventsRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RewardEvent>> {
+    async gamificationRewardEventLogRetrieveRaw(requestParameters: GamificationRewardEventLogRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RewardEventLog>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling gamificationRewardEventsRetrieve().'
+                'Required parameter "id" was null or undefined when calling gamificationRewardEventLogRetrieve().'
             );
         }
 
@@ -257,21 +203,75 @@ export class RewardEventsApi extends runtime.BaseAPI {
         }
 
         const response = await this.request({
-            path: `/api/gamification/reward_events/{id}/`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: `/api/gamification/reward_event_log/{id}/`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => RewardEventFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => RewardEventLogFromJSON(jsonValue));
     }
 
     /**
-     * Reward events (audit log)
+     * Reward event log (audit log)
      * Retrieve
      */
-    async gamificationRewardEventsRetrieve(requestParameters: GamificationRewardEventsRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RewardEvent> {
-        const response = await this.gamificationRewardEventsRetrieveRaw(requestParameters, initOverrides);
+    async gamificationRewardEventLogRetrieve(requestParameters: GamificationRewardEventLogRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RewardEventLog> {
+        const response = await this.gamificationRewardEventLogRetrieveRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Reward event log (audit log)
+     * Trigger Reward Event
+     */
+    async gamificationRewardEventLogTriggerRaw(requestParameters: GamificationRewardEventLogTriggerRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TriggerRewardEventLogResponse>> {
+        if (requestParameters['triggerRewardEventLogRequest'] == null) {
+            throw new runtime.RequiredError(
+                'triggerRewardEventLogRequest',
+                'Required parameter "triggerRewardEventLogRequest" was null or undefined when calling gamificationRewardEventLogTrigger().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['expand'] != null) {
+            queryParameters['_expand'] = requestParameters['expand'];
+        }
+
+        if (requestParameters['fields'] != null) {
+            queryParameters['_fields'] = requestParameters['fields'];
+        }
+
+        if (requestParameters['omit'] != null) {
+            queryParameters['_omit'] = requestParameters['omit'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["sessionId"] = await this.configuration.apiKey("sessionId"); // SessionAuthentication authentication
+        }
+
+        const response = await this.request({
+            path: `/api/gamification/reward_event_log/trigger/`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: TriggerRewardEventLogRequestToJSON(requestParameters['triggerRewardEventLogRequest']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TriggerRewardEventLogResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Reward event log (audit log)
+     * Trigger Reward Event
+     */
+    async gamificationRewardEventLogTrigger(requestParameters: GamificationRewardEventLogTriggerRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TriggerRewardEventLogResponse> {
+        const response = await this.gamificationRewardEventLogTriggerRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

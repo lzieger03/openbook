@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(venv/bin/python src/manage.py test openbook.gamification)",
+      "Bash(venv/bin/python src/manage.py backfill_streaks)",
+      "Bash(venv/bin/python src/manage.py shell -c ' *)"
+    ]
+  }
+}
