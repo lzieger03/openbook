@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "openbook.auth",
     "openbook.ai",
     "openbook.content",
+    "openbook.quiz",
 
     # 3rd-party reusable apps
     "daphne",

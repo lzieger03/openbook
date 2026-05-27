@@ -1,5 +1,5 @@
 # OpenBook: Interactive Online Textbooks - Server
-# © 2026 Sebastian Wolf
+# © 2026 Sebastian Wolf, Daniel Sachadä
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as

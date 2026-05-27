@@ -1,5 +1,5 @@
 # OpenBook: Interactive Online Textbooks - Server
-# © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
+# © 2026 Sebastian Wolf, Daniel Sachadä
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -13,6 +13,7 @@ from django.core.management import call_command
 from django.test            import TestCase
 
 from openbook.quiz.quiz_logic import QuizQuestion
+
 
 class ChatbotQuiz_Command_Tests(TestCase):
     """Tests for the chatbot_quiz management command."""
