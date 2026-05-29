@@ -25,6 +25,8 @@ export * from './RewardsApi';
 export * from './RoleAssignmentsApi';
 export * from './RolesApi';
 export * from './ScopeTypesApi';
+export * from './SkillApi';
+export * from './SkillProgressApi';
 export * from './StreakApi';
 export * from './TextbookPagesApi';
 export * from './TextbooksApi';

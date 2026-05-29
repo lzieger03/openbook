@@ -7,7 +7,7 @@ from ..models.skill import Skill
 
 
 class SkillAdmin(CustomModelAdmin):
-    model        = Skill
-    list_display  = ["account", "name", "level", "progress"]
-    list_filter   = ["level"]
-    search_fields = ["account__username", "account__email", "name"]
+    model = Skill
+    list_display = ["name", "description", "icon_path"]
+    ordering = ["name"]
+    search_fields = ["name", "description", "icon_path"]
