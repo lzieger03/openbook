@@ -31,6 +31,29 @@ def _log_event(account_id, event_type, context=None):
     Append an entry to the reward event log. Streak events carry no reward and a
     zero point delta, so they do not affect the account's point total.
     """
+    # Avoid creating repeated daily 'already counted' streak events. They are
+    # noisy in the audit log and carry no points, so only record one per
+    # account/date when activity_date is provided in the context.
+    if event_type == StreakEventType.STREAK_ALREADY_COUNTED_TODAY:
+        activity_date = None
+        if context:
+            activity_date = context.get("activity_date")
+
+        if activity_date:
+            exists = RewardEventLog.objects.filter(
+                account_id=account_id,
+                event_type=event_type,
+                context__activity_date=activity_date,
+            ).exists()
+        else:
+            exists = RewardEventLog.objects.filter(
+                account_id=account_id,
+                event_type=event_type,
+            ).exists()
+
+        if exists:
+            return
+
     RewardEventLog.objects.create(
         account_id   = account_id,
         reward       = None,
