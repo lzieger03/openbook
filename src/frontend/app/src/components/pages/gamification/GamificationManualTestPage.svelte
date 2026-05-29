@@ -32,6 +32,21 @@ Manual test page for gamification reward triggering and live user-impact checks.
         context: Record<string, unknown>;
     };
 
+    type CourseProgressCourse = {
+        id: string;
+        name: string;
+        slug?: string;
+    };
+
+    type CourseProgressRecord = {
+        id: string;
+        account: string;
+        course: string | CourseProgressCourse;
+        course_points: number;
+        course_level: number;
+        course_progress: number;
+    };
+
     let isLoading = $state(true);
     let isRefreshing = $state(false);
     let isTriggering = $state(false);
@@ -57,6 +72,7 @@ Manual test page for gamification reward triggering and live user-impact checks.
     let currentStreak = $state<number | null>(null);
     let longestStreak = $state<number | null>(null);
     let lastActiveDate = $state<string | null>(null);
+    let courseProgressRows = $state([] as CourseProgressRecord[]);
     let recentEvents = $state([] as RewardEventRecord[]);
 
     let beforePoints = $state<number | null>(null);
@@ -133,6 +149,10 @@ Manual test page for gamification reward triggering and live user-impact checks.
 
     function rewardTypeById(rewardId: string): string {
         return rewards.find((reward) => reward.id === rewardId)?.reward_type || rewardId;
+    }
+
+    function courseName(course: string | CourseProgressCourse): string {
+        return typeof course === "string" ? course : course.name;
     }
 
     async function loadCurrentUser(): Promise<void> {
@@ -215,6 +235,30 @@ Manual test page for gamification reward triggering and live user-impact checks.
         recentEvents = Array.isArray(listData?.results) ? listData.results : [];
     }
 
+    async function loadCourseProgressForTarget(): Promise<void> {
+        if (!targetUsername.trim()) {
+            courseProgressRows = [];
+            return;
+        }
+
+        const params = new URLSearchParams({
+            account: targetUsername,
+            _page_size: "50",
+            _sort: "course__name",
+            _expand: "course",
+        });
+
+        const listData = await requestJson(`/api/gamification/course_progress/?${params.toString()}`);
+        courseProgressRows = Array.isArray(listData?.results)
+            ? listData.results.map((row: CourseProgressRecord) => ({
+                ...row,
+                course_points: Number(row.course_points ?? 0),
+                course_level: Number(row.course_level ?? 1),
+                course_progress: Number(row.course_progress ?? 0),
+            }))
+            : [];
+    }
+
     async function refreshTargetData(): Promise<void> {
         isRefreshing = true;
         errorMessage = "";
@@ -229,6 +273,7 @@ Manual test page for gamification reward triggering and live user-impact checks.
             longestStreak = streak?.longest ?? null;
             lastActiveDate = streak?.lastActive ?? null;
 
+            await loadCourseProgressForTarget();
             await loadEventsForTarget();
         } catch (error) {
             errorMessage = toErrorMessage(error);
@@ -466,7 +511,31 @@ Manual test page for gamification reward triggering and live user-impact checks.
             </section>
 
             <section class="panel full-width">
-                <h2>4) Letzte Reward Events ({targetUsername})</h2>
+                <h2>4) Kursfortschritt ({targetUsername})</h2>
+
+                {#if courseProgressRows.length === 0}
+                    <p>Kein Kursfortschritt gefunden.</p>
+                {:else}
+                    <div class="course-progress-list">
+                        {#each courseProgressRows as progress}
+                            <article class="course-progress-card">
+                                <div class="course-progress-head">
+                                    <div>
+                                        <h3>{courseName(progress.course)}</h3>
+                                        <p>Level {progress.course_level} · {progress.course_points} Punkte</p>
+                                    </div>
+                                    <strong>{progress.course_progress.toFixed(2)}%</strong>
+                                </div>
+
+                                <progress class="progress progress-accent w-full" value={progress.course_progress} max="100"></progress>
+                            </article>
+                        {/each}
+                    </div>
+                {/if}
+            </section>
+
+            <section class="panel full-width">
+                <h2>5) Letzte Reward Events ({targetUsername})</h2>
 
                 {#if recentEvents.length === 0}
                     <p>Keine Events gefunden.</p>
@@ -659,6 +728,41 @@ Manual test page for gamification reward triggering and live user-impact checks.
 
     .table-wrap {
         overflow: auto;
+    }
+
+    .course-progress-list {
+        display: grid;
+        gap: 0.75rem;
+        margin-top: 0.5rem;
+    }
+
+    .course-progress-card {
+        border: 1px solid rgb(230, 230, 230);
+        border-radius: 0.5rem;
+        padding: 0.85rem;
+        background: rgb(250, 250, 250);
+    }
+
+    .course-progress-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .course-progress-head h3 {
+        margin: 0;
+        font-size: 1rem;
+    }
+
+    .course-progress-head p {
+        margin: 0.2rem 0 0 0;
+        color: rgb(90, 90, 90);
+    }
+
+    .course-progress-card :global(.progress) {
+        width: 100%;
     }
 
     table {

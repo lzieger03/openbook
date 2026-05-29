@@ -8,6 +8,7 @@ export * from './AuthenticationTokensApi';
 export * from './AvailableLanguagesApi';
 export * from './CourseMaterialPageRangesApi';
 export * from './CourseMaterialsApi';
+export * from './CourseProgressApi';
 export * from './CoursesApi';
 export * from './CurrentUserApi';
 export * from './EnrollmentMethodsApi';
