@@ -6,6 +6,7 @@ apis/AuthenticationTokensApi.ts
 apis/AvailableLanguagesApi.ts
 apis/CourseMaterialPageRangesApi.ts
 apis/CourseMaterialsApi.ts
+apis/CourseProgressApi.ts
 apis/CoursesApi.ts
 apis/CurrentUserApi.ts
 apis/EnrollmentMethodsApi.ts
@@ -44,6 +45,7 @@ models/BlankEnum.ts
 models/Course.ts
 models/CourseMaterial.ts
 models/CourseMaterialPageRange.ts
+models/CourseProgress.ts
 models/CurrentUser.ts
 models/DecisionEnum.ts
 models/DurationPeriodEnum.ts
@@ -66,6 +68,7 @@ models/PaginatedAuthTokenList.ts
 models/PaginatedCourseList.ts
 models/PaginatedCourseMaterialList.ts
 models/PaginatedCourseMaterialPageRangeList.ts
+models/PaginatedCourseProgressList.ts
 models/PaginatedCurrentUserList.ts
 models/PaginatedEnrollmentMethodList.ts
 models/PaginatedHTMLComponentDefinitionList.ts

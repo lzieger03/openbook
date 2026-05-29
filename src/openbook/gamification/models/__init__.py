@@ -4,6 +4,7 @@
 from .account_activity_day import AccountActivityDay
 from .account_progress import AccountProgress
 from .account_streak import AccountStreak
+from .course_progress import CourseProgress
 from .level_threshold import LevelThreshold
 from .reward import Reward
 from .reward_event_log import RewardEventLog

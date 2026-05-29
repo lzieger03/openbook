@@ -2,6 +2,7 @@
 # © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 
 from .viewsets.account_progress import AccountProgressViewSet
+from .viewsets.course_progress import CourseProgressViewSet
 from .viewsets.reward import RewardViewSet
 from .viewsets.reward_event_log import RewardEventLogViewSet
 from .viewsets.streak import ActivityViewSet, StreakViewSet
@@ -15,6 +16,11 @@ def register_api_routes(router, prefix):
         f"{prefix}/account_progress",
         AccountProgressViewSet,
         basename="account_progress",
+    )
+    router.register(
+        f"{prefix}/course_progress",
+        CourseProgressViewSet,
+        basename="course_progress",
     )
     router.register(
         f"{prefix}/rewards",
