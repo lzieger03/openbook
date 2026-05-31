@@ -9,9 +9,10 @@
 from __future__ import annotations
 
 from django.templatetags.static import static
-from django.urls                import reverse_lazy
-from django.utils.translation   import gettext_lazy as _
-from pathlib                    import Path
+from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
+from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / "subdir".
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,6 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 #
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECURITY WARNING: don"t run with debug turned on in production!
+MISTRAL_API_KEY = os.environ.get("MISTRAL_API_KEY")
 SECRET_KEY = "django-insecure-jeo+.}_}9(Q.t_IU$WJ!%eL=b:MDbAL.~NY_=a:>D@:W[XPh4["
 DEBUG = True
 ALLOWED_HOSTS = ["*"]
@@ -38,30 +40,25 @@ INSTALLED_APPS = [
     "openbook.ai",
     "openbook.content",
     "openbook.quiz",
-
     # 3rd-party reusable apps
     "daphne",
     "channels",
-    "chanx.channels",
 
     # Django REST framework
-    #"rest_wind",
+    # "rest_wind",
     "rest_framework",
-
     "django_filters",
     "drf_spectacular",
     "drf_spectacular_sidecar",
-
     # Django Unfold (Modern Admin)
-    "unfold.apps.BasicAppConfig",            # before django.contrib.admin
-    "unfold.contrib.filters",                # optional, if special filters are needed
-    "unfold.contrib.forms",                  # optional, if special form elements are needed
-    "unfold.contrib.inlines",                # optional, if special inlines are needed
-    "unfold.contrib.import_export",          # optional, if django-import-export package is used
-    #"unfold.contrib.guardian",              # optional, if django-guardian package is used
-    #"unfold.contrib.simple_history",        # optional, if django-simple-history package is used
-    "crispy_forms",                          # Better forms for custom admin views
-
+    "unfold.apps.BasicAppConfig",  # before django.contrib.admin
+    "unfold.contrib.filters",  # optional, if special filters are needed
+    "unfold.contrib.forms",  # optional, if special form elements are needed
+    "unfold.contrib.inlines",  # optional, if special inlines are needed
+    "unfold.contrib.import_export",  # optional, if django-import-export package is used
+    # "unfold.contrib.guardian",              # optional, if django-guardian package is used
+    # "unfold.contrib.simple_history",        # optional, if django-simple-history package is used
+    "crispy_forms",  # Better forms for custom admin views
     # Django built-in apps
     "openbook.apps.OpenBookAdmin",
     "django.contrib.auth",
@@ -70,21 +67,19 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sites",
-
     # django-allauth
     "allauth",
     "allauth.account",
     "allauth.headless",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.saml",
-
     # Other useful apps
-    "django_cleanup.apps.CleanupConfig",    # Django Cleanup: Automatically delete files when models are deleted or updated
-    "django_extensions",                    # Django Extensions (additional management commands)
-    "dbbackup",                             # Django DBBackup: Database and Media Files Backups
-    "import_export",                        # Django Import/Export: Import and export data in the Django Admin
-    "djangoql",                             # Django QL: Advanced search language for Django
-    "colorfield",                           # Django Color Field: Color field for models with color-picker in the admin
+    "django_cleanup.apps.CleanupConfig",  # Django Cleanup: Automatically delete files when models are deleted or updated
+    "django_extensions",  # Django Extensions (additional management commands)
+    "dbbackup",  # Django DBBackup: Database and Media Files Backups
+    "import_export",  # Django Import/Export: Import and export data in the Django Admin
+    "djangoql",  # Django QL: Advanced search language for Django
+    "colorfield",  # Django Color Field: Color field for models with color-picker in the admin
 ]
 
 MIDDLEWARE = [
@@ -98,10 +93,8 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.contrib.sites.middleware.CurrentSiteMiddleware",
-
     # django-allauth
     "allauth.account.middleware.AccountMiddleware",
-
     # OpenBook
     "openbook.auth.middleware.current_user.CurrentUserMiddleware",
     "openbook.core.middleware.current_language.CurrentLanguageMiddleware",
@@ -144,22 +137,30 @@ DATABASES = {
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# Django Channels
+CHANNEL_LAYERS = {
+    "default": {
+        #"BACKEND": "channels.layers.InMemoryChannelLayer",
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
+    },
+}
+
 # Django REST framework
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "openbook.drf.pagination.PageNumberPagination",
     "PAGE_SIZE": 100,
-
     "DEFAULT_AUTHENTICATION_CLASSES": [
         # Remember authenticated user (similar to our custom middleware)
         "openbook.auth.middleware.current_user.CurrentUserTrackingAuthentication",
     ],
-
     "_DEFAULT_AUTHENTICATION_CLASSES": [
         "openbook.drf.authentication.TokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ],
-
     # Serve authenticated users only, checking Django object permissions (with
     # our own permission backend that falls back on regular Django permissions
     # on the user/group if the object-based permission check fails)
@@ -167,15 +168,13 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",
         "openbook.drf.permissions.DjangoObjectPermissionsOnly",
     ],
-
     "DEFAULT_FILTER_BACKENDS": (
-        "rest_flex_fields2.filter_backends.FlexFieldsFilterBackend",    # Automatic query optimization
-        "django_filters.rest_framework.DjangoFilterBackend",            # Query filters
-        "rest_framework.filters.SearchFilter",                          # _search query parameter
-        "openbook.drf.filters.DjangoObjectPermissionsFilter",           # Object-permission based filter
-        "rest_framework.filters.OrderingFilter",                        # _sort query parameter
+        "rest_flex_fields2.filter_backends.FlexFieldsFilterBackend",  # Automatic query optimization
+        "django_filters.rest_framework.DjangoFilterBackend",  # Query filters
+        "rest_framework.filters.SearchFilter",  # _search query parameter
+        "openbook.drf.filters.DjangoObjectPermissionsFilter",  # Object-permission based filter
+        "rest_framework.filters.OrderingFilter",  # _sort query parameter
     ),
-
     "SEARCH_PARAM": "_search",
     "ORDERING_PARAM": "_sort",
     "PAGE_PARAM": "_page",
@@ -189,6 +188,7 @@ REST_FRAMEWORK = {
 #   3. Using dummy string as fallback
 try:
     from importlib.metadata import version
+
     OPENBOOK_VERSION = version("openbook")
 except Exception:
     try:
@@ -212,20 +212,14 @@ SPECTACULAR_SETTINGS = {
     "SERVERS": [
         # This suppresses a warning during OpenAPI generation. However, we need to manually
         # set the base URL when instantiating the generated API client classes in the front end.
-        {
-            "url": f"http://localhost:8000",
-            "description": "Local Development"
-        }
+        {"url": f"http://localhost:8000", "description": "Local Development"}
     ],
     "SERVE_INCLUDE_SCHEMA": False,
-
     # Self-serve Swagger and Redoc instead of loading from CDN
     "SWAGGER_UI_DIST": "SIDECAR",
     "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
     "REDOC_DIST": "SIDECAR",
-
     "DEBUG": True,
-
     # Create a custom group in the ReDoc documentation for each app, using the custom
     # tags set on each viewset class. Because otherwise drf-spectacular creates a group
     # for each app using the app label and puts all operations in one large group.
@@ -307,11 +301,11 @@ HEADLESS_ONLY = False
 HEADLESS_ADAPTER = "allauth.headless.adapter.DefaultHeadlessAdapter"
 HEADLESS_SERVE_SPECIFICATION = True
 HEADLESS_FRONTEND_URLS = {
-    "account_confirm_email":           f"{OB_ROOT_REDIRECT}#/account/verify-email/{{key}}",
-    "account_reset_password":          f"{OB_ROOT_REDIRECT}#/account/password/reset",
-    "account_reset_password_from_key": f"{OB_ROOT_REDIRECT}#/account/password/reset/key/{{key}}",
-    "account_signup":                  f"{OB_ROOT_REDIRECT}#/account/signup",
-    "socialaccount_login_error":       f"{OB_ROOT_REDIRECT}#/account/provider/callback",
+    #"account_confirm_email": "https://app.project.org/account/verify-email/{key}",
+    #"account_reset_password": "https://app.project.org/account/password/reset",
+    #"account_reset_password_from_key": "https://app.project.org/account/password/reset/key/{key}",
+    #"account_signup": "https://app.project.org/account/signup",
+    #"socialaccount_login_error": "https://app.project.org/account/provider/callback",
 }
 
 ### LOGIN_URL           = f"{OB_ROOT_REDIRECT}#/account/login"
@@ -330,7 +324,7 @@ CRISPY_TEMPLATE_PACK = "unfold_crispy"
 CRISPY_ALLOWED_TEMPLATE_PACKS = ["unfold_crispy"]
 
 UNFOLD = {
-    "SITE_TITLE":  _(f"OpenBook {OPENBOOK_VERSION}: Admin"),
+    "SITE_TITLE": _(f"OpenBook {OPENBOOK_VERSION}: Admin"),
     "SITE_HEADER": _(f"OpenBook {OPENBOOK_VERSION}: Admin"),
     "STYLES": [
         lambda request: static("openbook/admin/bundle.css"),
@@ -338,7 +332,6 @@ UNFOLD = {
     "SCRIPTS": [
         lambda request: static("openbook/admin/bundle.js"),
     ],
-
     "SITE_FAVICONS": [
         {
             "rel": "icon",
@@ -347,11 +340,9 @@ UNFOLD = {
             "href": lambda request: static("favicon.ico"),
         },
     ],
-
     "SIDEBAR": {
         "show_search": True,
     },
-
     # Icons: https://fonts.google.com/icons
     "SITE_DROPDOWN": [
         {
@@ -391,7 +382,6 @@ UNFOLD = {
             "link": "https://github.com/DennisSchulmeister/openbook/",
         },
     ],
-
     # Changelist tabs to clean-up the menu structure
     # See: https://unfoldadmin.com/docs/tabs/changelist/
     #
@@ -406,16 +396,21 @@ UNFOLD = {
             ],
             "items": [
                 {
-                    "title":      _("HTML Libraries"),
-                    "link":       reverse_lazy("admin:openbook_core_htmllibrary_changelist"),
-                    "permission": lambda req: req.user.has_perm("openbook_core.view_htmllibrary"),
+                    "title": _("HTML Libraries"),
+                    "link": reverse_lazy("admin:openbook_core_htmllibrary_changelist"),
+                    "permission": lambda req: req.user.has_perm(
+                        "openbook_core.view_htmllibrary"
+                    ),
                 },
                 {
-                    "title":      _("HTML Components"),
-                    "link":       reverse_lazy("admin:openbook_core_htmlcomponent_changelist"),
-                    "permission": lambda req: req.user.has_perm("openbook_core.view_htmlcomponent"),
+                    "title": _("HTML Components"),
+                    "link": reverse_lazy(
+                        "admin:openbook_core_htmlcomponent_changelist"
+                    ),
+                    "permission": lambda req: req.user.has_perm(
+                        "openbook_core.view_htmlcomponent"
+                    ),
                 },
-
                 # TODO: Repository Servers (Model)
                 # TODO: Install Libraries (Custom View)
                 # TODO: Upgrade Libraries (Custom View)
@@ -432,24 +427,34 @@ UNFOLD = {
             ],
             "items": [
                 {
-                    "title":      _("Authentication Settings"),
-                    "link":       reverse_lazy("admin:openbook_auth_authconfig_changelist"),
-                    "permission": lambda req: req.user.has_perm("openbook_auth.view_authconfig"),
+                    "title": _("Authentication Settings"),
+                    "link": reverse_lazy("admin:openbook_auth_authconfig_changelist"),
+                    "permission": lambda req: req.user.has_perm(
+                        "openbook_auth.view_authconfig"
+                    ),
                 },
                 {
-                    "title":      _("Social Applications"),
-                    "link":       reverse_lazy("admin:socialaccount_socialapp_changelist"),
-                    "permission": lambda req: req.user.has_perm("socialaccount.view_socialapp"),
+                    "title": _("Social Applications"),
+                    "link": reverse_lazy("admin:socialaccount_socialapp_changelist"),
+                    "permission": lambda req: req.user.has_perm(
+                        "socialaccount.view_socialapp"
+                    ),
                 },
                 {
-                    "title":      _("Group Assignment on Sign-Up"),
-                    "link":       reverse_lazy("admin:openbook_auth_signupgroupassignment_changelist"),
-                    "permission": lambda req: req.user.has_perm("openbook_auth.view_signupgroupassignment"),
+                    "title": _("Group Assignment on Sign-Up"),
+                    "link": reverse_lazy(
+                        "admin:openbook_auth_signupgroupassignment_changelist"
+                    ),
+                    "permission": lambda req: req.user.has_perm(
+                        "openbook_auth.view_signupgroupassignment"
+                    ),
                 },
                 {
-                    "title":      _("Social Application Tokens"),
-                    "link":       reverse_lazy("admin:socialaccount_socialtoken_changelist"),
-                    "permission": lambda req: req.user.has_perm("socialaccount.view_socialtoken"),
+                    "title": _("Social Application Tokens"),
+                    "link": reverse_lazy("admin:socialaccount_socialtoken_changelist"),
+                    "permission": lambda req: req.user.has_perm(
+                        "socialaccount.view_socialtoken"
+                    ),
                 },
             ],
         },
@@ -464,29 +469,41 @@ UNFOLD = {
             ],
             "items": [
                 {
-                    "title":      _("Users"),
-                    "link":       reverse_lazy("admin:openbook_auth_user_changelist"),
-                    "permission": lambda req: req.user.has_perm("openbook_auth.view_user"),
+                    "title": _("Users"),
+                    "link": reverse_lazy("admin:openbook_auth_user_changelist"),
+                    "permission": lambda req: req.user.has_perm(
+                        "openbook_auth.view_user"
+                    ),
                 },
                 {
-                    "title":      _("User Groups"),
-                    "link":       reverse_lazy("admin:openbook_auth_group_changelist"),
-                    "permission": lambda req: req.user.has_perm("openbook_auth.view_group"),
+                    "title": _("User Groups"),
+                    "link": reverse_lazy("admin:openbook_auth_group_changelist"),
+                    "permission": lambda req: req.user.has_perm(
+                        "openbook_auth.view_group"
+                    ),
                 },
                 {
-                    "title":      _("E-Mail Addresses"),
-                    "link":       reverse_lazy("admin:account_emailaddress_changelist"),
-                    "permission": lambda req: req.user.has_perm("account.view_emailaddress"),
+                    "title": _("E-Mail Addresses"),
+                    "link": reverse_lazy("admin:account_emailaddress_changelist"),
+                    "permission": lambda req: req.user.has_perm(
+                        "account.view_emailaddress"
+                    ),
                 },
                 {
-                    "title":      _("Social Accounts"),
-                    "link":       reverse_lazy("admin:socialaccount_socialaccount_changelist"),
-                    "permission": lambda req: req.user.has_perm("socialaccount.view_socialaccount"),
+                    "title": _("Social Accounts"),
+                    "link": reverse_lazy(
+                        "admin:socialaccount_socialaccount_changelist"
+                    ),
+                    "permission": lambda req: req.user.has_perm(
+                        "socialaccount.view_socialaccount"
+                    ),
                 },
                 {
-                    "title":      _("Authentication Tokens"),
-                    "link":       reverse_lazy("admin:openbook_auth_authtoken_changelist"),
-                    "permission": lambda req: req.user.has_perm("openbook_auth.authtoken_token"),
+                    "title": _("Authentication Tokens"),
+                    "link": reverse_lazy("admin:openbook_auth_authtoken_changelist"),
+                    "permission": lambda req: req.user.has_perm(
+                        "openbook_auth.authtoken_token"
+                    ),
                 },
             ],
         },
@@ -499,19 +516,31 @@ UNFOLD = {
             ],
             "items": [
                 {
-                    "title":      _("Translated Permissions"),
-                    "link":       reverse_lazy("admin:openbook_auth_permissiontext_changelist"),
-                    "permission": lambda req: req.user.has_perm("openbook_auth.view_permissiontext"),
+                    "title": _("Translated Permissions"),
+                    "link": reverse_lazy(
+                        "admin:openbook_auth_permissiontext_changelist"
+                    ),
+                    "permission": lambda req: req.user.has_perm(
+                        "openbook_auth.view_permissiontext"
+                    ),
                 },
                 {
-                    "title":      _("Anonymous Permissions"),
-                    "link":       reverse_lazy("admin:openbook_auth_anonymouspermission_changelist"),
-                    "permission": lambda req: req.user.has_perm("openbook_auth.view_anonymouspermission"),
+                    "title": _("Anonymous Permissions"),
+                    "link": reverse_lazy(
+                        "admin:openbook_auth_anonymouspermission_changelist"
+                    ),
+                    "permission": lambda req: req.user.has_perm(
+                        "openbook_auth.view_anonymouspermission"
+                    ),
                 },
                 {
-                    "title":      _("Allowed Role Permissions"),
-                    "link":       reverse_lazy("admin:openbook_auth_allowedrolepermission_changelist"),
-                    "permission": lambda req: req.user.has_perm("openbook_auth.view_allowedrolepermission"),
+                    "title": _("Allowed Role Permissions"),
+                    "link": reverse_lazy(
+                        "admin:openbook_auth_allowedrolepermission_changelist"
+                    ),
+                    "permission": lambda req: req.user.has_perm(
+                        "openbook_auth.view_allowedrolepermission"
+                    ),
                 },
             ],
         },
@@ -525,24 +554,38 @@ UNFOLD = {
             ],
             "items": [
                 {
-                    "title":      _("Roles"),
-                    "link":       reverse_lazy("admin:openbook_auth_role_changelist"),
-                    "permission": lambda req: req.user.has_perm("openbook_auth.view_role"),
+                    "title": _("Roles"),
+                    "link": reverse_lazy("admin:openbook_auth_role_changelist"),
+                    "permission": lambda req: req.user.has_perm(
+                        "openbook_auth.view_role"
+                    ),
                 },
                 {
-                    "title":      _("Enrollment Methods"),
-                    "link":       reverse_lazy("admin:openbook_auth_enrollmentmethod_changelist"),
-                    "permission": lambda req: req.user.has_perm("openbook_auth.view_enrollmentmethod"),
+                    "title": _("Enrollment Methods"),
+                    "link": reverse_lazy(
+                        "admin:openbook_auth_enrollmentmethod_changelist"
+                    ),
+                    "permission": lambda req: req.user.has_perm(
+                        "openbook_auth.view_enrollmentmethod"
+                    ),
                 },
                 {
-                    "title":      _("Access Requests"),
-                    "link":       reverse_lazy("admin:openbook_auth_accessrequest_changelist"),
-                    "permission": lambda req: req.user.has_perm("openbook_auth.view_accessrequest"),
+                    "title": _("Access Requests"),
+                    "link": reverse_lazy(
+                        "admin:openbook_auth_accessrequest_changelist"
+                    ),
+                    "permission": lambda req: req.user.has_perm(
+                        "openbook_auth.view_accessrequest"
+                    ),
                 },
                 {
-                    "title":      _("Role Assignments"),
-                    "link":       reverse_lazy("admin:openbook_auth_roleassignment_changelist"),
-                    "permission": lambda req: req.user.has_perm("openbook_auth.view_roleassignment"),
+                    "title": _("Role Assignments"),
+                    "link": reverse_lazy(
+                        "admin:openbook_auth_roleassignment_changelist"
+                    ),
+                    "permission": lambda req: req.user.has_perm(
+                        "openbook_auth.view_roleassignment"
+                    ),
                 },
             ],
         },
@@ -554,14 +597,22 @@ UNFOLD = {
             ],
             "items": [
                 {
-                    "title":      _("Groups"),
-                    "link":       reverse_lazy("admin:openbook_content_librarygroup_changelist"),
-                    "permission": lambda req: req.user.has_perm("openbook_content.view_librarygroup"),
+                    "title": _("Groups"),
+                    "link": reverse_lazy(
+                        "admin:openbook_content_librarygroup_changelist"
+                    ),
+                    "permission": lambda req: req.user.has_perm(
+                        "openbook_content.view_librarygroup"
+                    ),
                 },
                 {
-                    "title":      _("Links"),
-                    "link":       reverse_lazy("admin:openbook_content_librarylink_changelist"),
-                    "permission": lambda req: req.user.has_perm("openbook_content.view_librarylink"),
+                    "title": _("Links"),
+                    "link": reverse_lazy(
+                        "admin:openbook_content_librarylink_changelist"
+                    ),
+                    "permission": lambda req: req.user.has_perm(
+                        "openbook_content.view_librarylink"
+                    ),
                 },
             ],
         },
@@ -573,14 +624,20 @@ UNFOLD = {
             ],
             "items": [
                 {
-                    "title":      _("Textbooks"),
-                    "link":       reverse_lazy("admin:openbook_content_textbook_changelist"),
-                    "permission": lambda req: req.user.has_perm("openbook_content.view_textbook"),
+                    "title": _("Textbooks"),
+                    "link": reverse_lazy("admin:openbook_content_textbook_changelist"),
+                    "permission": lambda req: req.user.has_perm(
+                        "openbook_content.view_textbook"
+                    ),
                 },
                 {
-                    "title":      _("Pages"),
-                    "link":       reverse_lazy("admin:openbook_content_textbookpage_changelist"),
-                    "permission": lambda req: req.user.has_perm("openbook_content.view_textbookpage"),
+                    "title": _("Pages"),
+                    "link": reverse_lazy(
+                        "admin:openbook_content_textbookpage_changelist"
+                    ),
+                    "permission": lambda req: req.user.has_perm(
+                        "openbook_content.view_textbookpage"
+                    ),
                 },
             ],
         },
@@ -592,18 +649,24 @@ UNFOLD = {
             ],
             "items": [
                 {
-                    "title":      _("Courses"),
-                    "link":       reverse_lazy("admin:openbook_content_course_changelist"),
-                    "permission": lambda req: req.user.has_perm("openbook_content.view_course"),
+                    "title": _("Courses"),
+                    "link": reverse_lazy("admin:openbook_content_course_changelist"),
+                    "permission": lambda req: req.user.has_perm(
+                        "openbook_content.view_course"
+                    ),
                 },
                 {
-                    "title":      _("Materials"),
-                    "link":       reverse_lazy("admin:openbook_content_coursematerial_changelist"),
-                    "permission": lambda req: req.user.has_perm("openbook_content.view_coursematerial"),
+                    "title": _("Materials"),
+                    "link": reverse_lazy(
+                        "admin:openbook_content_coursematerial_changelist"
+                    ),
+                    "permission": lambda req: req.user.has_perm(
+                        "openbook_content.view_coursematerial"
+                    ),
                 },
             ],
         },
-    ]
+    ],
 }
 
 # Internal IPs (required by Django Debug Toolbar)
@@ -612,12 +675,12 @@ INTERNAL_IPS = ["127.0.0.1"]
 # E-Mail Settings
 # See: https://docs.djangoproject.com/en/5.0/ref/settings/#std-setting-EMAIL_BACKEND
 # The values below assume you started maildev with "npm start" at the root directory.
-DEFAULT_FROM_EMAIL   = "noreply@example.com"
+DEFAULT_FROM_EMAIL = "noreply@example.com"
 EMAIL_SUBJECT_PREFIX = "[OpenBook] "
 
-#EMAIL_BACKEND        = "django.core.mail.backends.console.EmailBackend"
-EMAIL_HOST          = "localhost"
-EMAIL_PORT          = 1025
+# EMAIL_BACKEND        = "django.core.mail.backends.console.EmailBackend"
+EMAIL_HOST = "localhost"
+EMAIL_PORT = 1025
 # EMAIL_HOST_USER     = ""
 # EMAIL_HOST_PASSWORD = ""
 # EMAIL_TIMEOUT       = 30
