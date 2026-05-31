@@ -46,6 +46,7 @@ twisted = {extras = ["http2", "tls"], version = "^25.5.0"}
 django-colorfield = "^0.14.0"
 faiss-cpu = "^1.14.2"
 mistralai = "^2.4.8"
+dotenv = "^0.9.9"
 
 # Documentation dependencies
 [tool.poetry.group.docs.dependencies]
