@@ -9,11 +9,13 @@
 from django.templatetags.static import static
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
+from dotenv import load_dotenv
 from pathlib import Path
 import os
 
 # Build paths inside the project like this: BASE_DIR / "subdir".
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR.parent / ".env")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -37,6 +39,7 @@ INSTALLED_APPS = [
     "openbook.auth",
     "openbook.content",
     "openbook.quiz",
+    "openbook.assistant",
     # 3rd-party reusable apps
     "daphne",
     "channels",

@@ -1,10 +1,14 @@
+# OpenBook: Interactive Online Textbooks - Server
+# © 2026 Sebastian Wolf, Daniel Sachadä
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+
 from django.conf import settings
 from mistralai.client import Mistral
-from dotenv import load_dotenv
 import requests
-import os
-
-load_dotenv()
 
 
 class MistralClient:
@@ -16,10 +20,8 @@ class MistralClient:
         return cls._instance
 
     def __init__(self):
-        # api_key = getattr(settings, "MISTRAL_API_KEY", None)
-
         if not hasattr(self, "initialized"):
-            api_key = os.environ["MISTRAL_API_KEY"]
+            api_key = settings.MISTRAL_API_KEY
 
             if not api_key:
                 raise ValueError("MISTRAL_API_KEY is not set in settings")
