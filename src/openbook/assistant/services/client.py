@@ -10,12 +10,14 @@ if __name__ == "__main__":
 
     client = Mistral(api_key=api_key)
 
+    user_content = input(str("Dein Prompt: "))
+
     chat_response = client.chat.complete(
         model=model,
         messages=[
             {
                 "role": "user",
-                "content": "How far is the moon from earth?",
+                "content": user_content,
             },
         ],
     )
