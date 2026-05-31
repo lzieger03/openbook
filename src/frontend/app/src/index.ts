@@ -9,6 +9,7 @@
  */
 
 import "./tailwind.css";
+import "./fonts.css";
 import "./index.css";
 import "./global.js";
 

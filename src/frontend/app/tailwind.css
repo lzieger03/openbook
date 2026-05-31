@@ -10,6 +10,12 @@
 
 @import "tailwindcss";
 
+@theme {
+  --font-sans: SansSerif, sans-serif;
+  --font-serif: Serif, serif;
+  --font-mono: Mono, monospace;
+}
+
 @plugin "daisyui" {
     themes: OpenBook-Light --default, nord,  aqua, dim --prefersdark;
 }
