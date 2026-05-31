@@ -8,15 +8,27 @@ load_dotenv()
 
 
 class MistralClient:
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(MistralClient, cls).__new__(cls)
+        return cls._instance
+
     def __init__(self):
         # api_key = getattr(settings, "MISTRAL_API_KEY", None)
-        api_key = os.environ["MISTRAL_API_KEY"]
-        if not api_key:
-            raise ValueError("MISTRAL_API_KEY is not set in settings")
 
-        self.client = Mistral(api_key=api_key)
-        self.model = "mistral-small-latest"
-        self.text_data = None
+        if not hasattr(self, "initialized"):
+            api_key = os.environ["MISTRAL_API_KEY"]
+
+            if not api_key:
+                raise ValueError("MISTRAL_API_KEY is not set in settings")
+
+            self.client = Mistral(api_key=api_key)
+            self.model = "mistral-small-latest"
+            self.text_data = None
+
+            self.initialized = True
 
     def chat_complete(self, message: str) -> str:
         response = self.client.chat.complete(
