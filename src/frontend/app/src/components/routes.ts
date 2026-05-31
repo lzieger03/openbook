@@ -24,7 +24,7 @@ import {wrap} from "svelte-spa-router/wrap";
 
 export default {
     "/": wrap({
-        asyncComponent: () => import("./app-frame/Placeholder.svelte"),
+        asyncComponent: () => import("./pages/home/HomePage.svelte"),
         // conditions: [setPageNumber],
     }),
 

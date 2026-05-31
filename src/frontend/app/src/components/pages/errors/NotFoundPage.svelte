@@ -18,12 +18,12 @@ Simple 404 not found page
 </script>
 
 <div>
-    <h1>{$i18n.Error404.Title}</h1>
+    <h1>{$i18n.Error.PageNotFound.Title}</h1>
     <p>
-        {@html _($i18n.Error404.Message1, {url: router.location})}
+        {@html _($i18n.Error.PageNotFound.Message1, {url: router.location})}
     </p>
     <p>
-        {@html $i18n.Error404.Message2}
+        {@html $i18n.Error.PageNotFound.Message2}
     </p>
     <img src="page-not-found.png" alt="">
 </div>

@@ -8,8 +8,22 @@
  * License, or (at your option) any later version.
  */
 
+import ApplicationFrame from "../../components/ApplicationFrame.svelte";
+
 // This is the master language. Therefore no type import here.
 export default {
+    ApplicationFrame: {
+        Search: {
+            Placeholder: "Search",
+        },
+        UserMenu: {
+            AltText:  "User Menu",
+            Profile:  "Profile",
+            Settings: "Settings",
+            Logout:   "Logout",
+        }
+    },
+
     Placeholder: {
         Title: "OpenBook",
         Text:  "Under Construction!",

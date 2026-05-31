@@ -14,18 +14,35 @@ Root component of the application which defines the global application UI.
 -->
 
 <script lang="ts">
-    import Router  from "svelte-spa-router";
-    import routes  from "./routes.js";
-    import {error} from "../stores/error.js";
+    import NavigationBar    from "./app-frame/NavigationBar.svelte";
+    import LoadingAnimation from "./app-frame/LoadingAnimation.svelte";
+
+    import Router           from "svelte-spa-router";
+    import routes           from "./routes.js";
+    import {errorPage}      from "../stores/error.js";
 
     /**
      * Hidden previously shown error message, when navigating to a new page.
      */
     function onRouteLoaded() {
-        error.hide();
+        errorPage.hide();
     }
 </script>
 
-<main class="flex flex-1 flex-col">
-    <Router {routes} {onRouteLoaded}/>
+<NavigationBar/>
+
+<main class="flex flex-1 flex-col p-2.5">
+    <svelte:boundary>
+        <Router {routes} {onRouteLoaded}/>
+
+        {#snippet pending()}
+            <LoadingAnimation/>
+        {/snippet}
+
+        {#snippet failed(error, reset)}
+            An error occurred: {error}
+
+            <button onclick={reset}>Try again!</button>
+        {/snippet}
+    </svelte:boundary>
 </main>

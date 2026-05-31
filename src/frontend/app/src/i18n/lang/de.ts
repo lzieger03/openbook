@@ -11,6 +11,18 @@
 import type {I18N} from "../index.js";
 
 const i18n: I18N = {
+    ApplicationFrame: {
+        Search: {
+            Placeholder: "Suche",
+        },
+        UserMenu: {
+            AltText:  "Benutzermenü",
+            Profile:  "Profil",
+            Settings: "Einstellungen",
+            Logout:   "Logout",
+        },
+    },
+
     Placeholder: {
         Title: "OpenBook",
         Text:  "Achtung, Baustelle!",
