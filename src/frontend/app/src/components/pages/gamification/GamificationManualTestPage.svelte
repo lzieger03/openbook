@@ -14,6 +14,7 @@ Manual test page for gamification reward triggering and live user-impact checks.
 -->
 <script lang="ts">
     import {onMount} from "svelte";
+    import SkillsSection from "../../sections/SkillsSection.svelte";
 
     type RewardRecord = {
         id: string;
@@ -36,6 +37,30 @@ Manual test page for gamification reward triggering and live user-impact checks.
         id: string;
         name: string;
         slug?: string;
+    };
+
+    type SkillProgressSkill = {
+        id: string;
+        name: string;
+        description?: string;
+        icon_path?: string;
+    };
+
+    type SkillProgressRecord = {
+        id: string;
+        account: string;
+        skill: string | SkillProgressSkill;
+        level: number;
+        progress: number;
+    };
+
+    type SkillCardRecord = {
+        id: string;
+        name: string;
+        description: string;
+        icon_path: string;
+        level: number;
+        progress: number;
     };
 
     type CourseProgressRecord = {
@@ -72,6 +97,7 @@ Manual test page for gamification reward triggering and live user-impact checks.
     let currentStreak = $state<number | null>(null);
     let longestStreak = $state<number | null>(null);
     let lastActiveDate = $state<string | null>(null);
+    let skillProgressRows = $state([] as SkillCardRecord[]);
     let courseProgressRows = $state([] as CourseProgressRecord[]);
     let recentEvents = $state([] as RewardEventRecord[]);
 
@@ -149,6 +175,24 @@ Manual test page for gamification reward triggering and live user-impact checks.
 
     function rewardTypeById(rewardId: string): string {
         return rewards.find((reward) => reward.id === rewardId)?.reward_type || rewardId;
+    }
+
+    function skillData(skill: string | SkillProgressSkill): SkillProgressSkill {
+        if (typeof skill === "string") {
+            return {
+                id: skill,
+                name: skill,
+                description: "",
+                icon_path: "",
+            };
+        }
+
+        return {
+            id: skill.id,
+            name: skill.name,
+            description: skill.description || "",
+            icon_path: skill.icon_path || "",
+        };
     }
 
     function courseName(course: string | CourseProgressCourse): string {
@@ -235,6 +279,36 @@ Manual test page for gamification reward triggering and live user-impact checks.
         recentEvents = Array.isArray(listData?.results) ? listData.results : [];
     }
 
+    async function loadSkillProgressForTarget(): Promise<void> {
+        if (!targetUsername.trim()) {
+            skillProgressRows = [];
+            return;
+        }
+
+        const params = new URLSearchParams({
+            account: targetUsername,
+            _page_size: "50",
+            _sort: "skill__name",
+            _expand: "skill",
+        });
+
+        const listData = await requestJson(`/api/gamification/skill_progress/?${params.toString()}`);
+        skillProgressRows = Array.isArray(listData?.results)
+            ? listData.results.map((row: SkillProgressRecord) => {
+                const skill = skillData(row.skill);
+
+                return {
+                    id: row.id,
+                    name: skill.name,
+                    description: skill.description || "",
+                    icon_path: skill.icon_path || "",
+                    level: Number(row.level ?? 1),
+                    progress: Number(row.progress ?? 0),
+                };
+            })
+            : [];
+    }
+
     async function loadCourseProgressForTarget(): Promise<void> {
         if (!targetUsername.trim()) {
             courseProgressRows = [];
@@ -273,6 +347,7 @@ Manual test page for gamification reward triggering and live user-impact checks.
             longestStreak = streak?.longest ?? null;
             lastActiveDate = streak?.lastActive ?? null;
 
+            await loadSkillProgressForTarget();
             await loadCourseProgressForTarget();
             await loadEventsForTarget();
         } catch (error) {
@@ -511,7 +586,13 @@ Manual test page for gamification reward triggering and live user-impact checks.
             </section>
 
             <section class="panel full-width">
-                <h2>4) Kursfortschritt ({targetUsername})</h2>
+                <h2>4) Skill-Fortschritt ({targetUsername})</h2>
+
+                <SkillsSection skills={skillProgressRows} />
+            </section>
+
+            <section class="panel full-width">
+                <h2>5) Kursfortschritt ({targetUsername})</h2>
 
                 {#if courseProgressRows.length === 0}
                     <p>Kein Kursfortschritt gefunden.</p>
@@ -535,7 +616,7 @@ Manual test page for gamification reward triggering and live user-impact checks.
             </section>
 
             <section class="panel full-width">
-                <h2>5) Letzte Reward Events ({targetUsername})</h2>
+                <h2>6) Letzte Reward Events ({targetUsername})</h2>
 
                 {#if recentEvents.length === 0}
                     <p>Keine Events gefunden.</p>

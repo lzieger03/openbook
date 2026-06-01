@@ -9,3 +9,4 @@ from .level_threshold import LevelThreshold
 from .reward import Reward
 from .reward_event_log import RewardEventLog
 from .skill import Skill
+from .skill_progress import SkillProgress

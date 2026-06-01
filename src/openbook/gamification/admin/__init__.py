@@ -9,6 +9,7 @@ from .level_threshold import LevelThresholdAdmin
 from .reward import RewardAdmin
 from .reward_event_log import RewardEventLogAdmin
 from .skill import SkillAdmin
+from .skill_progress import SkillProgressAdmin
 
 from .. import models
 from openbook.admin import admin_site
@@ -21,3 +22,4 @@ admin_site.register(models.LevelThreshold, LevelThresholdAdmin)
 admin_site.register(models.Reward,         RewardAdmin)
 admin_site.register(models.RewardEventLog,  RewardEventLogAdmin)
 admin_site.register(models.Skill,          SkillAdmin)
+admin_site.register(models.SkillProgress,  SkillProgressAdmin)

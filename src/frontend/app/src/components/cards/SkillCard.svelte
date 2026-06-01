@@ -16,8 +16,9 @@ Card displaying a single skill with progress visualization.
 <script lang="ts">
     export let data: {
         id: string;
-        account_id: string;
         name: string;
+        description: string;
+        icon_path: string;
         level: number;
         progress: number;
     };
@@ -58,8 +59,16 @@ Card displaying a single skill with progress visualization.
         <div class="flex items-start justify-between mb-3">
             <div>
                 <h3 class="card-title text-lg">
-                    {emoji} {data.name}
+                    {#if data.icon_path}
+                        <img src={data.icon_path} alt="" class="inline-block w-5 h-5 mr-1 rounded-sm align-middle" />
+                    {:else}
+                        {emoji}
+                    {/if}
+                    {data.name}
                 </h3>
+                {#if data.description}
+                    <p class="text-sm text-gray-600 mt-1">{data.description}</p>
+                {/if}
             </div>
             <div class={`badge ${getLevelColor(data.level)}`}>
                 Level {data.level}
@@ -78,10 +87,6 @@ Card displaying a single skill with progress visualization.
             ></progress>
         </div>
 
-        <div class="card-actions justify-end mt-3">
-            <button class="btn btn-xs btn-ghost">Update</button>
-            <button class="btn btn-xs btn-ghost text-error">Remove</button>
-        </div>
     </div>
 </div>
 

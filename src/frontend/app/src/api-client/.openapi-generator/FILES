@@ -23,6 +23,8 @@ apis/RewardsApi.ts
 apis/RoleAssignmentsApi.ts
 apis/RolesApi.ts
 apis/ScopeTypesApi.ts
+apis/SkillApi.ts
+apis/SkillProgressApi.ts
 apis/StreakApi.ts
 apis/TextbookPagesApi.ts
 apis/TextbooksApi.ts
@@ -87,6 +89,8 @@ models/PaginatedRewardList.ts
 models/PaginatedRoleAssignmentList.ts
 models/PaginatedRoleList.ts
 models/PaginatedSiteList.ts
+models/PaginatedSkillList.ts
+models/PaginatedSkillProgressList.ts
 models/PaginatedTextbookList.ts
 models/PaginatedTextbookPageList.ts
 models/PaginatedUserList.ts
@@ -116,6 +120,8 @@ models/ScopeObject.ts
 models/ScopeTypeList.ts
 models/ScopeTypeRetrieve.ts
 models/Site.ts
+models/Skill.ts
+models/SkillProgress.ts
 models/StreakState.ts
 models/TextFormatEnum.ts
 models/Textbook.ts
