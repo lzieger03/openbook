@@ -16,6 +16,7 @@ export default {
         Search: {
             Placeholder: "Search",
         },
+
         Menu: {
             Title: "Menu",
             Theme: {
@@ -33,15 +34,8 @@ export default {
         }
     },
 
-    Placeholder: {
-        Title: "OpenBook",
-        Text:  "Under Construction!",
-
-        BackendStatus: {
-            Checking: "Checking Now …",
-            Online:   "Online",
-            Offline:  "Offline",
-        },
+    Home: {
+        Title: "Home",
     },
 
     Error: {

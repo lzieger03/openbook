@@ -8,6 +8,7 @@
  * License, or (at your option) any later version.
  */
 
+// TODO: The following import silently breaks the page!
 // import {i18n}          from "./i18n.js";
 import {WritableStore} from "../utils/store.js";
 

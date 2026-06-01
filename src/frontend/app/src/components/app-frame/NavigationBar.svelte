@@ -14,12 +14,15 @@ Top navigation page of the application frame.
 -->
 
 <script lang="ts">
+    import Breadcrumbs       from "../basic/breadcrumbs/Breadcrumbs.svelte";
+    import BreadcrumbsItem   from "../basic/breadcrumbs/BreadcrumbsItem.svelte";
     import DropdownMenu      from "../basic/dropdown-menu/DropdownMenu.svelte";
     import MenuItem          from "../basic/dropdown-menu/MenuItem.svelte";
     import MenuTitle         from "../basic/dropdown-menu/MenuTitle.svelte";
     import SubMenu           from "../basic/dropdown-menu/SubMenu.svelte";
     import Navbar            from "../basic/navbar/Navbar.svelte";
 
+    import {breadcrumbs}     from "../../stores/breadcrumbs.js";
     import {i18n}            from "../../stores/i18n.js";
     import {availableThemes} from "../../stores/theme.js";
     import {theme}           from "../../stores/theme.js";
@@ -40,14 +43,25 @@ Top navigation page of the application frame.
 
 <!-- Navbar -->
 <Navbar class="top-0 sticky z-10 bg-base-100/95">
-    <!-- Breadcrumb with current location -->
-    <div class="flex-1">
-        Breadcrumb
+    <!-- Logo and breadcrumb -->
+    <div class="flex-1 flex flex-row items-center gap-8">
+        <!-- Logo -->
+        <div class="flex flex-row items-center gap-1">
+            <img src="favicon.svg" alt="" class="block size-6"/>
+            <div class="text-primary text-xl font-bold">OpenBook</div>
+        </div>
+
+        <!-- Breadcrumbs -->
+        <Breadcrumbs class="hidden md:block text-sm">
+            {#each $breadcrumbs as item (item.href + item.label)}
+                <BreadcrumbsItem href={item.href || undefined}>
+                    {item.label}
+                </BreadcrumbsItem>
+            {/each}
+        </Breadcrumbs>
     </div>
 
-    <!-- Page menu -->
-
-    <!-- Search and user menu -->
+    <!-- Search and menu -->
     <div class="flex gap-2">
         <!-- Search input -->
         <input type="text" placeholder="{$i18n.ApplicationFrame.Search.Placeholder}" class="input input-bordered w-24 md:w-auth"/>

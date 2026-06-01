@@ -8,24 +8,32 @@
  * License, or (at your option) any later version.
  */
 
-import {wrap} from "svelte-spa-router/wrap";
-// import {currentPage} from "../stores/book.js";
+import type { BreadcrumbsItem } from "../stores/breadcrumbs.js";
+import type { RouteDetail }     from "svelte-spa-router";
 
-// /**
-//  * Update page number in the global store before the router renders the
-//  * next page. This makes sure that all components, not just the one chosen
-//  * by the router, receive the updated page number.
-//  */
-// function setPageNumber(detail:RouteDetail): boolean {
-//     let page = parseInt(detail?.params?.pageNumber || "1");
-//     currentPage.set(page);
-//     return true;
-// }
+import {i18n}                   from "../stores/i18n.js";
+import {breadcrumbs}            from "../stores/breadcrumbs.js";
+import {wrap}                   from "svelte-spa-router/wrap";
+
+const HOME_BREADCRUMB: BreadcrumbsItem = {
+    href:  "#/",
+    label: "Home",
+};
+
+/**
+ * Set breadcrumbs for a route when it is matched.
+ */
+function setBreadcrumbsLine(items: BreadcrumbsItem[]) {
+    return (_detail: RouteDetail): boolean => {
+        breadcrumbs.set([HOME_BREADCRUMB, ...items]);
+        return true;
+    };
+}
 
 export default {
     "/": wrap({
         asyncComponent: () => import("./pages/home/HomePage.svelte"),
-        // conditions: [setPageNumber],
+        conditions: [setBreadcrumbsLine([])],
     }),
 
     // "/book/page/:pageNumber": wrap({
@@ -35,5 +43,11 @@ export default {
 
     "*": wrap({
         asyncComponent: () => import("./pages/errors/NotFoundPage.svelte"),
+        conditions: [setBreadcrumbsLine([
+            {
+                href:  "",
+                label: i18n.value.Error.Page.NotFound.Title,
+            },
+        ])],
     }),
 };

@@ -15,6 +15,7 @@ const i18n: I18N = {
         Search: {
             Placeholder: "Suche",
         },
+
         Menu: {
             Title: "Menü",
             Theme: {
@@ -32,15 +33,8 @@ const i18n: I18N = {
         },
     },
 
-    Placeholder: {
-        Title: "OpenBook",
-        Text:  "Achtung, Baustelle!",
-
-        BackendStatus: {
-            Checking: "Wird geprüft …",
-            Online:   "Online",
-            Offline:  "Offline",
-        },
+    Home: {
+        Title: "Startseite",
     },
 
     Error: {
