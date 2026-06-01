@@ -22,6 +22,18 @@ TODO: Implement keyboard navigation with arrow keys
     type Side     = "top" | "bottom" | "left" | "right";
     type MenuSize = "" | "sm" | "md" | "lg";
 
+    const ALIGN_CLASSES: Record<Align, string> = {
+        start: "dropdown-start",
+        end:   "dropdown-end",
+    };
+
+    const SIDE_CLASSES: Record<Side, string> = {
+        top:    "dropdown-top",
+        bottom: "dropdown-bottom",
+        left:   "dropdown-left",
+        right:  "dropdown-right",
+    };
+
     interface Props {
         class?:          string;
         align?:          Align;
@@ -30,9 +42,9 @@ TODO: Implement keyboard navigation with arrow keys
         hover?:          boolean;
         menuHorizontal?: boolean;
         menuSize?:       MenuSize;
+        triggerClass?:   string;
         contentClass?:   string;
         contentRole?:    string;
-        summaryClass?:   string;
         trigger?:        Snippet;
         children?:       Snippet;
     }
@@ -44,25 +56,31 @@ TODO: Implement keyboard navigation with arrow keys
         hover            = false,
         menuHorizontal   = false,
         menuSize         = "",
+        triggerClass     = "",
         contentClass     = "",
         contentRole      = "menu",
-        summaryClass     = "",
         class: className = "",
         trigger,
         children,
     }: Props = $props();
 
-    const detailsClass = $derived(
+    const parentClasses = $derived(
         [
             "dropdown",
-            align ? `dropdown-${align}` : "",
-            side  ? `dropdown-${side}`  : "",
-            hover ? "dropdown-hover"    : "",
+            align ? ALIGN_CLASSES[align] : "",
+            side  ? SIDE_CLASSES[side]   : "",
+            hover ? "dropdown-hover"     : "",
             className,
         ].filter(Boolean).join(" ")
     );
 
-    const menuClass = $derived(
+    const triggerClasses = $derived(
+        [
+            triggerClass,
+        ].filter(Boolean).join(" ")
+    );
+
+    const contentClasses = $derived(
         [
             "dropdown-content",
             "menu",
@@ -73,12 +91,12 @@ TODO: Implement keyboard navigation with arrow keys
     );
 </script>
 
-<details class={detailsClass} {open}>
-    <summary class={summaryClass}>
+<details class={parentClasses} {open}>
+    <summary class={triggerClasses}>
         {@render trigger?.()}
     </summary>
 
-    <ul class={menuClass} role={contentRole}>
+    <ul class={contentClasses} role={contentRole}>
         {@render children?.()}
     </ul>
 </details>

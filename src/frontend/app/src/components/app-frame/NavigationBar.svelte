@@ -55,7 +55,7 @@ Top navigation page of the application frame.
         <!-- Menu -->
         <DropdownMenu
             align        = "end"
-            summaryClass = "btn btn-ghost btn-circle avatar"
+            triggerClass = "btn btn-ghost btn-circle avatar"
             contentClass = "menu-sm xl:menu-horizontal bg-base-100/85 backdrop-blur shadow rounded-box lg:min-w-max z-10"
         >
             {#snippet trigger()}
