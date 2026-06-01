@@ -39,6 +39,8 @@ Root component of the application which defines the global application UI.
      * during the build nor at runtime.
      */
     async function resolveErrorPage(error: unknown): Promise<ErrorPageResolverResult> {
+        console.error(error);
+
         if (error instanceof NotFoundError) {
             return {
                 component: (await import("./pages/errors/NotFoundPage.svelte")).default,
