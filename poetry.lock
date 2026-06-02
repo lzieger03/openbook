@@ -3384,6 +3384,52 @@ standalone = ["Sphinx (>=5)"]
 test = ["pytest"]
 
 [[package]]
+name = "sqlean-py"
+version = "3.50.4.5"
+description = "sqlite3 with extensions"
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "sqlean_py-3.50.4.5-cp310-cp310-macosx_10_15_x86_64.whl", hash = "sha256:6823757790bf92198be58256e4d243cd28aa5a3188bb22709514667a136096c1"},
+    {file = "sqlean_py-3.50.4.5-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:9152bd9a5056282f33724f666a71bd297d970e39a829f05fbfd0bee6897d7195"},
+    {file = "sqlean_py-3.50.4.5-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:077144be1fbbbf49c41e64e62c306b62ffd74dc25e9f39f9d0251ee56db7d5a1"},
+    {file = "sqlean_py-3.50.4.5-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:70c4790d2d9ac4146ad3d43c597668ebeb0bced10f2d23a3dea42569b961ae89"},
+    {file = "sqlean_py-3.50.4.5-cp311-cp311-macosx_10_15_x86_64.whl", hash = "sha256:3775efae4c6aac64dd29b8495518f13c129bae5692476cb8b654caf62ce43447"},
+    {file = "sqlean_py-3.50.4.5-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:80ea9019bbbfb76914934f600e376393a25bb5318f76279e07448dde2d4b986d"},
+    {file = "sqlean_py-3.50.4.5-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:501606e6cdcf72c476ff1f1416542b99134656a92c4c95897284de0fee00e07f"},
+    {file = "sqlean_py-3.50.4.5-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:2b54d55c25646bf4a161de48077cd16f17d45fadc374e960d0687278e7b916d7"},
+    {file = "sqlean_py-3.50.4.5-cp312-cp312-macosx_10_15_x86_64.whl", hash = "sha256:2fc2b1949ad65c770af13a3c740cd15d57fcf7a98a07a71373fcef15e2839f0a"},
+    {file = "sqlean_py-3.50.4.5-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:2d5a62013c7483fc8ca20c6f346f7190dc184e40ac7584b32e0c3c854bebf707"},
+    {file = "sqlean_py-3.50.4.5-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:95c5154b8ef576bc4775d3eac36f949c3556fbed5ef918c6652b1caee542e3a7"},
+    {file = "sqlean_py-3.50.4.5-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:410ba1d4532b5b090c9696686fdd7e95484409ffb9fcd035be371bc6d8aaa18d"},
+    {file = "sqlean_py-3.50.4.5-cp313-cp313-macosx_10_15_x86_64.whl", hash = "sha256:89233ad3640b1442eaf2d44a07debd17e23a1bde48d15c9b77a423ce7823b6a2"},
+    {file = "sqlean_py-3.50.4.5-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:e63b246ceb0eb48d37abeada97b2a7695dfe79655b7a8285c001e5ad9e79711b"},
+    {file = "sqlean_py-3.50.4.5-cp313-cp313-manylinux_2_28_aarch64.whl", hash = "sha256:3725a94c80a64740489aa5765f9c6d11fa428b7d557c53c2197d51305cbe70a8"},
+    {file = "sqlean_py-3.50.4.5-cp313-cp313-manylinux_2_28_x86_64.whl", hash = "sha256:05eb8d758104339c8d8ecf99238e15bbf6ba07a572f770f1a92589d487a8282c"},
+    {file = "sqlean_py-3.50.4.5-cp314-cp314-macosx_10_15_x86_64.whl", hash = "sha256:78d1436db198ed633e0d56c3aeec52a4eaf54d47ef333bf7204687993236bc20"},
+    {file = "sqlean_py-3.50.4.5-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:51e33489be3a4e5d88712e1f7236d378208b8604f50d6f936b4da9b20e4f8327"},
+    {file = "sqlean_py-3.50.4.5-cp314-cp314-manylinux_2_28_aarch64.whl", hash = "sha256:ed29b050cbb13a4f7b80518d379f2742dfb15f079b2b237497738dfe8cdf1b59"},
+    {file = "sqlean_py-3.50.4.5-cp314-cp314-manylinux_2_28_x86_64.whl", hash = "sha256:af6b2b4b7f6c4bc3191db8ca2551ba2fec298c8507e64baf13c1f9026199f01c"},
+    {file = "sqlean_py-3.50.4.5.tar.gz", hash = "sha256:9764b565e7ab430ab6e9e43cb2816199c2b39926dffc93c212a52f0019278459"},
+]
+
+[[package]]
+name = "sqlite-vec"
+version = "0.1.9"
+description = ""
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "sqlite_vec-0.1.9-py3-none-macosx_10_6_x86_64.whl", hash = "sha256:1b62a7f0a060d9475575d4e599bbf94a13d85af896bc1ce86ee80d1b5b48e5fb"},
+    {file = "sqlite_vec-0.1.9-py3-none-macosx_11_0_arm64.whl", hash = "sha256:1d52e30513bae4cc9778ddbf6145610434081be4c3afe57cd877893bad9f6b6c"},
+    {file = "sqlite_vec-0.1.9-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:4e921e592f24a5f9a18f590b6ddd530eb637e2d474e3b1972f9bbeb773aa3cb9"},
+    {file = "sqlite_vec-0.1.9-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux1_x86_64.whl", hash = "sha256:1515727990b49e79bcaf75fdee2ffc7d461f8b66905013231251f1c8938e7786"},
+    {file = "sqlite_vec-0.1.9-py3-none-win_amd64.whl", hash = "sha256:4a28dc12fa4b53d7b1dced22da2488fade444e96b5d16fd2d698cd670675cf32"},
+]
+
+[[package]]
 name = "sqlparse"
 version = "0.5.5"
 description = "A non-validating SQL parser."
@@ -4146,4 +4192,4 @@ testing = ["coverage[toml]", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "aca812773d71bbc337c771767c5f2c3e3f97b1347b143440f5ffcc95938dc0e2"
+content-hash = "bbbe106d2e81603ca51517cff90da8121f142b962d0eca4818f85e6fd3d7ad2f"
