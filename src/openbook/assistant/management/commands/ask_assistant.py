@@ -1,3 +1,11 @@
+# OpenBook: Interactive Online Textbooks - Server
+# © 2026 Sebastian Wolf, Daniel Sachadä
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+
 # src/openbook/assistant/management/commands/ask_assistant.py
 from django.core.management.base import BaseCommand
 from openbook.assistant.services.client import AssistantClient, SNOW_FILE_PATH
