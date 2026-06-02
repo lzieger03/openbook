@@ -15,7 +15,7 @@ profile picture (REST), and request an e-mail change (allauth, verified).
 Username is read-only; e-mail becomes active only after the verification link.
 -->
 <script lang="ts">
-    import {onMount} from "svelte";
+    import {onDestroy, onMount} from "svelte";
     import {push} from "svelte-spa-router";
     import {fetchCurrentUser} from "../../api/gamification.js";
     import {fetchEmailAddresses, requestEmailChange, saveProfile} from "../../api/profile.js";
