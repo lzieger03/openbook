@@ -961,7 +961,7 @@
   .range {
     @layer daisyui.l1.l2.l3 {
       appearance: none;
-      webkit-appearance: none;
+      -webkit-appearance: none;
       --range-thumb: var(--color-base-100);
       --range-thumb-size: calc(var(--size-selector, 0.25rem) * 6);
       --range-progress: currentColor;
