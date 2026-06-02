@@ -26,10 +26,11 @@ License, or (at your option) any later version.
     const points = $derived(stats?.points ?? 0);
     const level = $derived(stats?.level ?? 1);
 
-    // No explicit "points needed for next level" is exposed; show progress toward
-    // the next 1000-point milestone as a reasonable visual approximation.
-    const pointsMax = $derived(points <= 0 ? 1000 : Math.ceil((points + 1) / 1000) * 1000);
-    const levelProgress = $derived((points / pointsMax) * 100);
+    // Progress towards the next level (from the level-threshold table); resets per level.
+    const levelProgress = $derived(stats?.levelProgress ?? 0);
+
+    // Points needed for the next level; at the max level fall back to the total.
+    const nextLevelPoints = $derived(stats?.nextLevelPoints ?? points);
 
     function format(value: number): string {
         return numberFormat.format(value);
@@ -43,7 +44,7 @@ License, or (at your option) any later version.
 
 <section class="card panel">
     <header class="panel-head">
-        <h2 class="panel-title">Your Stats</h2>
+        <h2 class="panel-title">My Stats</h2>
         <button type="button" class="btn btn-outline btn-sm" onclick={goToProfile}>Go to Profile</button>
     </header>
 
@@ -60,7 +61,7 @@ License, or (at your option) any later version.
                 <div class="level-bar">
                     <ProgressBar value={levelProgress} label={`Level ${level} progress`} />
                 </div>
-                <span class="level-points">{format(points)}</span>
+                <span class="level-points">{format(nextLevelPoints)}</span>
             </div>
         </div>
     </div>
@@ -75,9 +76,10 @@ License, or (at your option) any later version.
 
 <style>
     .panel {
+        flex: 0 0 auto;
         background: var(--color-base-100);
-        border-radius: 1rem;
-        padding: 1.5rem;
+        border-radius: 1.25rem;
+        padding: 1.75rem;
         box-shadow: 0 0 24px color-mix(in oklab, var(--color-primary) 10%, transparent);
     }
 

@@ -14,6 +14,7 @@ from openbook.auth.serializers.user import UserField
 from openbook.drf.flex_serializers  import FlexFieldsModelSerializer
 from openbook.drf.viewsets          import with_flex_fields_parameters
 from ..models.account_progress      import AccountProgress
+from ..models.level_threshold       import LevelThreshold
 
 class AccountProgressSerializer(FlexFieldsModelSerializer):
     __doc__ = "Account Progress"
@@ -29,8 +30,10 @@ class AccountProgressSerializer(FlexFieldsModelSerializer):
         }
 
 class AccountProgressMeSerializer(Serializer):
-    point_total = IntegerField()
-    level       = IntegerField()
+    point_total              = IntegerField()
+    level                    = IntegerField()
+    current_level_min_points = IntegerField()
+    next_level_min_points    = IntegerField(allow_null=True)
 
 class AccountProgressFilter(FilterSet):
     account = CharFilter(method="account_filter")
@@ -87,7 +90,26 @@ class AccountProgressViewSet(ReadOnlyModelViewSet):
             defaults={"point_total": 0, "level": 1},
         )[0]
 
+        level = account_progress.level
+
+        # Point bounds of the current level so the client can render a
+        # "progress towards the next level" bar that resets on each level-up.
+        current_threshold = (
+            LevelThreshold.objects
+            .filter(level__lte=level)
+            .order_by("-level")
+            .first()
+        )
+        next_threshold = (
+            LevelThreshold.objects
+            .filter(level__gt=level)
+            .order_by("level")
+            .first()
+        )
+
         return Response({
-            "point_total": account_progress.point_total,
-            "level":       account_progress.level,
+            "point_total":              account_progress.point_total,
+            "level":                    level,
+            "current_level_min_points": current_threshold.min_points if current_threshold else 0,
+            "next_level_min_points":    next_threshold.min_points if next_threshold else None,
         })

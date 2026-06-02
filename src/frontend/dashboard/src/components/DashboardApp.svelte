@@ -82,40 +82,52 @@ renders the loading / error / content states across the three panels.
 </div>
 
 <style>
+    /* Fill ~90% of the viewport with little margin around the edges. */
     .dashboard {
         flex: 1;
+        min-height: 0;
         display: flex;
         flex-direction: column;
-        gap: 2rem;
-        max-width: 80rem;
-        width: 100%;
+        gap: 1.25rem;
+        width: 90%;
+        max-width: 110rem;
         margin: 0 auto;
-        padding: 2rem 1.5rem 1rem;
+        padding: 1.25rem 0 0.5rem;
     }
 
     .top {
+        flex: 0 0 auto;
         text-align: center;
     }
 
     .title {
-        font-size: clamp(1.8rem, 4vw, 3rem);
+        font-size: clamp(1.6rem, 3.5vw, 2.6rem);
         font-weight: 800;
         letter-spacing: 0.04em;
         color: var(--color-base-content);
         text-shadow: 0 0 24px color-mix(in oklab, var(--color-primary) 45%, transparent);
     }
 
+    /* Stretch so both columns share the available height. */
     .grid {
+        flex: 1;
+        min-height: 0;
         display: grid;
         grid-template-columns: 2fr 1fr;
-        gap: 1.5rem;
-        align-items: start;
+        gap: 1.25rem;
+        align-items: stretch;
+    }
+
+    .grid-main {
+        display: flex;
+        min-height: 0;
     }
 
     .grid-side {
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
+        gap: 1.25rem;
+        min-height: 0;
     }
 
     .status {

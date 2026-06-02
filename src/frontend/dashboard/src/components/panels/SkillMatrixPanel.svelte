@@ -27,17 +27,28 @@ License, or (at your option) any later version.
 </section>
 
 <style>
+    /* Fill the remaining height of the right column and centre the radar. */
     .panel {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
         background: var(--color-base-100);
-        border-radius: 1rem;
-        padding: 1.5rem;
+        border-radius: 1.25rem;
+        padding: 1.75rem;
         box-shadow: 0 0 24px color-mix(in oklab, var(--color-primary) 10%, transparent);
     }
 
     .panel-title {
-        font-size: 1.3rem;
+        font-size: 1.5rem;
         font-weight: 700;
         margin-bottom: 1rem;
         color: var(--color-base-content);
+    }
+
+    .panel :global(svg) {
+        flex: 1;
+        min-height: 0;
+        margin: auto;
     }
 </style>

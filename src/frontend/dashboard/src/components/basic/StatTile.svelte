@@ -27,16 +27,23 @@ A single stat: an emoji icon above a value, with an accessible label.
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 0.25rem;
+        justify-content: center;
+        gap: 0.35rem;
+        text-align: center;
     }
 
     .stat-icon {
+        display: block;
+        width: 100%;
+        text-align: center;
         font-size: 1.5rem;
         line-height: 1;
-        filter: drop-shadow(0 0 8px color-mix(in oklab, var(--color-primary) 50%, transparent));
     }
 
     .stat-value {
+        display: block;
+        width: 100%;
+        text-align: center;
         font-weight: 700;
         font-size: 1.1rem;
         color: var(--color-base-content);

@@ -18,6 +18,8 @@ import {apiGet} from "./client.js";
 export interface AccountProgressDto {
     point_total: number;
     level: number;
+    current_level_min_points?: number;
+    next_level_min_points?: number | null;
 }
 
 export interface StreakDto {
