@@ -14,13 +14,6 @@ import django
 from django.conf import settings
 from mistralai.client import Mistral
 
-if __name__ == "__main__":
-    # START - Only in development (SO WE RUN THIS FILE LOCALLY)
-    sys.path.append(str(Path(__file__).resolve().parents[3]))
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "openbook.settings")
-
-    django.setup()
-    # END
 
 try:  # Drop-In replacement für SQLite 3 aufgrund von MacOS Problemen mit Loadable Extensions
     import sqlean as sqlite3
@@ -200,29 +193,29 @@ class AssistantClient:
 
 lm_client = AssistantClient()
 
-if __name__ == "__main__":
-    # START - Only in development (SO WE RUN THIS FILE LOCALLY)
-    sys.path.append(str(Path(__file__).resolve().parents[3]))
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "openbook.settings")
+# if __name__ == "__main__":
+#     # START - Only in development (SO WE RUN THIS FILE LOCALLY)
+#     sys.path.append(str(Path(__file__).resolve().parents[3]))
+#     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "openbook.settings")
 
-    django.setup()
-    # END
+#     django.setup()
+#     # END
 
-    # For's testing purposes, use local file (by default)
-    file_path = input(
-        f"Gib den Pfad zur Textdatei ein (Enter für '{SNOW_FILE_PATH}'): "
-    ).strip()
-    if not file_path:
-        file_path = SNOW_FILE_PATH
+#     # For's testing purposes, use local file (by default)
+#     file_path = input(
+#         f"Gib den Pfad zur Textdatei ein (Enter für '{SNOW_FILE_PATH}'): "
+#     ).strip()
+#     if not file_path:
+#         file_path = SNOW_FILE_PATH
 
-    try:
-        lm_client.load_data(file_path)
-        query = input("\nDeine Frage: ").strip()
-        answer = lm_client.perform_rag_query(query)
-        print(f"Antwort:\n{answer}")
-    except KeyboardInterrupt:
-        print("\nAbbruch durch Benutzer. Auf Wiedersehen!")
-        sys.exit(0)
-    except Exception as e:
-        print(f"Fehler beim Laden der Datei: {e}")
-        sys.exit(1)
+#     try:
+#         lm_client.load_data(file_path)
+#         query = input("\nDeine Frage: ").strip()
+#         answer = lm_client.perform_rag_query(query)
+#         print(f"Antwort:\n{answer}")
+#     except KeyboardInterrupt:
+#         print("\nAbbruch durch Benutzer. Auf Wiedersehen!")
+#         sys.exit(0)
+#     except Exception as e:
+#         print(f"Fehler beim Laden der Datei: {e}")
+#         sys.exit(1)
