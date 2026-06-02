@@ -14,14 +14,14 @@ except ImportError:
     import sqlite3
 import sqlite_vec
 from sqlite_vec import serialize_float32
-from .client import AssistantClient, SNOW_FILE_PATH
+from .llm_client import LLM_Client, SNOW_FILE_PATH
 
 DB_PATH = settings.BASE_DIR / "db.sqlite3"
 
 
 class RagClient:
     def __init__(self):
-        self.assistant = AssistantClient()
+        self.assistant = LLM_Client()
         self.text_data = None
 
         # Setup SQLite connection
