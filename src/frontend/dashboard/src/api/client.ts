@@ -65,3 +65,92 @@ export async function apiGet<T>(path: string, query: Record<string, string> = {}
 
     return (await response.json()) as T;
 }
+
+/** Read a cookie value by name (used for the CSRF token on write requests). */
+function readCookie(name: string): string {
+    const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+    return match ? decodeURIComponent(match[1]) : "";
+}
+
+/** Best-effort extraction of a human-readable message from an API error body. */
+function extractError(data: unknown): string {
+    if (typeof data === "string") {
+        return data;
+    }
+
+    if (data && typeof data === "object") {
+        const record = data as Record<string, unknown>;
+
+        if (typeof record.detail === "string") {
+            return record.detail;
+        }
+
+        // allauth wraps errors as {errors: [{message}]}.
+        if (Array.isArray(record.errors)) {
+            const messages = record.errors
+                .map((entry) => (entry && typeof entry === "object" ? String((entry as Record<string, unknown>).message ?? "") : ""))
+                .filter(Boolean);
+            if (messages.length > 0) {
+                return messages.join(" ");
+            }
+        }
+
+        // DRF field errors: {field: ["msg", ...]}.
+        const fieldMessages = Object.values(record)
+            .flatMap((value) => (Array.isArray(value) ? value : [value]))
+            .filter((value): value is string => typeof value === "string");
+        if (fieldMessages.length > 0) {
+            return fieldMessages.join(" ");
+        }
+    }
+
+    return "";
+}
+
+type WriteMethod = "POST" | "PUT" | "PATCH" | "DELETE";
+
+/**
+ * Perform a typed write request. JSON bodies are serialized automatically; pass a
+ * `FormData` body with `{formData: true}` for multipart uploads. The CSRF token is
+ * read from the cookie and the session cookie is sent for authentication.
+ */
+export async function apiSend<T>(
+    method: WriteMethod,
+    path: string,
+    body?: unknown,
+    options: {formData?: boolean} = {},
+): Promise<T> {
+    const base = await getBaseUrl();
+
+    const headers: Record<string, string> = {
+        Accept: "application/json",
+        "X-CSRFToken": readCookie("csrftoken"),
+    };
+
+    let payload: BodyInit | undefined;
+
+    if (options.formData && body instanceof FormData) {
+        payload = body; // The browser sets the multipart Content-Type with boundary.
+    } else if (body !== undefined) {
+        headers["Content-Type"] = "application/json";
+        payload = JSON.stringify(body);
+    }
+
+    const response = await fetch(`${base}${path}`, {
+        method,
+        credentials: "include",
+        headers,
+        body: payload,
+    });
+
+    if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        throw new Error(extractError(data) || `Request to ${path} failed (HTTP ${response.status}).`);
+    }
+
+    if (response.status === 204) {
+        return undefined as T;
+    }
+
+    return (await response.json().catch(() => undefined)) as T;
+}

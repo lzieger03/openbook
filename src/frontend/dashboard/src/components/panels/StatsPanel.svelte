@@ -18,7 +18,15 @@ License, or (at your option) any later version.
     import StatTile from "../basic/StatTile.svelte";
     import type {DashboardStats, DashboardUser} from "../../data/dashboard.js";
 
-    let {user, stats}: {user: DashboardUser | null; stats: DashboardStats | null} = $props();
+    let {
+        user,
+        stats,
+        onProfile,
+    }: {
+        user: DashboardUser | null;
+        stats: DashboardStats | null;
+        onProfile?: () => void;
+    } = $props();
 
     const numberFormat = new Intl.NumberFormat();
 
@@ -35,17 +43,12 @@ License, or (at your option) any later version.
     function format(value: number): string {
         return numberFormat.format(value);
     }
-
-    function goToProfile(): void {
-        // Placeholder target: no dedicated profile route exists yet, so link to the app.
-        window.location.href = "/app/index.html";
-    }
 </script>
 
 <section class="card panel">
     <header class="panel-head">
         <h2 class="panel-title">My Stats</h2>
-        <button type="button" class="btn btn-outline btn-sm" onclick={goToProfile}>Go to Profile</button>
+        <button type="button" class="btn btn-outline btn-sm" onclick={() => onProfile?.()}>Go to Profile</button>
     </header>
 
     <div class="identity">
@@ -61,7 +64,7 @@ License, or (at your option) any later version.
                 <div class="level-bar">
                     <ProgressBar value={levelProgress} label={`Level ${level} progress`} />
                 </div>
-                <span class="level-points">{format(nextLevelPoints)}</span>
+                <span class="level-points">{format(points)}</span>
             </div>
         </div>
     </div>
@@ -76,10 +79,9 @@ License, or (at your option) any later version.
 
 <style>
     .panel {
-        flex: 0 0 auto;
         background: var(--color-base-100);
-        border-radius: 1.25rem;
-        padding: 1.75rem;
+        border-radius: 1rem;
+        padding: 1.5rem;
         box-shadow: 0 0 24px color-mix(in oklab, var(--color-primary) 10%, transparent);
     }
 
