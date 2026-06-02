@@ -18,7 +18,7 @@ except ImportError:
 import sqlite_vec
 from sqlite_vec import serialize_float32
 
-DB_PATH = settings.BASE_DIR / "rag_docs.db"
+DB_PATH = settings.BASE_DIR / "db.sqlite3"
 SNOW_FILE_PATH = (
     settings.BASE_DIR / "openbook/assistant/services/test_files/white-black.txt"
 )
