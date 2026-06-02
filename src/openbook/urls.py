@@ -58,3 +58,6 @@ if settings.DEBUG:
 
     # Frontend SPA
     urlpatterns += static("app/", document_root=f"{settings.BASE_DIR}/frontend/app/dist/openbook/app")
+
+    # Gamification dashboard microfrontend
+    urlpatterns += static("dashboard/", document_root=f"{settings.BASE_DIR}/frontend/dashboard/dist/openbook/dashboard")

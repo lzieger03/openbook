@@ -80,4 +80,12 @@ export default {
     course: {
         courses:                new apiClient.CoursesApi(apiConfiguration),
     },
+
+    // Gamification App
+    gamification: {
+        accountProgress:        new apiClient.AccountProgressApi(apiConfiguration),
+        courseProgress:         new apiClient.CourseProgressApi(apiConfiguration),
+        skillProgress:          new apiClient.SkillProgressApi(apiConfiguration),
+        streak:                 new apiClient.StreakApi(apiConfiguration),
+    },
 }

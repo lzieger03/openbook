@@ -16,16 +16,28 @@ Root component of the application which defines the global application UI.
 <script lang="ts">
     import Router from "svelte-spa-router";
     import routes from "./routes.js";
+    import AppHeader from "./app-frame/AppHeader.svelte";
+    import AppFooter from "./app-frame/AppFooter.svelte";
 </script>
 
-<main>
-    <Router {routes} />
+<main class="app-frame">
+    <AppHeader />
+    <section class="app-content">
+        <Router {routes} />
+    </section>
+    <AppFooter />
 </main>
 
 <style>
-    main {
+    .app-frame {
         flex: 1;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
 
+    .app-content {
+        flex: 1;
         display: flex;
         flex-direction: column;
     }

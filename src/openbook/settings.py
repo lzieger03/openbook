@@ -620,6 +620,7 @@ STATIC_ROOT = BASE_DIR / "_static"
 STATICFILES_DIRS = [
     BASE_DIR / "frontend" / "admin" / "dist",
     BASE_DIR / "frontend" / "app" / "dist",
+    BASE_DIR / "frontend" / "dashboard" / "dist",
 ]
 
 # Uploaded media files
