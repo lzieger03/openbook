@@ -11,12 +11,12 @@ from mistralai.client import Mistral
 import requests
 
 
-class MistralClient:
+class AssistantClient:
     _instance = None
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
-            cls._instance = super(MistralClient, cls).__new__(cls)
+            cls._instance = super(AssistantClient, cls).__new__(cls)
         return cls._instance
 
     def __init__(self):
@@ -55,4 +55,4 @@ class MistralClient:
         return f"Results for: {query}"
 
 
-mistral_client = MistralClient()
+assistant_client = AssistantClient()
