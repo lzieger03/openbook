@@ -6,10 +6,6 @@
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 
-import os
-import sys
-from pathlib import Path
-import django
 
 from django.conf import settings
 from mistralai.client import Mistral
@@ -192,30 +188,3 @@ class AssistantClient:
 
 
 lm_client = AssistantClient()
-
-# if __name__ == "__main__":
-#     # START - Only in development (SO WE RUN THIS FILE LOCALLY)
-#     sys.path.append(str(Path(__file__).resolve().parents[3]))
-#     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "openbook.settings")
-
-#     django.setup()
-#     # END
-
-#     # For's testing purposes, use local file (by default)
-#     file_path = input(
-#         f"Gib den Pfad zur Textdatei ein (Enter für '{SNOW_FILE_PATH}'): "
-#     ).strip()
-#     if not file_path:
-#         file_path = SNOW_FILE_PATH
-
-#     try:
-#         lm_client.load_data(file_path)
-#         query = input("\nDeine Frage: ").strip()
-#         answer = lm_client.perform_rag_query(query)
-#         print(f"Antwort:\n{answer}")
-#     except KeyboardInterrupt:
-#         print("\nAbbruch durch Benutzer. Auf Wiedersehen!")
-#         sys.exit(0)
-#     except Exception as e:
-#         print(f"Fehler beim Laden der Datei: {e}")
-#         sys.exit(1)

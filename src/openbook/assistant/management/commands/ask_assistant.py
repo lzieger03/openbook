@@ -1,5 +1,4 @@
 # src/openbook/assistant/management/commands/ask_assistant.py
-import sys
 from django.core.management.base import BaseCommand
 from openbook.assistant.services.client import AssistantClient, SNOW_FILE_PATH
 
