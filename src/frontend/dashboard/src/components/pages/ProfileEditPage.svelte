@@ -101,6 +101,10 @@ Username is read-only; e-mail becomes active only after the verification link.
                 message += " A verification link was sent to the new e-mail address.";
             }
 
+            if (previewUrl) {
+                URL.revokeObjectURL(previewUrl);
+            }
+
             pictureFile = null;
             previewUrl = null;
             await dashboardStore.refresh();
