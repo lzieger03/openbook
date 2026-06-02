@@ -70,6 +70,12 @@ Username is read-only; e-mail becomes active only after the verification link.
             });
     });
 
+    onDestroy(() => {
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+        }
+    });
+
     function onPickFile(event: Event): void {
         const input = event.currentTarget as HTMLInputElement;
         const file = input.files?.[0] ?? null;
