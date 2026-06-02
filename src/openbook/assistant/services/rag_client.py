@@ -1,3 +1,11 @@
+# OpenBook: Interactive Online Textbooks - Server
+# © 2026 Sebastian Wolf, Daniel Sachadä
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+
 from django.conf import settings
 
 try:  # Drop-In replacement für SQLite 3 aufgrund von MacOS Problemen mit Loadable Extensions
@@ -94,7 +102,7 @@ class RagClient:
         context = "\n\n".join(top_contexts)
 
         prompt = f"""
-            Du bist ein hilfreicher Assistent. 
+            Du bist ein hilfreicher Assistent.
             Beantworte die folgende Frage basierend auf diesem Kontext:
             \n\n{context}\n\nFrage: {query}
         """.strip()
