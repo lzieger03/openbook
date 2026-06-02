@@ -152,9 +152,7 @@ CHANNEL_LAYERS = {
     },
 }
 
-LLM_API_KEY  = ""
-LLM_BASE_URL = ""
-LLM_MODEL    = ""
+MISTRAL_API_KEY = ""
 
 # Django REST framework
 REST_FRAMEWORK = {
