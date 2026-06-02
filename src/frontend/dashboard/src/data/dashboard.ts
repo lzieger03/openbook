@@ -40,6 +40,10 @@ export interface DashboardUser {
 export interface DashboardStats {
     points: number;
     level: number;
+    // Progress (0–100) towards the next level; resets to 0 on each level-up.
+    levelProgress: number;
+    // Points required to reach the next level (null at the maximum level).
+    nextLevelPoints: number | null;
     currentStreak: number;
     longestStreak: number;
     streakFreezes: number;
@@ -92,14 +96,32 @@ function mapUser(user: CurrentUserDto | null): DashboardUser | null {
     };
 }
 
+/** Progress (0–100) from the current level's threshold towards the next one. */
+function levelProgress(points: number, progress: AccountProgressDto | null): number {
+    const currentMin = toNumber(progress?.current_level_min_points);
+    const nextMin = progress?.next_level_min_points;
+
+    // No higher level defined (max level reached) => bar full.
+    if (nextMin === null || nextMin === undefined) {
+        return 100;
+    }
+
+    const span = nextMin - currentMin;
+    return span > 0 ? clampPercent(((points - currentMin) / span) * 100) : 0;
+}
+
 function mapStats(progress: AccountProgressDto | null, streak: StreakDto | null): DashboardStats | null {
     if (!progress && !streak) {
         return null;
     }
 
+    const points = toNumber(progress?.point_total);
+
     return {
-        points: toNumber(progress?.point_total),
+        points,
         level: toNumber(progress?.level, 1),
+        levelProgress: levelProgress(points, progress),
+        nextLevelPoints: progress?.next_level_min_points ?? null,
         currentStreak: toNumber(streak?.current_streak),
         longestStreak: toNumber(streak?.longest_streak),
         streakFreezes: toNumber(streak?.streak_freezes),

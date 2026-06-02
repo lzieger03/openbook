@@ -36,81 +36,118 @@ skills are shown as a flat list rather than nested under their course.
         <SegmentedTabs tabs={tabs} active="Current" disabledTabs={disabledTabs} />
     </header>
 
-    {#if isEmpty}
-        <p class="empty">No learning progress yet. Start a course to see it here.</p>
-    {:else}
-        {#each courses as course (course.id)}
-            <div class="course-group">
-                <div class="course-head">
-                    <span class="course-name">{course.name}</span>
-                    <span class="course-percent">{Math.round(course.progress)}%</span>
+    <div class="panel-body">
+        {#if isEmpty}
+            <p class="empty">No learning progress yet. Start a course to see it here.</p>
+        {:else}
+            {#each courses as course (course.id)}
+                <div class="course-group">
+                    <div class="course-head">
+                        <span class="course-name">{course.name}</span>
+                        <span class="course-bar">
+                            <ProgressBar value={course.progress} label={`${course.name} progress`} />
+                        </span>
+                        <span class="course-percent">{Math.round(course.progress)}%</span>
+                    </div>
                 </div>
-                <ProgressBar value={course.progress} label={`${course.name} progress`} />
-            </div>
-        {/each}
+            {/each}
 
-        {#if skills.length > 0}
-            <ul class="skill-list">
-                {#each skills as skill (skill.id)}
-                    <li>
-                        <LearningRow label={skill.name} iconPath={skill.iconPath} />
-                    </li>
-                {/each}
-            </ul>
+            {#if skills.length > 0}
+                <ul class="skill-list">
+                    {#each skills as skill (skill.id)}
+                        <li>
+                            <LearningRow label={skill.name} iconPath={skill.iconPath} />
+                        </li>
+                    {/each}
+                </ul>
+            {/if}
         {/if}
-    {/if}
+    </div>
 </section>
 
 <style>
+    /* Fill the grid cell at a fixed height; the body scrolls instead of growing. */
     .panel {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
         background: var(--color-base-100);
-        border-radius: 1rem;
-        padding: 1.5rem;
+        border-radius: 1.25rem;
+        padding: 1.75rem;
         box-shadow: 0 0 24px color-mix(in oklab, var(--color-primary) 10%, transparent);
     }
 
     .panel-head {
+        flex: 0 0 auto;
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 1rem;
-        margin-bottom: 1.25rem;
+        padding-bottom: 1rem;
+        margin-bottom: 0.5rem;
+        border-bottom: 1px solid color-mix(in oklab, var(--color-base-content) 8%, transparent);
     }
 
     .panel-title {
-        font-size: 1.3rem;
+        font-size: 1.5rem;
         font-weight: 700;
+        letter-spacing: 0.02em;
         color: var(--color-base-content);
+    }
+
+    /* Scroll area: keeps the card a fixed size regardless of how many items. */
+    .panel-body {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        padding-right: 0.5rem;
+    }
+
+    .panel-body::-webkit-scrollbar {
+        width: 0.5rem;
+    }
+
+    .panel-body::-webkit-scrollbar-thumb {
+        border-radius: 999px;
+        background: color-mix(in oklab, var(--color-base-content) 20%, transparent);
     }
 
     .course-group {
-        margin-bottom: 1.25rem;
+        margin: 1.25rem 0;
     }
 
+    /* Fixed name + percent columns => the 1fr bar column is identical on every row. */
     .course-head {
-        display: flex;
-        align-items: baseline;
-        justify-content: space-between;
-        margin-bottom: 0.4rem;
+        display: grid;
+        grid-template-columns: 15rem 1fr 3.5rem;
+        align-items: center;
+        gap: 1rem;
     }
 
     .course-name {
-        font-size: 1.1rem;
-        font-weight: 600;
+        font-size: 1.8rem;
+        font-weight: 700;
         color: var(--color-base-content);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .course-bar {
+        min-width: 0;
     }
 
     .course-percent {
         font-weight: 700;
-        color: var(--color-primary);
+        text-align: right;
+        color: var(--color-base-content);
     }
 
     .skill-list {
         list-style: none;
         margin: 0;
         padding: 0;
-        border-top: 1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);
-        padding-top: 0.5rem;
     }
 
     .empty {

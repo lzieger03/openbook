@@ -34,10 +34,11 @@ License, or (at your option) any later version.
     const points = $derived(stats?.points ?? 0);
     const level = $derived(stats?.level ?? 1);
 
-    // No explicit "points needed for next level" is exposed; show progress toward
-    // the next 1000-point milestone as a reasonable visual approximation.
-    const pointsMax = $derived(points <= 0 ? 1000 : Math.ceil((points + 1) / 1000) * 1000);
-    const levelProgress = $derived((points / pointsMax) * 100);
+    // Progress towards the next level (from the level-threshold table); resets per level.
+    const levelProgress = $derived(stats?.levelProgress ?? 0);
+
+    // Points needed for the next level; at the max level fall back to the total.
+    const nextLevelPoints = $derived(stats?.nextLevelPoints ?? points);
 
     function format(value: number): string {
         return numberFormat.format(value);
@@ -46,7 +47,7 @@ License, or (at your option) any later version.
 
 <section class="card panel">
     <header class="panel-head">
-        <h2 class="panel-title">Your Stats</h2>
+        <h2 class="panel-title">My Stats</h2>
         <button type="button" class="btn btn-outline btn-sm" onclick={() => onProfile?.()}>Go to Profile</button>
     </header>
 
