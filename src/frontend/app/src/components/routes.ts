@@ -11,7 +11,7 @@
 import type { BreadcrumbsItem } from "../stores/breadcrumbs.js";
 import type { RouteDetail }     from "svelte-spa-router";
 
-import {i18n}                   from "../stores/i18n.js";
+// import {i18n}                   from "../stores/i18n.js";
 import {breadcrumbs}            from "../stores/breadcrumbs.js";
 import {wrap}                   from "svelte-spa-router/wrap";
 
@@ -46,7 +46,7 @@ export default {
         conditions: [setBreadcrumbsLine([
             {
                 href:  "",
-                label: i18n.value.Error.Page.NotFound.Title,
+                label: "Not Found", //i18n.value.Error.Page.NotFound.Title,
             },
         ])],
     }),

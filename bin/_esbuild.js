@@ -8,10 +8,11 @@
  * License, or (at your option) any later version.
  */
 
-import * as esbuild from "esbuild";
-import path         from "node:path";
-import shelljs      from "shelljs";
-import sveltePlugin from "esbuild-svelte";
+import * as esbuild     from "esbuild";
+import path             from "node:path";
+import shelljs          from "shelljs";
+import esbuildSvelte    from "esbuild-svelte";
+import sveltePreprocess from "svelte-preprocess";
 
 /**
  * Centralized esbuild configuration to build JavaScript assets. This is used
@@ -36,7 +37,7 @@ export async function runEsbuild({infile, outfiles, staticdirs, watch, plugins} 
     let ctx = await esbuild.context({
         entryPoints: [infile],
         bundle:      true,
-        minify:      true,
+        minify:      false, //true,
         outfile:     outfiles[0],
         sourcemap:   true,
         format:      "esm",
@@ -45,7 +46,8 @@ export async function runEsbuild({infile, outfiles, staticdirs, watch, plugins} 
         conditions: ["svelte", "browser"],
 
         plugins: [
-            sveltePlugin({
+            esbuildSvelte({
+                preprocess: sveltePreprocess(),
                 compilerOptions: {
                     compatibility: {
                         componentApi: 4

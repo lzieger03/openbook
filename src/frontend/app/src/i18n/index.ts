@@ -8,7 +8,7 @@
  * License, or (at your option) any later version.
  */
 
-import en from "./lang/en.js";
+import type en from "./lang/en.js";
 
 /**
  * Typing for message catalogues. This simply mirrors the dynamically inferred

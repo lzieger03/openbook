@@ -13,6 +13,8 @@ License, or (at your option) any later version.
 Root component of the application which defines the global application UI.
 -->
 
+<!-- TODO: Render toasts -->
+
 <script lang="ts">
     import NavigationBar        from "./app-frame/NavigationBar.svelte";
     import LoadingAnimation     from "./app-frame/LoadingAnimation.svelte";

@@ -26,10 +26,14 @@ Top navigation page of the application frame.
     import {i18n}            from "../../stores/i18n.js";
     import {availableThemes} from "../../stores/theme.js";
     import {theme}           from "../../stores/theme.js";
+    // import api               from "../../stores/api.js";
 
     import AvatarDefault     from "./img/AvatarDefault.jpg";
 
     let avatar = $state(AvatarDefault);
+
+    // let site = backend.openbook.call("/api/core/sites/", "error-toast");
+    // let siteData = await site.GET();
 
     function switchTheme(event: MouseEvent) {
         const target = event.currentTarget as HTMLElement | null;

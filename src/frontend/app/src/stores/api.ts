@@ -8,48 +8,49 @@
  * License, or (at your option) any later version.
  */
 
-import type {Client}     from "openapi-fetch";
+import type { Client }                 from "openapi-fetch";
+import type { paths as authPaths }     from "../api/openapi/auth";
+import type { paths as openbookPaths } from "../api/openapi/openbook";
 
-import client              from "../backend";
-import { rethrowAppError } from "../utils/error";
-import { toast }           from "./toast";
+import clients                         from "../api/index.js";
+import { rethrowAppError }             from "../utils/error.js";
+import { toast }                       from "./toast.js";
 
 /**
- * Factory for creating typed API client wrappers for a given OpenAPI client.
+ * Factory for pre-configured wrapped API clients. The raw API clients are wrapped here
+ * to simplify typical usage scenarios in a Svelte component.
  *
- * @template Paths The OpenAPI paths type.
+ * First of all, it is assumed that each component only ever accesses very few paths
+ * (usually one) but needs to call different HTTP methods on that path. Therefore, the
+ * path is only given once during creation of the wrapped API client.
+ *
+ * Next, errors are automatically handled in one of two possible ways:
+ *
+ * - "error-page" (default): Remote errors are thrown as exceptions, so that the
+ *   `ApplicationFrame` can render a full-size error page.
+ *
+ * - "error-toast": Remote errors don't throw but trigger a toast notification.
+ *   The wrapped client methods return the error object, for the caller to recognize
+ *   and handle the error.
  */
-class ClientWrapperFactory<Paths extends {}> {
+export default {
     /**
-     * The OpenAPI client instance.
+     * @returns Wrapped API client for the authentication API
      */
-    client: Client<Paths>
+    auth: async <Path extends AllPaths<authPaths>>(path: Path, errors: ErrorHandling = "error-page") => {
+        let client = await clients.auth();
+        return new ClientWrapper(client, path, errors);
+
+    },
 
     /**
-     * Create a new factory for a specific OpenAPI client.
-     *
-     * @param client The OpenAPI client instance.
+     * @returns Wrapped API client for the OpenBook API
      */
-    constructor(client: Client<Paths>) {
-        this.client = client;
-    }
-
-    /**
-     * Create a new client wrapper for a specific API path and error handling mode.
-     *
-     * @param path The OpenAPI path to call.
-     * @param errors The error handling mode.
-     * @returns A client wrapper for the given path.
-     */
-    call<Path extends AllPaths<Paths>>(path: Path, errors: ErrorHandling): ClientWrapper<Paths, Path> {
-        return new ClientWrapper(this.client, path, errors);
-    }
-}
-
-/**
- * Error handling modes for API calls.
- */
-export type ErrorHandling = "error-toast" | "error-page";
+    openbook: async <Path extends AllPaths<openbookPaths>>(path: Path, errors: ErrorHandling = "error-page") => {
+        let client = await clients.openbook();
+        return new ClientWrapper(client, path, errors);
+    },
+};
 
 /**
  * Wrapper for calling a specific OpenAPI path with error handling.
@@ -191,37 +192,31 @@ class ClientWrapper<Paths extends {}, Path extends AllPaths<Paths>> {
 }
 
 /**
- * Client stubs to call the backend REST API from inside other Svelte stores
- * or Svelte UI components.
+ * Error handling modes for API calls.
  */
-export default {
-    auth:     new ClientWrapperFactory(client.auth),
-    openbook: new ClientWrapperFactory(client.openbook),
-}
-
+export type ErrorHandling = "error-toast" | "error-page";
 
 /* The following types extract the paths from the OpenAPI-generated
  * types that support each respective HTTP method. They work like this:
  *
- * Iterate over all keys (Key) in the Path object.
- * For each key, check if the value has a property for the wished HTTP method.
- * If yes, keep the key; if not, set it to never.
+ * Iterate over each path in the paths object.
+ * For each path, check if has a property for the given HTTP method.
+ * If yes, keep the path; if not, set it to never.
  *
- * The final [keyof Path] at the end creates a union of all the keys that are not never.
+ * The final [keyof Paths] at the end creates a union of all the keys that are not never.
  */
-export type AllPaths<Path>    = {[Key in keyof Path]: Key}[keyof Path];
-export type GetPaths<Path>    = {[Key in keyof Path]: Path[Key] extends {get:    any} ? Key : never}[keyof Path];
-export type PostPaths<Path>   = {[Key in keyof Path]: Path[Key] extends {post:   any} ? Key : never}[keyof Path];
-export type PutPaths<Path>    = {[Key in keyof Path]: Path[Key] extends {put:    any} ? Key : never}[keyof Path];
-export type PatchPaths<Path>  = {[Key in keyof Path]: Path[Key] extends {patch:  any} ? Key : never}[keyof Path];
-export type DeletePaths<Path> = {[Key in keyof Path]: Path[Key] extends {delete: any} ? Key : never}[keyof Path];
+export type AllPaths<Paths>    = {[Path in keyof Paths]: Path}[keyof Paths];
+export type GetPaths<Paths>    = {[Path in keyof Paths]: Paths[Path] extends {get:    any} ? Path : never}[keyof Paths];
+export type PostPaths<Paths>   = {[Path in keyof Paths]: Paths[Path] extends {post:   any} ? Path : never}[keyof Paths];
+export type PutPaths<Paths>    = {[Path in keyof Paths]: Paths[Path] extends {put:    any} ? Path : never}[keyof Paths];
+export type PatchPaths<Paths>  = {[Path in keyof Paths]: Paths[Path] extends {patch:  any} ? Path : never}[keyof Paths];
+export type DeletePaths<Paths> = {[Path in keyof Paths]: Paths[Path] extends {delete: any} ? Path : never}[keyof Paths];
 
 /**
  * The following types extract the result types for each HTTP method and path.
  *
- * For a given path key, check if the value at that key has a get/put/... property with
- * a response for the expected HTTP status (e.g., 200 for GET, 201 for PUT, 204 for DELETE)
- * and content type application/json.
+ * For a given path, check it has a get/put/... property with a response for the expected
+ * HTTP status (e.g., 200 for GET, 201 for PUT, 204 for DELETE) and content type application/json.
  *
  * If so, use TypeScript’s infer keyword to extract the type of the response body as `data`.
  * The result type always includes `data`, `error`, and `response` fields.
@@ -230,8 +225,8 @@ export type DeletePaths<Path> = {[Key in keyof Path]: Path[Key] extends {delete:
  * Note: Error and non-JSON responses are typed as unknown because they are not explicitly defined
  * in the OpenAPI schema.
  */
-type GetResult<Path, Key extends keyof Path> =
-    Path[Key] extends {get: {responses: infer Responses}}
+type GetResult<Paths, Path extends keyof Paths> =
+    Paths[Path] extends {get: {responses: infer Responses}}
         ? {
                 data:     Responses extends {200: {content: {"application/json": infer ResponseBody}}} ? ResponseBody : undefined;
                 error:    unknown;
@@ -239,8 +234,8 @@ type GetResult<Path, Key extends keyof Path> =
             }
         : ErrorResult;
 
-type PostResult<Path, Key extends keyof Path> =
-    Path[Key] extends {post: {responses: infer Responses}}
+type PostResult<Paths, Path extends keyof Paths> =
+    Paths[Path] extends {post: {responses: infer Responses}}
         ? {
                 data:     Responses extends {201: {content: {"application/json": infer ResponseBody}}} ? ResponseBody : undefined;
                 error:    unknown;
@@ -248,8 +243,8 @@ type PostResult<Path, Key extends keyof Path> =
             }
         : ErrorResult;
 
-type PutResult<Path, Key extends keyof Path> =
-    Path[Key] extends {put: {responses: infer Responses}}
+type PutResult<Paths, Path extends keyof Paths> =
+    Paths[Path] extends {put: {responses: infer Responses}}
         ? {
                 data:     Responses extends {200: {content: {"application/json": infer ResponseBody}}} ? ResponseBody : undefined;
                 error:    unknown;
@@ -257,8 +252,8 @@ type PutResult<Path, Key extends keyof Path> =
             }
         : ErrorResult;
 
-type PatchResult<Path, Key extends keyof Path> =
-    Path[Key] extends {patch: {responses: infer Responses}}
+type PatchResult<Paths, Path extends keyof Paths> =
+    Paths[Path] extends {patch: {responses: infer Responses}}
         ? {
                 data:     Responses extends {200: {content: {"application/json": infer ResponseBody}}} ? ResponseBody : undefined;
                 error:    unknown;
@@ -266,8 +261,8 @@ type PatchResult<Path, Key extends keyof Path> =
             }
         : ErrorResult;
 
-type DeleteResult<Path, Key extends keyof Path> =
-    Path[Key] extends {delete: {responses: infer Responses}}
+type DeleteResult<Paths, Path extends keyof Paths> =
+    Paths[Path] extends {delete: {responses: infer Responses}}
         ? {
                 data:     Responses extends {204: {content: {"application/json": infer ResponseBody}}} ? ResponseBody : undefined;
                 error:    unknown;

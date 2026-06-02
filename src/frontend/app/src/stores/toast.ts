@@ -8,7 +8,7 @@
  * License, or (at your option) any later version.
  */
 
-import {ReadableStore} from "../utils/store.js";
+import { ReadableStore } from "../utils/store.js";
 
 /**
  * A short information, warning or error message.
