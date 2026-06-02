@@ -12,6 +12,7 @@ from channels.security.websocket import AllowedHostsOriginValidator
 from channels.auth               import AuthMiddlewareStack
 from django.core.asgi            import get_asgi_application
 from django.urls                 import path
+from openbook.ai.routing        import websocket_urlpatterns
 
 # Initialize Django ASGI application early to ensure the AppRegistry
 # is populated before importing code that may import ORM models.
@@ -31,6 +32,7 @@ application = ProtocolTypeRouter({
             # Therefor we define all routes of all Django apps here.
             URLRouter([
                 ## path("ws/example-websocket-client", ExampleWebsocketClient.as_asgi())
+                *websocket_urlpatterns,
             ]),
         ),
     ),

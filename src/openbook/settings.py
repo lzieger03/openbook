@@ -34,6 +34,8 @@ INSTALLED_APPS = [
     "openbook.core",
     "openbook.auth",
     "openbook.content",
+    "openbook.learning",
+    "openbook.ai",
 
     # 3rd-party reusable apps
     "daphne",
@@ -149,6 +151,10 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+LLM_API_KEY  = ""
+LLM_BASE_URL = ""
+LLM_MODEL    = ""
 
 # Django REST framework
 REST_FRAMEWORK = {
