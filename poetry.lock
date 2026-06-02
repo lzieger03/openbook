@@ -3390,6 +3390,7 @@ description = "sqlite3 with extensions"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
+markers = "sys_platform == \"darwin\""
 files = [
     {file = "sqlean_py-3.50.4.5-cp310-cp310-macosx_10_15_x86_64.whl", hash = "sha256:6823757790bf92198be58256e4d243cd28aa5a3188bb22709514667a136096c1"},
     {file = "sqlean_py-3.50.4.5-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:9152bd9a5056282f33724f666a71bd297d970e39a829f05fbfd0bee6897d7195"},
@@ -4192,4 +4193,4 @@ testing = ["coverage[toml]", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "bbbe106d2e81603ca51517cff90da8121f142b962d0eca4818f85e6fd3d7ad2f"
+content-hash = "c1aaff1066228be71863512349aaee71641419e258ce98bb49d4f1e93fcdaa5a"
