@@ -15,12 +15,12 @@ SNOW_FILE_PATH = (
 )
 
 
-class AssistantClient:
+class LLM_Client:
     _instance = None
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
-            cls._instance = super(AssistantClient, cls).__new__(cls)
+            cls._instance = super(LLM_Client, cls).__new__(cls)
         return cls._instance
 
     def __init__(self):
@@ -54,7 +54,7 @@ class AssistantClient:
         )
         return response.choices[0].message.content
 
-    def get_embedding(self, text: str):
+    def get_embedding(self, text: str) -> list[float]:
         """Retrieve Embedding aus Vector-DB
 
         Args:
@@ -66,7 +66,7 @@ class AssistantClient:
         response = self.client.embeddings.create(model="mistral-embed", inputs=[text])
         return response.data[0].embedding
 
-    def load_data(self, file_path: str = SNOW_FILE_PATH):
+    def load_data(self, file_path: str = SNOW_FILE_PATH) -> None:
         """Delegiert das Laden der RAG-Daten an den RagClient."""
         self.rag_client.load_data(file_path)
 
@@ -75,4 +75,4 @@ class AssistantClient:
         return self.rag_client.perform_rag_query(query)
 
 
-lm_client = AssistantClient()
+llm_client = LLM_Client()

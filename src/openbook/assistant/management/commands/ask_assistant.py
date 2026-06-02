@@ -8,14 +8,14 @@
 
 # src/openbook/assistant/management/commands/ask_assistant.py
 from django.core.management.base import BaseCommand
-from openbook.assistant.services.client import AssistantClient, SNOW_FILE_PATH
+from openbook.assistant.services.llm_client import LLM_Client, SNOW_FILE_PATH
 
 
 class Command(BaseCommand):
     help = "Ermöglicht die LOKALE Interaktion mit Assistent"
 
     def handle(self, *args, **options):
-        client = AssistantClient()
+        llm_client = LLM_Client()
         file_path = input(
             f"Gib den Pfad zur Textdatei ein (Enter für '{SNOW_FILE_PATH}'): "
         ).strip()
@@ -23,10 +23,13 @@ class Command(BaseCommand):
             file_path = SNOW_FILE_PATH
 
         try:
-            client.load_data(file_path)
-            query = input("\nDeine Frage: ").strip()
-            answer = client.perform_rag_query(query)
-            self.stdout.write(self.style.SUCCESS(f"Antwort:\n{answer}"))
+            llm_client.load_data(file_path)
+
+            while True:
+                query = input("\nDeine Frage: ").strip()
+                answer = llm_client.perform_rag_query(query)
+                self.stdout.write(self.style.SUCCESS(f"Antwort:\n{answer}"))
+
         except KeyboardInterrupt:
             self.stdout.write("\nAbbruch durch Benutzer.")
         except Exception as e:
