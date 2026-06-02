@@ -10,19 +10,17 @@ License, or (at your option) any later version.
 
 <!--
 @component
-Root of the gamification dashboard microfrontend. Orchestrates data loading and
-renders the loading / error / content states across the three panels.
+Application shell for the dashboard microfrontend: persistent header and footer
+around the routed page content. The header avatar follows the shared store.
 -->
 <script lang="ts">
     import {onMount} from "svelte";
+    import Router from "svelte-spa-router";
     import {dashboardStore} from "../stores/dashboard.store.js";
     import type {DashboardState} from "../stores/dashboard.store.js";
     import DashboardHeader from "./app-frame/DashboardHeader.svelte";
-    import MyLearningPanel from "./panels/MyLearningPanel.svelte";
-    import StatsPanel from "./panels/StatsPanel.svelte";
-    import SkillMatrixPanel from "./panels/SkillMatrixPanel.svelte";
+    import routes from "./routes.js";
 
-    // Mirror the store into local reactive state via an explicit subscription.
     let state = $state<DashboardState>({
         isLoading: true,
         errorMessage: "",
@@ -33,118 +31,47 @@ renders the loading / error / content states across the three panels.
     });
 
     onMount(() => {
-        const unsubscribe = dashboardStore.subscribe((value) => {
+        // Subscribe so the header avatar/name stay in sync on every route.
+        return dashboardStore.subscribe((value) => {
             state = value;
         });
-
-        dashboardStore.refresh();
-
-        return unsubscribe;
     });
-
-    const handle = $derived(state.user?.username ? `@${state.user.username}` : "@user");
 </script>
 
-<DashboardHeader user={state.user} />
+<div class="shell">
+    <DashboardHeader user={state.user} />
 
-<div class="dashboard">
-    <header class="top">
-        <h1 class="title">{handle} Dashboard</h1>
-    </header>
+    <main class="shell-content">
+        <Router {routes} />
+    </main>
 
-    {#if state.isLoading}
-        <div class="status" role="status" aria-live="polite">
-            <span class="loading loading-spinner loading-lg"></span>
-            <p>Loading your dashboard…</p>
-        </div>
-    {:else if state.errorMessage}
-        <div class="status" role="alert">
-            <p class="error">{state.errorMessage}</p>
-            <button type="button" class="btn btn-primary btn-sm" onclick={() => dashboardStore.refresh()}>
-                Retry
-            </button>
-        </div>
-    {:else}
-        <div class="grid">
-            <div class="grid-main">
-                <MyLearningPanel courses={state.courses} skills={state.skills} />
-            </div>
-            <div class="grid-side">
-                <StatsPanel user={state.user} stats={state.stats} />
-                <SkillMatrixPanel skills={state.skills} />
-            </div>
-        </div>
-    {/if}
-
-    <footer class="bottom">
+    <footer class="shell-footer">
         <span>Copyright 2026 | OpenBook</span>
     </footer>
 </div>
 
 <style>
-    .dashboard {
+    .shell {
+        flex: 1;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .shell-content {
         flex: 1;
         display: flex;
         flex-direction: column;
-        gap: 2rem;
-        max-width: 80rem;
-        width: 100%;
-        margin: 0 auto;
-        padding: 2rem 1.5rem 1rem;
     }
 
-    .top {
-        text-align: center;
-    }
-
-    .title {
-        font-size: clamp(1.8rem, 4vw, 3rem);
-        font-weight: 800;
-        letter-spacing: 0.04em;
-        color: var(--color-base-content);
-        text-shadow: 0 0 24px color-mix(in oklab, var(--color-primary) 45%, transparent);
-    }
-
-    .grid {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 1.5rem;
-        align-items: start;
-    }
-
-    .grid-side {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-    }
-
-    .status {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
-        padding: 4rem 0;
-        color: color-mix(in oklab, var(--color-base-content) 70%, transparent);
-    }
-
-    .error {
-        color: var(--color-error);
-        font-weight: 600;
-        text-align: center;
-    }
-
-    .bottom {
+    .shell-footer {
         margin-top: auto;
+        padding: 1rem 1.5rem 1.5rem;
         text-align: center;
         font-size: 0.75rem;
         letter-spacing: 0.08em;
         text-transform: uppercase;
         color: color-mix(in oklab, var(--color-base-content) 60%, transparent);
-    }
-
-    @media (max-width: 60rem) {
-        .grid {
-            grid-template-columns: 1fr;
-        }
+        border-top: 1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);
     }
 </style>

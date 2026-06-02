@@ -18,12 +18,14 @@ Top application bar: brand on the left, user avatar and a status pill on the rig
     let {
         user = null,
         brand = "ElisaAI",
+        logoSrc = "logo.png",
         pageLabel = "Dashboard",
         statusLabel = "System online",
         statusDetail = "v2.0.2.5",
     }: {
         user?: DashboardUser | null;
         brand?: string;
+        logoSrc?: string;
         pageLabel?: string;
         statusLabel?: string;
         statusDetail?: string;
@@ -32,7 +34,7 @@ Top application bar: brand on the left, user avatar and a status pill on the rig
 
 <header class="app-header">
     <div class="header-left">
-        <span class="brand-mark" aria-hidden="true"></span>
+        <img class="brand-logo" src={logoSrc} alt={`${brand} logo`} />
         <span class="brand-text">{brand}</span>
     </div>
 
@@ -69,14 +71,11 @@ Top application bar: brand on the left, user avatar and a status pill on the rig
         letter-spacing: 0.05em;
     }
 
-    .brand-mark {
-        width: 2rem;
-        height: 2rem;
+    .brand-logo {
+        width: 2.4rem;
+        height: 2.4rem;
         border-radius: 0.6rem;
-        background: linear-gradient(135deg,
-            color-mix(in oklab, var(--color-primary) 80%, transparent),
-            color-mix(in oklab, var(--color-secondary) 70%, transparent));
-        box-shadow: 0 0 18px color-mix(in oklab, var(--color-primary) 35%, transparent);
+        object-fit: contain;
     }
 
     .brand-text {

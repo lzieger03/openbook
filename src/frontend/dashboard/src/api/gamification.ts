@@ -62,6 +62,10 @@ export interface CourseProgressDto {
 export interface CurrentUserDto {
     username: string;
     full_name: string | null;
+    first_name?: string;
+    last_name?: string;
+    description?: string;
+    email?: string;
     picture?: string | null;
     is_authenticated: boolean;
 }

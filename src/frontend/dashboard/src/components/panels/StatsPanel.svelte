@@ -18,7 +18,15 @@ License, or (at your option) any later version.
     import StatTile from "../basic/StatTile.svelte";
     import type {DashboardStats, DashboardUser} from "../../data/dashboard.js";
 
-    let {user, stats}: {user: DashboardUser | null; stats: DashboardStats | null} = $props();
+    let {
+        user,
+        stats,
+        onProfile,
+    }: {
+        user: DashboardUser | null;
+        stats: DashboardStats | null;
+        onProfile?: () => void;
+    } = $props();
 
     const numberFormat = new Intl.NumberFormat();
 
@@ -34,17 +42,12 @@ License, or (at your option) any later version.
     function format(value: number): string {
         return numberFormat.format(value);
     }
-
-    function goToProfile(): void {
-        // Placeholder target: no dedicated profile route exists yet, so link to the app.
-        window.location.href = "/app/index.html";
-    }
 </script>
 
 <section class="card panel">
     <header class="panel-head">
         <h2 class="panel-title">Your Stats</h2>
-        <button type="button" class="btn btn-outline btn-sm" onclick={goToProfile}>Go to Profile</button>
+        <button type="button" class="btn btn-outline btn-sm" onclick={() => onProfile?.()}>Go to Profile</button>
     </header>
 
     <div class="identity">
