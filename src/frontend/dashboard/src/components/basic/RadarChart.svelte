@@ -11,7 +11,8 @@ License, or (at your option) any later version.
 <!--
 @component
 SVG radar (spider) chart. Each axis is one skill; the value is its progress
-percentage (0–100). Renders up to six axes.
+percentage (0–100). Renders up to six axes. The viewBox carries extra padding
+so axis labels near the edges are never clipped.
 -->
 <script lang="ts">
     interface RadarAxis {
@@ -26,10 +27,15 @@ percentage (0–100). Renders up to six axes.
 
     let {data, max = 6}: {data: RadarAxis[]; max?: number} = $props();
 
-    const size = 240;
+    const size = 320;
     const center = size / 2;
-    const radius = 82;
+    const radius = 100;
+    const labelDistance = radius + 24;
     const rings = [0.25, 0.5, 0.75, 1];
+
+    // Even padding around a square chart so edge labels fit without clipping.
+    const pad = 40;
+    const viewBox = `${-pad} ${-pad} ${size + pad * 2} ${size + pad * 2}`;
 
     const axes = $derived(data.slice(0, max));
 
@@ -39,6 +45,10 @@ percentage (0–100). Renders up to six axes.
             x: center + distance * Math.cos(angle),
             y: center + distance * Math.sin(angle),
         };
+    }
+
+    function clamp(value: number): number {
+        return Math.min(100, Math.max(0, value));
     }
 
     function polygon(points: Point[]): string {
@@ -51,21 +61,21 @@ percentage (0–100). Renders up to six axes.
 
     const spokes = $derived(axes.map((_, i) => point(i, axes.length, radius)));
 
-    const valueShape = $derived(
-        polygon(axes.map((axis, i) => point(i, axes.length, (radius * Math.min(100, Math.max(0, axis.value))) / 100))),
-    );
+    const valuePoints = $derived(axes.map((axis, i) => point(i, axes.length, (radius * clamp(axis.value)) / 100)));
+
+    const valueShape = $derived(polygon(valuePoints));
 
     const labels = $derived(
-        axes.map((axis, i) => ({...point(i, axes.length, radius + 18), label: axis.label})),
+        axes.map((axis, i) => ({...point(i, axes.length, labelDistance), label: axis.label})),
     );
 </script>
 
 {#if axes.length === 0}
     <p class="empty">No skill data yet.</p>
 {:else}
-    <svg viewBox={`0 0 ${size} ${size}`} class="radar" role="img" aria-label="Skill matrix">
+    <svg viewBox={viewBox} class="radar" role="img" aria-label="Skill matrix">
         {#each ringShapes as ring, i (i)}
-            <polygon points={ring} class="ring" />
+            <polygon points={ring} class="ring" class:outer={i === ringShapes.length - 1} />
         {/each}
 
         {#each spokes as spoke, i (i)}
@@ -74,11 +84,16 @@ percentage (0–100). Renders up to six axes.
 
         <polygon points={valueShape} class="value" />
 
+        {#each valuePoints as vertex, i (i)}
+            <circle cx={vertex.x} cy={vertex.y} r="3.5" class="vertex" />
+        {/each}
+
         {#each labels as item, i (i)}
             <text
                 x={item.x}
                 y={item.y}
                 class="label"
+                font-size="13"
                 text-anchor={item.x < center - 1 ? "end" : item.x > center + 1 ? "start" : "middle"}
                 dominant-baseline="middle"
             >
@@ -91,7 +106,7 @@ percentage (0–100). Renders up to six axes.
 <style>
     .radar {
         width: 100%;
-        max-width: 18rem;
+        max-width: 24rem;
         height: auto;
         margin: 0 auto;
         display: block;
@@ -99,24 +114,33 @@ percentage (0–100). Renders up to six axes.
 
     .ring {
         fill: none;
-        stroke: color-mix(in oklab, var(--color-base-content) 18%, transparent);
+        stroke: color-mix(in oklab, var(--color-base-content) 14%, transparent);
         stroke-width: 1;
     }
 
+    .ring.outer {
+        stroke: color-mix(in oklab, var(--color-base-content) 24%, transparent);
+    }
+
     .spoke {
-        stroke: color-mix(in oklab, var(--color-base-content) 18%, transparent);
+        stroke: color-mix(in oklab, var(--color-base-content) 14%, transparent);
         stroke-width: 1;
     }
 
     .value {
-        fill: color-mix(in oklab, var(--color-success) 35%, transparent);
+        fill: color-mix(in oklab, var(--color-success) 30%, transparent);
         stroke: var(--color-success);
         stroke-width: 2;
+        stroke-linejoin: round;
+    }
+
+    .vertex {
+        fill: var(--color-success);
     }
 
     .label {
-        fill: color-mix(in oklab, var(--color-base-content) 75%, transparent);
-        font-size: 0.62rem;
+        fill: color-mix(in oklab, var(--color-base-content) 80%, transparent);
+        font-weight: 600;
     }
 
     .empty {

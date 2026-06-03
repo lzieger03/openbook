@@ -23,7 +23,9 @@ License, or (at your option) any later version.
 
 <section class="card panel">
     <h2 class="panel-title">Skill Matrix</h2>
-    <RadarChart data={axes} />
+    <div class="matrix-body">
+        <RadarChart data={axes} />
+    </div>
 </section>
 
 <style>
@@ -46,9 +48,12 @@ License, or (at your option) any later version.
         color: var(--color-base-content);
     }
 
-    .panel :global(svg) {
+    /* Centre the radar in the remaining space without stretching its aspect ratio. */
+    .matrix-body {
         flex: 1;
         min-height: 0;
-        margin: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 </style>

@@ -10,8 +10,8 @@ License, or (at your option) any later version.
 
 <!--
 @component
-"Your Stats" panel: avatar, username, level/points progress and four stat tiles
-(current streak, longest streak, total points, level).
+"My Stats" panel: avatar, username, level progress (towards the next level) and
+four stat tiles (current streak, longest streak, total points, level).
 -->
 <script lang="ts">
     import ProgressBar from "../basic/ProgressBar.svelte";
@@ -64,7 +64,7 @@ License, or (at your option) any later version.
                 <div class="level-bar">
                     <ProgressBar value={levelProgress} label={`Level ${level} progress`} />
                 </div>
-                <span class="level-points">{format(points)}</span>
+                <span class="level-points">{format(nextLevelPoints)}</span>
             </div>
         </div>
     </div>

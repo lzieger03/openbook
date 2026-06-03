@@ -961,7 +961,7 @@
   .range {
     @layer daisyui.l1.l2.l3 {
       appearance: none;
-      -webkit-appearance: none;
+      webkit-appearance: none;
       --range-thumb: var(--color-base-100);
       --range-thumb-size: calc(var(--size-selector, 0.25rem) * 6);
       --range-progress: currentColor;
@@ -1017,7 +1017,7 @@
         width: var(--range-thumb-size);
         border: var(--range-p) solid;
         appearance: none;
-        -webkit-appearance: none;
+        webkit-appearance: none;
         top: 50%;
         color: var(--range-progress);
         transform: translateY(-50%);
@@ -1579,6 +1579,9 @@
   .absolute {
     position: absolute;
   }
+  .fixed {
+    position: fixed;
+  }
   .relative {
     position: relative;
   }
@@ -1597,13 +1600,14 @@
   .file-input {
     @layer daisyui.l1.l2.l3 {
       cursor: pointer;
+      cursor: pointer;
       border: var(--border) solid #0000;
       display: inline-flex;
       appearance: none;
       align-items: center;
       background-color: var(--color-base-100);
       vertical-align: middle;
-      -webkit-user-select: none;
+      webkit-user-select: none;
       user-select: none;
       width: clamp(3rem, 20rem, 100%);
       height: var(--size);
@@ -1628,7 +1632,7 @@
         margin-inline-end: calc(0.25rem * 4);
         cursor: pointer;
         padding-inline: calc(0.25rem * 4);
-        -webkit-user-select: none;
+        webkit-user-select: none;
         user-select: none;
         height: calc(100% + var(--border) * 2);
         margin-block: calc(var(--border) * -1);
