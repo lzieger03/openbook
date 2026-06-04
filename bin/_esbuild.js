@@ -53,6 +53,9 @@ export async function runEsbuild({infile, outfiles, staticdirs, watch, plugins} 
             esbuildSvelte({
                 preprocess: sveltePreprocess(),
                 compilerOptions: {
+                    experimental: {
+                        async: true,
+                    },
                     compatibility: {
                         componentApi: 5
                     },

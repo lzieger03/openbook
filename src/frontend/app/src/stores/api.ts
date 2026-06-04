@@ -8,13 +8,25 @@
  * License, or (at your option) any later version.
  */
 
-import type { Client }                 from "openapi-fetch";
-import type { paths as authPaths }     from "../api/openapi/auth";
-import type { paths as openbookPaths } from "../api/openapi/openbook";
+import type { paths      as authPaths }          from "../api/openapi/auth";
+import type { components as authComponents }     from "../api/openapi/auth";
+import type { paths      as openbookPaths }      from "../api/openapi/openbook";
+import type { components as openbookComponents } from "../api/openapi/openbook";
+import type { Client }                           from "openapi-fetch";
 
-import clients                         from "../api/index.js";
-import { rethrowAppError }             from "../utils/error.js";
-import { toast }                       from "./toast.js";
+import clients                                   from "../api/index.js";
+import { rethrowAppError }                       from "../utils/error.js";
+import { toast }                                 from "./toast.js";
+
+/**
+ * Typed schema components for the authentication API.
+ */
+export type authSchemas = authComponents["schemas"];
+
+/**
+ * Typed schema components for the OpenBook API.
+ */
+export type openbookSchemas = openbookComponents["schemas"];
 
 /**
  * Factory for pre-configured wrapped API clients. The raw API clients are wrapped here

@@ -18,7 +18,8 @@ import {wrap}                   from "svelte-spa-router/wrap";
  * Set breadcrumbs for a route when it is matched.
  */
 function setBreadcrumbsLine(items: BreadcrumbsItem[]): boolean {
-    breadcrumbs.set([{href:  "#/", label: i18n.value.Home.Title}, ...items]);
+    // TODO: Rerender when language changes
+    breadcrumbs.set([{href:  "#/", label: () => i18n.value.Home.Title}, ...items]);
     return true;
 }
 
@@ -28,17 +29,12 @@ export default {
         conditions: [() => setBreadcrumbsLine([])],
     }),
 
-    // "/book/page/:pageNumber": wrap({
-    //     asyncComponent: () => import("./pages/book/BookContentPage.svelte"),
-    //     conditions: [setPageNumber],
-    // }),
-
     "*": wrap({
         asyncComponent: () => import("./pages/errors/NotFoundPage.svelte"),
         conditions: [() => setBreadcrumbsLine([
             {
                 href:  "",
-                label: i18n.value.Error.Page.NotFound.Title,
+                label: () => i18n.value.Error.Page.NotFound.Title,
             },
         ])],
     }),

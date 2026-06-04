@@ -20,6 +20,7 @@ export type Theme      = {name: ThemeName, label: () => ThemeLabel, type: ThemeT
  * Static list of all available themes
  */
 export const availableThemes: Theme[] = [
+    // TODO: Rerender when language changes
     {
         name:  "OpenBook-Light",
         label: () => i18n.value.ApplicationFrame.Menu.Theme.Light,

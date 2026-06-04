@@ -20,7 +20,7 @@ export type I18N = typeof en;
 /**
  * Language code for translations.
  */
-export type LanguageCode = `${Lowercase<string>}${Lowercase<string>}`;
+export type LanguageCode = string;
 
 /**
  * All available languages. Note, that there must be a `.ts` file of the

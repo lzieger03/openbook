@@ -12,7 +12,7 @@ import {WritableStore} from "../utils/store.js";
 
 export type BreadcrumbsItem = {
     href:  string,
-    label: string,
+    label: (language: string) => string,
 }
 
 export const breadcrumbs = new WritableStore<BreadcrumbsItem[]>([]);

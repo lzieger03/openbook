@@ -25,6 +25,9 @@ const i18n: I18N = {
                 Nord:  "Nord",
                 Aqua:  "Aqua",
             },
+            Language: {
+                Title: "Sprache"
+            },
             Account: {
                 Title:   "Benutzerkonto",
                 Profile: "Profil bearbeiten",

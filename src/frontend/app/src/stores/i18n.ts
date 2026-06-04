@@ -42,10 +42,32 @@ class I18nStore extends ReadableStore<I18N> {
 }
 
 /**
+ * Writable store to change the current languages. Saves the selected language in
+ * the browser's local storage.
+ */
+class LanguageStore extends WritableStore<LanguageCode> {
+    /**
+     * Initialize with the current language from local storage.
+     */
+    constructor() {
+        let value = localStorage.getItem("language") || defaultLanguage;
+        super(value);
+    }
+
+    /**
+     * Set new value.
+     */
+    set(value: LanguageCode) {
+        localStorage.setItem("language", value);
+        super.set(value);
+    }
+}
+
+/**
  * The current UI language. To change the language simple assign a new value.
  * The UI will rerender accordingly.
  */
-export const language = new WritableStore<LanguageCode>(defaultLanguage);
+export const language = new LanguageStore();
 
 /**
  * Message catalogue with all translations of the currently active language.

@@ -14,36 +14,36 @@ Top navigation page of the application frame.
 -->
 
 <script lang="ts">
-    import Breadcrumbs       from "../basic/breadcrumbs/Breadcrumbs.svelte";
-    import BreadcrumbsItem   from "../basic/breadcrumbs/BreadcrumbsItem.svelte";
-    import DropdownMenu      from "../basic/dropdown-menu/DropdownMenu.svelte";
-    import MenuItem          from "../basic/dropdown-menu/MenuItem.svelte";
-    import MenuTitle         from "../basic/dropdown-menu/MenuTitle.svelte";
-    import SubMenu           from "../basic/dropdown-menu/SubMenu.svelte";
-    import Navbar            from "../basic/navbar/Navbar.svelte";
+    import type { openbookSchemas } from "../../stores/api.js";
 
-    import {breadcrumbs}     from "../../stores/breadcrumbs.js";
-    import {i18n}            from "../../stores/i18n.js";
-    import {availableThemes} from "../../stores/theme.js";
-    import {theme}           from "../../stores/theme.js";
-    // import api               from "../../stores/api.js";
+    import Breadcrumbs              from "../basic/breadcrumbs/Breadcrumbs.svelte";
+    import BreadcrumbsItem          from "../basic/breadcrumbs/BreadcrumbsItem.svelte";
+    import DropdownMenu             from "../basic/dropdown-menu/DropdownMenu.svelte";
+    import MenuItem                 from "../basic/dropdown-menu/MenuItem.svelte";
+    import MenuTitle                from "../basic/dropdown-menu/MenuTitle.svelte";
+    import SubMenu                  from "../basic/dropdown-menu/SubMenu.svelte";
+    import Navbar                   from "../basic/navbar/Navbar.svelte";
 
-    import AvatarDefault     from "./img/AvatarDefault.jpg";
+    import { breadcrumbs }          from "../../stores/breadcrumbs.js";
+    import { i18n }                 from "../../stores/i18n.js";
+    import { language }             from "../../stores/i18n.js";
+    import { availableThemes }      from "../../stores/theme.js";
+    import { theme }                from "../../stores/theme.js";
+    import api                      from "../../stores/api.js";
+
+    import AvatarDefault            from "./img/AvatarDefault.jpg";
 
     let avatar = $state(AvatarDefault);
+    let availableLanguages: openbookSchemas["Language"][] = $state([]);
 
-    // let site = backend.openbook.call("/api/core/sites/", "error-toast");
-    // let siteData = await site.GET();
-
-    function switchTheme(event: MouseEvent) {
-        const target = event.currentTarget as HTMLElement | null;
-        const themeName = target?.dataset.themeName;
-
-        if (themeName) {
-            $theme = themeName;
-        }
+    async function loadLanguages() {
+        let backend  = await api.openbook("/api/core/languages/", "error-toast");
+        let response = await backend.GET();
+        availableLanguages = response.data.results;
     }
 </script>
+
+{#await loadLanguages()}{/await}
 
 <!-- Navbar -->
 <Navbar class="top-0 sticky z-10 bg-base-100/95">
@@ -57,9 +57,9 @@ Top navigation page of the application frame.
 
         <!-- Breadcrumbs -->
         <Breadcrumbs class="hidden md:block text-sm">
-            {#each $breadcrumbs as item (item.href + item.label)}
+            {#each $breadcrumbs as item (`${item.href}/${item.label}`)}
                 <BreadcrumbsItem href={item.href || undefined}>
-                    {item.label}
+                    {item.label($language)}
                 </BreadcrumbsItem>
             {/each}
         </Breadcrumbs>
@@ -74,13 +74,42 @@ Top navigation page of the application frame.
         <DropdownMenu
             align        = "end"
             triggerClass = "btn btn-ghost btn-circle avatar"
-            contentClass = "menu-sm xl:menu-horizontal bg-base-100/95 backdrop-blur shadow rounded-box lg:min-w-max"
+            contentClass = "menu-sm bg-base-100/95 backdrop-blur shadow rounded-box lg:min-w-max"
         >
             {#snippet trigger()}
                 <div class="w-10 rounded-full">
                     <img src="{avatar}" alt="{$i18n.ApplicationFrame.Menu.Title}"/>
                 </div>
             {/snippet}
+
+            <!-- Language -->
+            {#if availableLanguages.length > 1}
+                <MenuItem>
+                    <MenuTitle>
+                        {$i18n.ApplicationFrame.Menu.Language.Title}
+                    </MenuTitle>
+
+                    <SubMenu>
+                        {#each availableLanguages as availableLanguage (availableLanguage.language)}
+                            <MenuItem
+                                itemClass          = "justify-start"
+                                onclick            = {() => $language = availableLanguage.language}
+                                role               = "menuitemradio"
+                                aria-checked       = {$language === availableLanguage.language}
+                                tabindex           = {$language === availableLanguage.language ? 0 : -1}
+                            >
+                                {#if $language === availableLanguage.language}
+                                    <i class="bi bi-check-circle"></i>
+                                {:else}
+                                    <i class="bi bi-circle"></i>
+                                {/if}
+
+                                {availableLanguage.name}
+                            </MenuItem>
+                        {/each}
+                    </SubMenu>
+                </MenuItem>
+            {/if}
 
             <!-- Theme -->
             <MenuItem>
@@ -89,11 +118,11 @@ Top navigation page of the application frame.
                 </MenuTitle>
 
                 <SubMenu>
-                    {#each availableThemes as availableTheme}
+                    {#each availableThemes as availableTheme (availableTheme.name)}
                         <MenuItem
                             itemClass       = "justify-start"
                             data-theme-name = {availableTheme.name}
-                            onclick         = {switchTheme}
+                            onclick         = {() => $theme = availableTheme.name}
                             role            = "menuitemradio"
                             aria-checked    = {$theme === availableTheme.name}
                             tabindex        = {$theme === availableTheme.name ? 0 : -1}

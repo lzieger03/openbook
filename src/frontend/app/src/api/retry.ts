@@ -40,7 +40,7 @@ export async function fetchWithRetry(request: Request): Promise<Response> {
         lastError = null;
 
         try {
-            const response = await fetch(request.clone());
+            response = await fetch(request.clone());
             if (!RETRY_STATUS_CODES.has(response.status)) break;
         } catch (error) {
             lastError = error;

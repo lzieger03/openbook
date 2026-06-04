@@ -26,6 +26,9 @@ export default {
                 Nord:  "Nord",
                 Aqua:  "Aqua",
             },
+            Language: {
+                Title: "Language"
+            },
             Account: {
                 Title: "User Account",
                 Profile: "Profile",
