@@ -8,14 +8,13 @@
  * License, or (at your option) any later version.
  */
 
-// TODO: The following import silently breaks the page!
-// import {i18n}          from "./i18n.js";
+import {i18n}          from "./i18n.js";
 import {WritableStore} from "../utils/store.js";
 
 export type ThemeName  = string;
 export type ThemeLabel = string;
 export type ThemeType  = "light" | "dark" | "other";
-export type Theme      = {name: ThemeName, label: ThemeLabel, type: ThemeType};
+export type Theme      = {name: ThemeName, label: () => ThemeLabel, type: ThemeType};
 
 /**
  * Static list of all available themes
@@ -23,22 +22,22 @@ export type Theme      = {name: ThemeName, label: ThemeLabel, type: ThemeType};
 export const availableThemes: Theme[] = [
     {
         name:  "OpenBook-Light",
-        label: "Light", //i18n.value.ApplicationFrame.Menu.Theme.Light,
+        label: () => i18n.value.ApplicationFrame.Menu.Theme.Light,
         type:  "light",
     },
     {
         name:  "dim",
-        label: "Dark", //i18n.value.ApplicationFrame.Menu.Theme.Dark,
+        label: () => i18n.value.ApplicationFrame.Menu.Theme.Dark,
         type:  "dark",
     },
     {
         name:  "nord",
-        label: "Nord", //i18n.value.ApplicationFrame.Menu.Theme.Nord,
+        label: () => i18n.value.ApplicationFrame.Menu.Theme.Nord,
         type:  "other",
     },
     {
         name:  "aqua",
-        label: "Aqua", //i18n.value.ApplicationFrame.Menu.Theme.Aqua,
+        label: () => i18n.value.ApplicationFrame.Menu.Theme.Aqua,
         type:  "other",
     },
 ];

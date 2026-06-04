@@ -104,7 +104,7 @@ Top navigation page of the application frame.
                                 <i class="bi bi-circle"></i>
                             {/if}
 
-                            {availableTheme.label}
+                            {availableTheme.label()}
                         </MenuItem>
                     {/each}
                 </SubMenu>
