@@ -8,34 +8,34 @@
  * License, or (at your option) any later version.
  */
 
-import type { BreadcrumbsItem } from "../stores/breadcrumbs.js";
-
-import {i18n}                   from "../stores/i18n.js";
-import {breadcrumbs}            from "../stores/breadcrumbs.js";
-import {wrap}                   from "svelte-spa-router/wrap";
+import type { BreadcrumbsCallback } from "../stores/breadcrumbs.js";
+import { breadcrumbs }              from "../stores/breadcrumbs.js";
+import { wrap }                     from "svelte-spa-router/wrap";
 
 /**
- * Set breadcrumbs for a route when it is matched.
+ * Set breadcrumbs callback for a matched route and prefix it with a fixed
+ * item for the home page.
  */
-function setBreadcrumbsLine(items: BreadcrumbsItem[]): boolean {
-    // TODO: Rerender when language changes
-    breadcrumbs.set([{href:  "#/", label: () => i18n.value.Home.Title}, ...items]);
-    return true;
+function _breadcrumbs(fn?: BreadcrumbsCallback) {
+    return function() {
+        breadcrumbs.set((i18n) => {
+            let result = [{ href: "#/", label: i18n.Home.Title }];
+            if (fn) result = [...result, ...fn(i18n)];
+            return result;
+        });
+
+        return true;
+    }
 }
 
 export default {
     "/": wrap({
         asyncComponent: () => import("./pages/home/HomePage.svelte"),
-        conditions: [() => setBreadcrumbsLine([])],
+        conditions: [_breadcrumbs()],
     }),
 
     "*": wrap({
         asyncComponent: () => import("./pages/errors/NotFoundPage.svelte"),
-        conditions: [() => setBreadcrumbsLine([
-            {
-                href:  "",
-                label: () => i18n.value.Error.Page.NotFound.Title,
-            },
-        ])],
+        conditions: [_breadcrumbs(i18n => [{ href: "", label: i18n.Error.Page.NotFound.Title }])],
     }),
 };

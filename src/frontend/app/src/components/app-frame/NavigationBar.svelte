@@ -57,9 +57,9 @@ Top navigation page of the application frame.
 
         <!-- Breadcrumbs -->
         <Breadcrumbs class="hidden md:block text-sm">
-            {#each $breadcrumbs as item (`${item.href}/${item.label}`)}
+            {#each $breadcrumbs($i18n) as item (`${item.href}/${item.label}`)}
                 <BreadcrumbsItem href={item.href || undefined}>
-                    {item.label($language)}
+                    {item.label}
                 </BreadcrumbsItem>
             {/each}
         </Breadcrumbs>
@@ -118,7 +118,7 @@ Top navigation page of the application frame.
                 </MenuTitle>
 
                 <SubMenu>
-                    {#each availableThemes as availableTheme (availableTheme.name)}
+                    {#each availableThemes($i18n) as availableTheme (availableTheme.name)}
                         <MenuItem
                             itemClass       = "justify-start"
                             data-theme-name = {availableTheme.name}
@@ -133,7 +133,7 @@ Top navigation page of the application frame.
                                 <i class="bi bi-circle"></i>
                             {/if}
 
-                            {availableTheme.label()}
+                            {availableTheme.label}
                         </MenuItem>
                     {/each}
                 </SubMenu>

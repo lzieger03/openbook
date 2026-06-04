@@ -8,11 +8,22 @@
  * License, or (at your option) any later version.
  */
 
-import {WritableStore} from "../utils/store.js";
+import type { I18N }     from "../i18n/index.js";
+import { WritableStore } from "../utils/store.js";
 
-export type BreadcrumbsItem = {
-    href:  string,
-    label: (language: string) => string,
-}
+/**
+ * A single item in the breadcrumbs line
+ */
+export type BreadcrumbsItem = {href:  string, label: string}
 
-export const breadcrumbs = new WritableStore<BreadcrumbsItem[]>([]);
+/**
+ * Callback function to determine the breadcrumb items of the current page. Gets the
+ * `i18n` store passed so that it will automatically be recalled when the user changes
+ * the current language.
+ */
+export type BreadcrumbsCallback = (i18n: I18N) => BreadcrumbsItem[];
+
+/**
+ * Writable store for the current breadcrumbs callback function.
+ */
+export const breadcrumbs = new WritableStore<BreadcrumbsCallback>(() => []);

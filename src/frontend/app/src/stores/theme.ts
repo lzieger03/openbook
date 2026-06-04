@@ -8,40 +8,42 @@
  * License, or (at your option) any later version.
  */
 
-import {i18n}          from "./i18n.js";
-import {WritableStore} from "../utils/store.js";
+import type {I18N}       from "../i18n/index.js";
+import { WritableStore } from "../utils/store.js";
 
 export type ThemeName  = string;
 export type ThemeLabel = string;
 export type ThemeType  = "light" | "dark" | "other";
-export type Theme      = {name: ThemeName, label: () => ThemeLabel, type: ThemeType};
+export type Theme      = {name: ThemeName, label: ThemeLabel, type: ThemeType};
 
 /**
- * Static list of all available themes
+ * Static list of all available themes. Note: `i18n` is only optional
+ * to call this function within `getDefaultTheme()` below.
  */
-export const availableThemes: Theme[] = [
-    // TODO: Rerender when language changes
-    {
-        name:  "OpenBook-Light",
-        label: () => i18n.value.ApplicationFrame.Menu.Theme.Light,
-        type:  "light",
-    },
-    {
-        name:  "dim",
-        label: () => i18n.value.ApplicationFrame.Menu.Theme.Dark,
-        type:  "dark",
-    },
-    {
-        name:  "nord",
-        label: () => i18n.value.ApplicationFrame.Menu.Theme.Nord,
-        type:  "other",
-    },
-    {
-        name:  "aqua",
-        label: () => i18n.value.ApplicationFrame.Menu.Theme.Aqua,
-        type:  "other",
-    },
-];
+export function availableThemes(i18n?: I18N): Theme[] {
+    return [
+        {
+            name:  "OpenBook-Light",
+            label: i18n?.ApplicationFrame.Menu.Theme.Light || "*** i18n missing ***",
+            type:  "light",
+        },
+        {
+            name:  "dim",
+            label: i18n?.ApplicationFrame.Menu.Theme.Dark || "*** i18n missing ***",
+            type:  "dark",
+        },
+        {
+            name:  "nord",
+            label: i18n?.ApplicationFrame.Menu.Theme.Nord || "*** i18n missing ***",
+            type:  "other",
+        },
+        {
+            name:  "aqua",
+            label: i18n?.ApplicationFrame.Menu.Theme.Aqua || "*** i18n missing ***",
+            type:  "other",
+        },
+    ];
+}
 
 /**
  * Writable store to change the current theme. Saves the selected theme in the
@@ -81,7 +83,7 @@ export const theme = new ThemeStore();
 function getDefaultTheme(): ThemeName {
     const dark  = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
     const type  = dark ? "dark" : "light";
-    const theme = availableThemes.find(t => t.type === type) || availableThemes[0] as Theme;
+    const theme = availableThemes().find(t => t.type === type) || availableThemes()[0] as Theme;
 
     return theme.name;
 }

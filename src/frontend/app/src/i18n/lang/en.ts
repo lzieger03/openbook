@@ -8,8 +8,6 @@
  * License, or (at your option) any later version.
  */
 
-import ApplicationFrame from "../../components/ApplicationFrame.svelte";
-
 // This is the master language. Therefore no type import here.
 export default {
     ApplicationFrame: {
@@ -31,7 +29,7 @@ export default {
             },
             Account: {
                 Title: "User Account",
-                Profile: "Profile",
+                Profile: "User Profile",
                 Logout:  "Logout",
             }
         }

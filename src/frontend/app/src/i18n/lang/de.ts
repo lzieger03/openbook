@@ -30,7 +30,7 @@ const i18n: I18N = {
             },
             Account: {
                 Title:   "Benutzerkonto",
-                Profile: "Profil bearbeiten",
+                Profile: "Benutzerprofil",
                 Logout:  "Logout",
             }
         },
