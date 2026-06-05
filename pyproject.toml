@@ -55,7 +55,7 @@ sphinx-tabs = "^3.5.0"
 
 # Development dependencies
 [tool.poetry.group.dev.dependencies]
-coverage = "^7.13.5"
+coverage = "^7.14.1"
 pip-audit = "^2.10.0"
 tblib = "^3.2.2"
 
