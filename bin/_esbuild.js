@@ -8,10 +8,11 @@
  * License, or (at your option) any later version.
  */
 
-import * as esbuild from "esbuild";
-import path         from "node:path";
-import shelljs      from "shelljs";
-import sveltePlugin from "esbuild-svelte";
+import * as esbuild         from "esbuild";
+import path                 from "node:path";
+import shelljs              from "shelljs";
+import esbuildSvelte        from "esbuild-svelte";
+import { sveltePreprocess } from "svelte-preprocess";
 
 /**
  * Centralized esbuild configuration to build JavaScript assets. This is used
@@ -36,22 +37,37 @@ export async function runEsbuild({infile, outfiles, staticdirs, watch, plugins} 
     let ctx = await esbuild.context({
         entryPoints: [infile],
         bundle:      true,
-        minify:      true,
+        minify:      !watch,
         outfile:     outfiles[0],
         sourcemap:   true,
+        splitting:   false,
         format:      "esm",
 
         mainFields: ["svelte", "browser", "module", "main"],
         conditions: ["svelte", "browser"],
+        logLevel:   "info",
 
         plugins: [
-            sveltePlugin({
+            // TODO: Different options for frontend app and libraries?
+            // Libraries must emit web components
+            esbuildSvelte({
+                preprocess: sveltePreprocess(),
                 compilerOptions: {
-                    compatibility: {
-                        componentApi: 4
+                    experimental: {
+                        async: true,
                     },
-                    customElement: true
-                }
+                    compatibility: {
+                        componentApi: 5
+                    },
+                    customElement: true,
+                },
+
+                // Suppress the following warning, relevant only for building real web components:
+                // [WARNING] Using a rest element or a non-destructured declaration with `$props()`
+                // means that Svelte can't infer what properties to expose when creating a custom
+                // element. Consider destructuring all the props or explicitly specifying the
+                // `customElement.props` option.
+                filterWarnings: warning => warning.code !== "custom_element_props_identifier"
             }),
             additionalOutfilesPlugin(outfiles),
             staticFilesPlugin(outfiles, staticdirs),
@@ -158,7 +174,7 @@ function staticFilesPlugin(outfiles, staticdirs) {
             build.onEnd(build => {
                 console.log(">>> COPY STATIC FILES <<<");
 
-                for (let staticdir of staticdirs) {    
+                for (let staticdir of staticdirs) {
                     let staticFiles = getStaticCopySources(staticdir);
                     if (staticFiles.length < 1) continue;
 

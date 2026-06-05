@@ -36,8 +36,6 @@ to install additional packages (see next section).
       - Workspace orchestration and building frontend assets
     * - Redis
       - Task queue and worker communication
-    * - Java Runtime
-      - OpenAPI generator tooling
     * - Graphviz
       - Rendering diagrams in the manual
 
@@ -54,6 +52,13 @@ First you need to install the required tools:
       - `Node.js (LTS) <https://nodejs.org/en/download>`_
       - `Redis (unofficial Windows port) <https://github.com/redis-windows/redis-windows/releases>`_
       - `Graphviz <https://graphviz.org/download/>`_
+
+      .. note::
+
+         Note that there is no official Windows port of Redis except for the commercial product
+         `Memurai <https://www.memurai.com/>`_. For development we recommend the unofficial port
+         linked above, which may not receive the same level of support or security updates as
+         official Redis releases on other platforms.
 
       Use the **Python**, **Node.js** and **Graphviz** installers and keep default settings.
       When installing Python and Graphviz, enable the option to add each to the :envvar:`PATH`
@@ -78,19 +83,6 @@ First you need to install the required tools:
       Download the ZIP file from the GitHub release page and extract it, for example, to :file:`C:\Program Files\Redis`.
       Add this directory to the system :envvar:`PATH` variable as described above.
 
-      **Java** can be installed using the Windows Package Manager. First, search for the most recent version
-      of Microsoft OpenJDK:
-
-      .. code-block:: powershell
-
-         winget search Microsoft.OpenJDK
-
-      Then install the latest version (25 in this example), e.g.:
-
-      .. code-block:: powershell
-
-         winget install Microsoft.OpenJDK.25
-
    .. tab:: macOS
 
       macOS requires Homebrew for Redis, which has no official native macOS installer.
@@ -98,7 +90,7 @@ First you need to install the required tools:
 
       .. code-block:: bash
 
-         brew install python@3.12 poetry node redis openjdk@21 graphviz
+         brew install python poetry node redis graphviz
          brew services start redis
 
       If you don't have Homebrew installed, visit `brew.sh <https://brew.sh>`_ for setup instructions.
@@ -110,7 +102,7 @@ First you need to install the required tools:
       .. code-block:: bash
 
          sudo apt update
-         sudo apt install -y python3 python3-poetry nodejs npm redis-server default-jre graphviz
+         sudo apt install -y python3 python3-poetry nodejs npm redis-server graphviz
 
       If you use another distribution, install equivalent packages with your package manager.
 
@@ -123,7 +115,6 @@ Verify that all tools are available in your shell:
    node --version
    npm --version
    redis-server --version
-   java -version
    dot --version
 
 Set up OpenBook dependencies and initial data from the repository root:
@@ -161,7 +152,8 @@ Container* from the command palette. Be very patient. The first build takes
 quite a while; subsequent starts are fast, though.
 
 All required tools come pre-installed in the containers, including the `Pi Coding Agent <https://pi.dev>`_
-as a little extra. The container uses the same ports as the local development environment,
+as a little extra (bring your own API key and use it as a lightweight alternative to commercial
+AI coding assistants). The container uses the same ports as the local development environment,
 so you can access the application as usual.
 
 .. note::

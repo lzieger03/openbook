@@ -1,10 +1,12 @@
-# OpenBook: Interactive Online Textbooks - Server
+# OpenBook: Interactive Online Textbooks
 # © 2024 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
+
+from __future__ import annotations
 
 import os
 from channels.routing            import ChannelNameRouter, ProtocolTypeRouter, URLRouter
@@ -28,7 +30,7 @@ application = ProtocolTypeRouter({
             # From: https://channels.readthedocs.io/en/latest/topics/routing.html#urlrouter
             # "Please note that URLRouter nesting will not work properly with path() routes
             # if inner routers are wrapped by additional middleware. See Issue #1428."
-            # Therefor we define all routes of all Django apps here.
+            # Therefore, we define all routes of all Django apps here.
             URLRouter([
                 ## path("ws/example-websocket-client", ExampleWebsocketClient.as_asgi())
             ]),

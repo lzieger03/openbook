@@ -1,5 +1,5 @@
 /*
- * OpenBook: Interactive Online Textbooks - Server
+ * OpenBook: Interactive Online Textbooks
  * © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -8,7 +8,13 @@
  * License, or (at your option) any later version.
  */
 
+import {initI18n} from "./stores/i18n.js";
+await initI18n();
+
+import "bootstrap-icons/font/bootstrap-icons.min.css";
+
 import "./tailwind.css";
+import "./fonts.css";
 import "./index.css";
 import "./global.js";
 

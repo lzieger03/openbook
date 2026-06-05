@@ -1,10 +1,12 @@
-# OpenBook: Interactive Online Textbooks - Server
+# OpenBook: Interactive Online Textbooks
 # © 2024 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
+
+from __future__ import annotations
 
 from django.templatetags.static import static
 from django.urls                import reverse_lazy
@@ -23,7 +25,7 @@ SECRET_KEY = "django-insecure-jeo+.}_}9(Q.t_IU$WJ!%eL=b:MDbAL.~NY_=a:>D@:W[XPh4[
 DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
-OB_ROOT_REDIRECT = "/app/index.html"
+OB_ROOT_REDIRECT = "/app/"
 
 # Application definition
 #
@@ -287,16 +289,21 @@ SOCIALACCOUNT_ADAPTER = "openbook.auth.allauth.adapter.SocialAccountAdapter"
 
 # Allauth - Headless API
 # See: https://docs.allauth.org/en/latest/headless/configuration.html
+### HEADLESS_ONLY = True
 HEADLESS_ONLY = False
 HEADLESS_ADAPTER = "allauth.headless.adapter.DefaultHeadlessAdapter"
 HEADLESS_SERVE_SPECIFICATION = True
 HEADLESS_FRONTEND_URLS = {
-    #"account_confirm_email": "https://app.project.org/account/verify-email/{key}",
-    #"account_reset_password": "https://app.project.org/account/password/reset",
-    #"account_reset_password_from_key": "https://app.project.org/account/password/reset/key/{key}",
-    #"account_signup": "https://app.project.org/account/signup",
-    #"socialaccount_login_error": "https://app.project.org/account/provider/callback",
+    "account_confirm_email":           f"{OB_ROOT_REDIRECT}#/account/verify-email/{{key}}",
+    "account_reset_password":          f"{OB_ROOT_REDIRECT}#/account/password/reset",
+    "account_reset_password_from_key": f"{OB_ROOT_REDIRECT}#/account/password/reset/key/{{key}}",
+    "account_signup":                  f"{OB_ROOT_REDIRECT}#/account/signup",
+    "socialaccount_login_error":       f"{OB_ROOT_REDIRECT}#/account/provider/callback",
 }
+
+### LOGIN_URL           = f"{OB_ROOT_REDIRECT}#/account/login"
+### LOGIN_REDIRECT_URL  = OB_ROOT_REDIRECT
+### LOGOUT_REDIRECT_URL = OB_ROOT_REDIRECT
 
 # Recommended settings for SAML behind a reverse proxy
 # See: https://django-allauth.readthedocs.io/en/latest/socialaccount/providers/saml.html#guidelines
@@ -350,7 +357,7 @@ UNFOLD = {
             "link": reverse_lazy("api-redoc"),
         },
         {
-            # NOTE: Unfortunately. we cannot use reverse_lazy() to resolve the URL defined by Django-Alluth here
+            # NOTE: Unfortunately, we cannot use reverse_lazy() to resolve the URL defined by Django-Allauth here
             "icon": "api",
             "title": _("Auth API Explorer"),
             "link": "/auth-api/openapi.html",
@@ -581,7 +588,7 @@ UNFOLD = {
     ]
 }
 
-# Interlal IPs (required by Django Debug Toolbar)
+# Internal IPs (required by Django Debug Toolbar)
 INTERNAL_IPS = ["127.0.0.1"]
 
 # E-Mail Settings

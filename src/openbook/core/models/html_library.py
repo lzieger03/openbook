@@ -1,10 +1,12 @@
-# OpenBook: Interactive Online Textbooks - Server
+# OpenBook: Interactive Online Textbooks
 # © 2025 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
+
+from __future__ import annotations
 
 import os, sys, typing
 
@@ -323,7 +325,7 @@ class HTMLLibraryVersion(UUIDMixin, FileUploadMixin, CreatedModifiedByMixin):
 
     @classmethod
     def get_by_library_version(cls, library: str, version: str) -> "HTMLLibraryVersion":
-        organization, name = split_library_fqn(fqn)
+        organization, name = split_library_fqn(library)
         library = HTMLLibrary.objects.get(organization=organization, name=name)
         return HTMLLibraryVersion.objects.get(parent=library, version=version)
 

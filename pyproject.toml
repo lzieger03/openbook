@@ -13,6 +13,11 @@ readme = "README.md"
 # in future, in which case we need to reconsider some of the project structure.
 package-mode = false
 
+[build-system]
+requires = ["poetry-core>=1.9.1"]
+build-backend = "poetry.core.masonry.api"
+
+# Runtime dependencies
 [tool.poetry.dependencies]
 channels = {extras = ["daphne"], version = "^4.3.2"}
 channels-redis = "^4.3.0"
@@ -39,6 +44,7 @@ semver = "^3.0.4"
 twisted = {extras = ["http2", "tls"], version = "^25.5.0"}
 django-colorfield = "^0.14.0"
 
+# Documentation dependencies
 [tool.poetry.group.docs.dependencies]
 sphinx = "^9.0.0"
 sphinx-rtd-theme = "^3.1.0"
@@ -47,11 +53,18 @@ sphinx-autobuild = "^2025.08.25"
 sphinx-llm = "^0.4.1"
 sphinx-tabs = "^3.5.0"
 
+# Development dependencies
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.14.1"
 pip-audit = "^2.10.0"
 tblib = "^3.2.2"
 
+# Dependencies to for the fontutil script
+[tool.poetry.group.fontutil.dependencies]
+fonttools = "^4.63.0"
+brotli = "^1.2.0"
+
+# Test coverage reporting
 [tool.coverage.run]
 parallel = true
 patch = ["execv", "_exit", "subprocess"]
@@ -65,7 +78,3 @@ omit = [
 fail_under = 75
 show_missing = true
 skip_covered = true
-
-[build-system]
-requires = ["poetry-core>=1.9.1"]
-build-backend = "poetry.core.masonry.api"

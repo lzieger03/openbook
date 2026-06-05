@@ -1,4 +1,4 @@
-# OpenBook: Interactive Online Textbooks - Server
+# OpenBook: Interactive Online Textbooks
 # © 2024 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -6,11 +6,15 @@
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 
+from __future__ import annotations
+
 from django.conf                     import settings
 from django.conf.urls.static         import static
-from django.views.generic.base       import RedirectView
 from django.urls                     import include
 from django.urls                     import path
+from django.urls                     import re_path
+from django.views.generic.base       import RedirectView
+from django.views.static             import serve
 from drf_spectacular.views           import SpectacularAPIView
 from drf_spectacular.views           import SpectacularRedocView
 from rest_framework.permissions      import IsAuthenticatedOrReadOnly
@@ -55,4 +59,9 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
     # Frontend SPA
+    urlpatterns += [re_path(r"^app/$", serve, kwargs={
+        "path":          "index.html",
+        "document_root": f"{settings.BASE_DIR}/frontend/app/dist/openbook/app"
+    })]
+
     urlpatterns += static("app/", document_root=f"{settings.BASE_DIR}/frontend/app/dist/openbook/app")
