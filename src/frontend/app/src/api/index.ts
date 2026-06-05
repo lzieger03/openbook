@@ -43,7 +43,7 @@ async function getBaseUrl() {
  * Register middlewares for the given API client object.
  * @param client API client
  */
-function registerMiddlewares<Paths extends {}, Media extends `${string}/${string}`>(client: Client<Paths, Media>): void {
+function registerMiddlewares<Paths extends object, Media extends `${string}/${string}`>(client: Client<Paths, Media>): void {
     for (let middleware of middlewares) {
         client.use(middleware);
     }

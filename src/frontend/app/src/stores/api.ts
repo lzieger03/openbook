@@ -80,7 +80,7 @@ export default {
  * @template Paths The OpenAPI paths type.
  * @template Path The specific path key.
  */
-export class ClientWrapper<Paths extends {}, Path extends AllPaths<Paths>> {
+export class ClientWrapper<Paths extends object, Path extends AllPaths<Paths>> {
     client: Client<Paths>;
     path:   Path;
     errors: ErrorHandling;
@@ -108,7 +108,8 @@ export class ClientWrapper<Paths extends {}, Path extends AllPaths<Paths>> {
         if (!error || this.errors === "error-return") return;
 
         let status = 0;
-        let message = "";
+        let message: string;
+
         const maybeErrorObject = typeof error === "object" ? error : undefined;
 
         if (maybeErrorObject && "status" in maybeErrorObject) {
@@ -139,8 +140,10 @@ export class ClientWrapper<Paths extends {}, Path extends AllPaths<Paths>> {
             case 401:
             case 403:
                 rethrowAppError("PermissionDenied", error, message);
+                break;
             case 404:
                 rethrowAppError("NotFound", error, message);
+                break;
             default:
                 rethrowAppError("OperationFailed", error, message);
         }
