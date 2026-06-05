@@ -31,6 +31,8 @@ export default {
                 Title: "User Account",
                 Profile: "User Profile",
                 Logout:  "Logout",
+                Login:   "Login",
+                SignUp:  "Sign Up",
             }
         }
     },

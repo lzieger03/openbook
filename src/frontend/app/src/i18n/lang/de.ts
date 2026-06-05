@@ -32,6 +32,8 @@ const i18n: I18N = {
                 Title:   "Benutzerkonto",
                 Profile: "Benutzerprofil",
                 Logout:  "Logout",
+                Login:   "Login",
+                SignUp:  "Registrieren",
             }
         },
     },

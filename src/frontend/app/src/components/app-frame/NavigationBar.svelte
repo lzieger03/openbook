@@ -10,7 +10,7 @@ License, or (at your option) any later version.
 
 <!--
 @component
-Top navigation page of the application frame.
+Top navigation bar of the application frame.
 -->
 
 <script lang="ts">
@@ -24,6 +24,7 @@ Top navigation page of the application frame.
     import SubMenu                  from "../basic/dropdown-menu/SubMenu.svelte";
     import Navbar                   from "../basic/navbar/Navbar.svelte";
 
+    import { AuthStore }            from "../../stores/auth.js";
     import { breadcrumbs }          from "../../stores/breadcrumbs.js";
     import { i18n }                 from "../../stores/i18n.js";
     import { language }             from "../../stores/i18n.js";
@@ -33,6 +34,7 @@ Top navigation page of the application frame.
 
     import AvatarDefault            from "./img/AvatarDefault.jpg";
 
+    let auth = new AuthStore();
     let avatar = $state(AvatarDefault);
     let availableLanguages: openbookSchemas["Language"][] = $state([]);
 
@@ -43,7 +45,8 @@ Top navigation page of the application frame.
     }
 </script>
 
-{#await loadLanguages()}{/await}
+<!-- TODO: This swallows thrown errors! -->
+{#await Promise.all([loadLanguages(), auth.init()])}{/await}
 
 <!-- Navbar -->
 <Navbar class="top-0 sticky z-10 bg-base-100/95">
@@ -146,15 +149,27 @@ Top navigation page of the application frame.
                 </MenuTitle>
 
                 <SubMenu>
-                    <MenuItem href="#/accounts/profile">
-                        <i class="bi bi-person-circle"></i>
-                        {$i18n.ApplicationFrame.Menu.Account.Profile}
-                    </MenuItem>
+                    {#if $auth?.meta.is_authenticated}
+                        <MenuItem href="#/accounts/profile">
+                            <i class="bi bi-person-circle"></i>
+                            {$i18n.ApplicationFrame.Menu.Account.Profile}
+                        </MenuItem>
 
-                    <MenuItem href="#/accounts/logout">
-                        <i class="bi bi-box-arrow-right"></i>
-                        {$i18n.ApplicationFrame.Menu.Account.Logout}
-                    </MenuItem>
+                        <MenuItem href="#/accounts/logout">
+                            <i class="bi bi-box-arrow-right"></i>
+                            {$i18n.ApplicationFrame.Menu.Account.Logout}
+                        </MenuItem>
+                    {:else}
+                        <MenuItem href="#/accounts/login">
+                            <i class="bi bi-box-arrow-in-left"></i>
+                            {$i18n.ApplicationFrame.Menu.Account.Login}
+                        </MenuItem>
+
+                        <MenuItem href="#/accounts/signup">
+                            <i class="bi bi-pencil-square"></i>
+                            {$i18n.ApplicationFrame.Menu.Account.SignUp}
+                        </MenuItem>
+                    {/if}
                 </SubMenu>
             </MenuItem>
         </DropdownMenu>

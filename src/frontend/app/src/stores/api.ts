@@ -8,25 +8,35 @@
  * License, or (at your option) any later version.
  */
 
-import type { paths      as authPaths }          from "../api/openapi/auth";
-import type { components as authComponents }     from "../api/openapi/auth";
-import type { paths      as openbookPaths }      from "../api/openapi/openbook";
-import type { components as openbookComponents } from "../api/openapi/openbook";
-import type { Client }                           from "openapi-fetch";
+import type { paths      as _authPaths }          from "../api/openapi/auth";
+import type { components as _authComponents }     from "../api/openapi/auth";
+import type { paths      as _openbookPaths }      from "../api/openapi/openbook";
+import type { components as _openbookComponents } from "../api/openapi/openbook";
+import type { Client }                            from "openapi-fetch";
 
-import clients                                   from "../api/index.js";
-import { rethrowAppError }                       from "../utils/error.js";
-import { toasts }                                from "./toasts.js";
+import clients                                    from "../api/index.js";
+import { rethrowAppError }                        from "../utils/error.js";
+import { toasts }                                 from "./toasts.js";
+
+/**
+ * Available paths for the authentication API.
+ */
+export type authPaths = _authPaths;
 
 /**
  * Typed schema components for the authentication API.
  */
-export type authSchemas = authComponents["schemas"];
+export type authSchemas = _authComponents["schemas"];
+
+/**
+ * Available paths for the OpenBook API.
+ */
+export type openbookPaths = _openbookPaths;
 
 /**
  * Typed schema components for the OpenBook API.
  */
-export type openbookSchemas = openbookComponents["schemas"];
+export type openbookSchemas = _openbookComponents["schemas"];
 
 /**
  * Factory for pre-configured wrapped API clients. The raw API clients are wrapped here
@@ -49,7 +59,7 @@ export default {
     /**
      * @returns Wrapped API client for the authentication API
      */
-    auth: async <Path extends AllPaths<authPaths>>(path: Path, errors: ErrorHandling = "error-page") => {
+    auth: async <Path extends AllPaths<_authPaths>>(path: Path, errors: ErrorHandling = "error-page") => {
         let client = await clients.auth();
         return new ClientWrapper(client, path, errors);
 
@@ -58,7 +68,7 @@ export default {
     /**
      * @returns Wrapped API client for the OpenBook API
      */
-    openbook: async <Path extends AllPaths<openbookPaths>>(path: Path, errors: ErrorHandling = "error-page") => {
+    openbook: async <Path extends AllPaths<_openbookPaths>>(path: Path, errors: ErrorHandling = "error-page") => {
         let client = await clients.openbook();
         return new ClientWrapper(client, path, errors);
     },
@@ -70,7 +80,7 @@ export default {
  * @template Paths The OpenAPI paths type.
  * @template Path The specific path key.
  */
-class ClientWrapper<Paths extends {}, Path extends AllPaths<Paths>> {
+export class ClientWrapper<Paths extends {}, Path extends AllPaths<Paths>> {
     client: Client<Paths>;
     path:   Path;
     errors: ErrorHandling;
@@ -95,7 +105,7 @@ class ClientWrapper<Paths extends {}, Path extends AllPaths<Paths>> {
      * @param error The error object received from the API call.
      */
     private handleError(error: unknown) {
-        if (!error) return;
+        if (!error || this.errors === "error-return") return;
 
         let status = 0;
         let message = "";
@@ -207,7 +217,7 @@ class ClientWrapper<Paths extends {}, Path extends AllPaths<Paths>> {
 /**
  * Error handling modes for API calls.
  */
-export type ErrorHandling = "error-toast" | "error-page";
+export type ErrorHandling = "error-toast" | "error-page" | "error-return";
 
 /* The following types extract the paths from the OpenAPI-generated
  * types that support each respective HTTP method. They work like this:
