@@ -6,6 +6,8 @@
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 
+import typing
+
 from .viewsets.access_request          import AccessRequestViewSet
 from .viewsets.allowed_role_permission import AllowedRolePermissionViewSet
 from .viewsets.auth_token              import AuthTokenViewSet
@@ -18,7 +20,10 @@ from .viewsets.scope                   import ScopeTypeViewSet
 from .viewsets.user                    import CurrentUserViewSet
 from .viewsets.user                    import UserViewSet
 
-def register_api_routes(router, prefix):
+if typing.TYPE_CHECKING:
+    from rest_framework.routers        import DefaultRouter
+
+def register_api_routes(router: DefaultRouter, prefix: str) -> None:
     router.register(f"{prefix}/access_requests",          AccessRequestViewSet,         basename="access_request")
     router.register(f"{prefix}/allowed_role_permissions", AllowedRolePermissionViewSet, basename="allowed_role_permission")
     router.register(f"{prefix}/auth_tokens",              AuthTokenViewSet,             basename="auth_token")

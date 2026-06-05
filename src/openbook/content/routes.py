@@ -6,15 +6,20 @@
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 
-from .viewsets.course                    import CourseViewSet
-from .viewsets.course_material           import CourseMaterialViewSet
-from .viewsets.course_material_page_range import CourseMaterialPageRangeViewSet
-from .viewsets.library_group             import LibraryGroupViewSet
-from .viewsets.library_link              import LibraryLinkViewSet
-from .viewsets.textbook                  import TextbookViewSet
-from .viewsets.textbook_page             import TextbookPageViewSet
+import typing
 
-def register_api_routes(router, prefix):
+from .viewsets.course                     import CourseViewSet
+from .viewsets.course_material            import CourseMaterialViewSet
+from .viewsets.course_material_page_range import CourseMaterialPageRangeViewSet
+from .viewsets.library_group              import LibraryGroupViewSet
+from .viewsets.library_link               import LibraryLinkViewSet
+from .viewsets.textbook                   import TextbookViewSet
+from .viewsets.textbook_page              import TextbookPageViewSet
+
+if typing.TYPE_CHECKING:
+    from rest_framework.routers           import DefaultRouter
+
+def register_api_routes(router: DefaultRouter, prefix: str) -> None:
     router.register(f"{prefix}/courses", CourseViewSet, basename="course")
     router.register(f"{prefix}/library_groups", LibraryGroupViewSet, basename="library-group")
     router.register(f"{prefix}/library_links", LibraryLinkViewSet, basename="library-link")

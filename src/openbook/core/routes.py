@@ -6,6 +6,8 @@
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 
+import typing
+
 from .viewsets.html_component            import HTMLComponentViewSet
 from .viewsets.html_component_definition import HTMLComponentDefinitionViewSet
 from .viewsets.html_library              import HTMLLibraryViewSet
@@ -15,7 +17,10 @@ from .viewsets.media_file                import MediaFileViewSet
 from .viewsets.language                  import LanguageViewSet
 from .viewsets.site                      import SiteViewSet
 
-def register_api_routes(router, prefix):
+if typing.TYPE_CHECKING:
+    from rest_framework.routers          import DefaultRouter
+
+def register_api_routes(router: DefaultRouter, prefix: str) -> None:
     router.register(f"{prefix}/html_library/components",            HTMLComponentViewSet,           basename="html_component")
     router.register(f"{prefix}/html_library/component_definitions", HTMLComponentDefinitionViewSet, basename="html_component_definition")
     router.register(f"{prefix}/html_library/libraries",             HTMLLibraryViewSet,             basename="html_library")
