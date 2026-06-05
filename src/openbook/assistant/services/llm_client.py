@@ -7,6 +7,8 @@
 # License, or (at your option) any later version.
 
 
+from pathlib import Path
+
 from django.conf import settings
 from mistralai.client import Mistral
 
@@ -33,11 +35,6 @@ class LLM_Client:
             self.client = Mistral(api_key=api_key)
             self.model = "mistral-small-latest"
             self.initialized = True
-
-            # Lazy import to avoid circular dependency
-            from .rag_client import RagClient
-
-            self.rag_client = RagClient()
 
     def get_user_message(self, message: str) -> str:
         """Collected User-Prompt
@@ -66,13 +63,19 @@ class LLM_Client:
         response = self.client.embeddings.create(model="mistral-embed", inputs=[text])
         return response.data[0].embedding
 
-    def load_data(self, file_path: str = SNOW_FILE_PATH) -> None:
+    def load_data(self, file_path: str | Path = SNOW_FILE_PATH) -> None:
         """Delegiert das Laden der RAG-Daten an den RagClient."""
-        self.rag_client.load_data(file_path)
+        self._get_rag_client().load_data(file_path)
 
     def perform_rag_query(self, query: str) -> str:
         """Delegiert die RAG-Abfrage an den RagClient."""
-        return self.rag_client.perform_rag_query(query)
+        return self._get_rag_client().perform_rag_query(query)
 
+    def _get_rag_client(self):
+        """Create the RAG client lazily to avoid circular service initialization."""
+        if not hasattr(self, "rag_client"):
+            from .rag_client import RagClient
 
-llm_client = LLM_Client()
+            self.rag_client = RagClient(assistant=self)
+
+        return self.rag_client
