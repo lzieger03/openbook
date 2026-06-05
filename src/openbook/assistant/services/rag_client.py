@@ -6,99 +6,119 @@
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 
-from django.conf import settings
+from pathlib import Path
+from typing import TYPE_CHECKING
 
-try:  # Drop-In replacement für SQLite 3 aufgrund von MacOS Problemen mit Loadable Extensions
-    import sqlean as sqlite3
-except ImportError:
-    import sqlite3
-import sqlite_vec
+from django.core.files import File
 from sqlite_vec import serialize_float32
-from .llm_client import LLM_Client, SNOW_FILE_PATH
 
-DB_PATH = settings.BASE_DIR / "db.sqlite3"
+from openbook.assistant.models import AssistantDocument
+from openbook.assistant.models import AssistantDocumentChunk
+from openbook.assistant.services.vector_index import DOCUMENTS_TABLE
+from openbook.assistant.services.vector_index import delete_document_vectors
+from openbook.assistant.services.vector_index import get_vector_connection
+
+from .llm_client import SNOW_FILE_PATH
+
+if TYPE_CHECKING:
+    from .llm_client import LLM_Client
 
 
 class RagClient:
-    def __init__(self):
-        self.assistant = LLM_Client()
+    def __init__(self, assistant: "LLM_Client"):
+        self.assistant = assistant
         self.text_data = None
 
-        # Setup SQLite connection
-        self.db = sqlite3.connect(str(DB_PATH), check_same_thread=False)
+    def load_data(self, file_path: str | Path = SNOW_FILE_PATH) -> AssistantDocument:
+        """Create an assistant document from a local file and index it."""
+        path = Path(file_path)
+        document = AssistantDocument.objects.create(title=path.stem)
+
         try:
-            self.db.enable_load_extension(True)
-            sqlite_vec.load(self.db)
-            self.db.enable_load_extension(False)
-            self.db.execute("""
-                CREATE VIRTUAL TABLE IF NOT EXISTS documents USING vec0(
-                    embedding float[1024],
-                    +chunk_id INTEGER,
-                    +content TEXT
-                )
-            """)
-            self.db.commit()
-        except AttributeError:
-            print(
-                "Warning: sqlite3 does not support enable_load_extension. SQLite Vec cannot be loaded.",
-                flush=True,
-            )
-        except sqlite3.OperationalError as e:
-            print(f"Failed to create virtual table: {e}", flush=True)
+            with path.open("rb") as file:
+                document.file_data.save(path.name, File(file), save=True)
 
-    def load_data(self, file_path: str = SNOW_FILE_PATH):
-        """Lädt Datei in SQLite-Datenbank als Vektoren."""
-        with open(file_path, "r", encoding="utf-8") as f:
-            content = f.read()
+            self.index_document(document)
+            return document
+        except Exception:
+            if document.file_data:
+                document.file_data.delete(save=False)
+            document.delete()
+            raise
 
-        # Check if already loaded
-        count_res = self.db.execute("SELECT count(*) FROM documents").fetchone()
-        if count_res and count_res[0] > 0:
-            if file_path:
-                print(
-                    "Datei bereits in Datenbank.",
-                    flush=True,
-                )
-                self.db.execute("DELETE FROM documents")
-                print("Datenbank geleert. Neue Datei wird geladen...", flush=True)
-                print(self.db.execute("SELECT count(*) FROM documents").fetchone())
-            else:
-                self.text_data = content
-                return
+    def index_document(self, document: AssistantDocument) -> None:
+        """Read an uploaded assistant document and rebuild its retrieval index."""
+        database_alias = document._state.db or "default"
+        get_vector_connection(database_alias)
 
-        # Vektorisieren und in SQLite einfügen
+        document.file_data.open("rb")
+        try:
+            content = document.file_data.read().decode("utf-8")
+        finally:
+            document.file_data.close()
+
         chunks = self._chunk_text(content)
-        for i, chunk in enumerate(chunks):
-            embedding = self.assistant.get_embedding(chunk)
-            self.db.execute(
-                "INSERT INTO documents (embedding, chunk_id, content) VALUES (?, ?, ?)",
-                (serialize_float32(embedding), i, chunk),
+        indexed_chunks = []
+
+        for position, chunk in enumerate(chunks):
+            indexed_chunks.append(
+                {
+                    "position": position,
+                    "content": chunk,
+                    "embedding": serialize_float32(self.assistant.get_embedding(chunk)),
+                }
             )
-        self.db.commit()
+
+        document.chunks.all().delete()
+        delete_document_vectors(document.id, using=database_alias)
+
+        for indexed_chunk in indexed_chunks:
+            document_chunk = AssistantDocumentChunk.objects.using(database_alias).create(
+                parent=document,
+                position=indexed_chunk["position"],
+                content=indexed_chunk["content"],
+                embedding=indexed_chunk["embedding"],
+            )
+            self._insert_vector_index(document_chunk, using=database_alias)
+
         self.text_data = content
 
-    def perform_rag_query(self, query: str):
-        """Führe eine RAG-Abfrage mittels Embeddings in SQLite durch."""
-        if not self.text_data:
+    def perform_rag_query(self, query: str) -> str:
+        """Run a RAG query through sqlite-vec on Django's database connection."""
+        connection = get_vector_connection()
+        if connection is None:
+            raise RuntimeError("RAG vector search currently requires Django's SQLite backend.")
+
+        if not AssistantDocumentChunk.objects.exists():
             self.load_data()
 
         query_embedding = self.assistant.get_embedding(query)
 
-        rows = self.db.execute(
-            """
-            SELECT
-                chunk_id,
-                content,
-                distance
-            FROM documents
-            WHERE embedding MATCH ?
-            ORDER BY distance
-            LIMIT 3
-            """,
-            [serialize_float32(query_embedding)],
-        ).fetchall()
+        with connection.cursor() as cursor:
+            cursor.execute(
+                f"""
+                SELECT
+                    chunk_id,
+                    distance
+                FROM {DOCUMENTS_TABLE}
+                WHERE embedding MATCH %s
+                ORDER BY distance
+                LIMIT 3
+                """,
+                [serialize_float32(query_embedding)],
+            )
+            rows = cursor.fetchall()
 
-        top_contexts = [row[1] for row in rows]
+        chunk_ids = [row[0] for row in rows]
+        chunks_by_id = {
+            str(chunk.id): chunk
+            for chunk in AssistantDocumentChunk.objects.filter(id__in=chunk_ids)
+        }
+        top_contexts = [
+            chunks_by_id[chunk_id].content
+            for chunk_id in chunk_ids
+            if chunk_id in chunks_by_id
+        ]
         context = "\n\n".join(top_contexts)
 
         prompt = f"""
@@ -108,10 +128,42 @@ class RagClient:
         """.strip()
         return self.assistant.get_user_message(prompt)
 
+    def _insert_vector_index(
+        self,
+        chunk: AssistantDocumentChunk,
+        using: str = "default",
+    ) -> None:
+        """Insert one Django chunk into the sqlite-vec search index."""
+        connection = get_vector_connection(using)
+        if connection is None:
+            return
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                f"""
+                INSERT INTO {DOCUMENTS_TABLE} (
+                    embedding,
+                    document_id,
+                    chunk_id,
+                    position
+                )
+                VALUES (%s, %s, %s, %s)
+                """,
+                [
+                    bytes(chunk.embedding),
+                    str(chunk.parent_id),
+                    str(chunk.id),
+                    chunk.position,
+                ],
+            )
+
     def _chunk_text(
-        self, text: str, chunk_size: int = 1000, overlap: int = 200
+        self,
+        text: str,
+        chunk_size: int = 1000,
+        overlap: int = 200,
     ) -> list[str]:
-        """Chunks text in multiple Größen von max. 1000"""
+        """Split text into overlapping chunks."""
         chunks = []
         start = 0
         while start < len(text):
