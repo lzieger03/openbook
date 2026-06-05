@@ -99,9 +99,10 @@ class ClientWrapper<Paths extends {}, Path extends AllPaths<Paths>> {
 
         let status = 0;
         let message = "";
+        const maybeErrorObject = typeof error === "object" ? error : undefined;
 
-        if (typeof error === "object" && error !== null && "status" in error) {
-            const maybeError  = error as {status?: unknown, detail?: unknown, message?: unknown};
+        if (maybeErrorObject && "status" in maybeErrorObject) {
+            const maybeError  = maybeErrorObject as {status?: unknown, detail?: unknown, message?: unknown};
             const maybeStatus = maybeError.status;
 
             if (typeof maybeStatus === "number") {
