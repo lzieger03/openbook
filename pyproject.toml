@@ -44,9 +44,7 @@ pyyaml = "^6.0.3"
 semver = "^3.0.4"
 twisted = {extras = ["http2", "tls"], version = "^25.5.0"}
 django-colorfield = "^0.14.0"
-faiss-cpu = "^1.14.2"
 mistralai = "^2.4.8"
-dotenv = "^0.9.9"
 sqlite-vec = "^0.1.9"
 sqlean-py = { version = "^3.50.4.5", markers = "sys_platform == 'darwin'" }
 
