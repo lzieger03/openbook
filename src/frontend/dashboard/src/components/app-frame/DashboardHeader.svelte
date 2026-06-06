@@ -63,6 +63,9 @@ Top application bar: brand on the left, user avatar and a status pill on the rig
 
 <style>
     .app-header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
         display: flex;
         align-items: center;
         justify-content: space-between;

@@ -62,9 +62,12 @@ around the routed page content. The header avatar follows the shared store.
 </div>
 
 <style>
+    /* Lock the shell to the viewport so only inner page areas scroll. */
     .shell {
         flex: 1;
-        min-height: 100vh;
+        height: 100vh;
+        min-height: 0;
+        overflow: hidden;
         display: flex;
         flex-direction: column;
         transition: padding-right 0.25s ease;
@@ -77,6 +80,8 @@ around the routed page content. The header avatar follows the shared store.
 
     .shell-content {
         flex: 1;
+        min-height: 0;
+        overflow: hidden;
         display: flex;
         flex-direction: column;
     }

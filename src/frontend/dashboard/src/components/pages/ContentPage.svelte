@@ -141,12 +141,17 @@ load and render the real course material (Markdown) from the content API.
     .content-screen {
         flex: 1;
         min-height: 0;
+        overflow: hidden;
         display: grid;
         grid-template-columns: 15rem minmax(0, 1fr);
+        grid-template-rows: minmax(0, 1fr);
         width: 100%;
     }
 
+    /* Sidebar stays put; it never scrolls. */
     .toc {
+        min-height: 0;
+        overflow: hidden;
         display: flex;
         flex-direction: column;
         gap: 1rem;

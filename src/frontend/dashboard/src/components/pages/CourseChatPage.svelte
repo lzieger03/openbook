@@ -179,12 +179,17 @@ sidebar, minimised icon) can be layered on later.
     .chat-screen {
         flex: 1;
         min-height: 0;
+        overflow: hidden;
         display: grid;
         grid-template-columns: 16rem 1fr;
+        grid-template-rows: minmax(0, 1fr);
         width: 100%;
     }
 
+    /* Sidebar stays put; only the conversation scrolls. */
     .sidebar {
+        min-height: 0;
+        overflow: hidden;
         display: flex;
         flex-direction: column;
         gap: 1.5rem;

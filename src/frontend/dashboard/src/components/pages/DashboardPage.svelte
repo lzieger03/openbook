@@ -83,6 +83,7 @@ with loading / error / content states.
     .dashboard {
         flex: 1;
         min-height: 0;
+        overflow-y: auto;
         display: flex;
         flex-direction: column;
         gap: 1.25rem;

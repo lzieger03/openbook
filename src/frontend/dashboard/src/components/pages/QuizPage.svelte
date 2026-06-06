@@ -160,8 +160,8 @@ TODO: load questions from the quiz API once it exists and report the result.
 
 <div class="quiz">
     <header class="quiz-top">
-        <button type="button" class="content-btn" onclick={() => push(`/content/${params?.id ?? ""}`)}>
-            ← Content
+        <button type="button" class="content-btn" onclick={() => window.history.back()}>
+            ← Back
         </button>
         {#if !finished}
             <div class="progress-track" aria-hidden="true">
