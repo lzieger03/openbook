@@ -6,15 +6,8 @@
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 
-
-from pathlib import Path
-
 from django.conf import settings
 from mistralai.client import Mistral
-
-SNOW_FILE_PATH = (
-    settings.BASE_DIR / "openbook/assistant/services/test_files/white-black.txt"
-)
 
 
 class LLM_Client:
@@ -63,7 +56,7 @@ class LLM_Client:
         response = self.client.embeddings.create(model="mistral-embed", inputs=[text])
         return response.data[0].embedding
 
-    def load_data(self, file_path: str | Path = SNOW_FILE_PATH) -> None:
+    def load_data(self, file_path: str) -> None:
         """Delegiert das Laden der RAG-Daten an den RagClient."""
         self._get_rag_client().load_data(file_path)
 

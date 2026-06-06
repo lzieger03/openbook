@@ -6,6 +6,8 @@
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 
+from django.conf import settings
+from django.contrib import messages
 from django.contrib.admin import RelatedOnlyFieldListFilter
 from django.utils.translation import gettext_lazy as _
 from unfold.admin import TabularInline
@@ -96,6 +98,46 @@ class AssistantDocumentAdmin(CustomModelAdmin):
             "fields": ["title", "file_data"],
         }),
     ]
+
+    def save_model(self, request, obj, form, change) -> None:
+        """Save uploaded documents and rebuild their assistant index."""
+        super().save_model(request, obj, form, change)
+
+        if "file_data" not in form.changed_data:
+            return
+
+        if not obj.file_data:
+            obj.chunks.all().delete()
+            return
+
+        if not getattr(settings, "MISTRAL_API_KEY", ""):
+            self.message_user(
+                request,
+                _(
+                    "Document saved, but indexing was skipped because "
+                    "MISTRAL_API_KEY is not set."
+                ),
+                level=messages.WARNING,
+            )
+            return
+
+        from openbook.assistant.services.llm_client import LLM_Client
+
+        try:
+            LLM_Client()._get_rag_client().index_document(obj)
+        except Exception as error:
+            self.message_user(
+                request,
+                _("Document saved, but indexing failed: %(error)s") % {"error": error},
+                level=messages.ERROR,
+            )
+            return
+
+        self.message_user(
+            request,
+            _("Document indexed for assistant retrieval."),
+            level=messages.SUCCESS,
+        )
 
 
 class AssistantDocumentChunkAdmin(CustomModelAdmin):

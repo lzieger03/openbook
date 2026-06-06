@@ -18,8 +18,6 @@ from openbook.assistant.services.vector_index import DOCUMENTS_TABLE
 from openbook.assistant.services.vector_index import delete_document_vectors
 from openbook.assistant.services.vector_index import get_vector_connection
 
-from .llm_client import SNOW_FILE_PATH
-
 if TYPE_CHECKING:
     from .llm_client import LLM_Client
 
@@ -29,7 +27,7 @@ class RagClient:
         self.assistant = assistant
         self.text_data = None
 
-    def load_data(self, file_path: str | Path = SNOW_FILE_PATH) -> AssistantDocument:
+    def load_data(self, file_path: str | Path) -> AssistantDocument:
         """Create an assistant document from a local file and index it."""
         path = Path(file_path)
         document = AssistantDocument.objects.create(title=path.stem)
@@ -90,7 +88,7 @@ class RagClient:
             raise RuntimeError("RAG vector search currently requires Django's SQLite backend.")
 
         if not AssistantDocumentChunk.objects.exists():
-            self.load_data()
+            raise RuntimeError("No assistant documents have been indexed yet.")
 
         query_embedding = self.assistant.get_embedding(query)
 
