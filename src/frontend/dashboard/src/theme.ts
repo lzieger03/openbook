@@ -9,14 +9,17 @@
  */
 
 /**
- * Centralized theme handling. Defaults to the system colour scheme and lets a
- * stored choice override it. Applied before render to avoid a flash.
+ * Centralized theme handling. Defaults to the system colour scheme, lets a
+ * stored choice override it, and exposes a store + toggle for the UI. The theme
+ * is applied via `data-theme` on the root element.
  */
+
+import {get, writable} from "svelte/store";
 
 const STORAGE_KEY = "openbook-dashboard-theme";
 const DARK_QUERY = "(prefers-color-scheme: dark)";
 
-type Theme = "light" | "dark";
+export type Theme = "light" | "dark";
 
 function systemTheme(): Theme {
     return window.matchMedia(DARK_QUERY).matches ? "dark" : "light";
@@ -27,17 +30,34 @@ function storedTheme(): Theme | null {
     return value === "light" || value === "dark" ? value : null;
 }
 
-function applyTheme(theme: Theme): void {
-    document.documentElement.setAttribute("data-theme", theme);
+function applyTheme(value: Theme): void {
+    document.documentElement.setAttribute("data-theme", value);
+}
+
+/** The active theme. Components subscribe to this to reflect the current choice. */
+export const theme = writable<Theme>(storedTheme() ?? systemTheme());
+
+/** Persist and apply a theme choice. */
+export function setTheme(value: Theme): void {
+    localStorage.setItem(STORAGE_KEY, value);
+    applyTheme(value);
+    theme.set(value);
+}
+
+/** Switch between light and dark. */
+export function toggleTheme(): void {
+    setTheme(get(theme) === "dark" ? "light" : "dark");
 }
 
 /** Apply the initial theme and keep following the system when no choice is stored. */
 export function initTheme(): void {
-    applyTheme(storedTheme() ?? systemTheme());
+    applyTheme(get(theme));
 
     window.matchMedia(DARK_QUERY).addEventListener("change", (event) => {
         if (!storedTheme()) {
-            applyTheme(event.matches ? "dark" : "light");
+            const next: Theme = event.matches ? "dark" : "light";
+            applyTheme(next);
+            theme.set(next);
         }
     });
 }

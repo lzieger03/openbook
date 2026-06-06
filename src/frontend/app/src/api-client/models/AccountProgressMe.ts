@@ -31,6 +31,18 @@ export interface AccountProgressMe {
      * @memberof AccountProgressMe
      */
     level: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof AccountProgressMe
+     */
+    currentLevelMinPoints: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof AccountProgressMe
+     */
+    nextLevelMinPoints: number | null;
 }
 
 /**
@@ -39,6 +51,8 @@ export interface AccountProgressMe {
 export function instanceOfAccountProgressMe(value: object): value is AccountProgressMe {
     if (!('pointTotal' in value) || value['pointTotal'] === undefined) return false;
     if (!('level' in value) || value['level'] === undefined) return false;
+    if (!('currentLevelMinPoints' in value) || value['currentLevelMinPoints'] === undefined) return false;
+    if (!('nextLevelMinPoints' in value) || value['nextLevelMinPoints'] === undefined) return false;
     return true;
 }
 
@@ -54,6 +68,8 @@ export function AccountProgressMeFromJSONTyped(json: any, ignoreDiscriminator: b
         
         'pointTotal': json['point_total'],
         'level': json['level'],
+        'currentLevelMinPoints': json['current_level_min_points'],
+        'nextLevelMinPoints': json['next_level_min_points'],
     };
 }
 
@@ -70,6 +86,8 @@ export function AccountProgressMeToJSONTyped(value?: AccountProgressMe | null, i
         
         'point_total': value['pointTotal'],
         'level': value['level'],
+        'current_level_min_points': value['currentLevelMinPoints'],
+        'next_level_min_points': value['nextLevelMinPoints'],
     };
 }
 

@@ -14,6 +14,7 @@ Top application bar: brand on the left, user avatar and a status pill on the rig
 -->
 <script lang="ts">
     import type {DashboardUser} from "../../data/dashboard.js";
+    import {theme, toggleTheme} from "../../theme.js";
 
     let {
         user = null,
@@ -39,6 +40,14 @@ Top application bar: brand on the left, user avatar and a status pill on the rig
     </div>
 
     <div class="header-right">
+        <button
+            type="button"
+            class="theme-toggle"
+            aria-label={$theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            onclick={toggleTheme}
+        >
+            {$theme === "dark" ? "☀️" : "🌙"}
+        </button>
         <span class="avatar-mark" aria-hidden="true">
             {#if user?.avatarUrl}
                 <img src={user.avatarUrl} alt="" />
@@ -88,6 +97,27 @@ Top application bar: brand on the left, user avatar and a status pill on the rig
         display: flex;
         align-items: center;
         gap: 0.85rem;
+    }
+
+    .theme-toggle {
+        display: grid;
+        place-items: center;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 999px;
+        font-size: 1rem;
+        cursor: pointer;
+        background: color-mix(in oklab, var(--color-base-200) 70%, transparent);
+        border: 1px solid color-mix(in oklab, var(--color-base-content) 18%, transparent);
+    }
+
+    .theme-toggle:hover {
+        border-color: color-mix(in oklab, var(--color-primary) 50%, transparent);
+    }
+
+    .theme-toggle:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
     }
 
     .avatar-mark {

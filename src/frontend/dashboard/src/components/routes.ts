@@ -11,9 +11,15 @@
 // Hash routes for the dashboard microfrontend.
 import DashboardPage from "./pages/DashboardPage.svelte";
 import ProfileEditPage from "./pages/ProfileEditPage.svelte";
+import CourseChatPage from "./pages/CourseChatPage.svelte";
+import QuizPage from "./pages/QuizPage.svelte";
+import ContentPage from "./pages/ContentPage.svelte";
 
 export default {
     "/": DashboardPage,
     "/profile": ProfileEditPage,
+    "/chat/:id": CourseChatPage,
+    "/quiz/:id": QuizPage,
+    "/content/:id": ContentPage,
     "*": DashboardPage,
 };

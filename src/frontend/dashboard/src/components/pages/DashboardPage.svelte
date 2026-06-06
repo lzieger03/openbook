@@ -64,7 +64,11 @@ with loading / error / content states.
     {:else}
         <div class="grid">
             <div class="grid-main">
-                <MyLearningPanel courses={state.courses} skills={state.skills} />
+                <MyLearningPanel
+                    courses={state.courses}
+                    skills={state.skills}
+                    onCourseOpen={(course) => push(`/chat/${course.id}`)}
+                />
             </div>
             <div class="grid-side">
                 <StatsPanel user={state.user} stats={state.stats} onProfile={() => push("/profile")} />

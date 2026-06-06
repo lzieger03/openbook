@@ -15,10 +15,11 @@ around the routed page content. The header avatar follows the shared store.
 -->
 <script lang="ts">
     import {onMount} from "svelte";
-    import Router from "svelte-spa-router";
+    import Router, {router} from "svelte-spa-router";
     import {dashboardStore} from "../stores/dashboard.store.js";
     import type {DashboardState} from "../stores/dashboard.store.js";
     import DashboardHeader from "./app-frame/DashboardHeader.svelte";
+    import ChatWidget from "./app-frame/ChatWidget.svelte";
     import routes from "./routes.js";
 
     let state = $state<DashboardState>({
@@ -30,6 +31,12 @@ around the routed page content. The header avatar follows the shared store.
         courses: [],
     });
 
+    // True while the chat is docked as a sidebar, so the shell makes room for it.
+    let chatDocked = $state(false);
+
+    // The full chat page is itself a chat, so the Quick Chat widget is hidden there.
+    const onChatPage = $derived((router.location ?? "").startsWith("/chat"));
+
     onMount(() => {
         // Subscribe so the header avatar/name stay in sync on every route.
         return dashboardStore.subscribe((value) => {
@@ -38,7 +45,7 @@ around the routed page content. The header avatar follows the shared store.
     });
 </script>
 
-<div class="shell">
+<div class="shell" class:chat-docked={chatDocked && !onChatPage}>
     <DashboardHeader user={state.user} />
 
     <main class="shell-content">
@@ -48,6 +55,10 @@ around the routed page content. The header avatar follows the shared store.
     <footer class="shell-footer">
         <span>Copyright 2026 | OpenBook</span>
     </footer>
+
+    {#if !onChatPage}
+        <ChatWidget onSidebarChange={(docked) => (chatDocked = docked)} />
+    {/if}
 </div>
 
 <style>
@@ -56,6 +67,12 @@ around the routed page content. The header avatar follows the shared store.
         min-height: 100vh;
         display: flex;
         flex-direction: column;
+        transition: padding-right 0.25s ease;
+    }
+
+    /* Make room for the docked chat sidebar so nothing is hidden behind it. */
+    .shell.chat-docked {
+        padding-right: min(28rem, 100vw);
     }
 
     .shell-content {
