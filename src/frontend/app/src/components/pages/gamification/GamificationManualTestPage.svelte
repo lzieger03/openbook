@@ -479,7 +479,9 @@ Manual test page for gamification reward triggering and live user-impact checks.
     });
 </script>
 
-<div class="page">
+<!-- Force the light DaisyUI theme here so token-based sections (e.g. SkillsSection's
+     bg-base-100) match the hardcoded light panels and stay readable. -->
+<div class="page" data-theme="light">
     <h1>Gamification Manual Test</h1>
     <p class="intro">
         Nutze diese Seite, um manuell ein Punktevergabe-Event auszulösen und die Auswirkung
