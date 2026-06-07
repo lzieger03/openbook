@@ -28,14 +28,14 @@ const BASE_DELAY_MS = 250;
  * Received messages must be JSON objects with a property called `action` (as per the
  * [chanx](https://chanx.readthedocs.io/) convention) to identify the message type.
  */
-export class WebSocketClient {
+export class WebSocketClient<SentMessages extends WebSocketMessage, ReceivedMessages extends WebSocketMessage> {
     #url:             string;
     #socket?:         WebSocket;
     #status:          WSConnectionStatus = "disconnected";
     #statusListener?: WSConnectionStatusListener;
     #errorHandler?:   WSErrorHandler;
     #messageHandlers: Map<WebSocketMessageAction, WebSocketMessageHandler> = new Map();
-    #messageQueue:    WebSocketMessage[] = [];
+    #messageQueue:    SentMessages[] = [];
 
     /**
      * Object initialization.
@@ -69,10 +69,13 @@ export class WebSocketClient {
      * Set message handler for a given message type. Note that this replaces the
      * previous handler for the same message type.
      *
-     * @param action Message type (use `*` to catch messages without explicit handler)
+     * @param action Message type
      * @param handler Message handler
      */
-    setMessageHandler(action: WebSocketMessageAction, handler: WebSocketMessageHandler) {
+    setMessageHandler<Action extends ReceivedMessages["action"]>(
+        action:  Action,
+        handler: WebSocketMessageHandler<ExtractMessageByAction<ReceivedMessages, Action>>
+    ) {
         this.#messageHandlers.set(action, handler);
     }
 
@@ -140,7 +143,7 @@ export class WebSocketClient {
                         // Case 1: The connection never got established. The outer method
                         // is therefore still waiting for the promise to resolve or reject.
                         if (this.#status === "connecting") {
-                            reject(new Error(i18n.value.Error.WebSocketConnectionFailed.Failed));
+                            reject(new Error(i18n.value.Error.WebSocket.Failed));
                         };
 
                         // Case 2: External caller deliberately wanted to disconnect.
@@ -170,12 +173,12 @@ export class WebSocketClient {
                     this.#socket.addEventListener("message", async (event: MessageEvent) => {
                         try {
                             const message = JSON.parse(event.data);
-                            if (!message.action) throw new Error(i18n.value.Error.WebSocketConnectionFailed.ActionMissing);
+                            if (!message.action) throw new Error(i18n.value.Error.WebSocket.ActionMissing);
 
                             const handler = this.#messageHandlers.get(message.action);
 
                             if (!handler) {
-                                throw new Error(_(i18n.value.Error.WebSocketConnectionFailed.NoMessageHandler, {
+                                throw new Error(_(i18n.value.Error.WebSocket.NoMessageHandler, {
                                     action: message.action
                                 }));
                             }
@@ -197,7 +200,7 @@ export class WebSocketClient {
             await new Promise(resolve => setTimeout(resolve, delayMs));
             delayMs *= 2;
 
-            console.warn(_(i18n.value.Error.WebSocketConnectionFailed.Retry, {
+            console.warn(_(i18n.value.Error.WebSocket.Retry, {
                 n: attempt,
                 m: MAX_ATTEMPTS,
                 s: this.#url,
@@ -206,7 +209,7 @@ export class WebSocketClient {
 
         await this.#setConnectionStatus("disconnected");
         if (lastError instanceof Error) throw lastError;
-        throw new Error(i18n.value.Error.WebSocketConnectionFailed.Failed);
+        throw new Error(i18n.value.Error.WebSocket.Failed);
     }
 
     /**
@@ -226,7 +229,7 @@ export class WebSocketClient {
      *
      * @param message Message to be sent
      */
-    async send(message: WebSocketMessage) {
+    async send(message: SentMessages) {
         if (this.#status === "connected" && this.#socket) {
             this.#send(message);
         } else {
@@ -240,7 +243,7 @@ export class WebSocketClient {
      *
      * @param message Message to be sent
      */
-    async #send(message: WebSocketMessage) {
+    async #send(message: SentMessages) {
         if (!this.#socket) return;
         const json = JSON.stringify(message);
         this.#socket.send(json);
@@ -285,4 +288,18 @@ export interface WebSocketMessage { action: WebSocketMessageAction };
 /**
  * Handler function to handle received messages of a given type.
  */
-export type WebSocketMessageHandler = (message: WebSocketMessage) => void | Promise<void>;
+export type WebSocketMessageHandler<MessageType extends WebSocketMessage = any> = (message: MessageType) => void | Promise<void>;
+
+/**
+ * TypeScript black magic!
+ *
+ * Helper to narrow down the message union to the specific message with the matching action.
+ * If the union can't be resolved (e.g. it is a raw WebSocketMessage), it returns the base type
+ * intersected with the action literal type.
+ */
+type ExtractMessageByAction<
+    Messages extends WebSocketMessage,
+    Action extends string
+> = [Extract<Messages, { action: Action }>] extends [never]
+    ? Messages & { action: Action }
+    : Extract<Messages, { action: Action }>;

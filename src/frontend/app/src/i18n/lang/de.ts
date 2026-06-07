@@ -86,11 +86,12 @@ const i18n: I18N = {
             Failed: "Anfrage fehlgeschlagen!",
         },
 
-        WebSocketConnectionFailed: {
+        WebSocket: {
             Retry:            "Versuche, Verbindung zum WebSocket-Server $s$ wiederherzustellen; Versuch $n$ von $m$",
             Failed:           "WebSocket-Verbindung fehlgeschlagen!",
             ActionMissing:    "Die empfangene WebSocket-Nachricht enthält kein Attribut 'action' zur Unterscheidung der Nachrichtenart.",
             NoMessageHandler: "Keine Handler-Methode gefunden für WebSocket-Nachrichtenart '$action$'.",
+            UnknownError:     "Während der WebSocket-Kommunikation mit dem Backend ist ein unbekannter Fehler aufgetreten.",
         },
 
         Backend: {

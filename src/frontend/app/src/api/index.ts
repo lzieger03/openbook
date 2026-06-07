@@ -11,6 +11,7 @@
 import type { Client }                 from "openapi-fetch";
 import type { paths as authPaths }     from "./openapi/auth.js";
 import type { paths as openbookPaths } from "./openapi/openbook.js";
+import type { WebSocketMessage }       from "./websocket.js";
 
 import createClient                    from "openapi-fetch";
 import middlewares                     from "./middleware/index.js";
@@ -86,9 +87,9 @@ export default {
      * @suffix URL suffix, e.g. `/ws/ai/chat`
      * @returns A new WebSocket client for the OpenBook WebSocket API
      */
-    ws: async (suffix: string) => {
+    ws: async <SentMessages extends WebSocketMessage, ReceivedMessages extends WebSocketMessage>(suffix: string) => {
         if (!suffix.startsWith("/")) suffix = `/${suffix}`;
         let url = (await getBaseUrl()) + suffix;
-        return new WebSocketClient(url);
+        return new WebSocketClient<SentMessages, ReceivedMessages>(url);
     },
 };

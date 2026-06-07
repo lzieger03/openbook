@@ -85,11 +85,12 @@ export default {
             Failed: "Request failed!",
         },
 
-        WebSocketConnectionFailed: {
+        WebSocket: {
             Retry:            "Retrying to connect to WebSocket server $s$; attempt $n$ from $m$",
             Failed:           "WebSocket connection failed!",
             ActionMissing:    "Received WebSocket message is missing the 'action' property which defines the message type.",
             NoMessageHandler: "No handler method found for WebSocket message of type '$action$'.",
+            UnknownError:     "An unknown error occurred during the WebSocket communication with the backend.",
         },
 
         Backend: {
