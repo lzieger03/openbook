@@ -85,6 +85,13 @@ export default {
             Failed: "Request failed!",
         },
 
+        WebSocketConnectionFailed: {
+            Retry:            "Retrying to connect to WebSocket server $s$; attempt $n$ from $m$",
+            Failed:           "WebSocket connection failed!",
+            ActionMissing:    "Received WebSocket message is missing the 'action' property which defines the message type.",
+            NoMessageHandler: "No handler method found for WebSocket message of type '$action$'.",
+        },
+
         Backend: {
             NotFound:         "Object Not Found",
             PermissionDenied: "Permission Denied",

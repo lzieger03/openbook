@@ -71,7 +71,7 @@ The following URLs expose the API schema on your running OpenBook installation:
 WebSocket API
 -------------
 
-Certain features like the AI chat are available through an asynchronous WebSocket API.
+Some features like the AI chat are available through an asynchronous WebSocket API.
 The following URLs expose the API schema and documentation on your installation:
 
 .. list-table::
@@ -91,4 +91,4 @@ The following URLs expose the API schema and documentation on your installation:
 ..     - `Open <../_static/asyncapi.html>`_
 ..     - ``https://<your-openbook-host>/ws/docs/``
 
-.. TODO: How to statically build and server the AsyncAPI docs?
+.. TODO: How to statically build and serve the AsyncAPI docs?
