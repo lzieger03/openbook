@@ -50,6 +50,7 @@ const i18n: I18N = {
     },
 
     AiChat: {
+        PanelAriaLabel: "KI-Chat",
         StreamingResponseAriaLabel: "Antwort wird übertragen",
         MessageImageAlt: "Antwort des Assistenten",
         StreamingUpdate: "Laufende Aktualisierung",

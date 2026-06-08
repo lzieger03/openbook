@@ -378,7 +378,7 @@ UNFOLD = {
             "icon": "api",
             "title": _("WebSocket API Explorer"),
             "link": reverse_lazy("asyncapi-docs"),
-        }
+        },
         {
             "icon": "menu_book",
             "title": _("Documentation"),

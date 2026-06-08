@@ -163,6 +163,7 @@ export class WebSocketClient<SentMessages extends WebSocketMessage, ReceivedMess
                                 if (this.#errorHandler) await this.#errorHandler(error as Error);
                             }
                         }, 0);
+                    });
 
                     /**
                      * Generic WebSocket error. Will be logged and passed to the error handler.

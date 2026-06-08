@@ -96,5 +96,4 @@ export default {
 
         return new WebSocketClient<SentMessages, ReceivedMessages>(wsUrl.toString());
     },
-    },
 };
