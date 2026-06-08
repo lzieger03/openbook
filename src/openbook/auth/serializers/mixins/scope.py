@@ -1,10 +1,12 @@
-# OpenBook: Interactive Online Textbooks - Server
+# OpenBook: Interactive Online Textbooks
 # © 2025 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
+
+from __future__ import annotations
 
 from django.utils.translation           import gettext_lazy as _
 from django.contrib.contenttypes.models import ContentType
@@ -68,6 +70,8 @@ class ScopeTypeField(RelatedField):
     def get_queryset(self):
         if not self.read_only:
             return ContentType.objects.all()
+
+        return None
 
     def to_internal_value(self, data):
         if not isinstance(data, str):

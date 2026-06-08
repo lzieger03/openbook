@@ -1,0 +1,72 @@
+/*
+ * OpenBook: Interactive Online Textbooks
+ * © 2024 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ */
+
+/* Semantic font names:
+ *
+ * To simplify changing the global fonts, OpenBook uses the following semantic
+ * font names for all content:
+ *
+ * - SansSerif: Regular text font without serifs
+ * - Serif: Serif font for certain headings
+ * - Mono: Monospaces font e.g. for code samples
+ */
+
+/* TODO: Optimize bundle size
+ *  - Use static fonts for normal, bold, italic instead of variations.
+ *  - Create separate bundle just for fonts?
+ */
+
+/* Normal font: Roboto */
+@font-face {
+    font-family: "SansSerif";
+    src: url("./fonts/Roboto/Roboto-VariableFont_wdth,wght.woff2") format(woff2) tech(variations);
+    font-weight: 100 900;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "SansSerif";
+    src: url("./fonts/Roboto/Roboto-Italic-VariableFont_wdth,wght.woff2") format(woff2) tech(variations);
+    font-weight: 100 900;
+    font-style: italic;
+}
+
+/* Serif font: Roboto Serif */
+/*
+@font-face {
+    font-family: "Serif";
+    src: url("./fonts/Roboto_Serif/RobotoSerif-VariableFont_GRAD,opsz,wdth,wght.woff2") format(woff2) tech(variations);
+    font-weight: 100 900;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Serif";
+    src: url("./fonts/Roboto_Serif/RobotoSerif-Italic-VariableFont_GRAD,opsz,wdth,wght.woff2") format(woff2) tech(variations);
+    font-weight: 100 900;
+    font-style: italic;
+}
+*/
+
+/* Monospaced font: Roboto Mono */
+@font-face {
+    font-family: "Mono";
+    src: url("./fonts/Roboto_Mono/RobotoMono-VariableFont_wght.woff2") format(woff2) tech(variations);
+    font-weight: 100 700;
+    font-style: normal;
+    /* font-style: normal (no ital/slnt axis) */
+}
+
+@font-face {
+    font-family: "Mono";
+    src: url("./fonts/Roboto_Mono/RobotoMono-Italic-VariableFont_wght.woff2") format(woff2) tech(variations);
+    font-weight: 100 700;
+    font-style: italic;
+}

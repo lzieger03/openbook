@@ -1,10 +1,12 @@
-# OpenBook: Interactive Online Textbooks - Server
+# OpenBook: Interactive Online Textbooks
 # © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
+
+from __future__ import annotations
 
 from django.utils.translation              import gettext_lazy as _
 
@@ -54,11 +56,7 @@ class LibraryGroupAdmin(CustomModelAdmin):
     readonly_fields     = [*created_modified_by_fields]
     prepopulated_fields = {"slug": ["name"]}
     filter_horizontal   = ["public_permissions"]
-    _inlines            = (RoleInline, RoleAssignmentInline, EnrollmentMethodInline, AccessRequestInline)
-    _add_inlines        = []
-
-    def get_inlines(self, request, obj):
-        return self._inlines if obj else self._add_inlines
+    inlines             = [RoleInline, RoleAssignmentInline, EnrollmentMethodInline, AccessRequestInline]
 
     fieldsets = [
         (None, {

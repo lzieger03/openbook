@@ -2,17 +2,17 @@
   "name": "@openbook-studio/frontend-app",
   "private": true,
   "type": "module",
-  "packageManager": "npm@11.x",
   "scripts": {
     "clean": "node ../../../bin/frontend/clean.js",
     "watch:tailwind": "tailwindcss -i tailwind.css -o src/tailwind.css --watch",
     "watch:src": "node ../../../bin/frontend/watch.js",
     "watch": "npm run build:tailwind && conc -n tailwind,src -c auto \"npm run watch:tailwind\" \"npm run watch:src\"",
     "build:tailwind": "tailwindcss -i tailwind.css -o src/tailwind.css",
-    "build:api-client": "openapi-generator-cli generate -i http://localhost:8000/api/schema/ -g typescript-fetch -o ./src/api-client/",
-    "build:auth-client": "openapi-generator-cli generate -i http://localhost:8000/auth-api/openapi.json -g typescript-fetch -o ./src/auth-client/",
+    "build:api:openbook": "openapi-typescript http://localhost:8000/api/schema/ -o ./src/api/openapi/openbook.d.ts",
+    "build:api:auth": "openapi-typescript http://localhost:8000/auth-api/openapi.json -o ./src/api/openapi/auth.d.ts",
+    "build:api": "npm run build:api:openbook && npm run build:api:auth",
     "build:src": "node ../../../bin/frontend/build.js",
-    "build": "npm run build:tailwind && npm run build:api-client && npm run build:auth-client && npm run build:src",
+    "build": "npm run build:tailwind && npm run build:api && npm run build:src",
     "lint": "eslint \"./**/*.{ts,tsx}\"",
     "lintfix": "eslint --fix \"./**/*.{ts,tsx}\"",
     "prettier": "prettier --ignore-path ../../.gitignore \"**/*.+(ts|tsx)\"",
@@ -20,10 +20,16 @@
     "check": "npm run lint && tsc"
   },
   "devDependencies": {
-    "@openapitools/openapi-generator-cli": "^2.31.1",
-    "@tailwindcss/cli": "^4.2.4",
-    "daisyui": "^5.5.19",
-    "svelte-spa-router": "^5.0.1",
-    "tailwindcss": "^4.2.4"
+    "@tailwindcss/cli": "^4.3.0",
+    "@types/markdown-it": "^14.1.2",
+    "bootstrap-icons": "^1.13.1",
+    "daisyui": "^5.5.20",
+    "openapi-fetch": "^0.17.0",
+    "openapi-typescript": "^7.13.0",
+    "svelte-spa-router": "^5.1.0",
+    "tailwindcss": "^4.3.0"
+  },
+  "dependencies": {
+    "markdown-it": "^14.2.0"
   }
 }

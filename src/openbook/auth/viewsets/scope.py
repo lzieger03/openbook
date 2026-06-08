@@ -1,10 +1,12 @@
-# OpenBook: Interactive Online Textbooks - Server
+# OpenBook: Interactive Online Textbooks
 # © 2025 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
+
+from __future__ import annotations
 
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions             import FieldError
@@ -109,8 +111,8 @@ class ScopeTypeViewSet(ViewSet):
                 content_type = ContentType.objects.get(pk=int(scope_type))
             except ValueError:
                 content_type = content_type_for_model_string(scope_type)
-        except:
-            pass
+        except (ContentType.DoesNotExist, ValueError, LookupError):
+            content_type = None
 
         if not content_type:
             return Response(status=status.HTTP_404_NOT_FOUND, data=[])

@@ -1,10 +1,12 @@
-# OpenBook: Interactive Online Textbooks - Server
+# OpenBook: Interactive Online Textbooks
 # © 2025 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
+
+from __future__ import annotations
 
 from django_filters.filterset               import FilterSet
 from drf_spectacular.utils                  import extend_schema
@@ -30,8 +32,7 @@ class CourseSerializer(ScopedRolesSerializerMixin, FlexFieldsModelSerializer):
         fields = [
             "id", "slug",
             "name", "description", "text_format",
-            "group", "position",
-            "is_template",
+            "group", "is_template",
             "materials",
             *ScopedRolesSerializerMixin.Meta.fields,
             "created_by", "created_at", "modified_by", "modified_at",
@@ -59,7 +60,6 @@ class CourseFilter(CreatedModifiedByFilterMixin, ScopedRolesFilterMixin, FilterS
             "slug":        ["exact"],
             "name":        ["exact"],
             "group":       ["exact"],
-            "position":    ["exact", "lte", "gte"],
             "is_template": ["exact"],
             **ScopedRolesFilterMixin.Meta.fields,
             **CreatedModifiedByFilterMixin.Meta.fields,
@@ -78,5 +78,5 @@ class CourseViewSet(AllowAnonymousListRetrieveViewSetMixin, ModelViewSetMixin, M
     queryset         = Course.objects.all()
     filterset_class  = CourseFilter
     serializer_class = CourseSerializer
-    ordering         = ["group", "position", "name"]
+    ordering         = ["group", "name"]
     search_fields    = ["slug", "name", "description"]

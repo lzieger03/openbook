@@ -1,10 +1,12 @@
-# OpenBook: Interactive Online Textbooks - Server
+# OpenBook: Interactive Online Textbooks
 # © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
+
+from __future__ import annotations
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -47,18 +49,12 @@ class LibraryLink(UUIDMixin, CreatedModifiedByMixin):
         related_name="library_links",
     )
 
-    position = models.PositiveIntegerField(
-        verbose_name=_("Position"),
-        default=0,
-        help_text=_("Sort order inside the group."),
-    )
-
     class Meta:
         verbose_name = _("Library Link")
         verbose_name_plural = _("Library Links")
-        ordering = ("group", "position", "id")
+        ordering = ("group", "id")
         indexes = [
-            models.Index(fields=("group", "position")),
+            models.Index(fields=("group",)),
         ]
         constraints = [
             models.CheckConstraint(

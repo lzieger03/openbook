@@ -1,10 +1,12 @@
-# OpenBook: Interactive Online Textbooks - Server
+# OpenBook: Interactive Online Textbooks
 # © 2025 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
+
+from __future__ import annotations
 
 from django.utils.translation         import gettext_lazy as _
 from import_export.fields             import Field
@@ -75,7 +77,7 @@ class AuthConfigAdmin(CustomModelAdmin):
     list_display_links  = ["site__domain", "site__name", "local_signup_allowed", "signup_email_suffix"]
     list_editable       = ["logout_next_url"]
     list_select_related = ["site"]
-    search_fields       = ["site__domain", "site__name", "site__short_name" "signup_email_suffix", "logout_next_url"]
+    search_fields       = ["site__domain", "site__name", "site__short_name", "signup_email_suffix", "logout_next_url"]
     inlines             = [_AuthConfigTextInline]
 
     fieldsets = [
