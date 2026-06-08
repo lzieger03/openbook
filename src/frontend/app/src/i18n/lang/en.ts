@@ -11,6 +11,13 @@
 // This is the master language. Therefore no type import here.
 export default {
     ApplicationFrame: {
+        PaneVisibility: {
+            AriaLabel: "Visible panes",
+            Chat:      "Chat",
+            Content:   "Content",
+            Both:      "Both",
+        },
+
         Search: {
             Placeholder: "Search",
         },
@@ -39,6 +46,85 @@ export default {
 
     Home: {
         Title: "Home",
+    },
+
+    AiChat: {
+        PanelAriaLabel: "AI chat",
+        StreamingResponseAriaLabel: "Streaming response",
+        MessageImageAlt: "Assistant response",
+        StreamingUpdate: "Streaming update",
+
+        Header: {
+            Title:           "AI Assistant",
+            Description:     "Ask questions, explore ideas, or draft content.",
+            MessageSingular: "message",
+            MessagePlural:   "messages",
+        },
+
+        Connection: {
+            Live:         "Online",
+            Connecting:   "Connecting",
+            Reconnecting: "Reconnecting",
+            Offline:      "Offline",
+        },
+
+        EmptyState: {
+            Eyebrow:                "Start here",
+            Title:                  "Ask a question",
+            Description:            "Ask for a summary, rewrite, comparison, or next step.",
+            GoodPromptsTitle:       "Try asking",
+            GoodPromptsDescription: "Summarize this chapter, turn notes into tasks, explain a concept, or compare options.",
+            BestFlowTitle:          "Tip",
+            BestFlowDescription:    "Use Shift+Enter for multiple lines. You can send the next message when the current reply is done.",
+        },
+
+        MessageTitle: {
+            AssistantStatus: "Assistant status",
+            Status:          "Status",
+            ReasoningNote:   "Reasoning note",
+            Action:          "Action",
+            You:             "You",
+            OpenBookAI:      "OpenBook AI",
+        },
+
+        MessageType: {
+            Status:  "Status",
+            Thought: "Reasoning note",
+            Action:  "Action",
+            System:  "System",
+        },
+
+        MessageFormat: {
+            Json:  "JSON",
+            Image: "Image",
+        },
+
+        SystemLabel: {
+            CriticalNotice: "Critical notice",
+            Error:          "Error",
+            Warning:        "Warning",
+            Notice:         "System notice",
+        },
+
+        Reasoning: {
+            ShowNote:       "Show reasoning note",
+            StillStreaming: "Reasoning note is still streaming",
+        },
+
+        GuardRails: {
+            Label: "Guard rails:",
+        },
+
+        Composer: {
+            Label:              "Message the AI assistant",
+            PlaceholderOnline:  "Ask the assistant to explain, summarize, or draft something...",
+            PlaceholderOffline: "Chat is offline. Reconnect to continue.",
+            HintWaiting:        "Wait for the current reply to finish.",
+            HintReady:          "Press Enter to send, Shift+Enter for a new line.",
+            HintOffline:        "Connection required before messages can be sent.",
+            Clear:              "Clear",
+            Send:               "Send",
+        },
     },
 
     Error: {

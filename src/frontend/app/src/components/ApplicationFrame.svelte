@@ -85,7 +85,7 @@ Root component of the application which defines the global application UI.
             ? "lg:hidden"
             : desktopPaneMode === "both"
                 ? "lg:flex lg:flex-1"
-                : "lg:flex lg:flex-1",
+                : "lg:flex lg:flex-1 lg:justify-center",
     ].join(" "));
 
     const mainPaneClass = $derived([
@@ -100,6 +100,14 @@ Root component of the application which defines the global application UI.
                 ? "lg:flex lg:flex-2"
                 : "lg:flex lg:flex-1",
     ].join(" "));
+
+    const chatPaneInnerClass = $derived([
+        "flex",
+        "min-h-0",
+        "flex-1",
+        "w-full",
+        desktopPaneMode === "chat" ? "lg:max-w-[96rem]" : "",
+    ].filter(Boolean).join(" "));
 </script>
 
 <NavigationBar
@@ -111,7 +119,9 @@ Root component of the application which defines the global application UI.
     <svelte:boundary>
         <div class="flex flex-1 min-h-0 flex-col lg:flex-row">
             <div class={chatPaneClass}>
-                <AiChatPane/>
+                <div class={chatPaneInnerClass}>
+                    <AiChatPane/>
+                </div>
             </div>
 
             <div class={mainPaneClass}>

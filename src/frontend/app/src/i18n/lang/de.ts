@@ -12,6 +12,13 @@ import type {I18N} from "../index.js";
 
 const i18n: I18N = {
     ApplicationFrame: {
+        PaneVisibility: {
+            AriaLabel: "Sichtbare Bereiche",
+            Chat:      "Chat",
+            Content:   "Inhalt",
+            Both:      "Beide",
+        },
+
         Search: {
             Placeholder: "Suche",
         },
@@ -40,6 +47,85 @@ const i18n: I18N = {
 
     Home: {
         Title: "Startseite",
+    },
+
+    AiChat: {
+        PanelAriaLabel: "KI-Chat",
+        StreamingResponseAriaLabel: "Antwort wird uebertragen",
+        MessageImageAlt: "Antwort des Assistenten",
+        StreamingUpdate: "Laufende Aktualisierung",
+
+        Header: {
+            Title:           "KI-Assistent",
+            Description:     "Stelle Fragen, sammle Ideen oder entwirf Inhalte.",
+            MessageSingular: "Nachricht",
+            MessagePlural:   "Nachrichten",
+        },
+
+        Connection: {
+            Live:         "Online",
+            Connecting:   "Verbinde",
+            Reconnecting: "Verbinde erneut",
+            Offline:      "Offline",
+        },
+
+        EmptyState: {
+            Eyebrow:                "Los geht's",
+            Title:                  "Stell eine Frage",
+            Description:            "Bitte um eine Zusammenfassung, Umarbeitung, einen Vergleich oder den nächsten Schritt.",
+            GoodPromptsTitle:       "Zum Beispiel",
+            GoodPromptsDescription: "Fasse dieses Kapitel zusammen, verwandle Notizen in Aufgaben, erkläre ein Konzept oder vergleiche Optionen.",
+            BestFlowTitle:          "Hinweis",
+            BestFlowDescription:    "Verwende Umschalt+Enter für mehrere Zeilen. Du kannst die nächste Nachricht senden, sobald die aktuelle Antwort fertig ist.",
+        },
+
+        MessageTitle: {
+            AssistantStatus: "Status des Assistenten",
+            Status:          "Status",
+            ReasoningNote:   "Denknotiz",
+            Action:          "Aktion",
+            You:             "Du",
+            OpenBookAI:      "OpenBook AI",
+        },
+
+        MessageType: {
+            Status:  "Status",
+            Thought: "Denknotiz",
+            Action:  "Aktion",
+            System:  "System",
+        },
+
+        MessageFormat: {
+            Json:  "JSON",
+            Image: "Bild",
+        },
+
+        SystemLabel: {
+            CriticalNotice: "Kritischer Hinweis",
+            Error:          "Fehler",
+            Warning:        "Warnung",
+            Notice:         "Systemhinweis",
+        },
+
+        Reasoning: {
+            ShowNote:       "Denknotiz anzeigen",
+            StillStreaming: "Denknotiz wird noch übertragen",
+        },
+
+        GuardRails: {
+            Label: "Leitplanken:",
+        },
+
+        Composer: {
+            Label:              "Nachricht an den KI-Assistenten",
+            PlaceholderOnline:  "Bitte den Assistenten, etwas zu erklären, zusammenzufassen oder zu entwerfen...",
+            PlaceholderOffline: "Der Chat ist offline. Stelle die Verbindung wieder her, um weiterzumachen.",
+            HintWaiting:        "Warte, bis die aktuelle Antwort fertig ist.",
+            HintReady:          "Drücke Enter zum Senden, Umschalt+Enter für eine neue Zeile.",
+            HintOffline:        "Zum Senden von Nachrichten ist eine Verbindung erforderlich.",
+            Clear:              "Leeren",
+            Send:               "Senden",
+        },
     },
 
     Error: {

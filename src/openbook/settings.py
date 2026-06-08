@@ -255,7 +255,7 @@ CHANNEL_LAYERS = {
 
 CHANX = {
     "CAMELIZE": True,
-    "SEND_COMPLETION": True,
+    "SEND_COMPLETION": False,
     "SEND_AUTHENTICATION_MESSAGE": True,
     "LOG_WEBSOCKET_MESSAGE": True,
     "ASYNCAPI_TITLE": "Interactive Online Textbooks",

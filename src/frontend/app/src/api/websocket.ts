@@ -175,12 +175,24 @@ export class WebSocketClient<SentMessages extends WebSocketMessage, ReceivedMess
                             const message = JSON.parse(event.data);
                             if (!message.action) throw new Error(i18n.value.Error.WebSocket.ActionMissing);
 
+                            if (isWebSocketServerErrorMessage(message)) {
+                                const error = new WebSocketServerError(
+                                    formatWebSocketServerErrorMessage(message.payload),
+                                    message.payload ?? [],
+                                    message,
+                                );
+
+                                console.error(error);
+                                if (this.#errorHandler) await this.#errorHandler(error);
+                                return;
+                            }
+
                             const handler = this.#messageHandlers.get(message.action);
 
                             if (!handler) {
-                                throw new Error(_(i18n.value.Error.WebSocket.NoMessageHandler, {
-                                    action: message.action
-                                }));
+                                const errorText = _(i18n.value.Error.WebSocket.NoMessageHandler, { action: message.action });
+                                console.warn(errorText, message);
+                                throw new Error(errorText);
                             }
 
                             await handler(message);
@@ -303,3 +315,43 @@ type ExtractMessageByAction<
 > = [Extract<Messages, { action: Action }>] extends [never]
     ? Messages & { action: Action }
     : Extract<Messages, { action: Action }>;
+
+type WebSocketServerErrorDetail = {
+    type?: string;
+    msg?: string;
+    loc?: unknown[];
+};
+
+type WebSocketServerErrorMessage = WebSocketMessage & {
+    action: "error";
+    payload?: WebSocketServerErrorDetail[];
+};
+
+class WebSocketServerError extends Error {
+    payload: WebSocketServerErrorDetail[];
+
+    constructor(message: string, payload: WebSocketServerErrorDetail[] = [], cause?: unknown) {
+        super(message, { cause });
+        this.name = "WebSocketServerError";
+        this.payload = payload;
+    }
+}
+
+function isWebSocketServerErrorMessage(message: unknown): message is WebSocketServerErrorMessage {
+    return typeof message === "object"
+        && message !== null
+        && "action" in message
+        && message.action === "error";
+}
+
+function formatWebSocketServerErrorMessage(payload?: WebSocketServerErrorDetail[]): string {
+    if (!Array.isArray(payload) || !payload.length) {
+        return i18n.value.Error.WebSocket.UnknownError;
+    }
+
+    return payload.map(({ type, msg, loc }) => {
+        const reason = msg || i18n.value.Error.WebSocket.UnknownError;
+        const suffix = Array.isArray(loc) && loc.length ? ` (${loc.map(String).join(".")})` : "";
+        return type ? `${reason} [${type}]${suffix}` : `${reason}${suffix}`;
+    }).join("\n");
+}

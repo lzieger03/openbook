@@ -97,7 +97,7 @@ Top navigation bar of the application frame.
 
     <!-- Toggle visibility of the AI chat and main content -->
     <div class="flex justify-center px-2">
-        <div class="join rounded-full border border-base-300 bg-base-200/60 p-1" role="radiogroup" aria-label="Visible panes">
+        <div class="join rounded-full border border-base-300 bg-base-200/60 p-1" role="radiogroup" aria-label={$i18n.ApplicationFrame.PaneVisibility.AriaLabel}>
             <button
                 type              = "button"
                 class             = "btn btn-sm join-item rounded-full border-0 lg:hidden"
@@ -107,7 +107,7 @@ Top navigation bar of the application frame.
                 role              = "radio"
                 aria-checked      = {mobilePaneMode === "chat"}
             >
-                Chat
+                {$i18n.ApplicationFrame.PaneVisibility.Chat}
             </button>
 
             <button
@@ -119,7 +119,7 @@ Top navigation bar of the application frame.
                 role              = "radio"
                 aria-checked      = {mobilePaneMode === "main"}
             >
-                Content
+                {$i18n.ApplicationFrame.PaneVisibility.Content}
             </button>
 
             <button
@@ -131,7 +131,7 @@ Top navigation bar of the application frame.
                 role="radio"
                 aria-checked={desktopPaneMode === "chat"}
             >
-                Chat
+                {$i18n.ApplicationFrame.PaneVisibility.Chat}
             </button>
 
             <button
@@ -143,7 +143,7 @@ Top navigation bar of the application frame.
                 role              = "radio"
                 aria-checked      = {desktopPaneMode === "main"}
             >
-                Content
+                {$i18n.ApplicationFrame.PaneVisibility.Content}
             </button>
 
             <button
@@ -155,7 +155,7 @@ Top navigation bar of the application frame.
                 role              = "radio"
                 aria-checked      = {desktopPaneMode === "both"}
             >
-                Both
+                {$i18n.ApplicationFrame.PaneVisibility.Both}
             </button>
         </div>
     </div>
