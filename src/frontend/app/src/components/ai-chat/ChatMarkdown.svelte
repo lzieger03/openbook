@@ -10,7 +10,7 @@ License, or (at your option) any later version.
 
 <!--
 @component
-Render markdown chat content as sanitized HTML with chat-specific typography.
+Render markdown chat content as HTML (MarkdownIt with `html: false`) with chat-specific typography.
 -->
 
 <script lang="ts">
