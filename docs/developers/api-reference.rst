@@ -82,7 +82,7 @@ The following URLs expose the API schema and documentation on your installation:
      - Online
      - Local Installation
    * - YAML schema
-     - :download:`Download <../_openapi/asyncapi.json>`
+     - :download:`Download <../_openapi/asyncapi.yaml>`
      - ``https://<your-openbook-host>/ws/schema/?format=yaml``
    * - JSON schema
      - :download:`Download <../_openapi/asyncapi.json>`
