@@ -30,8 +30,9 @@ import { sveltePreprocess } from "svelte-preprocess";
  * @param {string[]} staticdirs Paths with static files to be copied (optional)
  * @param {bool} watch Keep running and rebuild on file changes (optional)
  * @param {object[]} plug-in Additional esbuild plug-ins (optional)
+ * @param {string} tsconfigFile Full path of the tsconfig.json for Svelte TypeScript preprocessing (optional)
  */
-export async function runEsbuild({infile, outfiles, staticdirs, watch, plugins} = {}) {
+export async function runEsbuild({infile, outfiles, staticdirs, watch, plugins, tsconfigFile} = {}) {
     plugins = plugins || [];
 
     let ctx = await esbuild.context({
@@ -51,7 +52,9 @@ export async function runEsbuild({infile, outfiles, staticdirs, watch, plugins} 
             // TODO: Different options for frontend app and libraries?
             // Libraries must emit web components
             esbuildSvelte({
-                preprocess: sveltePreprocess(),
+                preprocess: sveltePreprocess({
+                    typescript: tsconfigFile ? {tsconfigFile} : undefined,
+                }),
                 compilerOptions: {
                     experimental: {
                         async: true,
