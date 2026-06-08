@@ -123,7 +123,7 @@ export class WebSocketClient<SentMessages extends WebSocketMessage, ReceivedMess
                      * resolve the promise to break the retry loop.
                      */
                     this.#socket.addEventListener("open", async () => {
-                        this.#setConnectionStatus("connected");
+                        await this.#setConnectionStatus("connected");
 
                         for (let message of this.#messageQueue) {
                             await this.#send(message);
