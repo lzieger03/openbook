@@ -202,7 +202,7 @@ except Exception:
 # See: https://drf-spectacular.readthedocs.io/
 SPECTACULAR_SETTINGS = {
     "TITLE": "OpenBook REST API",
-    "DESCRIPTION": "Beautiful and Engaging Learning Materials",
+    "DESCRIPTION": "Interactive Online Textbooks",
     "VERSION": OPENBOOK_VERSION,
     "LICENSE": {
         "name": "GNU Affero General Public License, Version 3 (or later)",
@@ -258,7 +258,7 @@ CHANX = {
     "SEND_COMPLETION": True,
     "SEND_AUTHENTICATION_MESSAGE": True,
     "LOG_WEBSOCKET_MESSAGE": True,
-    "ASYNCAPI_TITLE": "OpenBook WebSocket API",
+    "ASYNCAPI_TITLE": "Interactive Online Textbooks",
     "ASYNCAPI_DESCRIPTION": "Beautiful and Engaging Learning Materials",
     "ASYNCAPI_VERSION": OPENBOOK_VERSION,
 }
