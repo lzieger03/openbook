@@ -16,6 +16,9 @@ Top navigation bar of the application frame.
 <script lang="ts">
     import type { openbookSchemas } from "../../stores/api.js";
 
+    type MobilePaneMode = "chat" | "main";
+    type DesktopPaneMode = "chat" | "main" | "both";
+
     import Breadcrumbs              from "../basic/breadcrumbs/Breadcrumbs.svelte";
     import BreadcrumbsItem          from "../basic/breadcrumbs/BreadcrumbsItem.svelte";
     import DropdownMenu             from "../basic/dropdown-menu/DropdownMenu.svelte";
@@ -34,6 +37,16 @@ Top navigation bar of the application frame.
 
     import AvatarDefault            from "./img/AvatarDefault.jpg";
 
+    interface Props {
+        mobilePaneMode: MobilePaneMode;
+        desktopPaneMode: DesktopPaneMode;
+    }
+
+    let {
+        mobilePaneMode = $bindable("main"),
+        desktopPaneMode = $bindable("both"),
+    }: Props = $props();
+
     let auth = new AuthStore();
     let avatar = $state(AvatarDefault);
     let availableLanguages: openbookSchemas["Language"][] = $state([]);
@@ -42,6 +55,20 @@ Top navigation bar of the application frame.
         let backend  = await api.openbook("/api/core/languages/", "error-toast");
         let response = await backend.GET();
         availableLanguages = response.data.results;
+    }
+
+    function showChatPane() {
+        mobilePaneMode = "chat";
+        desktopPaneMode = "chat";
+    }
+
+    function showMainPane() {
+        mobilePaneMode = "main";
+        desktopPaneMode = "main";
+    }
+
+    function showBothPanes() {
+        desktopPaneMode = "both";
     }
 </script>
 
@@ -68,8 +95,73 @@ Top navigation bar of the application frame.
         </Breadcrumbs>
     </div>
 
+    <!-- Toggle visibility of the AI chat and main content -->
+    <div class="flex justify-center px-2">
+        <div class="join rounded-full border border-base-300 bg-base-200/60 p-1" role="radiogroup" aria-label="Visible panes">
+            <button
+                type              = "button"
+                class             = "btn btn-sm join-item rounded-full border-0 lg:hidden"
+                class:btn-primary = {mobilePaneMode === "chat"}
+                class:btn-ghost   = {mobilePaneMode !== "chat"}
+                onclick           = {showChatPane}
+                role              = "radio"
+                aria-checked      = {mobilePaneMode === "chat"}
+            >
+                Chat
+            </button>
+
+            <button
+                type              = "button"
+                class             = "btn btn-sm join-item rounded-full border-0 lg:hidden"
+                class:btn-primary = {mobilePaneMode === "main"}
+                class:btn-ghost   = {mobilePaneMode !== "main"}
+                onclick           = {showMainPane}
+                role              = "radio"
+                aria-checked      = {mobilePaneMode === "main"}
+            >
+                Content
+            </button>
+
+            <button
+                type="button"
+                class="btn btn-sm join-item hidden rounded-full border-0 lg:inline-flex"
+                class:btn-primary={desktopPaneMode === "chat"}
+                class:btn-ghost={desktopPaneMode !== "chat"}
+                onclick={showChatPane}
+                role="radio"
+                aria-checked={desktopPaneMode === "chat"}
+            >
+                Chat
+            </button>
+
+            <button
+                type              = "button"
+                class             = "btn btn-sm join-item hidden rounded-full border-0 lg:inline-flex"
+                class:btn-primary = {desktopPaneMode === "main"}
+                class:btn-ghost   = {desktopPaneMode !== "main"}
+                onclick           = {showMainPane}
+                role              = "radio"
+                aria-checked      = {desktopPaneMode === "main"}
+            >
+                Content
+            </button>
+
+            <button
+                type              = "button"
+                class             = "btn btn-sm join-item hidden rounded-full border-0 lg:inline-flex"
+                class:btn-primary = {desktopPaneMode === "both"}
+                class:btn-ghost   = {desktopPaneMode !== "both"}
+                onclick           = {showBothPanes}
+                role              = "radio"
+                aria-checked      = {desktopPaneMode === "both"}
+            >
+                Both
+            </button>
+        </div>
+    </div>
+
     <!-- Search and menu -->
-    <div class="flex gap-2">
+    <div class="flex flex-1 justify-end gap-2">
         <!-- Search input -->
         <input type="text" placeholder="{$i18n.ApplicationFrame.Search.Placeholder}" class="input input-bordered w-24 md:w-auth"/>
 
