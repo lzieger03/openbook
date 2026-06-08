@@ -1,5 +1,5 @@
 /*
- * OpenBook: Interactive Online Textbooks - Server
+ * OpenBook: Interactive Online Textbooks
  * © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -9,4 +9,48 @@
  */
 
 @import "tailwindcss";
-@plugin "daisyui";
+
+@theme {
+  --font-sans: SansSerif, sans-serif;
+  --font-serif: Serif, serif;
+  --font-mono: Mono, monospace;
+}
+
+@plugin "daisyui" {
+    themes: OpenBook-Light --default, nord,  aqua, dim --prefersdark;
+}
+
+@plugin "daisyui/theme" {
+    name: "OpenBook-Light";
+    default: true;
+    prefersdark: false;
+    color-scheme: "light";
+    --color-base-100: oklch(100% 0 0);
+    --color-base-200: oklch(97% 0 0);
+    --color-base-300: oklch(92% 0 0);
+    --color-base-content: oklch(20% 0 0);
+    --color-primary: oklch(35% 0.144 278.697);
+    --color-primary-content: oklch(98% 0 0);
+    --color-secondary: oklch(50% 0.118 165.612);
+    --color-secondary-content: oklch(98% 0.003 247.858);
+    --color-accent: oklch(75.5% 0.059 254.128);
+    --color-accent-content: oklch(37% 0 0);
+    --color-neutral: oklch(37% 0.013 285.805);
+    --color-neutral-content: oklch(98% 0 0);
+    --color-info: oklch(58% 0.158 241.966);
+    --color-info-content: oklch(97% 0.013 236.62);
+    --color-success: oklch(60% 0.118 184.704);
+    --color-success-content: oklch(98% 0.014 180.72);
+    --color-warning: oklch(70% 0.213 47.604);
+    --color-warning-content: oklch(98% 0.003 247.858);
+    --color-error: oklch(50% 0.213 27.518);
+    --color-error-content: oklch(98% 0.003 247.858);
+    --radius-selector: 1rem;
+    --radius-field: 0.5rem;
+    --radius-box: 0.5rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 0.5px;
+    --depth: 1;
+    --noise: 0;
+}

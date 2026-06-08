@@ -1,10 +1,12 @@
-# OpenBook: Interactive Online Textbooks - Server
+# OpenBook: Interactive Online Textbooks
 # © 2025 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
+
+from __future__ import annotations
 
 from django.contrib.auth    import get_permission_codename
 from django.core.exceptions import PermissionDenied
@@ -34,11 +36,12 @@ class ModelAdmin(UnfoldModelAdmin):
         if not change:
             opts = self.opts
             codename = get_permission_codename("add", opts)
+            obj = form.save(commit=False)
 
             if not request.user.has_perm("%s.%s" % (opts.app_label, codename), obj):
                 raise PermissionDenied
 
-        super(request, form, change)
+        super().save_form(request, form, change)
 
     def has_view_permission(self, request: HttpRequest, obj: Model = None) -> bool:
         """

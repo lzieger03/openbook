@@ -4,4 +4,7 @@
         "./src/**/*.ts",
         "./src/**/*.json",
     ],
+    "files": [
+        "src/global.d.ts",
+    ],
 }

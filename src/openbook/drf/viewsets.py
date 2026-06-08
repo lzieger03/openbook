@@ -1,10 +1,12 @@
-# OpenBook: Interactive Online Textbooks - Server
+# OpenBook: Interactive Online Textbooks
 # © 2025 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
+
+from __future__ import annotations
 
 from collections                import defaultdict
 from drf_spectacular.utils      import extend_schema
@@ -13,7 +15,6 @@ from drf_spectacular.utils      import OpenApiParameter
 from rest_framework             import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response    import Response
-from rest_framework.settings    import api_settings
 
 class ModelViewSetMixin:
     """

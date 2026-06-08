@@ -13,25 +13,31 @@ readme = "README.md"
 # in future, in which case we need to reconsider some of the project structure.
 package-mode = false
 
+[build-system]
+requires = ["poetry-core>=1.9.1"]
+build-backend = "poetry.core.masonry.api"
+
+# Runtime dependencies
 [tool.poetry.dependencies]
 channels = {extras = ["daphne"], version = "^4.3.2"}
 channels-redis = "^4.3.0"
+chanx = {extras = ["channels"], version = "^2.7.1"}
 daphne = "^4.2.1"
 Django = "^6.0.3"
-django-allauth = {extras = ["headless-spec", "saml", "socialaccount"], version = "^65.15.0"}
+django-allauth = {extras = ["headless-spec", "saml", "socialaccount"], version = "^65.16.1"}
 django-cleanup = "^9.0.0"
 django-crispy-forms = "^2.6"
-django-dbbackup = "^5.2.0"
+django-dbbackup = "^5.3.0"
 django-extensions = "^4.1"
 django-filter = "^25.2"
-django-import-export = {extras = ["all"], version = "^4.4.0"}
+django-import-export = {extras = ["all"], version = "^4.4.1"}
 django-unfold = "^0.85.0"
 djangoql = "^0.19.1"
-djangorestframework = "^3.16.1"
+djangorestframework = "^3.17.1"
 drf-flex-fields2 = "^2.0.2"
 drf-spectacular = {extras = ["sidecar"], version = "^0.29.0"}
 markdown = "^3.10.2"
-pillow = "^12.1.1"
+pillow = "^12.2.0"
 pygments = "^2.19.2"
 python = "^3.12"
 pyyaml = "^6.0.3"
@@ -39,27 +45,37 @@ semver = "^3.0.4"
 twisted = {extras = ["http2", "tls"], version = "^25.5.0"}
 django-colorfield = "^0.14.0"
 
+# Documentation dependencies
 [tool.poetry.group.docs.dependencies]
 sphinx = "^9.0.0"
 sphinx-rtd-theme = "^3.1.0"
 sphinx-autoapi = "^3.8.0"
 sphinx-autobuild = "^2025.08.25"
 sphinx-llm = "^0.4.1"
+sphinx-tabs = "^3.5.0"
 
+# Development dependencies
 [tool.poetry.group.dev.dependencies]
-coverage = "^7.13.5"
+coverage = "^7.14.1"
 pip-audit = "^2.10.0"
+tblib = "^3.2.2"
 
-[tool.coverage.report]
-fail_under = 75
-show_missing = true
-skip_covered = true
+# Dependencies to for the fontutil script
+[tool.poetry.group.fontutil.dependencies]
+fonttools = "^4.63.0"
+brotli = "^1.2.0"
+
+# Test coverage reporting
+[tool.coverage.run]
+parallel = true
+patch = ["execv", "_exit", "subprocess"]
 omit = [
     "*/__pycache__/*",
     "manage.py",
     "openbook/*.py",
 ]
 
-[build-system]
-requires = ["poetry-core>=1.9.1"]
-build-backend = "poetry.core.masonry.api"
+[tool.coverage.report]
+fail_under = 75
+show_missing = true
+skip_covered = true

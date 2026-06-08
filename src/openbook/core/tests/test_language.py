@@ -1,4 +1,4 @@
-# OpenBook: Interactive Online Textbooks - Server
+# OpenBook: Interactive Online Textbooks
 # © 2025 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -6,8 +6,9 @@
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 
+from __future__ import annotations
+
 from django.test       import TestCase
-from django.urls       import reverse
 
 from openbook.test     import ModelViewSetTestMixin
 from ..models.language import Language
@@ -34,7 +35,7 @@ class Language_ViewSet_Tests(ModelViewSetTestMixin, TestCase):
 
     def setUp(self):
         super().setUp()
-        
+
         Language.objects.create(language="en", name="English")
         Language.objects.create(language="de", name="Deutsch")
         Language.objects.create(language="fr", name="Français")

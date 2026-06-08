@@ -1,10 +1,12 @@
-# OpenBook: Interactive Online Textbooks - Server
+# OpenBook: Interactive Online Textbooks
 # © 2025 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
+
+from __future__ import annotations
 
 from django.db                         import models
 from django.utils.translation          import gettext_lazy as _
@@ -28,12 +30,6 @@ class Course(UUIDMixin, NonUniqueSlugMixin, NameDescriptionMixin, ScopedRolesMix
         related_name = "courses",
     )
 
-    position = models.PositiveIntegerField(
-        verbose_name = _("Position"),
-        default      = 0,
-        help_text    = _("Sort order inside the library group."),
-    )
-
     # License (via new model in core)
     # Image
     # AI Notes (new mixin)
@@ -48,13 +44,4 @@ class Course(UUIDMixin, NonUniqueSlugMixin, NameDescriptionMixin, ScopedRolesMix
     class Meta():
         verbose_name        = _("Course")
         verbose_name_plural = _("Courses")
-        ordering            = ("group", "position", "name")
-        indexes             = [
-            models.Index(fields=("group", "position")),
-        ]
-        constraints         = [
-            models.UniqueConstraint(
-                fields=("group", "position"),
-                name="openbook_content_unique_course_position_in_group",
-            ),
-        ]
+        ordering            = ("group", "name")

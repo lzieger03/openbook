@@ -1,10 +1,12 @@
-# OpenBook: Interactive Online Textbooks - Server
+# OpenBook: Interactive Online Textbooks
 # © 2025 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
+
+from __future__ import annotations
 
 from django.utils.translation         import gettext_lazy as _
 from import_export.fields             import Field
@@ -38,7 +40,7 @@ class AuthTokenAdmin(CustomModelAdmin):
     list_display_links  = ["user__username", "name", "is_active", "start_date", "end_date"]
     list_filter         = ["user__username", "is_active", "start_date", "end_date", *created_modified_by_filter]
     list_select_related = ["user", *created_modified_by_related]
-    search_fields       = ["user__username", "token", "name" "description"]
+    search_fields       = ["user__username", "token", "name", "description"]
     readonly_fields     = ["token", *created_modified_by_fields]
 
     fieldsets = [
