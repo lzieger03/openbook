@@ -21,11 +21,15 @@
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.3.0",
+    "@types/markdown-it": "^14.1.2",
     "bootstrap-icons": "^1.13.1",
     "daisyui": "^5.5.20",
     "openapi-fetch": "^0.17.0",
     "openapi-typescript": "^7.13.0",
     "svelte-spa-router": "^5.1.0",
     "tailwindcss": "^4.3.0"
+  },
+  "dependencies": {
+    "markdown-it": "^14.2.0"
   }
 }

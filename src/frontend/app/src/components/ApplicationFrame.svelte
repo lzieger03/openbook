@@ -14,6 +14,7 @@ Root component of the application which defines the global application UI.
 -->
 
 <script lang="ts">
+    import AiChatPane                from "./ai-chat/AiChatPane.svelte";
     import NavigationBar             from "./app-frame/NavigationBar.svelte";
     import LoadingAnimation          from "./app-frame/LoadingAnimation.svelte";
     import Toast                     from "./basic/toast/Toast.svelte";
@@ -32,6 +33,12 @@ Root component of the application which defines the global application UI.
         component: any;
         retryable: boolean;
     };
+
+    type MobilePaneMode  = "chat" | "main";
+    type DesktopPaneMode = "chat" | "main" | "both";
+
+    let mobilePaneMode  = $state<MobilePaneMode>("main");
+    let desktopPaneMode = $state<DesktopPaneMode>("both");
 
     /**
      * Resolve error page at runtime to avoid static import. Because statically importing
@@ -68,36 +75,84 @@ Root component of the application which defines the global application UI.
             retryable: error instanceof OperationFailedError,
         };
     }
+
+    const chatPaneClass = $derived([
+        "min-h-0",
+        "overflow-y-auto",
+        mobilePaneMode === "chat" ? "flex flex-1" : "hidden",
+        desktopPaneMode === "main"
+            ? "lg:hidden"
+            : desktopPaneMode === "both"
+                ? "lg:flex lg:flex-1"
+                : "lg:flex lg:flex-1 lg:justify-center",
+    ].join(" "));
+
+    const mainPaneClass = $derived([
+        "relative",
+        "min-h-0",
+        "overflow-y-auto",
+        "shadow-lg",
+        mobilePaneMode === "main" ? "flex flex-1" : "hidden",
+        desktopPaneMode === "chat"
+            ? "lg:hidden"
+            : desktopPaneMode === "both"
+                ? "lg:flex lg:flex-[2]"
+                : "lg:flex lg:flex-1",
+    ].filter(Boolean).join(" "));
+
+    const chatPaneInnerClass = $derived([
+        "flex",
+        "min-h-0",
+        "flex-1",
+        "w-full",
+        desktopPaneMode === "chat" ? "lg:max-w-[96rem]" : "",
+    ].filter(Boolean).join(" "));
 </script>
 
-<NavigationBar/>
+<div class="flex h-dvh min-h-0 flex-col overflow-hidden">
+    <NavigationBar
+        bind:mobilePaneMode
+        bind:desktopPaneMode
+    />
 
-<main class="flex flex-1 flex-col">
-    <svelte:boundary>
-        <Router {routes} />
-
-        {#snippet pending()}
-            <LoadingAnimation/>
-        {/snippet}
-
-        {#snippet failed(error, reset)}
-            {#await resolveErrorPage(error) then resolved}
-                {#if resolved.retryable}
-                    <svelte:component this={resolved.component} onRetry={reset}/>
-                {:else}
-                    <svelte:component this={resolved.component}/>
-                {/if}
-            {:catch error}
-                <div class="flex flex-1 items-center justify-center p-8 text-center text-base-content/70">
-                    {error}
+    <main class="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <svelte:boundary>
+            <div class="flex flex-1 min-h-0 flex-col overflow-hidden lg:flex-row">
+                <div class={chatPaneClass}>
+                    <div class={chatPaneInnerClass}>
+                        <AiChatPane/>
+                    </div>
                 </div>
-            {/await}
-        {/snippet}
-    </svelte:boundary>
 
-    <Toast>
-        {#each $toasts as toast (toast.id) }
-            <Alert type={toast.type} message={toast.message} />
-        {/each}
-    </Toast>
-</main>
+                <div class={mainPaneClass}>
+                    <Router {routes} />
+                </div>
+            </div>
+
+            {#snippet pending()}
+                <LoadingAnimation/>
+            {/snippet}
+
+            {#snippet failed(error, reset)}
+                {#await resolveErrorPage(error) then resolved}
+                    {@const ResolvedComponent = resolved.component}
+                    {#if resolved.retryable}
+                        <ResolvedComponent onRetry={reset}/>
+                    {:else}
+                        <ResolvedComponent/>
+                    {/if}
+                {:catch error}
+                    <div class="flex flex-1 items-center justify-center p-8 text-center text-base-content/70">
+                        {error}
+                    </div>
+                {/await}
+            {/snippet}
+        </svelte:boundary>
+
+        <Toast>
+            {#each $toasts as toast (toast.id) }
+                <Alert type={toast.type} message={toast.message} />
+            {/each}
+        </Toast>
+    </main>
+</div>

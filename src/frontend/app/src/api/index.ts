@@ -9,12 +9,14 @@
  */
 
 import type { Client }                 from "openapi-fetch";
-import type { paths as authPaths }     from "./openapi/auth";
-import type { paths as openbookPaths } from "./openapi/openbook";
+import type { paths as authPaths }     from "./openapi/auth.js";
+import type { paths as openbookPaths } from "./openapi/openbook.js";
+import type { WebSocketMessage }       from "./websocket.js";
 
 import createClient                    from "openapi-fetch";
-import middlewares                     from "./middleware";
-import {fetchWithRetry}                from "./retry";
+import middlewares                     from "./middleware/index.js";
+import { fetchWithRetry }              from "./retry.js";
+import { WebSocketClient }             from "./websocket.js";
 
 let _baseUrl = "";
 
@@ -26,7 +28,7 @@ let _baseUrl = "";
  *
  * @returns Backend base URL
  */
-async function getBaseUrl() {
+async function getBaseUrl(): Promise<string> {
     if (_baseUrl) return _baseUrl;
 
     let response = await fetch("server.url");
@@ -57,6 +59,7 @@ function registerMiddlewares<Paths extends object, Media extends `${string}/${st
  * */
 export default {
     /**
+     * Factory method for authentication API clients.
      * @returns API client for the authentication API
      */
     auth: async () => {
@@ -68,7 +71,8 @@ export default {
     },
 
     /**
-     * @returns API client for the OpenBook API
+     * Factory method for OpenBook REST API clients.
+     * @returns API client for the OpenBook REST API
      */
     openbook: async () => {
         let baseUrl = await getBaseUrl();
@@ -76,5 +80,20 @@ export default {
 
         registerMiddlewares(client);
         return client;
+    },
+
+    /**
+     * Factory method for new WebSocket clients.
+     * @param suffix URL suffix (without the `/ws` prefix), e.g. `/ai/chat`
+     * @returns A new WebSocket client for the OpenBook WebSocket API
+     */
+    ws: async <SentMessages extends WebSocketMessage, ReceivedMessages extends WebSocketMessage>(suffix: string) => {
+        if (!suffix.startsWith("/")) suffix = `/${suffix}`;
+
+        const wsUrl = new URL(`/ws${suffix}`, await getBaseUrl());
+        if (wsUrl.protocol === "http:") wsUrl.protocol = "ws:";
+        if (wsUrl.protocol === "https:") wsUrl.protocol = "wss:";
+
+        return new WebSocketClient<SentMessages, ReceivedMessages>(wsUrl.toString());
     },
 };

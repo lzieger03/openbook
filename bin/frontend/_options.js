@@ -19,9 +19,10 @@ export function getOptions() {
     const name = path.basename(cwd);
 
     return {
-        infile:     path.join(cwd, "src", "index.ts"),
-        staticdirs: [path.join(cwd, "static", "*")],
-        outfiles:   [path.join(cwd, "dist", "openbook", name, "bundle.js")],
-        watch:      process.argv[2] === "--watch",
+        infile:       path.join(cwd, "src", "index.ts"),
+        staticdirs:   [path.join(cwd, "static", "*")],
+        outfiles:     [path.join(cwd, "dist", "openbook", name, "bundle.js")],
+        tsconfigFile: path.join(cwd, "tsconfig.json"),
+        watch:        process.argv[2] === "--watch",
     };
 }

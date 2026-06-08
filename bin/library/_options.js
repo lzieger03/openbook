@@ -28,7 +28,9 @@ export function getOptions() {
         infile: path.join(cwd, "src", "index.ts"),
         watch:  process.argv[2] === "--watch",
 
-        outfiles:  [
+        tsconfigFile: path.join(cwd, "tsconfig.json"),
+
+        outfiles: [
             path.join(cwd, "dist", "library.js"),
         ],
 
@@ -60,7 +62,7 @@ function logHeader(cwd) {
                     let packageJson     = JSON.parse(packageJsonFile);
                     let logLine         = `Building library ${packageJson.name} ${packageJson.version}`;
                     let separator       = "=".repeat(logLine.length);
-    
+
                     console.log();
                     console.log(separator);
                     console.log(logLine);
@@ -79,7 +81,7 @@ function logHeader(cwd) {
  * Copy YML files describing the custom components to the WYSIWYG editor to a
  * new directory called `components`. Also validates the YML files and raises
  * an error when validation fails.
- * 
+ *
  * @param {string} cwd Root directory of the library
  * @param {string} outdir Build output directory
  * @returns esbuild plug-in instance
@@ -91,20 +93,20 @@ function validateAndCopyComponentYml(cwd, outdir) {
             build.onEnd(async () => {
                 try {
                     console.log("COPY COMPONENT YAML FILES");
-    
+
                     let srcDir              = path.join(cwd, "src");
                     let componentSchemaFile = await fs.readFile(path.join(import.meta.dirname, "component-schema.yml"), "utf-8");
                     let componentSchemaYml  = yaml.parse(componentSchemaFile);
                     let ajv = new Ajv();
-    
+
                     for (let srcFile of await glob([path.join(srcDir, "**", "*.yml")])) {
                         // Validate file
                         let componentFile = await fs.readFile(path.join(srcFile), "utf-8");
                         let componentYml  = yaml.parse(componentFile);
-    
+
                         await ajv.validate(componentSchemaYml, componentYml);
                         if (ajv.errors) throw ajv.errors;
-    
+
                         // Copy file
                         srcFile = path.relative(srcDir, srcFile);
                         shelljs.mkdir("-p", path.join(outdir, "components", path.dirname(srcFile)));
@@ -124,7 +126,7 @@ function validateAndCopyComponentYml(cwd, outdir) {
  * to creates the `library.yml` file. This file is used by the OpenBook server
  * when installing a library to check that it is a valid library and show some
  * information to the admin.
- * 
+ *
  * @param {string} cwd Root directory of the library
  * @param {string} outfile Path of the created file
  * @returns esbuild plug-in instance
@@ -136,11 +138,11 @@ function createLibraryYml(cwd, outfile) {
             build.onEnd(async () => {
                 try {
                     console.log("CREATE LIBRARY YAML");
-    
+
                     let packageJsonFile = await fs.readFile(path.join(cwd, "package.json"), "utf-8");
                     let packageJson     = JSON.parse(packageJsonFile);
                     let readmeFile      = await fs.readFile(path.join(cwd, "README.md"), "utf-8");
-    
+
                     let data = {
                         name:         packageJson.name               || "",
                         version:      packageJson.version            || "",
@@ -153,7 +155,7 @@ function createLibraryYml(cwd, outfile) {
                         description:  packageJson["ob-translated-description"] || {en: packageJson.description || ""},
                         readme:       readmeFile,
                     };
-    
+
                     await fs.writeFile(outfile, yaml.stringify(data, {lineWidth: 0}));
                 } catch (err) {
                     console.error(err);
@@ -167,7 +169,7 @@ function createLibraryYml(cwd, outfile) {
 /**
  * Internal plugin that creates a ZIP file with the bundled library source code,
  * ready to be installed on the OpenBook server.
- * 
+ *
  * @param {string} distdir Directory with the pre-built distribution files
  * @param {string} outfile Path of the created file
  * @returns esbuild plug-in instance
@@ -179,32 +181,32 @@ function createLibraryZip(distdir, outfile) {
             build.onEnd(async () => {
                 try {
                     console.log("CREATE LIBRARY ZIP");
-    
+
                     try {
                         await fs.unlink(outfile);
                     } catch {
-                        // File didn't exist                
+                        // File didn't exist
                     }
-    
+
                     fs.mkdir(path.dirname(outfile), {recursive: true});
-                    
+
                     let zip = new JSZip();
                     let folder = zip.folder("openbook-library");
-    
+
                     async function _addDirectoryContent(zip, srcdir) {
                         for (let entry of await fs.readdir(srcdir, {withFileTypes: true})) {
                             let entryPath = path.join(srcdir, entry.name);
-    
+
                             if (entry.isDirectory()) {
                                 let subfolder = zip.folder(entry.name);
                                 await _addDirectoryContent(subfolder, entryPath);
                             } else {
                                 let data = await fs.readFile(entryPath);
-                                zip.file(entry.name, data);   
+                                zip.file(entry.name, data);
                             }
                         }
                     }
-    
+
                     await _addDirectoryContent(folder, distdir);
                     let zipContent = await zip.generateAsync({type: "nodebuffer"});
                     await fs.writeFile(outfile, zipContent);
@@ -220,7 +222,7 @@ function createLibraryZip(distdir, outfile) {
 /**
  * Internal plugin that copies and renames the built ZIP file so that can be
  * automatically installed by the OpenBook server.
- * 
+ *
  * @param {string} cwd Root directory of the library
  * @param {string} zipfile Path to the built ZIP file
  * @param {string} outdir Install directory
@@ -233,7 +235,7 @@ function copyToInstallLocation(cwd, zipfile, outdir) {
             build.onEnd(async () => {
                 try {
                     console.log("COPY LIBRARY ZIP TO INSTALL LOCATION");
-                    
+
                     let packageJsonFile = await fs.readFile(path.join(cwd, "package.json"), "utf-8");
                     let packageJson     = JSON.parse(packageJsonFile);
                     let dstFile         = `${packageJson.name.slice(1)}_${packageJson.version}.zip`.replaceAll("/", "_");
