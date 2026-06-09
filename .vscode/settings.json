@@ -30,7 +30,13 @@
         "renovate.json5": "jsonc",
         ".renovaterc": "jsonc",
         ".renovaterc.json": "jsonc",
-        ".renovaterc.json5": "jsonc"
+        ".renovaterc.json5": "jsonc",
+
+        // Install the "Tailwind CSS Intellisense" puglin for this
+        "*.css": "tailwindcss"
+    },
+    "editor.quickSuggestions": {
+      "strings": "on"
     },
     "chat.agentFilesLocations": {
         ".agents/agents": true

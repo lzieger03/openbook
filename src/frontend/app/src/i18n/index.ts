@@ -1,5 +1,5 @@
 /*
- * OpenBook: Interactive Online Textbooks - Server
+ * OpenBook: Interactive Online Textbooks
  * © 2024 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -8,7 +8,7 @@
  * License, or (at your option) any later version.
  */
 
-import en from "./lang/en.js";
+import type en from "./lang/en.js";
 
 /**
  * Typing for message catalogues. This simply mirrors the dynamically inferred
@@ -18,19 +18,24 @@ import en from "./lang/en.js";
 export type I18N = typeof en;
 
 /**
+ * Language code for translations.
+ */
+export type LanguageCode = string;
+
+/**
  * All available languages. Note, that there must be a `.ts` file of the
  * same name in this directory which default exports a key/value object
  * with the translated texts.
  */
-export const languages = ["en", "de"];
+export const languages: LanguageCode[] = ["en", "de"];
 
 /**
  * Fallback language to use for missing translations in the currently
  * active language.
  */
-export const fallbackLanguage = "en";
+export const fallbackLanguage: LanguageCode = "en";
 
 /**
  * Default language when no other language has been chosen.
  */
-export const defaultLanguage = "en";
+export const defaultLanguage: LanguageCode = "en";

@@ -10,13 +10,13 @@
 
 import concurrently from "concurrently";
 import url          from "node:url";
+import path         from "node:path";
 
 const __dirname = url.fileURLToPath(new url.URL(".", import.meta.url));
 
 concurrently([{
     name: "build",
-    //command: `node ${path.join(__dirname, "build.js")} --watch`
-    command: "npm run build",
+    command: `node ${path.join(__dirname, "build.js")} --watch`
 }, {
     name:    "tsc",
     command: "tsc -w --preserveWatchOutput",

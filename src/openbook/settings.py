@@ -1,10 +1,12 @@
-# OpenBook: Interactive Online Textbooks - Server
+# OpenBook: Interactive Online Textbooks
 # © 2024 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
+
+from __future__ import annotations
 
 from django.templatetags.static import static
 from django.urls                import reverse_lazy
@@ -23,7 +25,7 @@ SECRET_KEY = "django-insecure-jeo+.}_}9(Q.t_IU$WJ!%eL=b:MDbAL.~NY_=a:>D@:W[XPh4[
 DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
-OB_ROOT_REDIRECT = "/app/index.html"
+OB_ROOT_REDIRECT = "/app/"
 
 # Application definition
 #
@@ -33,12 +35,14 @@ INSTALLED_APPS = [
     # OpenBook Server (order determines order in the Django Admin)
     "openbook.core",
     "openbook.auth",
+    "openbook.ai",
     "openbook.content",
     "openbook.gamification",
 
     # 3rd-party reusable apps
     "daphne",
     "channels",
+    "chanx.channels",
 
     # Django REST framework
     #"rest_wind",
@@ -140,17 +144,6 @@ DATABASES = {
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Django Channels
-CHANNEL_LAYERS = {
-    "default": {
-        #"BACKEND": "channels.layers.InMemoryChannelLayer",
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("localhost", 6379)],
-        },
-    },
-}
-
 # Django REST framework
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
@@ -189,7 +182,7 @@ REST_FRAMEWORK = {
     "PAGE_SIZE_PARAM": "_page_size",
 }
 
-# Read the OpenBook version to include it in the OpenAPIs. Try the following order:
+# Read the OpenBook version to include it in the API docs. Try the following order:
 #
 #   1. Installed version via importlib
 #   2. Parsing pyproject.toml
@@ -209,8 +202,8 @@ except Exception:
 
 # See: https://drf-spectacular.readthedocs.io/
 SPECTACULAR_SETTINGS = {
-    "TITLE": "OpenBook API",
-    "DESCRIPTION": "Beautiful and Engaging Learning Materials",
+    "TITLE": "OpenBook REST API",
+    "DESCRIPTION": "Interactive Online Textbooks",
     "VERSION": OPENBOOK_VERSION,
     "LICENSE": {
         "name": "GNU Affero General Public License, Version 3 (or later)",
@@ -248,6 +241,27 @@ REST_FLEX_FIELDS2 = {
     "EXPAND_PARAM": "_expand",
     "FIELDS_PARAM": "_fields",
     "OMIT_PARAM": "_omit",
+}
+
+# Django Channels
+CHANNEL_LAYERS = {
+    "default": {
+        #"BACKEND": "channels.layers.InMemoryChannelLayer",
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
+    },
+}
+
+CHANX = {
+    "CAMELIZE": True,
+    "SEND_COMPLETION": False,
+    "SEND_AUTHENTICATION_MESSAGE": True,
+    "LOG_WEBSOCKET_MESSAGE": True,
+    "ASYNCAPI_TITLE": "Interactive Online Textbooks",
+    "ASYNCAPI_DESCRIPTION": "Beautiful and Engaging Learning Materials",
+    "ASYNCAPI_VERSION": OPENBOOK_VERSION,
 }
 
 # Password validation
@@ -288,16 +302,21 @@ SOCIALACCOUNT_ADAPTER = "openbook.auth.allauth.adapter.SocialAccountAdapter"
 
 # Allauth - Headless API
 # See: https://docs.allauth.org/en/latest/headless/configuration.html
+### HEADLESS_ONLY = True
 HEADLESS_ONLY = False
 HEADLESS_ADAPTER = "allauth.headless.adapter.DefaultHeadlessAdapter"
 HEADLESS_SERVE_SPECIFICATION = True
 HEADLESS_FRONTEND_URLS = {
-    #"account_confirm_email": "https://app.project.org/account/verify-email/{key}",
-    #"account_reset_password": "https://app.project.org/account/password/reset",
-    #"account_reset_password_from_key": "https://app.project.org/account/password/reset/key/{key}",
-    #"account_signup": "https://app.project.org/account/signup",
-    #"socialaccount_login_error": "https://app.project.org/account/provider/callback",
+    "account_confirm_email":           f"{OB_ROOT_REDIRECT}#/account/verify-email/{{key}}",
+    "account_reset_password":          f"{OB_ROOT_REDIRECT}#/account/password/reset",
+    "account_reset_password_from_key": f"{OB_ROOT_REDIRECT}#/account/password/reset/key/{{key}}",
+    "account_signup":                  f"{OB_ROOT_REDIRECT}#/account/signup",
+    "socialaccount_login_error":       f"{OB_ROOT_REDIRECT}#/account/provider/callback",
 }
+
+### LOGIN_URL           = f"{OB_ROOT_REDIRECT}#/account/login"
+### LOGIN_REDIRECT_URL  = OB_ROOT_REDIRECT
+### LOGOUT_REDIRECT_URL = OB_ROOT_REDIRECT
 
 # Recommended settings for SAML behind a reverse proxy
 # See: https://django-allauth.readthedocs.io/en/latest/socialaccount/providers/saml.html#guidelines
@@ -351,15 +370,20 @@ UNFOLD = {
             "link": reverse_lazy("api-redoc"),
         },
         {
-            # NOTE: Unfortunately. we cannot use reverse_lazy() to resolve the URL defined by Django-Alluth here
+            # NOTE: Unfortunately, we cannot use reverse_lazy() to resolve the URL defined by Django-Allauth here
             "icon": "api",
             "title": _("Auth API Explorer"),
             "link": "/auth-api/openapi.html",
         },
         {
+            "icon": "api",
+            "title": _("WebSocket API Explorer"),
+            "link": reverse_lazy("asyncapi-docs"),
+        },
+        {
             "icon": "menu_book",
             "title": _("Documentation"),
-            "link": "https://openbook-learning.readthedocs.org",
+            "link": "https://openbook-education.readthedocs.org",
         },
         {
             "icon": "code",
@@ -582,7 +606,7 @@ UNFOLD = {
     ]
 }
 
-# Interlal IPs (required by Django Debug Toolbar)
+# Internal IPs (required by Django Debug Toolbar)
 INTERNAL_IPS = ["127.0.0.1"]
 
 # E-Mail Settings
@@ -636,7 +660,7 @@ DBBACKUP_STORAGE_OPTIONS = {"location": BASE_DIR / "_backup"}
 try:
     EXTRA_INSTALLED_APPS = []
 
-    from .local_settings import *
+    from .local_settings import * # type: ignore
 
     INSTALLED_APPS = [*INSTALLED_APPS, *EXTRA_INSTALLED_APPS]
 except ImportError:

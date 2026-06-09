@@ -8,18 +8,6 @@
  * License, or (at your option) any later version.
  */
 
-import backend from "../backend.js";
-import type {
-    AccountProgressMe,
-    CurrentUser,
-    PaginatedCurrentUserList,
-    StreakState,
-} from "../api-client/models/index.js";
-import type {
-    CourseProgress,
-    SkillProgress,
-} from "../api-client/models/index.js";
-
 export type DashboardUser = {
     username: string;
     fullName: string;
@@ -60,6 +48,27 @@ export type DashboardPayload = {
     courses: DashboardCourse[];
 };
 
+type AccountProgressMe = {
+    point_total: number;
+    level: number;
+    current_level_min_points?: number;
+    next_level_min_points?: number | null;
+};
+
+type StreakState = {
+    current_streak: number;
+    longest_streak: number;
+    streak_freezes: number;
+    last_active_date: string | null;
+};
+
+type CurrentUser = {
+    username: string;
+    full_name?: string | null;
+    picture?: string | null;
+    is_authenticated?: boolean;
+};
+
 type ExpandedSkill = {
     id: string;
     name: string;
@@ -73,11 +82,89 @@ type ExpandedCourse = {
     slug?: string;
 };
 
-type CurrentUserResponse = PaginatedCurrentUserList | CurrentUser;
+type PaginatedResponse<T> = {
+    results: T[];
+};
 
-type SkillProgressRecord = SkillProgress & {skill: string | ExpandedSkill};
+type CurrentUserResponse = PaginatedResponse<CurrentUser> | CurrentUser[] | CurrentUser;
 
-type CourseProgressRecord = CourseProgress & {course: string | ExpandedCourse};
+type SkillProgressRecord = {
+    id: string;
+    skill: string | ExpandedSkill;
+    level?: number;
+    progress?: number | string;
+};
+
+type CourseProgressRecord = {
+    id: string;
+    course: string | ExpandedCourse;
+    course_points?: number;
+    course_level?: number;
+    course_progress?: number | string;
+};
+
+let baseUrlPromise: Promise<string> | null = null;
+
+async function resolveBaseUrl(): Promise<string> {
+    const response = await fetch("server.url");
+
+    if (!response.ok) {
+        throw new Error(`Could not load backend URL (HTTP ${response.status}).`);
+    }
+
+    let url = (await response.text()).trim();
+
+    while (url.endsWith("/")) {
+        url = url.slice(0, url.length - 1);
+    }
+
+    return url;
+}
+
+function getBaseUrl(): Promise<string> {
+    if (!baseUrlPromise) {
+        baseUrlPromise = resolveBaseUrl();
+    }
+
+    return baseUrlPromise;
+}
+
+async function apiGet<T>(path: string, query: Record<string, string> = {}): Promise<T> {
+    const base = await getBaseUrl();
+    const url = new URL(`${base}${path}`);
+
+    for (const [key, value] of Object.entries(query)) {
+        url.searchParams.set(key, value);
+    }
+
+    const response = await fetch(url.toString(), {
+        credentials: "include",
+        headers: {Accept: "application/json"},
+    });
+
+    if (response.status === 401 || response.status === 403) {
+        throw new Error("You are not signed in. Please log in to view your dashboard.");
+    }
+
+    if (!response.ok) {
+        throw new Error(`Request to ${path} failed (HTTP ${response.status}).`);
+    }
+
+    return (await response.json()) as T;
+}
+
+function hasResults<T>(value: unknown): value is PaginatedResponse<T> {
+    const result = value as {results?: unknown};
+
+    return typeof value === "object"
+        && value !== null
+        && "results" in value
+        && Array.isArray(result.results);
+}
+
+function toList<T>(value: T[] | PaginatedResponse<T>): T[] {
+    return Array.isArray(value) ? value : value.results;
+}
 
 function toNumber(value: unknown, fallback = 0): number {
     const numeric = typeof value === "number" ? value : Number(value);
@@ -90,6 +177,15 @@ function clampPercent(value: number): number {
     }
 
     return Math.min(100, Math.max(0, value));
+}
+
+function toDate(value: string | null | undefined): Date | null {
+    if (!value) {
+        return null;
+    }
+
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? null : date;
 }
 
 function normalizeSkill(skill: string | ExpandedSkill): ExpandedSkill {
@@ -127,7 +223,11 @@ function normalizeCourse(course: string | ExpandedCourse): ExpandedCourse {
 }
 
 function extractCurrentUser(response: CurrentUserResponse): CurrentUser | null {
-    if ("results" in response && Array.isArray(response.results)) {
+    if (Array.isArray(response)) {
+        return response[0] ?? null;
+    }
+
+    if (hasResults(response)) {
         return response.results[0] ?? null;
     }
 
@@ -145,9 +245,9 @@ function mapUser(user: CurrentUser | null): DashboardUser | null {
 
     return {
         username: user.username,
-        fullName: user.fullName ?? user.username,
+        fullName: user.full_name ?? user.username,
         avatarUrl: user.picture ?? null,
-        isAuthenticated: Boolean(user.isAuthenticated),
+        isAuthenticated: Boolean(user.is_authenticated),
     };
 }
 
@@ -157,12 +257,12 @@ function mapStats(progress: AccountProgressMe | null, streak: StreakState | null
     }
 
     return {
-        points: toNumber(progress?.pointTotal ?? 0),
+        points: toNumber(progress?.point_total ?? 0),
         level: toNumber(progress?.level ?? 1, 1),
-        currentStreak: toNumber(streak?.currentStreak ?? 0),
-        longestStreak: toNumber(streak?.longestStreak ?? 0),
-        streakFreezes: toNumber(streak?.streakFreezes ?? 0),
-        lastActiveDate: streak?.lastActiveDate ?? null,
+        currentStreak: toNumber(streak?.current_streak ?? 0),
+        longestStreak: toNumber(streak?.longest_streak ?? 0),
+        streakFreezes: toNumber(streak?.streak_freezes ?? 0),
+        lastActiveDate: toDate(streak?.last_active_date),
     };
 }
 
@@ -186,63 +286,84 @@ function mapCourseProgress(records: CourseProgressRecord[]): DashboardCourse[] {
         return {
             id: record.id,
             name: course.name,
-            level: toNumber(record.courseLevel ?? 1, 1),
-            points: toNumber(record.coursePoints ?? 0),
-            progress: clampPercent(toNumber(record.courseProgress ?? 0)),
+            level: toNumber(record.course_level ?? 1, 1),
+            points: toNumber(record.course_points ?? 0),
+            progress: clampPercent(toNumber(record.course_progress ?? 0)),
         };
     });
 }
 
 async function loadCurrentUser(): Promise<DashboardUser | null> {
-    const response = await backend.auth.currentUser.authCurrentUser();
-    const user = extractCurrentUser(response as CurrentUserResponse);
+    const response = await apiGet<CurrentUserResponse>("/api/auth/current_user/");
+    const user = extractCurrentUser(response);
     return mapUser(user);
 }
 
 async function loadAccountProgress(): Promise<AccountProgressMe> {
-    return backend.gamification.accountProgress.gamificationAccountProgressMe();
+    return apiGet<AccountProgressMe>("/api/gamification/account_progress/me/");
 }
 
 async function loadStreakState(): Promise<StreakState | null> {
-    const response = await backend.gamification.streak.gamificationStreakRetrieve();
-    return response.length > 0 ? response[0] : null;
+    const response = await apiGet<StreakState | StreakState[] | PaginatedResponse<StreakState>>("/api/gamification/streak/");
+
+    if (Array.isArray(response)) {
+        return response[0] ?? null;
+    }
+
+    if (hasResults(response)) {
+        return response.results[0] ?? null;
+    }
+
+    return response;
 }
 
-async function loadSkillProgress(): Promise<DashboardSkill[]> {
-    const response = await backend.gamification.skillProgress.gamificationSkillProgressList({
-        expand: "skill",
-        pageSize: 50,
-        sort: "skill__name",
-    });
+async function loadSkillProgress(username?: string | null): Promise<DashboardSkill[]> {
+    const query: Record<string, string> = {
+        _expand: "skill",
+        _page_size: "50",
+        _sort: "skill__name",
+    };
 
-    const records = Array.isArray(response.results)
-        ? (response.results as SkillProgressRecord[])
-        : [];
+    if (username) {
+        query.account = username;
+    }
+
+    const response = await apiGet<SkillProgressRecord[] | PaginatedResponse<SkillProgressRecord>>(
+        "/api/gamification/skill_progress/",
+        query,
+    );
+    const records = toList(response);
 
     return mapSkillProgress(records);
 }
 
-async function loadCourseProgress(): Promise<DashboardCourse[]> {
-    const response = await backend.gamification.courseProgress.gamificationCourseProgressList({
-        expand: "course",
-        pageSize: 50,
-        sort: "course__name",
-    });
+async function loadCourseProgress(username?: string | null): Promise<DashboardCourse[]> {
+    const query: Record<string, string> = {
+        _expand: "course",
+        _page_size: "50",
+        _sort: "course__name",
+    };
 
-    const records = Array.isArray(response.results)
-        ? (response.results as CourseProgressRecord[])
-        : [];
+    if (username) {
+        query.account = username;
+    }
+
+    const response = await apiGet<CourseProgressRecord[] | PaginatedResponse<CourseProgressRecord>>(
+        "/api/gamification/course_progress/",
+        query,
+    );
+    const records = toList(response);
 
     return mapCourseProgress(records);
 }
 
 export async function loadGamificationDashboardData(): Promise<DashboardPayload> {
-    const [user, accountProgress, streak, skills, courses] = await Promise.all([
-        loadCurrentUser(),
+    const user = await loadCurrentUser();
+    const [accountProgress, streak, skills, courses] = await Promise.all([
         loadAccountProgress(),
         loadStreakState(),
-        loadSkillProgress(),
-        loadCourseProgress(),
+        loadSkillProgress(user?.username),
+        loadCourseProgress(user?.username),
     ]);
 
     return {

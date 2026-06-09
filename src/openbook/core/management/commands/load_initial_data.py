@@ -1,10 +1,12 @@
-# OpenBook: Interactive Online Textbooks - Server
+# OpenBook: Interactive Online Textbooks
 # © 2024 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
+
+from __future__ import annotations
 
 from django.core                 import management
 from django.core.management.base import BaseCommand
@@ -20,7 +22,8 @@ class Command(BaseCommand):
         "openbook_auth/anonymous_permissions",
         "openbook_auth/groups",
         "openbook_auth/signup_group_assignments",
-        #"openbook_content/test_course_1",
+        "openbook_content/library_groups",
+        "openbook_content/courses",
     ]
 
     def handle(self, *args, **options):

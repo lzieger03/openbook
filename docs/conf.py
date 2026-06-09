@@ -1,5 +1,7 @@
 """Sphinx configuration for OpenBook documentation."""
 
+from __future__ import annotations
+
 import tomllib
 from pathlib import Path
 
@@ -18,10 +20,12 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
     "sphinx_llm.txt",
+    "sphinx_tabs.tabs",
 ]
 
 llms_txt_build_parallel = False     # Don't spawn subprocess to avoid race-conditions
 autodoc_typehints = "description"   # Include type-hints in API docs
+sphinx_tabs_disable_tab_closing = True
 
 html_theme = "sphinx_rtd_theme"
 html_theme_options = {
@@ -30,6 +34,7 @@ html_theme_options = {
 }
 html_static_path = ["_static", "_openapi"]
 html_css_files = ["custom.css"]
+html_logo = "_static/logo.svg"
 
 # Ensure standalone OpenAPI HTML pages are published on RTD as build artifacts.
 # NOTE: The files need to be manually updated and checked into git.

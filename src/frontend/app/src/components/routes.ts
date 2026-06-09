@@ -1,5 +1,5 @@
 /*
- * OpenBook: Interactive Online Textbooks - Server
+ * OpenBook: Interactive Online Textbooks
  * © 2024 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -8,37 +8,39 @@
  * License, or (at your option) any later version.
  */
 
-import {wrap}       from "svelte-spa-router/wrap";
-import Placeholder  from "./app-frame/Placeholder.svelte";
-import NotFoundPage from "./pages/errors/NotFoundPage.svelte";
-import GamificationManualTestPage from "./pages/gamification/GamificationManualTestPage.svelte";
-// import {currentPage}      from "../stores/book.js";
+import type { BreadcrumbsCallback } from "../stores/breadcrumbs.js";
+import { breadcrumbs }              from "../stores/breadcrumbs.js";
+import { wrap }                     from "svelte-spa-router/wrap";
 
-// /**
-//  * Update page number in the global store before the router renders the
-//  * next page. This makes sure that all components, not just the one chosen
-//  * by the router, receive the updated page number.
-//  */
-// function setPageNumber(detail:RouteDetail): boolean {
-//     let page = parseInt(detail?.params?.pageNumber || "1");
-//     currentPage.set(page);
-//     return true;
-// }
+/**
+ * Set breadcrumbs callback for a matched route and prefix it with a fixed
+ * item for the home page.
+ */
+function _breadcrumbs(fn?: BreadcrumbsCallback) {
+    return function() {
+        breadcrumbs.set((i18n) => {
+            let result = [{ href: "#/", label: i18n.Home.Title }];
+            if (fn) result = [...result, ...fn(i18n)];
+            return result;
+        });
+
+        return true;
+    }
+}
 
 export default {
     "/": wrap({
-        component: Placeholder,
-        // conditions: [setPageNumber],
+        asyncComponent: () => import("./pages/home/HomePage.svelte"),
+        conditions: [_breadcrumbs()],
     }),
 
     "/gamification-test": wrap({
-        component: GamificationManualTestPage,
+        asyncComponent: () => import("./pages/gamification/GamificationManualTestPage.svelte"),
+        conditions: [_breadcrumbs(() => [{ href: "#/gamification-test", label: "Gamification Test" }])],
     }),
 
-    // "/book/page/:pageNumber": wrap({
-    //     component: BookContentPage,
-    //     conditions: [setPageNumber],
-    // }),
-
-    "*": NotFoundPage,
+    "*": wrap({
+        asyncComponent: () => import("./pages/errors/NotFoundPage.svelte"),
+        conditions: [_breadcrumbs(i18n => [{ href: "", label: i18n.Error.Page.NotFound.Title }])],
+    }),
 };

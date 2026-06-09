@@ -1,10 +1,12 @@
-# OpenBook: Interactive Online Textbooks - Server
+# OpenBook: Interactive Online Textbooks
 # © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
+
+from __future__ import annotations
 
 from django_filters.filterset           import FilterSet
 from drf_spectacular.utils              import extend_schema
@@ -15,7 +17,7 @@ from openbook.auth.serializers.user     import UserField
 from openbook.drf.flex_serializers      import FlexFieldsModelSerializer
 from openbook.drf.viewsets              import ModelViewSetMixin
 from openbook.drf.viewsets              import with_flex_fields_parameters
-from ..models.textbook                  import TextbookPage
+from ..models.textbook_page             import TextbookPage
 
 
 class TextbookPageSerializer(FlexFieldsModelSerializer):

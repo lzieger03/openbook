@@ -1,4 +1,4 @@
-# OpenBook: Interactive Online Textbooks - Server
+# OpenBook: Interactive Online Textbooks
 # © 2024 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -6,13 +6,14 @@
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 
+from __future__ import annotations
+
 from django.contrib.admin               import RelatedOnlyFieldListFilter
 from django.contrib.auth.models         import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.forms                       import ModelForm
 from django.utils.translation           import gettext_lazy as _
 from import_export.fields               import Field
-from unfold.admin                       import TabularInline
 from unfold.contrib.forms.widgets       import UnfoldAdminSelectWidget
 
 from openbook.admin                     import ImportExportModelResource
@@ -166,7 +167,7 @@ class ScopeRoleFieldFormMixin(ModelForm):
         css = {"all": ()}
         js  = ["openbook_auth/scope_roles_autoload.js"]
 
-class ScopeRoleFieldInlineMixin(TabularInline):
+class ScopeRoleFieldInlineMixin:
     """
     Restrict inline role choices to the current scope.
     """
@@ -178,7 +179,6 @@ class ScopeRoleFieldInlineMixin(TabularInline):
         if self.parent_obj and db_field.name == "role":
             scope_type = ContentType.objects.get_for_model(self.parent_obj)
             kwargs["queryset"] = Role.objects.filter(scope_type=scope_type, scope_uuid=self.parent_obj.id)
-            pass
 
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 

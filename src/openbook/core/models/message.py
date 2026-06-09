@@ -1,4 +1,4 @@
-# OpenBook: Interactive Online Textbooks - Server
+# OpenBook: Interactive Online Textbooks
 # © 2025 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -10,3 +10,4 @@
 # Messages can be user-created or system notifications.
 # Users can set in their profile whether to receive e-mails or not#
 # and whether the the state should automatically be "read", when e-mails are sent.
+from __future__ import annotations

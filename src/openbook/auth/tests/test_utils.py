@@ -1,4 +1,4 @@
-# OpenBook: Interactive Online Textbooks - Server
+# OpenBook: Interactive Online Textbooks
 # © 2025 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -6,8 +6,9 @@
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 
+from __future__ import annotations
+
 from django.contrib.auth.models         import Permission
-from django.contrib.contenttypes.models import ContentType
 from django.test                        import TestCase
 from django.utils.translation           import activate
 from ..                                 import utils

@@ -1,10 +1,12 @@
-# OpenBook: Interactive Online Textbooks - Server
+# OpenBook: Interactive Online Textbooks
 # © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
+
+from __future__ import annotations
 
 from django_filters.filterset           import FilterSet
 from drf_spectacular.utils              import extend_schema
@@ -29,7 +31,7 @@ class TextbookSerializer(FlexFieldsModelSerializer):
         fields = [
             "id", "slug",
             "name", "description", "text_format",
-            "group", "position",
+            "group",
             "pages", "used_in_courses", "library_links",
             "created_by", "created_at", "modified_by", "modified_at",
         ]
@@ -57,7 +59,6 @@ class TextbookFilter(CreatedModifiedByFilterMixin, FilterSet):
             "slug":     ["exact"],
             "name":     ["exact"],
             "group":    ["exact"],
-            "position": ["exact", "lte", "gte"],
             **CreatedModifiedByFilterMixin.Meta.fields,
         }
 
@@ -75,5 +76,5 @@ class TextbookViewSet(AllowAnonymousListRetrieveViewSetMixin, ModelViewSetMixin,
     queryset         = Textbook.objects.all()
     filterset_class  = TextbookFilter
     serializer_class = TextbookSerializer
-    ordering         = ["group", "position", "name"]
+    ordering         = ["group", "name"]
     search_fields    = ["slug", "name", "description"]
