@@ -15,6 +15,9 @@
  * sent automatically for same-origin requests.
  */
 
+import {WebSocketClient} from "./websocket.js";
+import type {WebSocketMessage} from "./websocket.js";
+
 let baseUrlPromise: Promise<string> | null = null;
 
 async function resolveBaseUrl(): Promise<string> {
@@ -39,6 +42,25 @@ function getBaseUrl(): Promise<string> {
     }
 
     return baseUrlPromise;
+}
+
+/**
+ * Create a typed WebSocket client for an OpenBook WS channel. `suffix` is the
+ * path after the `/ws` prefix, e.g. `/ai/chat` → `ws(s)://<host>/ws/ai/chat`.
+ */
+export async function ws<SentMessages extends WebSocketMessage, ReceivedMessages extends WebSocketMessage>(
+    suffix: string,
+): Promise<WebSocketClient<SentMessages, ReceivedMessages>> {
+    const path = suffix.startsWith("/") ? suffix : `/${suffix}`;
+    const wsUrl = new URL(`/ws${path}`, `${await getBaseUrl()}/`);
+
+    if (wsUrl.protocol === "http:") {
+        wsUrl.protocol = "ws:";
+    } else if (wsUrl.protocol === "https:") {
+        wsUrl.protocol = "wss:";
+    }
+
+    return new WebSocketClient<SentMessages, ReceivedMessages>(wsUrl.toString());
 }
 
 /** Perform a typed GET request against the API and return the parsed JSON body. */

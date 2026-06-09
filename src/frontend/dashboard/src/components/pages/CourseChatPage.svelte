@@ -10,10 +10,9 @@ License, or (at your option) any later version.
 
 <!--
 @component
-Full-screen AI tutor page for a single course (prototype). The assistant backend
-(webhook / LLM service) does not exist yet, so the composer is disabled with a
-notice. TODO: when the backend is ready, wire the composer to the assistant
-endpoint (cf. dev_assistant branch: LLM_Client.perform_rag_query(query)).
+Full-screen AI tutor page for a single course. Chat runs over the WebSocket API
+(channel /ws/ai/chat) via the shared ai-chat store; the composer is enabled while
+connected and the connection status is shown. See README-websocket-api.md.
 
 Default presentation is full-screen; other modes (floating window, docked
 sidebar, minimised icon) can be layered on later.
@@ -23,8 +22,8 @@ sidebar, minimised icon) can be layered on later.
     import {push} from "svelte-spa-router";
     import {dashboardStore} from "../../stores/dashboard.store.js";
     import type {DashboardState} from "../../stores/dashboard.store.js";
-    import {ASSISTANT_ENABLED, sendChatMessage} from "../../api/assistant.js";
-    import type {ChatMessage} from "../../api/assistant.js";
+    import {createAiChatStore} from "../../stores/ai-chat.store.js";
+    import type {AiChatState} from "../../stores/ai-chat.store.js";
 
     let {params}: {params?: {id?: string}} = $props();
 
@@ -37,8 +36,13 @@ sidebar, minimised icon) can be layered on later.
         courses: [],
     });
 
+    // AI chat over WebSocket (channel /ws/ai/chat).
+    const chat = createAiChatStore();
+    let chatState = $state<AiChatState>({connection: "disconnected", errorMessage: "", messages: []});
+    let draft = $state("");
+
     onMount(() => {
-        const unsubscribe = dashboardStore.subscribe((value) => {
+        const unsubscribeDashboard = dashboardStore.subscribe((value) => {
             state = value;
         });
 
@@ -46,7 +50,16 @@ sidebar, minimised icon) can be layered on later.
             dashboardStore.refresh();
         }
 
-        return unsubscribe;
+        const unsubscribeChat = chat.subscribe((value) => {
+            chatState = value;
+        });
+        void chat.connect();
+
+        return () => {
+            unsubscribeDashboard();
+            unsubscribeChat();
+            void chat.disconnect();
+        };
     });
 
     const courseName = $derived(
@@ -61,32 +74,25 @@ sidebar, minimised icon) can be layered on later.
         {icon: "💬", label: "Chats"},
     ]);
 
-    const suggestions = ["Explain the basics", "Quiz me", "Summarize this course"];
-
-    // Conversation (active once ASSISTANT_ENABLED and the backend endpoint are set).
-    let messages = $state<ChatMessage[]>([]);
-    let draft = $state("");
-    let sending = $state(false);
+    const connected = $derived(chatState.connection === "connected");
+    const statusLabel = $derived(
+        chatState.connection === "connected"
+            ? "Online"
+            : chatState.connection === "connecting"
+                ? "Connecting…"
+                : chatState.connection === "wait_before_retry"
+                    ? "Reconnecting…"
+                    : "Offline",
+    );
 
     async function send(): Promise<void> {
         const text = draft.trim();
-        if (!text || sending || !ASSISTANT_ENABLED) {
+        if (!text || !connected) {
             return;
         }
 
-        messages = [...messages, {role: "user", content: text}];
         draft = "";
-        sending = true;
-
-        try {
-            const reply = await sendChatMessage(text, courseName, messages);
-            messages = [...messages, {role: "assistant", content: reply}];
-        } catch (error) {
-            const detail = error instanceof Error ? error.message : "Something went wrong.";
-            messages = [...messages, {role: "assistant", content: `⚠️ ${detail}`}];
-        } finally {
-            sending = false;
-        }
+        await chat.sendChatInput("markdown", text);
     }
 </script>
 
@@ -125,53 +131,50 @@ sidebar, minimised icon) can be layered on later.
                 </div>
             </div>
 
-            {#each messages as message, i (i)}
-                <div class="message" class:user={message.role === "user"}>
-                    {#if message.role === "assistant"}
+            {#each chatState.messages as message (message.id)}
+                <div class="message" class:user={message.sender === "user"}>
+                    {#if message.sender === "assistant"}
                         <img class="avatar" src="logo.png" alt="ElisaAI assistant" />
                     {/if}
-                    <div class="bubble" class:user={message.role === "user"}>{message.content}</div>
+                    <div class="bubble" class:user={message.sender === "user"}>{message.content}</div>
                 </div>
             {/each}
-
-            {#if sending}
-                <div class="message">
-                    <img class="avatar" src="logo.png" alt="ElisaAI assistant" />
-                    <div class="bubble">…</div>
-                </div>
-            {/if}
-
-            {#if !ASSISTANT_ENABLED}
-                <div class="suggestions">
-                    {#each suggestions as suggestion (suggestion)}
-                        <button type="button" class="chip" disabled>{suggestion}</button>
-                    {/each}
-                </div>
-            {/if}
         </div>
 
         <div class="composer">
-            {#if !ASSISTANT_ENABLED}
-                <span class="coming-soon">🚧 The assistant is coming soon.</span>
-            {/if}
+            <span class="status" class:online={connected}>
+                <span class="status-dot" aria-hidden="true"></span>
+                {statusLabel}
+            </span>
             <form class="composer-row" onsubmit={(event) => {event.preventDefault(); send();}}>
                 <button type="button" class="composer-add" aria-label="Add attachment" disabled>+</button>
                 <input
                     class="composer-input"
                     type="text"
-                    placeholder="Message"
+                    placeholder={connected ? "Message" : "Connecting…"}
                     bind:value={draft}
-                    disabled={!ASSISTANT_ENABLED || sending}
+                    disabled={!connected}
                 />
                 <button
                     type="submit"
                     class="composer-send"
                     aria-label="Send message"
-                    disabled={!ASSISTANT_ENABLED || sending}
+                    disabled={!connected || draft.trim().length === 0}
                 >→</button>
             </form>
             <p class="disclaimer">ElisaAI 2026 // ElisaAI may generate misinformation. Please verify all information.</p>
         </div>
+
+        {#if chatState.errorMessage}
+            <div class="error-overlay" role="alert">
+                <div class="error-card">
+                    <span class="error-icon" aria-hidden="true">🔌</span>
+                    <h2 class="error-title">Assistant unavailable</h2>
+                    <p class="error-text">{chatState.errorMessage}</p>
+                    <button type="button" class="btn btn-primary" onclick={() => chat.retry()}>Retry</button>
+                </div>
+            </div>
+        {/if}
     </main>
 </div>
 
@@ -345,23 +348,6 @@ sidebar, minimised icon) can be layered on later.
         border-bottom-right-radius: 0.25rem;
     }
 
-    .suggestions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        padding-left: 3.6rem;
-    }
-
-    .chip {
-        font-size: 0.85rem;
-        padding: 0.35rem 0.85rem;
-        border-radius: 999px;
-        color: color-mix(in oklab, var(--color-base-content) 70%, transparent);
-        background: color-mix(in oklab, var(--color-base-content) 8%, transparent);
-        border: 1px solid color-mix(in oklab, var(--color-base-content) 14%, transparent);
-        cursor: not-allowed;
-    }
-
     .composer {
         flex: 0 0 auto;
         display: flex;
@@ -370,14 +356,74 @@ sidebar, minimised icon) can be layered on later.
         padding: 1rem clamp(1rem, 6vw, 6rem) 1.25rem;
     }
 
-    .coming-soon {
+    .status {
         align-self: center;
-        font-size: 0.8rem;
-        padding: 0.25rem 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: color-mix(in oklab, var(--color-base-content) 60%, transparent);
+    }
+
+    .status-dot {
+        width: 0.5rem;
+        height: 0.5rem;
         border-radius: 999px;
-        color: var(--color-warning);
-        background: color-mix(in oklab, var(--color-warning) 12%, transparent);
-        border: 1px solid color-mix(in oklab, var(--color-warning) 30%, transparent);
+        background: color-mix(in oklab, var(--color-base-content) 40%, transparent);
+    }
+
+    .status.online {
+        color: var(--color-success);
+    }
+
+    /* Centered overlay shown when the assistant connection gives up. */
+    .error-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+        display: grid;
+        place-items: center;
+        padding: 1.5rem;
+        background: color-mix(in oklab, var(--color-base-300) 55%, transparent);
+        backdrop-filter: blur(4px);
+    }
+
+    .error-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.85rem;
+        max-width: 26rem;
+        width: 100%;
+        text-align: center;
+        padding: 2rem;
+        border-radius: 1.25rem;
+        background: var(--color-base-100);
+        border: 1px solid color-mix(in oklab, var(--color-warning) 35%, transparent);
+        box-shadow: 0 0 40px color-mix(in oklab, var(--color-warning) 18%, transparent);
+    }
+
+    .error-icon {
+        font-size: 2.5rem;
+        line-height: 1;
+    }
+
+    .error-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--color-base-content);
+    }
+
+    .error-text {
+        line-height: 1.5;
+        color: color-mix(in oklab, var(--color-base-content) 75%, transparent);
+    }
+
+    .status.online .status-dot {
+        background: var(--color-success);
+        box-shadow: 0 0 10px color-mix(in oklab, var(--color-success) 70%, transparent);
     }
 
     .composer-row {

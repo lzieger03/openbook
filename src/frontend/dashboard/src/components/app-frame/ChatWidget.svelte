@@ -15,13 +15,14 @@ Global "Quick Chat" widget with three states:
   - floating:  a small draggable chat window;
   - sidebar:   a docked, full-height panel on the right (via the expand button).
 
-The assistant backend (webhook / LLM) does not exist yet, so the composer is
-disabled. TODO: wire to the assistant endpoint when the backend lands.
+Chat runs over the WebSocket API (channel /ws/ai/chat) via the shared ai-chat
+store; it connects lazily the first time the panel is opened. See
+README-websocket-api.md.
 -->
 <script lang="ts">
     import {onMount} from "svelte";
-    import {ASSISTANT_ENABLED, sendChatMessage} from "../../api/assistant.js";
-    import type {ChatMessage} from "../../api/assistant.js";
+    import {createAiChatStore} from "../../stores/ai-chat.store.js";
+    import type {AiChatState} from "../../stores/ai-chat.store.js";
 
     type Mode = "floating" | "sidebar";
 
@@ -35,41 +36,52 @@ disabled. TODO: wire to the assistant endpoint when the backend lands.
 
     let dragOffset: {x: number; y: number} | null = null;
 
-    // Conversation (active once ASSISTANT_ENABLED and the backend endpoint are set).
-    let messages = $state<ChatMessage[]>([]);
+    // AI chat over WebSocket; connect lazily the first time the panel is opened.
+    const chat = createAiChatStore();
+    let chatState = $state<AiChatState>({connection: "disconnected", errorMessage: "", messages: []});
     let draft = $state("");
-    let sending = $state(false);
+    let connectStarted = false;
+
+    const connected = $derived(chatState.connection === "connected");
+
+    function ensureConnected(): void {
+        if (!connectStarted) {
+            connectStarted = true;
+            void chat.connect();
+        }
+    }
 
     async function send(): Promise<void> {
         const text = draft.trim();
-        if (!text || sending || !ASSISTANT_ENABLED) {
+        if (!text || !connected) {
             return;
         }
 
-        messages = [...messages, {role: "user", content: text}];
         draft = "";
-        sending = true;
-
-        try {
-            const reply = await sendChatMessage(text, undefined, messages);
-            messages = [...messages, {role: "assistant", content: reply}];
-        } catch (error) {
-            const detail = error instanceof Error ? error.message : "Something went wrong.";
-            messages = [...messages, {role: "assistant", content: `⚠️ ${detail}`}];
-        } finally {
-            sending = false;
-        }
+        await chat.sendChatInput("markdown", text);
     }
 
     function notify(): void {
         onSidebarChange?.(open && mode === "sidebar");
     }
 
-    // Sync the shell on mount (e.g. after returning from the full chat page).
-    onMount(notify);
+    onMount(() => {
+        // Sync the shell on mount (e.g. after returning from the full chat page).
+        notify();
+        const unsubscribe = chat.subscribe((value) => {
+            chatState = value;
+        });
+        return () => {
+            unsubscribe();
+            void chat.disconnect();
+        };
+    });
 
     function toggle(): void {
         open = !open;
+        if (open) {
+            ensureConnected();
+        }
         notify();
     }
 
@@ -154,26 +166,19 @@ disabled. TODO: wire to the assistant endpoint when the backend lands.
                 </div>
             </div>
 
-            {#each messages as message, i (i)}
-                <div class="message" class:user={message.role === "user"}>
-                    {#if message.role === "assistant"}
+            {#each chatState.messages as message (message.id)}
+                <div class="message" class:user={message.sender === "user"}>
+                    {#if message.sender === "assistant"}
                         <img class="avatar" src="logo.png" alt="ElisaAI" />
                     {/if}
-                    <div class="bubble" class:user={message.role === "user"}>{message.content}</div>
+                    <div class="bubble" class:user={message.sender === "user"}>{message.content}</div>
                 </div>
             {/each}
-
-            {#if sending}
-                <div class="message">
-                    <img class="avatar" src="logo.png" alt="ElisaAI" />
-                    <div class="bubble">…</div>
-                </div>
-            {/if}
         </div>
 
         <div class="composer">
-            {#if !ASSISTANT_ENABLED}
-                <span class="coming-soon">🚧 coming soon</span>
+            {#if !connected}
+                <span class="coming-soon">{chatState.connection === "connecting" ? "Connecting…" : "Offline — reconnecting…"}</span>
             {/if}
             <form class="composer-row" onsubmit={(event) => {event.preventDefault(); send();}}>
                 <button type="button" class="composer-add" aria-label="Add" disabled>+</button>
@@ -182,13 +187,13 @@ disabled. TODO: wire to the assistant endpoint when the backend lands.
                     type="text"
                     placeholder="Message"
                     bind:value={draft}
-                    disabled={!ASSISTANT_ENABLED || sending}
+                    disabled={!connected}
                 />
                 <button
                     type="submit"
                     class="composer-send"
                     aria-label="Send"
-                    disabled={!ASSISTANT_ENABLED || sending}
+                    disabled={!connected || draft.trim().length === 0}
                 >→</button>
             </form>
             <p class="disclaimer">ElisaAI may generate misinformation. Please verify all information.</p>
