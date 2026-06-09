@@ -69,7 +69,8 @@ export async function apiGet<T>(path: string, query: Record<string, string> = {}
 /** Read a cookie value by name (used for the CSRF token on write requests). */
 function readCookie(name: string): string {
     const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
-    return match ? decodeURIComponent(match[1]) : "";
+    const value = match?.[1];
+    return value ? decodeURIComponent(value) : "";
 }
 
 /** Best-effort extraction of a human-readable message from an API error body. */
