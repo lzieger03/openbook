@@ -33,6 +33,13 @@ class LearningState(UUIDMixin):
         blank=True,
     )
 
+    completed_pages = models.ManyToManyField(
+        "openbook_content.TextbookPage",
+        verbose_name=_("Completed Pages"),
+        related_name="completed_in_states",
+        blank=True,
+    )
+
     last_accessed = models.DateTimeField(
         verbose_name=_("Last Accessed"),
         auto_now=True,

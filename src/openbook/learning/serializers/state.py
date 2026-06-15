@@ -9,7 +9,7 @@ class LearningStateSerializer(FlexFieldsModelSerializer):
         model  = LearningState
         fields = [
             "id",
-            "user", "course", "last_page",
+            "user", "course", "last_page", "completed_pages",
             "last_accessed",
         ]
         read_only_fields = [
@@ -18,7 +18,8 @@ class LearningStateSerializer(FlexFieldsModelSerializer):
             "last_accessed",
         ]
         expandable_fields = {
-            "user":      "openbook.auth.viewsets.user.UserSerializer",
-            "course":    "openbook.content.viewsets.course.CourseSerializer",
-            "last_page": "openbook.content.viewsets.textbook_page.TextbookPageSerializer",
+            "user":            "openbook.auth.viewsets.user.UserSerializer",
+            "course":          "openbook.content.viewsets.course.CourseSerializer",
+            "last_page":       "openbook.content.viewsets.textbook_page.TextbookPageSerializer",
+            "completed_pages": ("openbook.content.viewsets.textbook_page.TextbookPageSerializer", {"many": True}),
         }
