@@ -1,36 +1,37 @@
 # openbook_learning
 
 Verfolgt den Lernfortschritt der Nutzer für den KI-Tutor (ELISA).
-Der ChatConsumer liest diese Daten beim WebSocket-Connect und gibt sie als Kontext an das LLM weiter.
+Der Orchestrator liest diese Daten beim Login und gibt sie als Kontext an das LLM weiter.
 
 ---
 
 ## Modelle
 
 ### LearningState
-Eine Zeile pro User+Kurs. Wird aktualisiert sobald der Nutzer eine Seite öffnet.
+Eine Zeile pro User+Kurs. Wird aktualisiert sobald der Nutzer eine Seite öffnet oder ein Kapitel abschließt.
 
-| Feld           | Typ           | Beschreibung                              |
-|----------------|---------------|-------------------------------------------|
-| `id`           | UUID          | Primärschlüssel                           |
-| `user`         | FK → User     | Der Lernende                              |
-| `course`       | FK → Course   | Der Kurs in dem der Nutzer eingeschrieben ist |
-| `last_page`    | FK → TextbookPage (nullable) | Zuletzt besuchte Seite    |
-| `last_accessed`| DateTimeField | Wird bei jedem Schreibzugriff automatisch aktualisiert |
+| Feld              | Typ                          | Beschreibung                                          |
+|-------------------|------------------------------|-------------------------------------------------------|
+| `id`              | UUID                         | Primärschlüssel                                       |
+| `user`            | FK → User                    | Der Lernende (automatisch aus Login-Token)            |
+| `course`          | FK → Course                  | Der Kurs in dem der Nutzer eingeschrieben ist         |
+| `last_page`       | FK → TextbookPage (nullable) | Zuletzt besuchte Seite                                |
+| `completed_pages` | M2M → TextbookPage           | Alle abgeschlossenen Kapitel                          |
+| `last_accessed`   | DateTimeField                | Wird bei jedem Schreibzugriff automatisch aktualisiert |
 
 Constraint: eindeutig pro `user + course`.
 
 ### QuizResult
 Eine Zeile pro User+Seite. Wird nach jedem Quiz-Versuch aktualisiert (Score wird überschrieben, Versuche hochgezählt).
 
-| Feld          | Typ           | Beschreibung                              |
-|---------------|---------------|-------------------------------------------|
-| `id`          | UUID          | Primärschlüssel                           |
-| `user`        | FK → User     | Der Lernende                              |
-| `page`        | FK → TextbookPage | Das Kapitel zu dem das Quiz gehört    |
-| `score`       | Float         | Normierter Score 0.0–1.0                  |
-| `attempts`    | Integer       | Wie oft das Quiz bereits gemacht wurde    |
-| `answered_at` | DateTimeField | Wird bei jedem Schreibzugriff automatisch aktualisiert |
+| Feld          | Typ               | Beschreibung                                           |
+|---------------|-------------------|--------------------------------------------------------|
+| `id`          | UUID              | Primärschlüssel                                        |
+| `user`        | FK → User         | Der Lernende (automatisch aus Login-Token)             |
+| `page`        | FK → TextbookPage | Das Kapitel zu dem das Quiz gehört                     |
+| `score`       | Float             | Normierter Score 0.0–1.0                               |
+| `attempts`    | Integer           | Wie oft das Quiz bereits gemacht wurde                 |
+| `answered_at` | DateTimeField     | Wird bei jedem Schreibzugriff automatisch aktualisiert |
 
 Constraint: eindeutig pro `user + page`.
 
@@ -40,14 +41,14 @@ Constraint: eindeutig pro `user + page`.
 
 Basispfad: `/api/learning/`
 
-| Methode | Endpoint                           | Beschreibung                              |
-|---------|------------------------------------|-------------------------------------------|
-| GET     | `/api/learning/states/`            | Lernstände des aktuellen Nutzers abrufen  |
-| POST    | `/api/learning/states/`            | Neuen Lernstand anlegen                   |
-| PATCH   | `/api/learning/states/{id}/`       | Letzte Seite aktualisieren                |
-| GET     | `/api/learning/quiz-results/`      | Quiz-Ergebnisse des aktuellen Nutzers abrufen |
-| POST    | `/api/learning/quiz-results/`      | Quiz-Ergebnis anlegen                     |
-| PATCH   | `/api/learning/quiz-results/{id}/` | Score aktualisieren + Versuche hochzählen |
+| Methode | Endpoint                           | Beschreibung                                      |
+|---------|------------------------------------|---------------------------------------------------|
+| GET     | `/api/learning/states/`            | Lernstände des aktuellen Nutzers abrufen          |
+| POST    | `/api/learning/states/`            | Neuen Lernstand anlegen                           |
+| PATCH   | `/api/learning/states/{id}/`       | Letzte Seite oder abgeschlossene Kapitel updaten  |
+| GET     | `/api/learning/quiz-results/`      | Quiz-Ergebnisse des aktuellen Nutzers abrufen     |
+| POST    | `/api/learning/quiz-results/`      | Quiz-Ergebnis anlegen                             |
+| PATCH   | `/api/learning/quiz-results/{id}/` | Score aktualisieren + Versuche hochzählen         |
 
 Alle Endpoints erfordern Authentifizierung. Jeder Nutzer sieht nur seine eigenen Daten.
 
@@ -55,9 +56,15 @@ Vollständige Dokumentation: `http://localhost:8000/api/schema/redoc/`
 
 ---
 
-## Für das Frontend
+## Für den Orchestrator
 
-**Wenn der Nutzer eine Kursseite öffnet:**
+**Beim Login — aktuellen Stand laden:**
+```
+GET /api/learning/states/?course=<Course UUID>
+```
+Antwort enthält `last_page`, `completed_pages` und `last_accessed` — damit baut der Orchestrator den LLM-Kontext.
+
+**Wenn der Nutzer eine Seite öffnet:**
 ```
 PATCH /api/learning/states/{id}/
 { "last_page": "<TextbookPage UUID>" }
@@ -68,37 +75,25 @@ POST /api/learning/states/
 { "course": "<Course UUID>", "last_page": "<TextbookPage UUID>" }
 ```
 
-**Nach Abschluss eines Quiz:**
+**Wenn der Nutzer ein Kapitel abschließt:**
 ```
-PATCH /api/learning/quiz-results/{id}/
-{ "score": 0.8, "attempts": 2 }
-```
-Falls noch kein Ergebnis für diese Seite existiert:
-```
-POST /api/learning/quiz-results/
-{ "page": "<TextbookPage UUID>", "score": 0.8 }
+PATCH /api/learning/states/{id}/
+{ "completed_pages": ["<TextbookPage UUID>", ...] }
 ```
 
----
-
-## Für das KI-Team 
-
-**Beim WebSocket-Connect** — Nutzerkontext laden und als Prompt-Kontext nutzen:
-
-Nutzerkontext in `consumers/chat.py` beim WebSocket-Connect laden:
-
+**Beispiel Kontext-String für das LLM:**
 ```python
 from openbook.learning.models import LearningState, QuizResult
 
-state = LearningState.objects.filter(user=self.user).select_related("course", "last_page").first()
-quizzes = QuizResult.objects.filter(user=self.user).select_related("page")
+state = LearningState.objects.filter(user=user, course=course).prefetch_related("completed_pages").select_related("last_page").first()
+quizzes = QuizResult.objects.filter(user=user).select_related("page")
 
-# Kontext-String für den LLM-Prompt zusammenbauen
 kontext = ""
 if state:
     kontext += f"Der Nutzer ist im Kurs '{state.course.name}'. "
-    kontext += f"Zuletzt gelesen: '{state.last_page.name}'. "
-    kontext += f"Letzter Zugriff: {state.last_accessed.strftime('%d.%m.%Y')}. "
+    kontext += f"Abgeschlossene Kapitel: {state.completed_pages.count()}. "
+    if state.last_page:
+        kontext += f"Zuletzt gelesen: '{state.last_page.name}'. "
 
 if quizzes:
     schwach = [q for q in quizzes if q.score < 0.5]
@@ -106,41 +101,47 @@ if quizzes:
         kontext += f"Schwache Kapitel: {', '.join(q.page.name for q in schwach)}."
 ```
 
-**Beim WebSocket-Disconnect** — Gedächtniseintrag schreiben (sobald gebaut):
+---
 
+## Für das Frontend
+
+**Button "Kapitel abschließen" — ruft den Orchestrator auf:**
+
+Der Orchestrator übernimmt den PATCH-Call an unsere API. Das Frontend löst nur den Button-Event aus.
+
+**Nach Abschluss eines Quiz:**
+```
+POST /api/learning/quiz-results/
+{ "page": "<TextbookPage UUID>", "score": 0.8, "attempts": 1 }
+```
+Falls bereits ein Ergebnis existiert (Update):
+```
+PATCH /api/learning/quiz-results/{id}/
+{ "score": 0.8, "attempts": 2 }
+```
+
+---
+
+## Für das KI-Team
+
+Beim Verbindungsaufbau den Nutzerkontext per ORM laden (siehe Orchestrator-Abschnitt oben).
+
+**Beim Disconnect — Gedächtniseintrag schreiben (noch nicht gebaut):**
 ```python
 from openbook.learning.models import MemoryEntry  # noch nicht gebaut
 
-# KI fasst ihre Beobachtungen zusammen und speichert sie
 MemoryEntry.objects.create(
     user=self.user,
     course=current_course,
     text="User lernt am besten mit Beispielen. Hat Probleme mit Rekursion."
 )
-# Ältester Eintrag wird automatisch gelöscht wenn Limit erreicht
 ```
 
 ---
 
-## Noch offen / nicht gebaut
+## Noch offen
 
-### LearningState erweitern 
-- `completed_pages` — M2M-Feld für abgeschlossene Kapitel. Wartet auf Entscheidung wie "abgeschlossen" vom Frontend ausgelöst wird.
-- `status` — Status des Lernplans: Offen / Vorwissen abgefragt / Lernphase begonnen / Reflexion begonnen / Fertig / Abgebrochen
-- `deadline` — Zu erledigen bis (Datum + Uhrzeit)
-- `started_at` — Erstmals begonnen an (Datum + Uhrzeit)
-- `completed_at` — Abgeschlossen an (Datum + Uhrzeit)
-- `pre_knowledge_rating` — Bewertung des Vorwissens vor Kursbeginn
-- `post_knowledge_rating` — Bewertung des erworbenen Wissens nach Abschluss
-- FK auf Bewertungsraster — setzt voraus dass Bewertungsraster erst gebaut wird
-
-### Gedächtniseintrag
-Kurze Notizen der KI über das Lernverhalten des Users. Wird beim Chat-Connect als Kontext mitgegeben.
-- `user` — FK auf User (Pflicht)
-- `course` — FK auf Course (optional, leer = kursübergreifend)
-- `text` — Inhalt des Gedächtniseintrags
-- `created/modified` — via CreatedModifiedByMixin
-- **Limit:** Maximale Anzahl Einträge pro User+Kurs noch festzulegen
-
-### Sonstiges
-- Tests
+- **Tests** — am Ende
+- **Signals für Gamification** — nach Absprache mit Lars/Ledejna
+- **Quiz-Zuordnung zu Kapitel** — klärt sich mit dem Orchestrator
+- **Gedächtniseintrag-Modell** — KI schreibt Notizen über Lernverhalten nach jeder Session
