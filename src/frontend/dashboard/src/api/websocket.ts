@@ -249,7 +249,7 @@ export class WebSocketClient<SentMessages extends WebSocketMessage, ReceivedMess
 
                             const handler = this.#messageHandlers.get(message.action);
                             if (!handler) {
-                                console.warn(`No handler for WebSocket action "${message.action}".`, message);
+                                console.warn('No handler for WebSocket action "%s".', message.action, message);
                                 return;
                             }
 
