@@ -48,6 +48,23 @@ export default {
         Title: "Home",
     },
 
+    Login: {
+        Title:    "Login",
+        Subtitle: "Sign in to continue",
+        Username: {
+            Label:       "Username or Email",
+            Placeholder: "Enter your username or email",
+        },
+        Password: {
+            Label:       "Password",
+            Placeholder: "Enter your password",
+        },
+        Submit: "Sign In",
+        Error: {
+            Default: "Login failed. Please check your credentials.",
+        },
+    },
+
     AiChat: {
         PanelAriaLabel: "AI chat",
         StreamingResponseAriaLabel: "Streaming response",
