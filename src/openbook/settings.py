@@ -336,7 +336,7 @@ UNFOLD = {
         lambda request: static("openbook/admin/bundle.css"),
     ],
     "SCRIPTS": [
-        lambda request: static("openbook/admin/bundle.js"),
+        lambda request: static("openbook/admin/loader.js"),
     ],
 
     "SITE_FAVICONS": [
