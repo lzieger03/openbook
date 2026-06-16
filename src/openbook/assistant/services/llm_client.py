@@ -27,6 +27,7 @@ class LLM_Client:
 
             self.client = Mistral(api_key=api_key)
             self.model = "mistral-small-latest"
+            self.embedding_model = "mistral-embed"
             self.initialized = True
 
     def get_user_message(self, message: str) -> str:
@@ -53,16 +54,16 @@ class LLM_Client:
         Returns:
             _type_: Das abgerufene Embedding
         """
-        response = self.client.embeddings.create(model="mistral-embed", inputs=[text])
+        response = self.client.embeddings.create(model=self.embedding_model, inputs=[text])
         return response.data[0].embedding
 
-    def load_data(self, file_path: str) -> None:
+    def load_data(self, file_path: str, course=None) -> None:
         """Delegiert das Laden der RAG-Daten an den RagClient."""
-        self._get_rag_client().load_data(file_path)
+        self._get_rag_client().load_data(file_path, course=course)
 
-    def perform_rag_query(self, query: str) -> str:
+    def perform_rag_query(self, query: str, course=None) -> str:
         """Delegiert die RAG-Abfrage an den RagClient."""
-        return self._get_rag_client().perform_rag_query(query)
+        return self._get_rag_client().perform_rag_query(query, course=course)
 
     def _get_rag_client(self):
         """Create the RAG client lazily to avoid circular service initialization."""

@@ -49,6 +49,19 @@ def delete_document_vectors(document_id, using: str = "default") -> None:
         )
 
 
+def delete_course_vectors(course_id, using: str = "default") -> None:
+    """Delete vector rows for one course."""
+    connection = get_vector_connection(using)
+    if connection is None:
+        return
+
+    with connection.cursor() as cursor:
+        cursor.execute(
+            f"DELETE FROM {DOCUMENTS_TABLE} WHERE course_id = %s",
+            [str(course_id)],
+        )
+
+
 def delete_chunk_vector(chunk_id, using: str = "default") -> None:
     """Delete the vector row for one assistant document chunk."""
     connection = get_vector_connection(using)

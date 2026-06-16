@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from django.core.files import File
+from django.db import transaction
 from sqlite_vec import serialize_float32
 
 from openbook.assistant.models import AssistantDocument
@@ -19,6 +20,8 @@ from openbook.assistant.services.vector_index import delete_document_vectors
 from openbook.assistant.services.vector_index import get_vector_connection
 
 if TYPE_CHECKING:
+    from openbook.content.models import Course
+
     from .llm_client import LLM_Client
 
 
@@ -27,10 +30,14 @@ class RagClient:
         self.assistant = assistant
         self.text_data = None
 
-    def load_data(self, file_path: str | Path) -> AssistantDocument:
+    def load_data(
+        self,
+        file_path: str | Path,
+        course: "Course | None" = None,
+    ) -> AssistantDocument:
         """Create an assistant document from a local file and index it."""
         path = Path(file_path)
-        document = AssistantDocument.objects.create(title=path.stem)
+        document = AssistantDocument.objects.create(title=path.stem, course=course)
 
         try:
             with path.open("rb") as file:
@@ -49,46 +56,101 @@ class RagClient:
         database_alias = document._state.db or "default"
         get_vector_connection(database_alias)
 
-        document.file_data.open("rb")
         try:
-            content = document.file_data.read().decode("utf-8")
-        finally:
-            document.file_data.close()
+            if not document.file_data:
+                raise RuntimeError("Assistant document has no uploaded file.")
 
-        chunks = self._chunk_text(content)
-        indexed_chunks = []
-
-        for position, chunk in enumerate(chunks):
-            indexed_chunks.append(
-                {
-                    "position": position,
-                    "content": chunk,
-                    "embedding": serialize_float32(self.assistant.get_embedding(chunk)),
-                }
+            document.mark_indexing(embedding_model=self.assistant.embedding_model)
+            document.save(
+                update_fields=[
+                    "index_status",
+                    "index_error",
+                    "embedding_model",
+                    "modified_at",
+                ]
             )
 
-        document.chunks.all().delete()
-        delete_document_vectors(document.id, using=database_alias)
+            document.file_data.open("rb")
+            try:
+                content = document.file_data.read().decode("utf-8", errors="replace")
+            finally:
+                document.file_data.close()
 
-        for indexed_chunk in indexed_chunks:
-            document_chunk = AssistantDocumentChunk.objects.using(database_alias).create(
-                parent=document,
-                position=indexed_chunk["position"],
-                content=indexed_chunk["content"],
-                embedding=indexed_chunk["embedding"],
+            chunks = self._chunk_text(content)
+            indexed_chunks = []
+
+            for position, chunk in enumerate(chunks):
+                indexed_chunks.append(
+                    {
+                        "position": position,
+                        "content": chunk,
+                        "embedding": serialize_float32(self.assistant.get_embedding(chunk)),
+                    }
+                )
+
+            with transaction.atomic(using=database_alias):
+                document.chunks.all().delete()
+                delete_document_vectors(document.id, using=database_alias)
+
+                for indexed_chunk in indexed_chunks:
+                    document_chunk = AssistantDocumentChunk.objects.using(database_alias).create(
+                        parent=document,
+                        position=indexed_chunk["position"],
+                        content=indexed_chunk["content"],
+                        embedding=indexed_chunk["embedding"],
+                    )
+                    self._insert_vector_index(document_chunk, using=database_alias)
+
+                document.mark_indexed(chunk_count=len(indexed_chunks))
+                document.save(
+                    update_fields=[
+                        "index_status",
+                        "index_error",
+                        "chunk_count",
+                        "indexed_at",
+                        "modified_at",
+                    ]
+                )
+
+            self.text_data = content
+        except Exception as error:
+            document.mark_index_failed(error)
+            document.save(
+                update_fields=[
+                    "index_status",
+                    "index_error",
+                    "indexed_at",
+                    "modified_at",
+                ]
             )
-            self._insert_vector_index(document_chunk, using=database_alias)
+            raise
 
-        self.text_data = content
-
-    def perform_rag_query(self, query: str) -> str:
+    def perform_rag_query(
+        self,
+        query: str,
+        course: "Course | None" = None,
+    ) -> str:
         """Run a RAG query through sqlite-vec on Django's database connection."""
         connection = get_vector_connection()
         if connection is None:
             raise RuntimeError("RAG vector search currently requires Django's SQLite backend.")
 
-        if not AssistantDocumentChunk.objects.exists():
-            raise RuntimeError("No assistant documents have been indexed yet.")
+        chunk_queryset = AssistantDocumentChunk.objects.filter(
+            parent__index_status=AssistantDocument.IndexStatusChoices.INDEXED,
+        )
+        course_id = ""
+
+        if course is None:
+            chunk_queryset = chunk_queryset.filter(parent__course__isnull=True)
+        else:
+            course_id = str(course.id)
+            chunk_queryset = chunk_queryset.filter(parent__course=course)
+
+        if not chunk_queryset.exists():
+            if course is None:
+                raise RuntimeError("No global assistant documents have been indexed yet.")
+
+            raise RuntimeError("No assistant documents have been indexed for this course yet.")
 
         query_embedding = self.assistant.get_embedding(query)
 
@@ -100,23 +162,27 @@ class RagClient:
                     distance
                 FROM {DOCUMENTS_TABLE}
                 WHERE embedding MATCH %s
+                    AND course_id = %s
                 ORDER BY distance
                 LIMIT 3
                 """,
-                [serialize_float32(query_embedding)],
+                [serialize_float32(query_embedding), course_id],
             )
             rows = cursor.fetchall()
 
         chunk_ids = [row[0] for row in rows]
         chunks_by_id = {
             str(chunk.id): chunk
-            for chunk in AssistantDocumentChunk.objects.filter(id__in=chunk_ids)
+            for chunk in chunk_queryset.filter(id__in=chunk_ids)
         }
         top_contexts = [
             chunks_by_id[chunk_id].content
             for chunk_id in chunk_ids
             if chunk_id in chunks_by_id
         ]
+        if not top_contexts:
+            raise RuntimeError("No matching assistant context was found.")
+
         context = "\n\n".join(top_contexts)
 
         prompt = f"""
@@ -141,14 +207,16 @@ class RagClient:
                 f"""
                 INSERT INTO {DOCUMENTS_TABLE} (
                     embedding,
+                    course_id,
                     document_id,
                     chunk_id,
                     position
                 )
-                VALUES (%s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s)
                 """,
                 [
                     bytes(chunk.embedding),
+                    str(chunk.parent.course_id or ""),
                     str(chunk.parent_id),
                     str(chunk.id),
                     chunk.position,

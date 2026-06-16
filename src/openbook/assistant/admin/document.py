@@ -39,11 +39,17 @@ class AssistantDocumentResource(ImportExportModelResource):
         fields = [
             "id",
             "delete",
+            "course",
             "title",
             "file_data",
             "file_name",
             "file_size",
             "mime_type",
+            "index_status",
+            "index_error",
+            "indexed_at",
+            "embedding_model",
+            "chunk_count",
         ]
 
 
@@ -64,38 +70,55 @@ class AssistantDocumentAdmin(CustomModelAdmin):
     resource_classes = [AssistantDocumentResource]
     list_display = [
         "title",
+        "course",
         "file_name",
         "file_size",
         "mime_type",
+        "index_status",
+        "chunk_count",
         *created_modified_by_fields,
     ]
-    list_display_links = ["title", "file_name"]
-    list_filter = ["mime_type", *created_modified_by_filter]
-    list_select_related = [*created_modified_by_related]
-    search_fields = ["title", "file_name"]
-    ordering = ["title", "file_name"]
+    list_display_links = ["title", "course", "file_name"]
+    list_filter = ["course", "mime_type", "index_status", *created_modified_by_filter]
+    list_select_related = ["course", *created_modified_by_related]
+    search_fields = ["title", "file_name", "course__name"]
+    ordering = ["course", "title", "file_name"]
     readonly_fields = [
         "file_name",
         "file_size",
         "mime_type",
+        "index_status",
+        "index_error",
+        "indexed_at",
+        "embedding_model",
+        "chunk_count",
         *created_modified_by_fields,
     ]
     inlines = [_AssistantDocumentChunkInline]
 
     fieldsets = [
         (None, {
-            "fields": ["title", "file_data"],
+            "fields": ["course", "title", "file_data"],
         }),
         (_("File Metadata"), {
             "classes": ["tab"],
             "fields": ["file_name", "file_size", "mime_type"],
+        }),
+        (_("Indexing"), {
+            "classes": ["tab"],
+            "fields": [
+                "index_status",
+                "index_error",
+                ("indexed_at", "embedding_model"),
+                "chunk_count",
+            ],
         }),
         created_modified_by_fieldset,
     ]
 
     add_fieldsets = [
         (None, {
-            "fields": ["title", "file_data"],
+            "fields": ["course", "title", "file_data"],
         }),
     ]
 
@@ -103,14 +126,35 @@ class AssistantDocumentAdmin(CustomModelAdmin):
         """Save uploaded documents and rebuild their assistant index."""
         super().save_model(request, obj, form, change)
 
-        if "file_data" not in form.changed_data:
+        if not {"file_data", "course"}.intersection(form.changed_data):
             return
 
         if not obj.file_data:
             obj.chunks.all().delete()
+            obj.mark_indexed(chunk_count=0)
+            obj.index_status = AssistantDocument.IndexStatusChoices.PENDING
+            obj.indexed_at = None
+            obj.save(
+                update_fields=[
+                    "index_status",
+                    "index_error",
+                    "chunk_count",
+                    "indexed_at",
+                    "modified_at",
+                ]
+            )
             return
 
         if not getattr(settings, "MISTRAL_API_KEY", ""):
+            obj.mark_index_failed("MISTRAL_API_KEY is not set.")
+            obj.save(
+                update_fields=[
+                    "index_status",
+                    "index_error",
+                    "indexed_at",
+                    "modified_at",
+                ]
+            )
             self.message_user(
                 request,
                 _(

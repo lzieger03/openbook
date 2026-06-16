@@ -11,19 +11,38 @@ from django.core.management.base import BaseCommand
 from openbook.assistant.models import AssistantDocument
 from openbook.assistant.models import AssistantDocumentChunk
 from openbook.assistant.services.llm_client import LLM_Client
+from openbook.content.models import Course
 
 
 class Command(BaseCommand):
     help = "Lokaler Assistenten-Chat mit bereits indexierten Admin-Uploads."
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--course",
+            help="UUID des Kurses, dessen Assistant-Dokumente verwendet werden sollen.",
+        )
+
     def handle(self, *args, **options):
-        document_count = AssistantDocument.objects.count()
-        chunk_count = AssistantDocumentChunk.objects.count()
+        course = None
+        documents = AssistantDocument.objects.all()
+        chunks = AssistantDocumentChunk.objects.all()
+
+        if options.get("course"):
+            course = Course.objects.get(pk=options["course"])
+            documents = documents.filter(course=course)
+            chunks = chunks.filter(parent__course=course)
+        else:
+            documents = documents.filter(course__isnull=True)
+            chunks = chunks.filter(parent__course__isnull=True)
+
+        document_count = documents.count()
+        chunk_count = chunks.count()
 
         if chunk_count == 0:
             self.stderr.write(
                 "Keine indexierten Assistant-Dokumente gefunden. "
-                "Bitte zuerst eine Textdatei im Django Admin hochladen."
+                "Bitte zuerst eine Textdatei hochladen und indexieren."
             )
             return
 
@@ -39,7 +58,7 @@ class Command(BaseCommand):
                 if not query:
                     continue
 
-                answer = llm_client.perform_rag_query(query)
+                answer = llm_client.perform_rag_query(query, course=course)
                 self.stdout.write(self.style.SUCCESS(f"Antwort:\n{answer}"))
 
         except KeyboardInterrupt:

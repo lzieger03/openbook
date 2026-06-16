@@ -21,6 +21,7 @@ from rest_framework.permissions      import IsAuthenticatedOrReadOnly
 from rest_framework.routers          import DefaultRouter as DRFDefaultRouter
 
 from .admin                          import admin_site
+from .assistant.routes               import register_api_routes as register_assistant_api_routes
 from .auth.routes                    import register_api_routes as register_auth_api_routes
 from .core.routes                    import register_api_routes as register_core_api_routes
 from .content.routes                 import register_api_routes as register_course_api_routes
@@ -33,6 +34,7 @@ api_router = DRFDefaultRouter()
 register_auth_api_routes(api_router, "auth")
 register_core_api_routes(api_router, "core")
 register_course_api_routes(api_router, "content")
+register_assistant_api_routes(api_router, "assistant")
 
 urlpatterns = [
     # REST API
