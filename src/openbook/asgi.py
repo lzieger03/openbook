@@ -36,8 +36,12 @@ application = ProtocolTypeRouter({
             # if inner routers are wrapped by additional middleware. See Issue #1428."
             # Therefore, we define all routes of all Django apps here (and not in the apps).
             URLRouter([
+<<<<<<< HEAD
                 path("ws/ai/chat", ChatConsumer.as_asgi()),
                 path("ws/ai/courses/<uuid:course_id>/chat", ChatConsumer.as_asgi()),
+=======
+                path("ws/ai/chat", ChatConsumer.as_asgi())
+>>>>>>> origin/frontend-ai-integration-test
             ]),
         ),
     ),

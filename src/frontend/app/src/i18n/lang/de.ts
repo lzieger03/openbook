@@ -49,6 +49,26 @@ const i18n: I18N = {
         Title: "Startseite",
     },
 
+<<<<<<< HEAD
+=======
+    Login: {
+        Title:    "Anmeldung",
+        Subtitle: "Anmelden, um fortzufahren",
+        Username: {
+            Label:       "Benutzername oder E-Mail",
+            Placeholder: "Benutzername oder E-Mail eingeben",
+        },
+        Password: {
+            Label:       "Passwort",
+            Placeholder: "Passwort eingeben",
+        },
+        Submit: "Anmelden",
+        Error: {
+            Default: "Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihre Zugangsdaten.",
+        },
+    },
+
+>>>>>>> origin/frontend-ai-integration-test
     AiChat: {
         PanelAriaLabel: "KI-Chat",
         StreamingResponseAriaLabel: "Antwort wird übertragen",

@@ -48,6 +48,26 @@ export default {
         Title: "Home",
     },
 
+<<<<<<< HEAD
+=======
+    Login: {
+        Title:    "Login",
+        Subtitle: "Sign in to continue",
+        Username: {
+            Label:       "Username or Email",
+            Placeholder: "Enter your username or email",
+        },
+        Password: {
+            Label:       "Password",
+            Placeholder: "Enter your password",
+        },
+        Submit: "Sign In",
+        Error: {
+            Default: "Login failed. Please check your credentials.",
+        },
+    },
+
+>>>>>>> origin/frontend-ai-integration-test
     AiChat: {
         PanelAriaLabel: "AI chat",
         StreamingResponseAriaLabel: "Streaming response",

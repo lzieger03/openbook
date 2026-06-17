@@ -23,7 +23,19 @@ class FlexFieldsModelSerializer(RFFFlexFieldsModelSerializer):
         # Create or update instance for validation and cache for access in view
         self._instance = self.instance or self.Meta.model()
 
+<<<<<<< HEAD
         for attr, value in attrs.items():
+=======
+        # Many-to-many fields cannot be assigned directly on an unsaved instance and are
+        # not part of ``full_clean()``; DRF sets them via ``.set()`` after save. Skip them
+        # here so pre-save validation works for models with m2m fields (e.g. permissions).
+        m2m_field_names = {field.name for field in self._instance._meta.many_to_many}
+
+        for attr, value in attrs.items():
+            if attr in m2m_field_names:
+                continue
+
+>>>>>>> origin/frontend-ai-integration-test
             setattr(self._instance, attr, value)
 
         try:
