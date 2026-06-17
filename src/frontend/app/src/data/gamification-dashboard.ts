@@ -105,6 +105,32 @@ type CourseProgressRecord = {
 
 let baseUrlPromise: Promise<string> | null = null;
 
+function isLoopbackHost(hostname: string): boolean {
+    return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
+}
+
+function normalizeBaseUrl(value: string): string {
+    let configuredUrl = new URL(value || window.location.origin, window.location.origin);
+    const currentUrl = new URL(window.location.origin);
+
+    if (
+        isLoopbackHost(configuredUrl.hostname)
+        && isLoopbackHost(currentUrl.hostname)
+        && configuredUrl.protocol === currentUrl.protocol
+        && configuredUrl.port === currentUrl.port
+    ) {
+        configuredUrl = currentUrl;
+    }
+
+    let url = configuredUrl.toString();
+
+    while (url.endsWith("/")) {
+        url = url.slice(0, url.length - 1);
+    }
+
+    return url;
+}
+
 async function resolveBaseUrl(): Promise<string> {
     const response = await fetch("server.url");
 
@@ -112,13 +138,7 @@ async function resolveBaseUrl(): Promise<string> {
         throw new Error(`Could not load backend URL (HTTP ${response.status}).`);
     }
 
-    let url = (await response.text()).trim();
-
-    while (url.endsWith("/")) {
-        url = url.slice(0, url.length - 1);
-    }
-
-    return url;
+    return normalizeBaseUrl((await response.text()).trim());
 }
 
 function getBaseUrl(): Promise<string> {

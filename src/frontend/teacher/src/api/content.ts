@@ -15,17 +15,34 @@
  */
 
 import {apiGet, apiSend} from "./client.js";
+import {slugify} from "./courses.js";
+import type {TextFormat} from "./courses.js";
+
+export interface SourceContent {
+    type: "source";
+    format: TextFormat;
+    source: string;
+    filename?: string;
+}
 
 export interface TextbookDto {
     id: string;
     name: string;
     slug: string;
+    description?: string;
+    text_format?: TextFormat;
+    group?: string;
 }
 
 export interface TextbookPageDto {
     id: string;
+    textbook: string;
+    parent: string | null;
     name: string;
+    description: string;
+    text_format: TextFormat;
     position: number;
+    content: SourceContent | Record<string, unknown>;
 }
 
 export interface CourseMaterialDto {
@@ -62,12 +79,57 @@ export async function fetchTextbooks(): Promise<TextbookDto[]> {
     return toList(data);
 }
 
+export async function createTextbook(fields: {
+    name: string;
+    slug?: string;
+    description?: string;
+    text_format: TextFormat;
+    group: string;
+}): Promise<TextbookDto> {
+    const slug = fields.slug?.trim() || slugify(fields.name);
+    const {slug: _slug, ...payloadFields} = fields;
+
+    return apiSend<TextbookDto>("POST", "/api/content/textbooks/", {
+        description: "",
+        ...payloadFields,
+        slug,
+    });
+}
+
 export async function fetchTextbookPages(textbookId: string): Promise<TextbookPageDto[]> {
     const data = await apiGet<TextbookPageDto[] | Paginated<TextbookPageDto>>(
         "/api/content/textbook_pages/",
         {textbook: textbookId, _sort: "position", _page_size: "500"},
     );
     return toList(data);
+}
+
+export async function createTextbookPage(fields: {
+    textbook: string;
+    parent?: string | null;
+    position: number;
+    name: string;
+    description?: string;
+    text_format: TextFormat;
+    content: SourceContent;
+}): Promise<TextbookPageDto> {
+    return apiSend<TextbookPageDto>("POST", "/api/content/textbook_pages/", {
+        parent: null,
+        description: "",
+        ...fields,
+    });
+}
+
+export async function updateTextbookPage(
+    id: string,
+    fields: {
+        name?: string;
+        description?: string;
+        text_format?: TextFormat;
+        content?: SourceContent;
+    },
+): Promise<TextbookPageDto> {
+    return apiSend<TextbookPageDto>("PATCH", `/api/content/textbook_pages/${encodeURIComponent(id)}/`, fields);
 }
 
 /* ---- Course materials -------------------------------------------------- */

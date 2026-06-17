@@ -24,18 +24,49 @@ from openbook.content.models.library_group import LibraryGroup
 class RagClient_Tests(TestCase):
     """Tests for the RAG client."""
 
-    def test_perform_rag_query_requires_indexed_documents(self):
-        """Queries should not implicitly import demo data."""
-        rag_client = RagClient(assistant=Mock())
+    def test_perform_rag_query_falls_back_without_global_documents(self):
+        """Queries without indexed global documents should use the plain LLM fallback."""
+        assistant = Mock()
+        assistant.get_user_message.return_value = "fallback answer"
+        rag_client = RagClient(assistant=assistant)
 
         with patch(
             "openbook.assistant.services.rag_client.get_vector_connection",
             return_value=Mock(),
         ), patch.object(rag_client, "load_data") as load_data:
-            with self.assertRaises(RuntimeError):
-                rag_client.perform_rag_query("What is this?")
+            answer = rag_client.perform_rag_query("What is this?")
 
+        self.assertEqual(answer, "fallback answer")
         load_data.assert_not_called()
+        assistant.get_embedding.assert_not_called()
+        assistant.get_user_message.assert_called_once()
+        self.assertIn("What is this?", assistant.get_user_message.call_args.args[0])
+
+    def test_perform_rag_query_falls_back_without_course_documents(self):
+        """Course queries without indexed documents should use the plain LLM fallback."""
+        reset_current_user()
+        library_group = LibraryGroup.objects.create(name="Library", slug="library")
+        course = Course.objects.create(
+            name="Course",
+            slug="course",
+            group=library_group,
+        )
+        assistant = Mock()
+        assistant.get_user_message.return_value = "fallback answer"
+        rag_client = RagClient(assistant=assistant)
+
+        with patch(
+            "openbook.assistant.services.rag_client.get_vector_connection",
+            return_value=Mock(),
+        ):
+            answer = rag_client.perform_rag_query("Question?", course=course)
+
+        self.assertEqual(answer, "fallback answer")
+        assistant.get_embedding.assert_not_called()
+        assistant.get_user_message.assert_called_once()
+        prompt = assistant.get_user_message.call_args.args[0]
+        self.assertIn("Question?", prompt)
+        self.assertIn("Course", prompt)
 
     def test_perform_rag_query_filters_by_course(self):
         """Queries should restrict vector search to the requested course."""

@@ -21,10 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 #
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECURITY WARNING: don"t run with debug turned on in production!
-<<<<<<< HEAD
-MISTRAL_API_KEY = ""
-=======
->>>>>>> origin/frontend-ai-integration-test
+MISTRAL_API_KEY = "dZM4jr9K7YElmXBhhJwnHsfIQVGrrNRE"
 SECRET_KEY = "django-insecure-jeo+.}_}9(Q.t_IU$WJ!%eL=b:MDbAL.~NY_=a:>D@:W[XPh4["
 DEBUG = True
 ALLOWED_HOSTS = ["*"]
@@ -41,12 +38,9 @@ INSTALLED_APPS = [
     "openbook.auth",
     "openbook.ai",
     "openbook.content",
-<<<<<<< HEAD
     "openbook.quiz",
     "openbook.assistant",
-=======
     "openbook.gamification",
->>>>>>> origin/frontend-ai-integration-test
 
     # 3rd-party reusable apps
     "daphne",
@@ -345,11 +339,7 @@ UNFOLD = {
         lambda request: static("openbook/admin/bundle.css"),
     ],
     "SCRIPTS": [
-<<<<<<< HEAD
-        lambda request: static("openbook/admin/bundle.js"),
-=======
         lambda request: static("openbook/admin/loader.js"),
->>>>>>> origin/frontend-ai-integration-test
     ],
 
     "SITE_FAVICONS": [
@@ -657,10 +647,8 @@ STATIC_ROOT = BASE_DIR / "_static"
 STATICFILES_DIRS = [
     BASE_DIR / "frontend" / "admin" / "dist",
     BASE_DIR / "frontend" / "app" / "dist",
-<<<<<<< HEAD
-=======
     BASE_DIR / "frontend" / "dashboard" / "dist",
->>>>>>> origin/frontend-ai-integration-test
+    BASE_DIR / "frontend" / "teacher" / "dist",
 ]
 
 # Uploaded media files

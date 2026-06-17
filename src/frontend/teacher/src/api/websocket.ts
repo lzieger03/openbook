@@ -179,6 +179,7 @@ export class WebSocketClient<SentMessages extends WebSocketMessage, ReceivedMess
                         // Never connected: the outer attempt is still awaiting.
                         if (this.#status === "connecting") {
                             reject(new Error("WebSocket connection failed."));
+                            return;
                         }
 
                         // Caller deliberately disconnected.

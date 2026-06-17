@@ -7,9 +7,21 @@
 # License, or (at your option) any later version.
 
 from django.db import migrations
-import sqlite_vec
 
 DOCUMENTS_TABLE = "openbook_assistant_documents"
+
+
+def load_sqlite_vec(sqlite_connection) -> None:
+    try:
+        import sqlite_vec
+    except ImportError as error:
+        raise RuntimeError("sqlite-vec is required to run assistant vector migrations.") from error
+
+    sqlite_connection.enable_load_extension(True)
+    try:
+        sqlite_vec.load(sqlite_connection)
+    finally:
+        sqlite_connection.enable_load_extension(False)
 
 
 def create_documents_vector_table(apps, schema_editor) -> None:
@@ -17,12 +29,7 @@ def create_documents_vector_table(apps, schema_editor) -> None:
     if schema_editor.connection.vendor != "sqlite":
         return
 
-    sqlite_connection = schema_editor.connection.connection
-    sqlite_connection.enable_load_extension(True)
-    try:
-        sqlite_vec.load(sqlite_connection)
-    finally:
-        sqlite_connection.enable_load_extension(False)
+    load_sqlite_vec(schema_editor.connection.connection)
 
     with schema_editor.connection.cursor() as cursor:
         cursor.execute(

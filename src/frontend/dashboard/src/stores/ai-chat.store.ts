@@ -9,7 +9,7 @@
  */
 
 /**
- * AI chat store backed by the WebSocket API (channel `/ws/ai/chat`).
+ * AI chat store backed by the WebSocket API.
  *
  * IMPORTANT: the message typings below must match the Python side. There is no
  * tool yet to generate them from the server's AsyncAPI spec, so when the Python
@@ -104,7 +104,7 @@ export interface AiChatStore {
  * Create an independent AI chat store. Each UI surface (full page, widget) gets
  * its own instance; connect() on mount, disconnect() on unmount.
  */
-export function createAiChatStore(): AiChatStore {
+export function createAiChatStore(courseId?: string): AiChatStore {
     const {subscribe, update} = writable<AiChatState>({
         connection: "disconnected",
         errorMessage: "",
@@ -112,6 +112,7 @@ export function createAiChatStore(): AiChatStore {
     });
 
     let socket: WebSocketClient<SentMessages, ReceivedMessages> | undefined;
+    const endpoint = courseId ? `/ai/courses/${encodeURIComponent(courseId)}/chat` : "/ai/chat";
 
     async function getChatHistory(): Promise<void> {
         await socket?.send({action: "get_chat_history", payload: null});
@@ -119,7 +120,7 @@ export function createAiChatStore(): AiChatStore {
 
     async function connect(): Promise<void> {
         if (!socket) {
-            socket = await ws<SentMessages, ReceivedMessages>("/ai/chat");
+            socket = await ws<SentMessages, ReceivedMessages>(endpoint);
 
             socket.setConnectionStatusListener((status) => {
                 update((state) => ({

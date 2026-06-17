@@ -6944,6 +6944,7 @@ var WebSocketClient = class {
             this.#socket = void 0;
             if (this.#status === "connecting") {
               reject(new Error("WebSocket connection failed."));
+              return;
             }
             if (this.#status === "disconnected") {
               return;
@@ -7061,16 +7062,27 @@ var WebSocketClient = class {
 
 // src/api/client.ts
 var baseUrlPromise = null;
+function isLoopbackHost(hostname) {
+  return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
+}
+function normalizeBaseUrl(value) {
+  let configuredUrl = new URL(value || window.location.origin, window.location.origin);
+  const currentUrl = new URL(window.location.origin);
+  if (isLoopbackHost(configuredUrl.hostname) && isLoopbackHost(currentUrl.hostname) && configuredUrl.protocol === currentUrl.protocol && configuredUrl.port === currentUrl.port) {
+    configuredUrl = currentUrl;
+  }
+  let url = configuredUrl.toString();
+  while (url.endsWith("/")) {
+    url = url.slice(0, url.length - 1);
+  }
+  return url;
+}
 async function resolveBaseUrl() {
   const response = await fetch("server.url");
   if (!response.ok) {
     throw new Error(`Could not load backend URL (HTTP ${response.status}).`);
   }
-  let url = (await response.text()).trim();
-  while (url.endsWith("/")) {
-    url = url.slice(0, url.length - 1);
-  }
-  return url;
+  return normalizeBaseUrl((await response.text()).trim());
 }
 function getBaseUrl() {
   if (!baseUrlPromise) {
@@ -7457,19 +7469,20 @@ create_custom_element(
 );
 
 // src/stores/ai-chat.store.ts
-function createAiChatStore() {
+function createAiChatStore(courseId) {
   const { subscribe, update: update2 } = writable({
     connection: "disconnected",
     errorMessage: "",
     messages: []
   });
   let socket;
+  const endpoint = courseId ? `/ai/courses/${encodeURIComponent(courseId)}/chat` : "/ai/chat";
   async function getChatHistory() {
     await socket?.send({ action: "get_chat_history", payload: null });
   }
   async function connect() {
     if (!socket) {
-      socket = await ws("/ai/chat");
+      socket = await ws(endpoint);
       socket.setConnectionStatusListener((status) => {
         update2((state3) => ({
           ...state3,
@@ -8868,7 +8881,7 @@ function CourseChatPage($$anchor, $$props) {
     skills: [],
     courses: []
   }));
-  const chat = createAiChatStore();
+  let chat;
   let chatState = state(proxy({ connection: "disconnected", errorMessage: "", messages: [] }));
   let draft = state("");
   onMount(() => {
@@ -8878,6 +8891,7 @@ function CourseChatPage($$anchor, $$props) {
     if (get2(state3).courses.length === 0) {
       dashboardStore.refresh();
     }
+    chat = createAiChatStore(params()?.id);
     const unsubscribeChat = chat.subscribe((value) => {
       set(chatState, value, true);
     });
@@ -8885,7 +8899,7 @@ function CourseChatPage($$anchor, $$props) {
     return () => {
       unsubscribeDashboard();
       unsubscribeChat();
-      void chat.disconnect();
+      void chat?.disconnect();
     };
   });
   const courseName2 = user_derived(() => get2(state3).courses.find((course) => course.id === params()?.id)?.name ?? "this course");
@@ -8907,7 +8921,7 @@ function CourseChatPage($$anchor, $$props) {
       return;
     }
     set(draft, "");
-    await chat.sendChatInput("markdown", text2);
+    await chat?.sendChatInput("markdown", text2);
   }
   var $$exports = {
     get params() {
@@ -9013,7 +9027,7 @@ function CourseChatPage($$anchor, $$props) {
       reset(div_8);
       reset(div_7);
       template_effect(() => set_text(text_6, get2(chatState).errorMessage));
-      delegated("click", button_4, () => chat.retry());
+      delegated("click", button_4, () => chat?.retry());
       append($$anchor2, div_7);
     };
     if_block(node_3, ($$render) => {

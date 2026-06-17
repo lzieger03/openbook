@@ -7,7 +7,6 @@
 # License, or (at your option) any later version.
 
 from django.conf import settings
-from mistralai.client import Mistral
 
 
 class LLM_Client:
@@ -25,10 +24,21 @@ class LLM_Client:
             if not api_key:
                 raise ValueError("MISTRAL_API_KEY is not set in settings")
 
-            self.client = Mistral(api_key=api_key)
+            self.client = self._create_client(api_key)
             self.model = "mistral-small-latest"
             self.embedding_model = "mistral-embed"
             self.initialized = True
+
+    def _create_client(self, api_key: str):
+        try:
+            from mistralai.client import Mistral
+        except ImportError:
+            try:
+                from mistralai import Mistral
+            except ImportError as error:
+                raise RuntimeError("mistralai is required to use the assistant LLM client.") from error
+
+        return Mistral(api_key=api_key)
 
     def get_user_message(self, message: str) -> str:
         """Collected User-Prompt
@@ -53,6 +63,7 @@ class LLM_Client:
 
         Returns:
             list[float]: Das abgerufene Embedding
+        """
         response = self.client.embeddings.create(model=self.embedding_model, inputs=[text])
         return response.data[0].embedding
 

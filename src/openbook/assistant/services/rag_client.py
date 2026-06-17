@@ -147,10 +147,7 @@ class RagClient:
             chunk_queryset = chunk_queryset.filter(parent__course=course)
 
         if not chunk_queryset.exists():
-            if course is None:
-                raise RuntimeError("No global assistant documents have been indexed yet.")
-
-            raise RuntimeError("No assistant documents have been indexed for this course yet.")
+            return self._perform_unindexed_query(query, course=course)
 
         query_embedding = self.assistant.get_embedding(query)
 
@@ -189,6 +186,33 @@ class RagClient:
             Du bist ein hilfreicher Assistent.
             Beantworte die folgende Frage basierend auf diesem Kontext:
             \n\n{context}\n\nFrage: {query}
+        """.strip()
+        return self.assistant.get_user_message(prompt)
+
+    def _perform_unindexed_query(
+        self,
+        query: str,
+        course: "Course | None" = None,
+    ) -> str:
+        """Answer without document context when no assistant documents are indexed yet."""
+        if course is None:
+            context_note = (
+                "Es sind noch keine globalen OpenBook-Assistant-Dokumente indexiert."
+            )
+        else:
+            context_note = (
+                f"Es sind noch keine OpenBook-Assistant-Dokumente fuer den Kurs "
+                f'"{course.name}" indexiert.'
+            )
+
+        prompt = f"""
+            Du bist ein hilfreicher Assistent.
+            {context_note}
+            Beantworte die folgende Frage deshalb mit allgemeinem Wissen.
+            Weise kurz darauf hin, dass die Antwort noch nicht auf indexierten
+            OpenBook-Dokumenten basiert.
+
+            Frage: {query}
         """.strip()
         return self.assistant.get_user_message(prompt)
 

@@ -37,6 +37,8 @@ export interface LibraryGroupDto {
     id: string;
     name: string;
     slug: string;
+    description?: string;
+    parent?: string | null;
 }
 
 export interface CurrentUserDto {
@@ -47,6 +49,7 @@ export interface CurrentUserDto {
 }
 
 export interface CourseWriteFields {
+    slug?: string;
     name: string;
     description: string;
     group: string;
@@ -54,8 +57,16 @@ export interface CourseWriteFields {
     is_template?: boolean;
 }
 
+export interface LibraryGroupWriteFields {
+    slug?: string;
+    name: string;
+    description: string;
+    parent?: string | null;
+    text_format?: TextFormat;
+}
+
 /** Derive a URL-safe slug from a course name (the backend requires a slug). */
-function slugify(value: string): string {
+export function slugify(value: string): string {
     const slug = value
         .toLowerCase()
         .normalize("NFKD")
@@ -108,10 +119,15 @@ export async function fetchCourse(id: string): Promise<CourseDto> {
 }
 
 export async function createCourse(fields: CourseWriteFields): Promise<CourseDto> {
+    const slug = fields.slug?.trim() || slugify(fields.name);
+    const {slug: _slug, ...payloadFields} = fields;
+
     return apiSend<CourseDto>("POST", "/api/content/courses/", {
         text_format: "MD",
         is_template: false,
-        ...fields,
+        public_permissions: [],
+        ...payloadFields,
+        slug,
     });
 }
 
@@ -130,4 +146,17 @@ export async function fetchLibraryGroups(): Promise<LibraryGroupDto[]> {
         {_page_size: "200", _sort: "name"},
     );
     return toList(data);
+}
+
+export async function createLibraryGroup(fields: LibraryGroupWriteFields): Promise<LibraryGroupDto> {
+    const slug = fields.slug?.trim() || slugify(fields.name);
+    const {slug: _slug, ...payloadFields} = fields;
+
+    return apiSend<LibraryGroupDto>("POST", "/api/content/library_groups/", {
+        text_format: "MD",
+        parent: null,
+        public_permissions: [],
+        ...payloadFields,
+        slug,
+    });
 }

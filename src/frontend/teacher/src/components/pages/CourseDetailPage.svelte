@@ -94,7 +94,7 @@ page ranges). The active course id comes from the route parameter.
             {:else if tab === "students"}
                 <StudentsPanel {courseId} />
             {:else}
-                <ContentPanel {courseId} />
+                <ContentPanel {courseId} courseGroupId={course.group} />
             {/if}
         </section>
     {/if}

@@ -9,8 +9,9 @@
 from __future__ import annotations
 
 from django_filters.filters import CharFilter
+from django_filters.filterset import FilterSet
 
-class ScopedRolesFilterMixin:
+class ScopedRolesFilterMixin(FilterSet):
     """Provide owner filtering for models that implement ScopedRolesMixin."""
     owner = CharFilter(method="owner_filter")
 
@@ -20,7 +21,7 @@ class ScopedRolesFilterMixin:
     def owner_filter(self, queryset, name, value):
         return queryset.filter(owner__username=value)
 
-class ScopeTypeFilterMixin:
+class ScopeTypeFilterMixin(FilterSet):
     """Provide scope-type filtering for models with a scope_type field."""
     scope_type = CharFilter(method="scope_type_filter")
 

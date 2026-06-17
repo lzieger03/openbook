@@ -21,17 +21,11 @@ from rest_framework.permissions      import IsAuthenticatedOrReadOnly
 from rest_framework.routers          import DefaultRouter as DRFDefaultRouter
 
 from .admin                          import admin_site
-<<<<<<< HEAD
 from .assistant.routes               import register_api_routes as register_assistant_api_routes
 from .auth.routes                    import register_api_routes as register_auth_api_routes
 from .core.routes                    import register_api_routes as register_core_api_routes
 from .content.routes                 import register_api_routes as register_course_api_routes
-=======
-from .auth.routes                    import register_api_routes as register_auth_api_routes
-from .core.routes                    import register_api_routes as register_core_api_routes
-from .content.routes                 import register_api_routes as register_course_api_routes
 from .gamification.routes            import register_api_routes as register_gamification_api_routes
->>>>>>> origin/frontend-ai-integration-test
 
 # Overwrite permission class for API root view, since it uses the default from settings.py,
 # which would only allow authenticated users to see the API documentation.
@@ -41,11 +35,8 @@ api_router = DRFDefaultRouter()
 register_auth_api_routes(api_router, "auth")
 register_core_api_routes(api_router, "core")
 register_course_api_routes(api_router, "content")
-<<<<<<< HEAD
 register_assistant_api_routes(api_router, "assistant")
-=======
 register_gamification_api_routes(api_router, "gamification")
->>>>>>> origin/frontend-ai-integration-test
 
 urlpatterns = [
     # REST API
@@ -81,10 +72,13 @@ if settings.DEBUG:
     })]
 
     urlpatterns += static("app/", document_root=f"{settings.BASE_DIR}/frontend/app/dist/openbook/app")
-<<<<<<< HEAD
-=======
 
     # Gamification dashboard microfrontend
+    urlpatterns += [re_path(r"^dashboard/$", serve, kwargs={
+        "path":          "index.html",
+        "document_root": f"{settings.BASE_DIR}/frontend/dashboard/dist/openbook/dashboard"
+    })]
+
     urlpatterns += static("dashboard/", document_root=f"{settings.BASE_DIR}/frontend/dashboard/dist/openbook/dashboard")
 
     # Teacher microfrontend
@@ -94,4 +88,3 @@ if settings.DEBUG:
     })]
 
     urlpatterns += static("teacher/", document_root=f"{settings.BASE_DIR}/frontend/teacher/dist/openbook/teacher")
->>>>>>> origin/frontend-ai-integration-test

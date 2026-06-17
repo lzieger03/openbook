@@ -19,9 +19,11 @@ deleted from here after a confirmation step.
     import {push} from "svelte-spa-router";
     import {teacherStore} from "../../stores/teacher.store.js";
     import type {TeacherState} from "../../stores/teacher.store.js";
-    import {fetchLibraryGroups} from "../../api/courses.js";
-    import type {LibraryGroupDto} from "../../api/courses.js";
+    import {createLibraryGroup, fetchLibraryGroups, slugify} from "../../api/courses.js";
+    import type {LibraryGroupDto, TextFormat} from "../../api/courses.js";
     import Modal from "../basic/Modal.svelte";
+
+    type GroupMode = "existing" | "new";
 
     let state = $state<TeacherState>({
         isLoading: true,
@@ -34,8 +36,16 @@ deleted from here after a confirmation step.
     let showCreate = $state(false);
     let groups = $state<LibraryGroupDto[]>([]);
     let name = $state("");
+    let slug = $state("");
     let description = $state("");
+    let textFormat = $state<TextFormat>("MD");
+    let isTemplate = $state(false);
+    let groupMode = $state<GroupMode>("existing");
     let groupId = $state("");
+    let groupName = $state("");
+    let groupSlug = $state("");
+    let groupDescription = $state("");
+    let groupParentId = $state("");
     let saving = $state(false);
     let formError = $state("");
 
@@ -52,8 +62,16 @@ deleted from here after a confirmation step.
 
     async function openCreate(): Promise<void> {
         name = "";
+        slug = "";
         description = "";
+        textFormat = "MD";
+        isTemplate = false;
+        groupMode = "existing";
         groupId = "";
+        groupName = "";
+        groupSlug = "";
+        groupDescription = "";
+        groupParentId = "";
         formError = "";
         showCreate = true;
 
@@ -61,6 +79,8 @@ deleted from here after a confirmation step.
             groups = await fetchLibraryGroups();
             if (groups.length > 0 && groups[0]) {
                 groupId = groups[0].id;
+            } else {
+                groupMode = "new";
             }
         } catch (error) {
             formError = error instanceof Error ? error.message : String(error);
@@ -72,8 +92,12 @@ deleted from here after a confirmation step.
             formError = "Please enter a course name.";
             return;
         }
-        if (!groupId) {
+        if (groupMode === "existing" && !groupId) {
             formError = "Please choose a library group.";
+            return;
+        }
+        if (groupMode === "new" && !groupName.trim()) {
+            formError = "Please enter a library group name.";
             return;
         }
 
@@ -81,7 +105,28 @@ deleted from here after a confirmation step.
         formError = "";
 
         try {
-            await teacherStore.create({name: name.trim(), description: description.trim(), group: groupId});
+            let selectedGroupId = groupId;
+
+            if (groupMode === "new") {
+                const createdGroup = await createLibraryGroup({
+                    name: groupName.trim(),
+                    slug: groupSlug.trim() || slugify(groupName),
+                    description: groupDescription.trim(),
+                    parent: groupParentId || null,
+                    text_format: "MD",
+                });
+                selectedGroupId = createdGroup.id;
+                groups = [...groups, createdGroup];
+            }
+
+            await teacherStore.create({
+                name: name.trim(),
+                slug: slug.trim() || slugify(name),
+                description: description.trim(),
+                group: selectedGroupId,
+                text_format: textFormat,
+                is_template: isTemplate,
+            });
             showCreate = false;
         } catch (error) {
             formError = error instanceof Error ? error.message : String(error);
@@ -172,18 +217,84 @@ deleted from here after a confirmation step.
         </label>
 
         <label class="form-control w-full mt-3">
+            <span class="label-text">Course slug</span>
+            <input class="input input-bordered w-full" type="text" bind:value={slug} placeholder={slugify(name)} />
+        </label>
+
+        <label class="form-control w-full mt-3">
             <span class="label-text">Description</span>
             <textarea class="textarea textarea-bordered w-full" rows="3" bind:value={description}></textarea>
         </label>
 
-        <label class="form-control w-full mt-3">
-            <span class="label-text">Library group</span>
-            <select class="select select-bordered w-full" bind:value={groupId}>
-                {#each groups as group (group.id)}
-                    <option value={group.id}>{group.name}</option>
-                {/each}
-            </select>
-        </label>
+        <div class="settings-grid mt-3">
+            <label class="form-control w-full">
+                <span class="label-text">Text format</span>
+                <select class="select select-bordered w-full" bind:value={textFormat}>
+                    <option value="MD">Markdown</option>
+                    <option value="HTML">HTML</option>
+                    <option value="TEXT">Plain text</option>
+                </select>
+            </label>
+
+            <label class="label cursor-pointer justify-start gap-3">
+                <input class="checkbox checkbox-primary" type="checkbox" bind:checked={isTemplate} />
+                <span class="label-text">Template course</span>
+            </label>
+        </div>
+
+        <div class="divider my-4">Library group</div>
+
+        <div class="join w-full">
+            <button
+                type="button"
+                class="btn join-item flex-1"
+                class:btn-primary={groupMode === "existing"}
+                disabled={groups.length === 0}
+                onclick={() => (groupMode = "existing")}
+            >Existing</button>
+            <button
+                type="button"
+                class="btn join-item flex-1"
+                class:btn-primary={groupMode === "new"}
+                onclick={() => (groupMode = "new")}
+            >Create new</button>
+        </div>
+
+        {#if groupMode === "existing"}
+            <label class="form-control w-full mt-3">
+                <span class="label-text">Library group</span>
+                <select class="select select-bordered w-full" bind:value={groupId}>
+                    {#each groups as group (group.id)}
+                        <option value={group.id}>{group.name}</option>
+                    {/each}
+                </select>
+            </label>
+        {:else}
+            <label class="form-control w-full mt-3">
+                <span class="label-text">Group name</span>
+                <input class="input input-bordered w-full" type="text" bind:value={groupName} placeholder="e.g. Web Development" />
+            </label>
+
+            <label class="form-control w-full mt-3">
+                <span class="label-text">Group slug</span>
+                <input class="input input-bordered w-full" type="text" bind:value={groupSlug} placeholder={slugify(groupName)} />
+            </label>
+
+            <label class="form-control w-full mt-3">
+                <span class="label-text">Parent group</span>
+                <select class="select select-bordered w-full" bind:value={groupParentId}>
+                    <option value="">No parent</option>
+                    {#each groups as group (group.id)}
+                        <option value={group.id}>{group.name}</option>
+                    {/each}
+                </select>
+            </label>
+
+            <label class="form-control w-full mt-3">
+                <span class="label-text">Group description</span>
+                <textarea class="textarea textarea-bordered w-full" rows="3" bind:value={groupDescription}></textarea>
+            </label>
+        {/if}
     {/snippet}
 
     {#snippet actions()}
@@ -250,5 +361,18 @@ deleted from here after a confirmation step.
         color: var(--color-error);
         font-weight: 600;
         text-align: center;
+    }
+
+    .settings-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: end;
+        gap: 1rem;
+    }
+
+    @media (max-width: 42rem) {
+        .settings-grid {
+            grid-template-columns: 1fr;
+        }
     }
 </style>

@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 from django.test                           import TestCase
+from django.urls                           import reverse
 
 from openbook.core.utils.content_type      import content_type_for_model_string
 from openbook.core.utils.content_type      import model_string_for_content_type
@@ -90,6 +91,32 @@ class Role_ViewSet_Tests(ModelViewSetTestMixin, TestCase):
             "is_active":   False,
             "permissions": ["admin.delete_logentry", "admin.view_logentry"],
         }
+
+    def test_create_student_role_from_json_without_reverse_relations(self):
+        """Create should not require read-only reverse relation fields."""
+        self.create_user_and_login([
+            "openbook_auth.view_role",
+            "openbook_auth.add_role",
+        ])
+
+        response = self.client.post(
+            reverse("role-list"),
+            {
+                "scope_type": model_string_for_content_type(self.role_student.scope_type),
+                "scope_uuid": str(self.role_student.scope_uuid),
+                "slug": "json-student",
+                "name": "JSON Student",
+                "description": "Enrolled student of this course.",
+                "text_format": "MD",
+                "priority": 10,
+                "is_active": True,
+                "permissions": [],
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data["slug"], "json-student")
 
     operations = {
         "create": {

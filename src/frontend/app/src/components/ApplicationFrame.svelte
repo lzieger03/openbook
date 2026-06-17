@@ -17,17 +17,11 @@ Root component of the application which defines the global application UI.
     import AiChatPane                from "./ai-chat/AiChatPane.svelte";
     import NavigationBar             from "./app-frame/NavigationBar.svelte";
     import LoadingAnimation          from "./app-frame/LoadingAnimation.svelte";
-<<<<<<< HEAD
-    import Toast                     from "./basic/toast/Toast.svelte";
-    import Alert                     from "./basic/toast/Alert.svelte";
-
-=======
     import LoginPage                 from "./pages/auth/LoginPage.svelte";
     import Toast                     from "./basic/toast/Toast.svelte";
     import Alert                     from "./basic/toast/Alert.svelte";
 
     import { auth }                  from "../stores/auth.js";
->>>>>>> origin/frontend-ai-integration-test
     import { toasts }                from "../stores/toasts";
     import { NetworkError }          from "../utils/error.js";
     import { NotFoundError }         from "../utils/error.js";
@@ -118,53 +112,6 @@ Root component of the application which defines the global application UI.
 </script>
 
 <div class="flex h-dvh min-h-0 flex-col overflow-hidden">
-<<<<<<< HEAD
-    <NavigationBar
-        bind:mobilePaneMode
-        bind:desktopPaneMode
-    />
-
-    <main class="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <svelte:boundary>
-            <div class="flex flex-1 min-h-0 flex-col overflow-hidden lg:flex-row">
-                <div class={chatPaneClass}>
-                    <div class={chatPaneInnerClass}>
-                        <AiChatPane/>
-                    </div>
-                </div>
-
-                <div class={mainPaneClass}>
-                    <Router {routes} />
-                </div>
-            </div>
-
-            {#snippet pending()}
-                <LoadingAnimation/>
-            {/snippet}
-
-            {#snippet failed(error, reset)}
-                {#await resolveErrorPage(error) then resolved}
-                    {@const ResolvedComponent = resolved.component}
-                    {#if resolved.retryable}
-                        <ResolvedComponent onRetry={reset}/>
-                    {:else}
-                        <ResolvedComponent/>
-                    {/if}
-                {:catch error}
-                    <div class="flex flex-1 items-center justify-center p-8 text-center text-base-content/70">
-                        {error}
-                    </div>
-                {/await}
-            {/snippet}
-        </svelte:boundary>
-
-        <Toast>
-            {#each $toasts as toast (toast.id) }
-                <Alert type={toast.type} message={toast.message} />
-            {/each}
-        </Toast>
-    </main>
-=======
     {#await auth.init()}
         <div class="flex flex-1 items-center justify-center">
             <LoadingAnimation/>
@@ -220,5 +167,4 @@ Root component of the application which defines the global application UI.
             <Alert type={toast.type} message={toast.message} />
         {/each}
     </Toast>
->>>>>>> origin/frontend-ai-integration-test
 </div>
