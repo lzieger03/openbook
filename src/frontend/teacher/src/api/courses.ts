@@ -54,6 +54,18 @@ export interface CourseWriteFields {
     is_template?: boolean;
 }
 
+/** Derive a URL-safe slug from a course name (the backend requires a slug). */
+function slugify(value: string): string {
+    const slug = value
+        .toLowerCase()
+        .normalize("NFKD")
+        .replace(/[̀-ͯ]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+
+    return slug || "course";
+}
+
 interface Paginated<T> {
     results: T[];
 }
