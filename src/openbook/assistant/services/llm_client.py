@@ -52,8 +52,7 @@ class LLM_Client:
             text (str): Input-Text, für den das Embedding abgerufen werden soll.
 
         Returns:
-            _type_: Das abgerufene Embedding
-        """
+            list[float]: Das abgerufene Embedding
         response = self.client.embeddings.create(model=self.embedding_model, inputs=[text])
         return response.data[0].embedding
 
