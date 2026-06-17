@@ -9,8 +9,9 @@
       "Courier New", monospace;
     --color-black: #000;
     --spacing: 0.25rem;
-    --text-sm: 0.875rem;
-    --text-sm--line-height: calc(1.25 / 0.875);
+    --text-lg: 1.125rem;
+    --text-lg--line-height: calc(1.75 / 1.125);
+    --font-weight-bold: 700;
     --ease-out: cubic-bezier(0, 0, 0.2, 1);
     --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
     --default-transition-duration: 150ms;
@@ -220,98 +221,6 @@
         &.modal-open, &[open], &:target, .modal-toggle:checked + & {
           opacity: 0%;
         }
-      }
-    }
-  }
-  .fab {
-    @layer daisyui.l1.l2.l3 {
-      pointer-events: none;
-      position: fixed;
-      inset-inline-end: calc(0.25rem * 4);
-      bottom: calc(0.25rem * 4);
-      z-index: 999;
-      display: flex;
-      flex-direction: column-reverse;
-      align-items: flex-end;
-      gap: calc(0.25rem * 2);
-      font-size: var(--text-sm);
-      line-height: var(--tw-leading, var(--text-sm--line-height));
-      white-space: nowrap;
-      > * {
-        pointer-events: auto;
-        display: flex;
-        align-items: center;
-        gap: calc(0.25rem * 2);
-        &:hover, &:has(:focus-visible) {
-          z-index: 1;
-        }
-      }
-      > [tabindex] {
-        &:first-child {
-          position: relative;
-          display: grid;
-          transition-property: opacity, visibility, rotate;
-          transition-duration: 0.2s;
-          transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-        }
-      }
-      .fab-close {
-        position: absolute;
-        inset-inline-end: calc(0.25rem * 0);
-        bottom: calc(0.25rem * 0);
-      }
-      .fab-main-action {
-        position: absolute;
-        inset-inline-end: calc(0.25rem * 0);
-        bottom: calc(0.25rem * 0);
-      }
-      &:focus-within {
-        &:has(.fab-close), &:has(.fab-main-action) {
-          > [tabindex] {
-            rotate: 90deg;
-            opacity: 0%;
-          }
-        }
-        > [tabindex]:first-child {
-          pointer-events: none;
-        }
-        > :nth-child(n + 2) {
-          visibility: visible;
-          --tw-scale-x: 100%;
-          --tw-scale-y: 100%;
-          --tw-scale-z: 100%;
-          scale: var(--tw-scale-x) var(--tw-scale-y);
-          opacity: 100%;
-        }
-      }
-      > :nth-child(n + 2) {
-        visibility: hidden;
-        --tw-scale-x: 80%;
-        --tw-scale-y: 80%;
-        --tw-scale-z: 80%;
-        scale: var(--tw-scale-x) var(--tw-scale-y);
-        opacity: 0%;
-        transition-property: opacity, scale, visibility;
-        transition-duration: 0.2s;
-        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-        &.fab-main-action, &.fab-close {
-          --tw-scale-x: 100%;
-          --tw-scale-y: 100%;
-          --tw-scale-z: 100%;
-          scale: var(--tw-scale-x) var(--tw-scale-y);
-        }
-      }
-      > :nth-child(3) {
-        transition-delay: 30ms;
-      }
-      > :nth-child(4) {
-        transition-delay: 60ms;
-      }
-      > :nth-child(5) {
-        transition-delay: 90ms;
-      }
-      > :nth-child(6) {
-        transition-delay: 120ms;
       }
     }
   }
@@ -578,118 +487,6 @@
       }
     }
   }
-  .collapse-arrow {
-    @layer daisyui.l1.l2 {
-      > .collapse-title:after {
-        position: absolute;
-        display: block;
-        height: 0.5rem;
-        width: 0.5rem;
-        transform: translateY(-100%) rotate(45deg);
-        @media (prefers-reduced-motion: no-preference) {
-          transition-property: all;
-          transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-          transition-duration: 0.2s;
-        }
-        top: 50%;
-        inset-inline-end: 1.4rem;
-        content: "";
-        transform-origin: 75% 75%;
-        box-shadow: 2px 2px;
-        pointer-events: none;
-      }
-    }
-  }
-  .collapse-plus {
-    @layer daisyui.l1.l2 {
-      > .collapse-title:after {
-        position: absolute;
-        display: block;
-        height: 0.5rem;
-        width: 0.5rem;
-        @media (prefers-reduced-motion: no-preference) {
-          transition-property: all;
-          transition-duration: 300ms;
-          transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        top: 0.9rem;
-        inset-inline-end: 1.4rem;
-        --tw-content: "+";
-        content: var(--tw-content);
-        pointer-events: none;
-      }
-    }
-  }
-  .dock {
-    @layer daisyui.l1.l2.l3 {
-      position: fixed;
-      right: calc(0.25rem * 0);
-      bottom: calc(0.25rem * 0);
-      left: calc(0.25rem * 0);
-      z-index: 1;
-      display: flex;
-      width: 100%;
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-around;
-      background-color: var(--color-base-100);
-      padding: calc(0.25rem * 2);
-      color: currentcolor;
-      border-top: 0.5px solid var(--color-base-content);
-      @supports (color: color-mix(in lab, red, red)) {
-        border-top: 0.5px solid color-mix(in oklab, var(--color-base-content) 5%, #0000);
-      }
-      height: 4rem;
-      height: calc(4rem + env(safe-area-inset-bottom));
-      padding-bottom: env(safe-area-inset-bottom);
-      > * {
-        position: relative;
-        margin-bottom: calc(0.25rem * 2);
-        display: flex;
-        height: 100%;
-        max-width: calc(0.25rem * 32);
-        flex-shrink: 1;
-        flex-basis: 100%;
-        cursor: pointer;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 1px;
-        border-radius: var(--radius-box);
-        background-color: transparent;
-        transition: opacity 0.2s ease-out;
-        @media (hover: hover) {
-          &:hover {
-            opacity: 80%;
-          }
-        }
-        &[aria-disabled="true"], &[disabled] {
-          &, &:hover {
-            pointer-events: none;
-            color: var(--color-base-content);
-            @supports (color: color-mix(in lab, red, red)) {
-              color: color-mix(in oklab, var(--color-base-content) 10%, transparent);
-            }
-            opacity: 100%;
-          }
-        }
-        .dock-label {
-          font-size: 0.6875rem;
-        }
-        &:after {
-          content: "";
-          position: absolute;
-          height: calc(0.25rem * 1);
-          width: calc(0.25rem * 6);
-          border-radius: calc(infinity * 1px);
-          background-color: transparent;
-          bottom: 0.2rem;
-          border-top: 3px solid transparent;
-          transition: background-color 0.1s ease-out, text-color 0.1s ease-out, width 0.1s ease-out;
-        }
-      }
-    }
-  }
   .dropdown {
     @layer daisyui.l1.l2.l3 {
       position: relative;
@@ -927,206 +724,6 @@
       mask-position: center;
       mask-image: url("data:image/svg+xml,%3Csvg width='24' height='24' stroke='black' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cg transform-origin='center'%3E%3Ccircle cx='12' cy='12' r='9.5' fill='none' stroke-width='3' stroke-linecap='round'%3E%3CanimateTransform attributeName='transform' type='rotate' from='0 12 12' to='360 12 12' dur='2s' repeatCount='indefinite'/%3E%3Canimate attributeName='stroke-dasharray' values='0,150;42,150;42,150' keyTimes='0;0.475;1' dur='1.5s' repeatCount='indefinite'/%3E%3Canimate attributeName='stroke-dashoffset' values='0;-16;-59' keyTimes='0;0.475;1' dur='1.5s' repeatCount='indefinite'/%3E%3C/circle%3E%3C/g%3E%3C/svg%3E");
     }
-  }
-  .btn-disabled {
-    @layer daisyui.l1.l2 {
-      &:not(.btn-link, .btn-ghost) {
-        background-color: var(--color-base-content);
-        @supports (color: color-mix(in lab, red, red)) {
-          background-color: color-mix(in oklab, var(--color-base-content) 10%, transparent);
-        }
-        box-shadow: none;
-      }
-      pointer-events: none;
-      --btn-border: #0000;
-      --btn-noise: none;
-      --btn-fg: var(--color-base-content);
-      @supports (color: color-mix(in lab, red, red)) {
-        --btn-fg: color-mix(in oklch, var(--color-base-content) 20%, #0000);
-      }
-    }
-  }
-  .collapse {
-    &:not(td, tr, colgroup) {
-      visibility: revert-layer;
-    }
-    @layer daisyui.l1.l2.l3 {
-      display: grid;
-      position: relative;
-      overflow: hidden;
-      border-radius: var(--radius-box, 1rem);
-      width: 100%;
-      grid-template-rows: max-content 0fr;
-      grid-template-columns: minmax(0, 1fr);
-      isolation: isolate;
-      @media (prefers-reduced-motion: no-preference) {
-        transition: grid-template-rows 0.2s;
-      }
-      > input:is([type="checkbox"], [type="radio"]) {
-        grid-column-start: 1;
-        grid-row-start: 1;
-        appearance: none;
-        opacity: 0;
-        z-index: 1;
-        width: 100%;
-        padding: 1rem;
-        padding-inline-end: 3rem;
-        min-height: 1lh;
-        transition: background-color 0.2s ease-out;
-      }
-      &:is( [open], [tabindex]:focus:not(.collapse-close), [tabindex]:focus-within:not(.collapse-close) ), &:not(.collapse-close):has(> input:is([type="checkbox"], [type="radio"]):checked) {
-        grid-template-rows: max-content 1fr;
-      }
-      &:is( [open], [tabindex]:focus:not(.collapse-close), [tabindex]:focus-within:not(.collapse-close) ) > .collapse-content, &:not(.collapse-close) > :where(input:is([type="checkbox"], [type="radio"]):checked ~ .collapse-content) {
-        content-visibility: visible;
-        min-height: fit-content;
-        @supports not (content-visibility: visible) {
-          visibility: visible;
-        }
-      }
-      &:focus-visible, &:has(> input:is([type="checkbox"], [type="radio"]):focus-visible), &:has(summary:focus-visible) {
-        outline-color: var(--color-base-content);
-        outline-style: solid;
-        outline-width: 2px;
-        outline-offset: 2px;
-      }
-      &:not(.collapse-close) {
-        > input[type="checkbox"], > input[type="radio"]:not(:checked), > .collapse-title {
-          cursor: pointer;
-        }
-      }
-      &[tabindex]:focus:not(.collapse-close, .collapse[open]), &[tabindex]:focus-within:not(.collapse-close, .collapse[open]) {
-        > .collapse-title {
-          cursor: unset;
-        }
-      }
-      &:is( [open], [tabindex]:focus:not(.collapse-close), [tabindex]:focus-within:not(.collapse-close) ) > :where(.collapse-content), &:not(.collapse-close) > :where(input:is([type="checkbox"], [type="radio"]):checked ~ .collapse-content) {
-        padding-bottom: 1rem;
-      }
-    }
-    @layer daisyui.l1.l2 {
-      &:is([open]) {
-        &.collapse-arrow {
-          > .collapse-title:after {
-            @media (prefers-reduced-motion: no-preference) {
-              transform: translateY(-50%) rotate(225deg);
-            }
-          }
-        }
-      }
-      &.collapse-open {
-        &.collapse-arrow {
-          > .collapse-title:after {
-            @media (prefers-reduced-motion: no-preference) {
-              transform: translateY(-50%) rotate(225deg);
-            }
-          }
-        }
-        &.collapse-plus {
-          > .collapse-title:after {
-            --tw-content: "−";
-            content: var(--tw-content);
-          }
-        }
-      }
-      &[tabindex].collapse-arrow:focus:not(.collapse-close), &.collapse-arrow[tabindex]:focus-within:not(.collapse-close) {
-        > .collapse-title:after {
-          transform: translateY(-50%) rotate(225deg);
-        }
-      }
-      &.collapse-arrow:not(.collapse-close) {
-        > input:is([type="checkbox"], [type="radio"]):checked ~ .collapse-title:after {
-          transform: translateY(-50%) rotate(225deg);
-        }
-      }
-      &[open] {
-        &.collapse-plus {
-          > .collapse-title:after {
-            --tw-content: "−";
-            content: var(--tw-content);
-          }
-        }
-      }
-      &[tabindex].collapse-plus:focus:not(.collapse-close) {
-        > .collapse-title:after {
-          --tw-content: "−";
-          content: var(--tw-content);
-        }
-      }
-      &.collapse-plus:not(.collapse-close) {
-        > input:is([type="checkbox"], [type="radio"]):checked ~ .collapse-title:after {
-          --tw-content: "−";
-          content: var(--tw-content);
-        }
-      }
-    }
-    &:is(details) {
-      @layer daisyui.l1.l2.l3 {
-        width: 100%;
-        @media (prefers-reduced-motion: no-preference) {
-          &::details-content {
-            transition: content-visibility 0.2s allow-discrete, visibility 0.2s allow-discrete, min-height 0.2s ease-out allow-discrete, padding 0.1s ease-out 20ms, background-color 0.2s ease-out, height 0.2s;
-            height: 0;
-            interpolate-size: allow-keywords;
-          }
-          &:where([open])::details-content {
-            height: auto;
-          }
-        }
-        & summary {
-          position: relative;
-          display: block;
-          &::-webkit-details-marker {
-            display: none;
-          }
-        }
-        & > .collapse-content {
-          content-visibility: visible;
-        }
-      }
-    }
-    &:is(details) summary {
-      @layer daisyui.l1.l2.l3 {
-        outline: none;
-      }
-    }
-  }
-  .collapse-content {
-    @layer daisyui.l1.l2.l3 {
-      grid-column-start: 1;
-      grid-row-start: 1;
-    }
-    @layer daisyui.l1.l2.l3 {
-      content-visibility: hidden;
-      grid-column-start: 1;
-      grid-row-start: 2;
-      min-height: 0;
-      padding-left: 1rem;
-      padding-right: 1rem;
-      cursor: unset;
-      @supports not (content-visibility: hidden) {
-        visibility: hidden;
-      }
-      @media (prefers-reduced-motion: no-preference) {
-        transition: content-visibility 0.2s allow-discrete, visibility 0.2s allow-discrete, min-height 0.2s ease-out allow-discrete, padding 0.1s ease-out 20ms, background-color 0.2s ease-out;
-      }
-    }
-  }
-  .collapse-open {
-    @layer daisyui.l1.l2 {
-      grid-template-rows: max-content 1fr;
-      > .collapse-content {
-        content-visibility: visible;
-        min-height: fit-content;
-        padding-bottom: 1rem;
-        @supports not (content-visibility: visible) {
-          visibility: visible;
-        }
-      }
-    }
-  }
-  .collapse {
-    visibility: collapse;
   }
   .visible {
     visibility: visible;
@@ -1802,90 +1399,6 @@
       }
     }
   }
-  .collapse-title {
-    @layer daisyui.l1.l2.l3 {
-      grid-column-start: 1;
-      grid-row-start: 1;
-    }
-    @layer daisyui.l1.l2.l3 {
-      position: relative;
-      width: 100%;
-      padding: 1rem;
-      padding-inline-end: 3rem;
-      min-height: 1lh;
-      transition: background-color 0.2s ease-out;
-    }
-  }
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-    border-width: 0;
-  }
-  .menu-horizontal {
-    @layer daisyui.l1.l2 {
-      display: inline-flex;
-      flex-direction: row;
-      & > li:not(.menu-title) > details {
-        & > ul {
-          position: absolute;
-          margin-inline-start: calc(0.25rem * 0);
-          margin-top: calc(0.25rem * 4);
-          transform-origin: top;
-          border-radius: var(--radius-box);
-          background-color: var(--color-base-100);
-          padding-block: calc(0.25rem * 2);
-          padding-inline-end: calc(0.25rem * 2);
-          opacity: 0%;
-          scale: 95%;
-          box-shadow: 0 1px 3px 0 oklch(0% 0 0/0.1), 0 1px 2px -1px oklch(0% 0 0/0.1);
-          @media (prefers-reduced-motion: no-preference) {
-            @starting-style {
-              scale: 95%;
-              opacity: 0;
-            }
-            animation: menu 0.2s;
-            transition-property: opacity, scale, display;
-            transition-behavior: allow-discrete;
-            transition-duration: 0.2s;
-            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-          }
-        }
-        &[open] > ul {
-          opacity: 100%;
-          scale: 100%;
-        }
-      }
-      & > li > details > ul {
-        &:before {
-          --tw-content: none;
-          content: var(--tw-content);
-        }
-      }
-    }
-  }
-  .avatar {
-    @layer daisyui.l1.l2.l3 {
-      position: relative;
-      display: inline-flex;
-      vertical-align: middle;
-      & > div {
-        display: block;
-        aspect-ratio: 1 / 1;
-        overflow: hidden;
-      }
-      img {
-        height: 100%;
-        width: 100%;
-        object-fit: cover;
-      }
-    }
-  }
   .checkbox {
     @layer daisyui.l1.l2.l3 {
       border: var(--border) solid var(--input-color, var(--color-base-content));
@@ -2153,15 +1666,6 @@
       }
     }
   }
-  .stats {
-    @layer daisyui.l1.l2.l3 {
-      position: relative;
-      display: inline-grid;
-      grid-auto-flow: column;
-      overflow-x: auto;
-      border-radius: var(--radius-box);
-    }
-  }
   .progress {
     @layer daisyui.l1.l2.l3 {
       position: relative;
@@ -2215,224 +1719,11 @@
   .absolute {
     position: absolute;
   }
-  .fixed {
-    position: fixed;
-  }
   .relative {
     position: relative;
   }
   .static {
     position: static;
-  }
-  .dropdown-right {
-    @layer daisyui.l1.l2 {
-      --anchor-h: right;
-      --anchor-v: span-bottom;
-      .dropdown-content {
-        inset-inline-start: 100%;
-        top: calc(0.25rem * 0);
-        bottom: auto;
-        transform-origin: 0;
-      }
-    }
-  }
-  .dropdown-left {
-    @layer daisyui.l1.l2 {
-      --anchor-h: left;
-      --anchor-v: span-bottom;
-      .dropdown-content {
-        inset-inline-end: 100%;
-        top: calc(0.25rem * 0);
-        bottom: auto;
-        transform-origin: 100%;
-      }
-    }
-  }
-  .dropdown-end {
-    @layer daisyui.l1.l2 {
-      --anchor-h: span-left;
-      :where(.dropdown-content) {
-        inset-inline-end: calc(0.25rem * 0);
-        translate: 0 0;
-        [dir="rtl"] & {
-          translate: 0 0;
-        }
-      }
-      &.dropdown-left {
-        --anchor-h: left;
-        --anchor-v: span-top;
-        .dropdown-content {
-          top: auto;
-          bottom: calc(0.25rem * 0);
-        }
-      }
-      &.dropdown-right {
-        --anchor-h: right;
-        --anchor-v: span-top;
-        .dropdown-content {
-          top: auto;
-          bottom: calc(0.25rem * 0);
-        }
-      }
-    }
-  }
-  .dropdown-start {
-    @layer daisyui.l1.l2 {
-      --anchor-h: span-right;
-      :where(.dropdown-content) {
-        inset-inline-end: auto;
-        translate: 0 0;
-        [dir="rtl"] & {
-          translate: 0 0;
-        }
-      }
-      &.dropdown-left {
-        --anchor-h: left;
-        --anchor-v: span-bottom;
-        .dropdown-content {
-          top: calc(0.25rem * 0);
-          bottom: auto;
-        }
-      }
-      &.dropdown-right {
-        --anchor-h: right;
-        --anchor-v: span-bottom;
-        .dropdown-content {
-          top: calc(0.25rem * 0);
-          bottom: auto;
-        }
-      }
-    }
-  }
-  .dropdown-bottom {
-    @layer daisyui.l1.l2 {
-      --anchor-v: bottom;
-      .dropdown-content {
-        top: 100%;
-        bottom: auto;
-        transform-origin: top;
-      }
-    }
-  }
-  .dropdown-top {
-    @layer daisyui.l1.l2 {
-      --anchor-v: top;
-      .dropdown-content {
-        top: auto;
-        bottom: 100%;
-        transform-origin: bottom;
-      }
-    }
-  }
-  .file-input {
-    @layer daisyui.l1.l2.l3 {
-      cursor: pointer;
-      cursor: pointer;
-      border: var(--border) solid #0000;
-      display: inline-flex;
-      appearance: none;
-      align-items: center;
-      background-color: var(--color-base-100);
-      vertical-align: middle;
-      webkit-user-select: none;
-      user-select: none;
-      width: clamp(3rem, 20rem, 100%);
-      height: var(--size);
-      padding-inline-end: 0.75rem;
-      font-size: 0.875rem;
-      line-height: 2;
-      border-start-start-radius: var(--join-ss, var(--radius-field));
-      border-start-end-radius: var(--join-se, var(--radius-field));
-      border-end-start-radius: var(--join-es, var(--radius-field));
-      border-end-end-radius: var(--join-ee, var(--radius-field));
-      border-color: var(--input-color);
-      box-shadow: 0 1px var(--input-color) inset, 0 -1px oklch(100% 0 0 / calc(var(--depth) * 0.1)) inset;
-      @supports (color: color-mix(in lab, red, red)) {
-        box-shadow: 0 1px color-mix(in oklab, var(--input-color) calc(var(--depth) * 10%), #0000) inset, 0 -1px oklch(100% 0 0 / calc(var(--depth) * 0.1)) inset;
-      }
-      --size: calc(var(--size-field, 0.25rem) * 10);
-      --input-color: var(--color-base-content);
-      @supports (color: color-mix(in lab, red, red)) {
-        --input-color: color-mix(in oklab, var(--color-base-content) 20%, #0000);
-      }
-      &::file-selector-button {
-        margin-inline-end: calc(0.25rem * 4);
-        cursor: pointer;
-        padding-inline: calc(0.25rem * 4);
-        webkit-user-select: none;
-        user-select: none;
-        height: calc(100% + var(--border) * 2);
-        margin-block: calc(var(--border) * -1);
-        margin-inline-start: calc(var(--border) * -1);
-        font-size: 0.875rem;
-        color: var(--btn-fg);
-        border-width: var(--border);
-        border-style: solid;
-        border-color: var(--btn-border);
-        border-start-start-radius: calc(var(--join-ss, var(--radius-field) - var(--border)));
-        border-end-start-radius: calc(var(--join-es, var(--radius-field) - var(--border)));
-        font-weight: 600;
-        background-color: var(--btn-bg);
-        background-size: calc(var(--noise) * 100%);
-        background-image: var(--btn-noise);
-        text-shadow: 0 0.5px oklch(1 0 0 / calc(var(--depth) * 0.15));
-        box-shadow: 0 0.5px 0 0.5px white inset, var(--btn-shadow);
-        @supports (color: color-mix(in lab, red, red)) {
-          box-shadow: 0 0.5px 0 0.5px color-mix( in oklab, color-mix(in oklab, white 30%, var(--btn-bg)) calc(var(--depth) * 20%), #0000 ) inset, var(--btn-shadow);
-        }
-        --size: calc(var(--size-field, 0.25rem) * 10);
-        --btn-bg: var(--btn-color, var(--color-base-200));
-        --btn-fg: var(--color-base-content);
-        --btn-border: var(--btn-bg);
-        @supports (color: color-mix(in lab, red, red)) {
-          --btn-border: color-mix(in oklab, var(--btn-bg), #000 5%);
-        }
-        --btn-shadow: 0 3px 2px -2px var(--btn-bg),
-        0 4px 3px -2px var(--btn-bg);
-        @supports (color: color-mix(in lab, red, red)) {
-          --btn-shadow: 0 3px 2px -2px color-mix(in oklab, var(--btn-bg) 30%, #0000),
-        0 4px 3px -2px color-mix(in oklab, var(--btn-bg) 30%, #0000);
-        }
-        --btn-noise: var(--fx-noise);
-      }
-      &:focus {
-        --input-color: var(--color-base-content);
-        box-shadow: 0 1px var(--input-color);
-        @supports (color: color-mix(in lab, red, red)) {
-          box-shadow: 0 1px color-mix(in oklab, var(--input-color) 10%, #0000);
-        }
-        outline: 2px solid var(--input-color);
-        outline-offset: 2px;
-        isolation: isolate;
-      }
-      &:has(> input[disabled]), &:is(:disabled, [disabled]) {
-        cursor: not-allowed;
-        border-color: var(--color-base-200);
-        background-color: var(--color-base-200);
-        &::placeholder {
-          color: var(--color-base-content);
-          @supports (color: color-mix(in lab, red, red)) {
-            color: color-mix(in oklab, var(--color-base-content) 20%, transparent);
-          }
-        }
-        box-shadow: none;
-        color: var(--color-base-content);
-        @supports (color: color-mix(in lab, red, red)) {
-          color: color-mix(in oklch, var(--color-base-content) 20%, #0000);
-        }
-        &::file-selector-button {
-          cursor: not-allowed;
-          border-color: var(--color-base-200);
-          background-color: var(--color-base-200);
-          --btn-border: #0000;
-          --btn-noise: none;
-          --btn-fg: var(--color-base-content);
-          @supports (color: color-mix(in lab, red, red)) {
-            --btn-fg: color-mix(in oklch, var(--color-base-content) 20%, #0000);
-          }
-        }
-      }
-    }
   }
   .textarea {
     @layer daisyui.l1.l2.l3 {
@@ -2590,6 +1881,101 @@
       }
     }
   }
+  .stack\! {
+    @layer daisyui.l1.l2.l3 {
+      display: inline-grid !important;
+      grid-template-columns: 3px 4px 1fr 4px 3px !important;
+      grid-template-rows: 3px 4px 1fr 4px 3px !important;
+      & > * {
+        height: 100% !important;
+        width: 100% !important;
+        &:nth-child(n + 2) {
+          width: 100% !important;
+          opacity: 70% !important;
+        }
+        &:nth-child(2) {
+          z-index: 2 !important;
+          opacity: 90% !important;
+        }
+        &:nth-child(1) {
+          z-index: 3 !important;
+          width: 100% !important;
+        }
+      }
+    }
+    @layer daisyui.l1.l2 {
+      &, &.stack-bottom {
+        > * {
+          grid-column: 3 / 4 !important;
+          grid-row: 3 / 6 !important;
+          &:nth-child(2) {
+            grid-column: 2 / 5 !important;
+            grid-row: 2 / 5 !important;
+          }
+          &:nth-child(1) {
+            grid-column: 1 / 6 !important;
+            grid-row: 1 / 4 !important;
+          }
+        }
+      }
+      &.stack-top {
+        > * {
+          grid-column: 3 / 4 !important;
+          grid-row: 1 / 4 !important;
+          &:nth-child(2) {
+            grid-column: 2 / 5 !important;
+            grid-row: 2 / 5 !important;
+          }
+          &:nth-child(1) {
+            grid-column: 1 / 6 !important;
+            grid-row: 3 / 6 !important;
+          }
+        }
+      }
+      &.stack-start {
+        > * {
+          grid-column: 1 / 4 !important;
+          grid-row: 3 / 4 !important;
+          &:nth-child(2) {
+            grid-column: 2 / 5 !important;
+            grid-row: 2 / 5 !important;
+          }
+          &:nth-child(1) {
+            grid-column: 3 / 6 !important;
+            grid-row: 1 / 6 !important;
+          }
+        }
+      }
+      &.stack-end {
+        > * {
+          grid-column: 3 / 6 !important;
+          grid-row: 3 / 4 !important;
+          &:nth-child(2) {
+            grid-column: 2 / 5 !important;
+            grid-row: 2 / 5 !important;
+          }
+          &:nth-child(1) {
+            grid-column: 1 / 4 !important;
+            grid-row: 1 / 6 !important;
+          }
+        }
+      }
+    }
+  }
+  .modal-backdrop {
+    @layer daisyui.l1.l2.l3 {
+      grid-column-start: 1;
+      grid-row-start: 1;
+      display: grid;
+      align-self: stretch;
+      justify-self: stretch;
+      color: transparent;
+      z-index: -1;
+      button {
+        cursor: pointer;
+      }
+    }
+  }
   .tab-content {
     @layer daisyui.l1.l2.l3 {
       order: var(--tabcontent-order);
@@ -2629,14 +2015,6 @@
       box-shadow: oklch(0% 0 0/ 0.25) 0px 25px 50px -12px;
       overflow-y: auto;
       overscroll-behavior: contain;
-    }
-  }
-  .stat-value {
-    @layer daisyui.l1.l2.l3 {
-      grid-column-start: 1;
-      white-space: nowrap;
-      font-size: 2rem;
-      font-weight: 800;
     }
   }
   .container {
@@ -2741,6 +2119,23 @@
       }
     }
   }
+  .modal-action {
+    @layer daisyui.l1.l2.l3 {
+      margin-top: calc(0.25rem * 6);
+      display: flex;
+      justify-content: flex-end;
+      gap: calc(0.25rem * 2);
+    }
+  }
+  .mt-3 {
+    margin-top: calc(var(--spacing) * 3);
+  }
+  .mt-4 {
+    margin-top: calc(var(--spacing) * 4);
+  }
+  .mb-3 {
+    margin-bottom: calc(var(--spacing) * 3);
+  }
   .status {
     @layer daisyui.l1.l2.l3 {
       display: inline-block;
@@ -2763,6 +2158,31 @@
       box-shadow: 0 2px 3px -1px currentColor;
       @supports (color: color-mix(in lab, red, red)) {
         box-shadow: 0 2px 3px -1px color-mix(in oklab, currentColor calc(var(--depth) * 100%), #0000);
+      }
+    }
+  }
+  .status\! {
+    @layer daisyui.l1.l2.l3 {
+      display: inline-block !important;
+      aspect-ratio: 1 / 1 !important;
+      width: calc(0.25rem * 2) !important;
+      height: calc(0.25rem * 2) !important;
+      border-radius: var(--radius-selector) !important;
+      background-color: var(--color-base-content) !important;
+      @supports (color: color-mix(in lab, red, red)) {
+        background-color: color-mix(in oklab, var(--color-base-content) 20%, transparent) !important;
+      }
+      background-position: center !important;
+      background-repeat: no-repeat !important;
+      vertical-align: middle !important;
+      color: color-mix(in srgb, #000 30%, transparent) !important;
+      @supports (color: color-mix(in lab, red, red)) {
+        color: color-mix(in oklab, var(--color-black) 30%, transparent) !important;
+      }
+      background-image: radial-gradient( circle at 35% 30%, oklch(1 0 0 / calc(var(--depth) * 0.5)), #0000 ) !important;
+      box-shadow: 0 2px 3px -1px currentColor !important;
+      @supports (color: color-mix(in lab, red, red)) {
+        box-shadow: 0 2px 3px -1px color-mix(in oklab, currentColor calc(var(--depth) * 100%), #0000) !important;
       }
     }
   }
@@ -2824,23 +2244,6 @@
       }
     }
   }
-  .stat {
-    @layer daisyui.l1.l2.l3 {
-      display: inline-grid;
-      width: 100%;
-      column-gap: calc(0.25rem * 4);
-      padding-inline: calc(0.25rem * 6);
-      padding-block: calc(0.25rem * 4);
-      grid-template-columns: repeat(1, 1fr);
-      &:not(:last-child) {
-        border-inline-end: var(--border) dashed currentColor;
-        @supports (color: color-mix(in lab, red, red)) {
-          border-inline-end: var(--border) dashed color-mix(in oklab, currentColor 10%, #0000);
-        }
-        border-block-end: none;
-      }
-    }
-  }
   .card-body {
     @layer daisyui.l1.l2.l3 {
       display: flex;
@@ -2886,13 +2289,12 @@
       }
     }
   }
-  .chat {
+  .card-actions {
     @layer daisyui.l1.l2.l3 {
-      display: grid;
-      grid-auto-rows: min-content;
-      column-gap: calc(0.25rem * 3);
-      padding-block: calc(0.25rem * 1);
-      --mask-chat: url("data:image/svg+xml,%3csvg width='13' height='13' xmlns='http://www.w3.org/2000/svg'%3e%3cpath fill='black' d='M0 11.5004C0 13.0004 2 13.0004 2 13.0004H12H13V0.00036329L12.5 0C12.5 0 11.977 2.09572 11.8581 2.50033C11.6075 3.35237 10.9149 4.22374 9 5.50036C6 7.50036 0 10.0004 0 11.5004Z'/%3e%3c/svg%3e");
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: calc(0.25rem * 2);
     }
   }
   .card-title {
@@ -2993,14 +2395,6 @@
   .table {
     display: table;
   }
-  .btn-circle {
-    @layer daisyui.l1.l2 {
-      border-radius: calc(infinity * 1px);
-      padding-inline: calc(0.25rem * 0);
-      width: var(--size);
-      height: var(--size);
-    }
-  }
   .loading-lg {
     @layer daisyui.l1.l2 {
       width: calc(var(--size-selector, 0.25rem) * 7);
@@ -3010,6 +2404,9 @@
     @layer daisyui.l1.l2 {
       width: calc(var(--size-selector, 0.25rem) * 5);
     }
+  }
+  .w-full {
+    width: 100%;
   }
   .flex-shrink {
     flex-shrink: 1;
@@ -3063,9 +2460,23 @@
   .flex-wrap {
     flex-wrap: wrap;
   }
+  .justify-end {
+    justify-content: flex-end;
+  }
   .border {
     border-style: var(--tw-border-style);
     border-width: 1px;
+  }
+  .badge-ghost {
+    @layer daisyui.l1.l2 {
+      border-color: var(--color-base-200);
+      background-color: var(--color-base-200);
+      color: var(--color-base-content);
+      background-image: none;
+    }
+  }
+  .bg-base-100 {
+    background-color: var(--color-base-100);
   }
   .loading-spinner {
     @layer daisyui.l1.l2 {
@@ -3075,36 +2486,60 @@
   .mask-repeat {
     mask-repeat: repeat;
   }
-  .menu-title {
-    @layer daisyui.l1.l2.l3 {
-      padding-inline: calc(0.25rem * 3);
-      padding-block: calc(0.25rem * 2);
-      color: var(--color-base-content);
-      @supports (color: color-mix(in lab, red, red)) {
-        color: color-mix(in oklab, var(--color-base-content) 40%, transparent);
-      }
-      font-size: 0.875rem;
-      font-weight: 600;
-    }
-  }
-  .file-input-sm {
+  .select-sm {
     @layer daisyui.l1.l2 {
       --size: calc(var(--size-field, 0.25rem) * 8);
       font-size: 0.75rem;
-      line-height: 1.5rem;
-      &::file-selector-button {
-        font-size: 0.75rem;
+      option {
+        padding-inline: calc(0.25rem * 2.5);
+        padding-block: calc(0.25rem * 1);
       }
     }
   }
-  .badge-sm {
+  .table-sm {
     @layer daisyui.l1.l2 {
-      --size: calc(var(--size-selector, 0.25rem) * 5);
-      font-size: 0.75rem;
+      :not(thead, tfoot) tr {
+        font-size: 0.75rem;
+      }
+      :where(th, td) {
+        padding-inline: calc(0.25rem * 3);
+        padding-block: calc(0.25rem * 2);
+      }
     }
+  }
+  .py-4 {
+    padding-block: calc(var(--spacing) * 4);
+  }
+  .text-right {
+    text-align: right;
+  }
+  .text-lg {
+    font-size: var(--text-lg);
+    line-height: var(--tw-leading, var(--text-lg--line-height));
+  }
+  .font-bold {
+    --tw-font-weight: var(--font-weight-bold);
+    font-weight: var(--font-weight-bold);
   }
   .text-wrap {
     text-wrap: wrap;
+  }
+  .alert-error {
+    @layer daisyui.l1.l2 {
+      color: var(--color-error-content);
+      --alert-border-color: var(--color-error);
+      --alert-color: var(--color-error);
+    }
+  }
+  .alert-success {
+    @layer daisyui.l1.l2 {
+      color: var(--color-success-content);
+      --alert-border-color: var(--color-success);
+      --alert-color: var(--color-success);
+    }
+  }
+  .text-error {
+    color: var(--color-error);
   }
   .prose {
     & :where(a.btn:not(.btn-link)):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
@@ -3118,8 +2553,8 @@
     --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
-  .ring {
-    --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);
+  .shadow-sm {
+    --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
   .outline {
@@ -3157,10 +2592,6 @@
   .filter {
     filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
   }
-  .backdrop-filter {
-    -webkit-backdrop-filter: var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);
-    backdrop-filter: var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);
-  }
   .transition {
     transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, transform, translate, scale, rotate, filter, -webkit-backdrop-filter, backdrop-filter, display, content-visibility, overlay, pointer-events;
     transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
@@ -3174,26 +2605,6 @@
     --tw-ease: var(--ease-out);
     transition-timing-function: var(--ease-out);
   }
-  .btn-outline {
-    @layer daisyui.l1 {
-      &:not( .btn-active, :hover, :active:focus, :focus-visible, input:checked:not(.filter .btn), :disabled, [disabled], .btn-disabled ) {
-        --btn-shadow: "";
-        --btn-bg: #0000;
-        --btn-fg: var(--btn-color);
-        --btn-border: var(--btn-color);
-        --btn-noise: none;
-      }
-      @media (hover: none) {
-        &:not(.btn-active, :active, :focus-visible, input:checked:not(.filter .btn)):hover {
-          --btn-shadow: "";
-          --btn-bg: #0000;
-          --btn-fg: var(--btn-color);
-          --btn-border: var(--btn-color);
-          --btn-noise: none;
-        }
-      }
-    }
-  }
   .btn-sm {
     @layer daisyui.l1.l2 {
       --fontsize: 0.75rem;
@@ -3201,22 +2612,17 @@
       --size: calc(var(--size-field, 0.25rem) * 8);
     }
   }
-  .badge-primary {
+  .btn-xs {
     @layer daisyui.l1.l2 {
-      --badge-color: var(--color-primary);
-      --badge-fg: var(--color-primary-content);
+      --fontsize: 0.6875rem;
+      --btn-p: 0.5rem;
+      --size: calc(var(--size-field, 0.25rem) * 6);
     }
   }
-  .badge-success {
-    @layer daisyui.l1.l2 {
-      --badge-color: var(--color-success);
-      --badge-fg: var(--color-success-content);
-    }
-  }
-  .badge-warning {
-    @layer daisyui.l1.l2 {
-      --badge-color: var(--color-warning);
-      --badge-fg: var(--color-warning-content);
+  .btn-error {
+    @layer daisyui.l1.l2.l3 {
+      --btn-color: var(--color-error);
+      --btn-fg: var(--color-error-content);
     }
   }
   .btn-primary {
@@ -3497,6 +2903,10 @@
   inherits: false;
   initial-value: solid;
 }
+@property --tw-font-weight {
+  syntax: "*";
+  inherits: false;
+}
 @property --tw-shadow {
   syntax: "*";
   inherits: false;
@@ -3620,42 +3030,6 @@
   syntax: "*";
   inherits: false;
 }
-@property --tw-backdrop-blur {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-backdrop-brightness {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-backdrop-contrast {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-backdrop-grayscale {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-backdrop-hue-rotate {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-backdrop-invert {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-backdrop-opacity {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-backdrop-saturate {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-backdrop-sepia {
-  syntax: "*";
-  inherits: false;
-}
 @property --tw-ease {
   syntax: "*";
   inherits: false;
@@ -3669,6 +3043,7 @@
       --tw-skew-x: initial;
       --tw-skew-y: initial;
       --tw-border-style: solid;
+      --tw-font-weight: initial;
       --tw-shadow: 0 0 #0000;
       --tw-shadow-color: initial;
       --tw-shadow-alpha: 100%;
@@ -3697,15 +3072,6 @@
       --tw-drop-shadow-color: initial;
       --tw-drop-shadow-alpha: 100%;
       --tw-drop-shadow-size: initial;
-      --tw-backdrop-blur: initial;
-      --tw-backdrop-brightness: initial;
-      --tw-backdrop-contrast: initial;
-      --tw-backdrop-grayscale: initial;
-      --tw-backdrop-hue-rotate: initial;
-      --tw-backdrop-invert: initial;
-      --tw-backdrop-opacity: initial;
-      --tw-backdrop-saturate: initial;
-      --tw-backdrop-sepia: initial;
       --tw-ease: initial;
     }
   }

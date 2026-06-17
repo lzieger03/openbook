@@ -73,3 +73,11 @@ if settings.DEBUG:
 
     # Gamification dashboard microfrontend
     urlpatterns += static("dashboard/", document_root=f"{settings.BASE_DIR}/frontend/dashboard/dist/openbook/dashboard")
+
+    # Teacher microfrontend
+    urlpatterns += [re_path(r"^teacher/$", serve, kwargs={
+        "path":          "index.html",
+        "document_root": f"{settings.BASE_DIR}/frontend/teacher/dist/openbook/teacher"
+    })]
+
+    urlpatterns += static("teacher/", document_root=f"{settings.BASE_DIR}/frontend/teacher/dist/openbook/teacher")

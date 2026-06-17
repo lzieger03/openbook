@@ -34,6 +34,20 @@ function deferred() {
   });
   return { promise, resolve, reject };
 }
+function to_array(value, n) {
+  if (Array.isArray(value)) {
+    return value;
+  }
+  if (n === void 0 || !(Symbol.iterator in value)) {
+    return Array.from(value);
+  }
+  const array = [];
+  for (const element2 of value) {
+    array.push(element2);
+    if (array.length === n) break;
+  }
+  return array;
+}
 
 // ../../../node_modules/svelte/src/internal/client/constants.js
 var DERIVED = 1 << 1;
@@ -218,6 +232,17 @@ https://svelte.dev/e/hydration_failed`);
     throw new Error(`https://svelte.dev/e/hydration_failed`);
   }
 }
+function invalid_snippet() {
+  if (dev_fallback_default) {
+    const error = new Error(`invalid_snippet
+Could not \`{@render}\` snippet due to the expression being \`null\` or \`undefined\`. Consider using optional chaining \`{@render snippet?.()}\`
+https://svelte.dev/e/invalid_snippet`);
+    error.name = "Svelte error";
+    throw error;
+  } else {
+    throw new Error(`https://svelte.dev/e/invalid_snippet`);
+  }
+}
 function props_invalid_value(key2) {
   if (dev_fallback_default) {
     const error = new Error(`props_invalid_value
@@ -374,6 +399,15 @@ https://svelte.dev/e/lifecycle_double_unmount`, bold, normal);
     console.warn(`https://svelte.dev/e/lifecycle_double_unmount`);
   }
 }
+function select_multiple_invalid_value() {
+  if (dev_fallback_default) {
+    console.warn(`%c[svelte] select_multiple_invalid_value
+%cThe \`value\` property of a \`<select multiple>\` element should be an array, but it received a non-array value. The selection will be kept as is.
+https://svelte.dev/e/select_multiple_invalid_value`, bold, normal);
+  } else {
+    console.warn(`https://svelte.dev/e/select_multiple_invalid_value`);
+  }
+}
 function state_proxy_equality_mismatch(operator) {
   if (dev_fallback_default) {
     console.warn(`%c[svelte] state_proxy_equality_mismatch
@@ -437,7 +471,7 @@ function next(count = 1) {
     hydrate_node = node;
   }
 }
-function skip_nodes(remove = true) {
+function skip_nodes(remove2 = true) {
   var depth = 0;
   var node = hydrate_node;
   while (true) {
@@ -458,7 +492,7 @@ function skip_nodes(remove = true) {
       /** @type {TemplateNode} */
       get_next_sibling(node)
     );
-    if (remove) node.remove();
+    if (remove2) node.remove();
     node = next2;
   }
 }
@@ -782,7 +816,7 @@ function writable(value, start = noop) {
       }
     }
   }
-  function update2(fn) {
+  function update3(fn) {
     set2(fn(
       /** @type {T} */
       value
@@ -792,7 +826,7 @@ function writable(value, start = noop) {
     const subscriber = [run3, invalidate];
     subscribers.add(subscriber);
     if (subscribers.size === 1) {
-      stop = start(set2, update2) || noop;
+      stop = start(set2, update3) || noop;
     }
     run3(
       /** @type {T} */
@@ -806,7 +840,7 @@ function writable(value, start = noop) {
       }
     };
   }
-  return { set: set2, update: update2, subscribe };
+  return { set: set2, update: update3, subscribe };
 }
 function get(store) {
   let value;
@@ -1059,11 +1093,11 @@ var Batch = class _Batch {
     var effects = collected_effects = [];
     var render_effects = [];
     var updates = legacy_updates = [];
-    for (const root16 of roots) {
+    for (const root9 of roots) {
       try {
-        this.#traverse(root16, effects, render_effects);
+        this.#traverse(root9, effects, render_effects);
       } catch (e) {
-        reset_all(root16);
+        reset_all(root9);
         if (!this.#is_deferred()) this.discard();
         throw e;
       }
@@ -1136,9 +1170,9 @@ var Batch = class _Batch {
    * @param {Effect[]} effects
    * @param {Effect[]} render_effects
    */
-  #traverse(root16, effects, render_effects) {
-    root16.f ^= CLEAN;
-    var effect2 = root16.first;
+  #traverse(root9, effects, render_effects) {
+    root9.f ^= CLEAN;
+    var effect2 = root9.first;
     while (effect2 !== null) {
       var flags2 = effect2.f;
       var is_branch = (flags2 & (BRANCH_EFFECT | ROOT_EFFECT)) !== 0;
@@ -1375,8 +1409,8 @@ var Batch = class _Batch {
         }
         if (batch.#roots.length > 0 && !batch.#decrement_queued) {
           batch.apply();
-          for (var root16 of batch.#roots) {
-            batch.#traverse(root16, [], []);
+          for (var root9 of batch.#roots) {
+            batch.#traverse(root9, [], []);
           }
           batch.#roots = [];
         }
@@ -1565,18 +1599,18 @@ function infinite_loop_guard() {
       /** @type {Batch} */
       current_batch.current.keys()
     ) {
-      for (const [stack2, update2] of source2.updated ?? []) {
+      for (const [stack2, update3] of source2.updated ?? []) {
         var entry = updates.get(stack2);
         if (!entry) {
-          entry = { error: update2.error, count: 0 };
+          entry = { error: update3.error, count: 0 };
           updates.set(stack2, entry);
         }
-        entry.count += update2.count;
+        entry.count += update3.count;
       }
     }
-    for (const update2 of updates.values()) {
-      if (update2.error) {
-        console.error(update2.error);
+    for (const update3 of updates.values()) {
+      if (update3.error) {
+        console.error(update3.error);
       }
     }
   }
@@ -2953,6 +2987,9 @@ function get_proxied_value(value) {
   }
   return value;
 }
+function is(a, b) {
+  return Object.is(get_proxied_value(a), get_proxied_value(b));
+}
 var ARRAY_MUTATING_METHODS = /* @__PURE__ */ new Set([
   "copyWithin",
   "fill",
@@ -3677,7 +3714,7 @@ function is_dirty(reaction) {
   }
   return false;
 }
-function schedule_possible_effect_self_invalidation(signal, effect2, root16 = true) {
+function schedule_possible_effect_self_invalidation(signal, effect2, root9 = true) {
   var reactions = signal.reactions;
   if (reactions === null) return;
   if (!async_mode_flag && current_sources !== null && current_sources.has(signal)) {
@@ -3693,7 +3730,7 @@ function schedule_possible_effect_self_invalidation(signal, effect2, root16 = tr
         false
       );
     } else if (effect2 === reaction) {
-      if (root16) {
+      if (root9) {
         set_signal_status(reaction, DIRTY);
       } else if ((reaction.f & CLEAN) !== 0) {
         set_signal_status(reaction, MAYBE_DIRTY);
@@ -4147,38 +4184,6 @@ function register_style(hash2, style) {
 var event_symbol = /* @__PURE__ */ Symbol("events");
 var all_registered_events = /* @__PURE__ */ new Set();
 var root_event_handles = /* @__PURE__ */ new Set();
-function create_event(event_name, dom, handler, options = {}) {
-  function target_handler(event2) {
-    if (!options.capture) {
-      handle_event_propagation.call(dom, event2);
-    }
-    if (!event2.cancelBubble) {
-      return without_reactive_context(() => {
-        return handler?.call(this, event2);
-      });
-    }
-  }
-  if (event_name.startsWith("pointer") || event_name.startsWith("touch") || event_name === "wheel") {
-    queue_micro_task(() => {
-      dom.addEventListener(event_name, target_handler, options);
-    });
-  } else {
-    dom.addEventListener(event_name, target_handler, options);
-  }
-  return target_handler;
-}
-function event(event_name, dom, handler, capture2, passive2) {
-  var options = { capture: capture2, passive: passive2 };
-  var target_handler = create_event(event_name, dom, handler, options);
-  if (dom === document.body || // @ts-ignore
-  dom === window || // @ts-ignore
-  dom === document || // Firefox has quirky behavior, it can happen that we still get "canplay" events when the element is already removed
-  dom instanceof HTMLMediaElement) {
-    teardown(() => {
-      dom.removeEventListener(event_name, target_handler, options);
-    });
-  }
-}
 function delegated(event_name, element2, handler) {
   (element2[event_symbol] ??= {})[event_name] = handler;
 }
@@ -4344,63 +4349,6 @@ function from_html(content, flags2) {
     }
     return clone;
   };
-}
-// @__NO_SIDE_EFFECTS__
-function from_namespace(content, flags2, ns = "svg") {
-  var has_start = !content.startsWith("<!>");
-  var is_fragment = (flags2 & TEMPLATE_FRAGMENT) !== 0;
-  var wrapped = `<${ns}>${has_start ? content : "<!>" + content}</${ns}>`;
-  var node;
-  return () => {
-    if (hydrating) {
-      assign_nodes(hydrate_node, null);
-      return hydrate_node;
-    }
-    if (!node) {
-      var fragment = (
-        /** @type {DocumentFragment} */
-        create_fragment_from_html(wrapped)
-      );
-      var root16 = (
-        /** @type {Element} */
-        get_first_child(fragment)
-      );
-      if (is_fragment) {
-        node = document.createDocumentFragment();
-        while (get_first_child(root16)) {
-          node.appendChild(
-            /** @type {TemplateNode} */
-            get_first_child(root16)
-          );
-        }
-      } else {
-        node = /** @type {Element} */
-        get_first_child(root16);
-      }
-    }
-    var clone = (
-      /** @type {TemplateNode} */
-      node.cloneNode(true)
-    );
-    if (is_fragment) {
-      var start = (
-        /** @type {TemplateNode} */
-        get_first_child(clone)
-      );
-      var end = (
-        /** @type {TemplateNode} */
-        clone.lastChild
-      );
-      assign_nodes(start, end);
-    } else {
-      assign_nodes(clone, clone);
-    }
-    return clone;
-  };
-}
-// @__NO_SIDE_EFFECTS__
-function from_svg(content, flags2) {
-  return /* @__PURE__ */ from_namespace(content, flags2, "svg");
 }
 function comment() {
   if (hydrating) {
@@ -4824,9 +4772,6 @@ function if_block(node, fn, elseif = false) {
 }
 
 // ../../../node_modules/svelte/src/internal/client/dom/blocks/each.js
-function index(_, i) {
-  return i;
-}
 function pause_effects(state3, to_destroy, controlled_anchor) {
   var transitions = [];
   var length = to_destroy.length;
@@ -5300,6 +5245,18 @@ function validate_each_keys(array, key_fn) {
   }
 }
 
+// ../../../node_modules/svelte/src/internal/client/dom/blocks/snippet.js
+function snippet(node, get_snippet, ...args) {
+  var branches = new BranchManager(node);
+  block(() => {
+    const snippet2 = get_snippet() ?? null;
+    if (dev_fallback_default && snippet2 == null) {
+      invalid_snippet();
+    }
+    branches.ensure(snippet2, snippet2 && ((anchor) => snippet2(anchor, ...args)));
+  }, EFFECT_TRANSPARENT);
+}
+
 // ../../../node_modules/svelte/src/internal/client/dom/blocks/svelte-component.js
 function component(node, get_component, render_fn) {
   var hydration_start_node;
@@ -5334,16 +5291,16 @@ function component(node, get_component, render_fn) {
 // ../../../node_modules/svelte/src/internal/client/dom/css.js
 function append_styles(anchor, css) {
   effect(() => {
-    var root16 = anchor.getRootNode();
+    var root9 = anchor.getRootNode();
     var target = (
       /** @type {ShadowRoot} */
-      root16.host ? (
+      root9.host ? (
         /** @type {ShadowRoot} */
-        root16
+        root9
       ) : (
         /** @type {Document} */
-        root16.head ?? /** @type {Document} */
-        root16.ownerDocument.head
+        root9.head ?? /** @type {Document} */
+        root9.ownerDocument.head
       )
     );
     if (!target.querySelector("#" + css.hash)) {
@@ -5385,99 +5342,6 @@ function to_class(value, hash2, directives) {
   }
   return classname === "" ? null : classname;
 }
-function append_styles2(styles, important = false) {
-  var separator = important ? " !important;" : ";";
-  var css = "";
-  for (var key2 of Object.keys(styles)) {
-    var value = styles[key2];
-    if (value != null && value !== "") {
-      css += " " + key2 + ": " + value + separator;
-    }
-  }
-  return css;
-}
-function to_css_name(name) {
-  if (name[0] !== "-" || name[1] !== "-") {
-    return name.toLowerCase();
-  }
-  return name;
-}
-function to_style(value, styles) {
-  if (styles) {
-    var new_style = "";
-    var normal_styles;
-    var important_styles;
-    if (Array.isArray(styles)) {
-      normal_styles = styles[0];
-      important_styles = styles[1];
-    } else {
-      normal_styles = styles;
-    }
-    if (value) {
-      value = String(value).replaceAll(/\s*\/\*.*?\*\/\s*/g, "").trim();
-      var in_str = false;
-      var in_apo = 0;
-      var in_comment = false;
-      var reserved_names = [];
-      if (normal_styles) {
-        reserved_names.push(...Object.keys(normal_styles).map(to_css_name));
-      }
-      if (important_styles) {
-        reserved_names.push(...Object.keys(important_styles).map(to_css_name));
-      }
-      var start_index = 0;
-      var name_index = -1;
-      const len = value.length;
-      for (var i = 0; i < len; i++) {
-        var c = value[i];
-        if (in_comment) {
-          if (c === "/" && value[i - 1] === "*") {
-            in_comment = false;
-          }
-        } else if (in_str) {
-          if (in_str === c) {
-            in_str = false;
-          }
-        } else if (c === "/" && value[i + 1] === "*") {
-          in_comment = true;
-        } else if (c === '"' || c === "'") {
-          in_str = c;
-        } else if (c === "(") {
-          in_apo++;
-        } else if (c === ")") {
-          in_apo--;
-        }
-        if (!in_comment && in_str === false && in_apo === 0) {
-          if (c === ":" && name_index === -1) {
-            name_index = i;
-          } else if (c === ";" || i === len - 1) {
-            if (name_index !== -1) {
-              var name = to_css_name(value.substring(start_index, name_index).trim());
-              if (!reserved_names.includes(name)) {
-                if (c !== ";") {
-                  i++;
-                }
-                var property = value.substring(start_index, i).trim();
-                new_style += " " + property + ";";
-              }
-            }
-            start_index = i + 1;
-            name_index = -1;
-          }
-        }
-      }
-    }
-    if (normal_styles) {
-      new_style += append_styles2(normal_styles);
-    }
-    if (important_styles) {
-      new_style += append_styles2(important_styles, true);
-    }
-    new_style = new_style.trim();
-    return new_style === "" ? null : new_style;
-  }
-  return value == null ? null : String(value);
-}
 
 // ../../../node_modules/svelte/src/internal/client/dom/elements/class.js
 function set_class(dom, is_html, value, hash2, prev_classes, next_classes) {
@@ -5508,50 +5372,105 @@ function set_class(dom, is_html, value, hash2, prev_classes, next_classes) {
   return next_classes;
 }
 
-// ../../../node_modules/svelte/src/internal/client/dom/elements/style.js
-function update_styles(dom, prev = {}, next2, priority) {
-  for (var key2 in next2) {
-    var value = next2[key2];
-    if (prev[key2] !== value) {
-      if (next2[key2] == null) {
-        dom.style.removeProperty(key2);
-      } else {
-        dom.style.setProperty(key2, value, priority);
-      }
+// ../../../node_modules/svelte/src/internal/client/dom/elements/bindings/select.js
+function select_option(select, value, mounting = false) {
+  if (select.multiple) {
+    if (value == void 0) {
+      return;
     }
+    if (!is_array(value)) {
+      return select_multiple_invalid_value();
+    }
+    for (var option of select.options) {
+      option.selected = value.includes(get_option_value(option));
+    }
+    return;
+  }
+  for (option of select.options) {
+    var option_value = get_option_value(option);
+    if (is(option_value, value)) {
+      option.selected = true;
+      return;
+    }
+  }
+  if (!mounting || value !== void 0) {
+    select.selectedIndex = -1;
   }
 }
-function set_style(dom, value, prev_styles, next_styles) {
-  var prev = (
-    /** @type {any} */
-    dom[STYLE_CACHE]
-  );
-  if (hydrating || prev !== value) {
-    var next_style_attr = to_style(value, next_styles);
-    if (!hydrating || next_style_attr !== dom.getAttribute("style")) {
-      if (next_style_attr == null) {
-        dom.removeAttribute("style");
-      } else {
-        dom.style.cssText = next_style_attr;
+function init_select(select) {
+  var observer = new MutationObserver(() => {
+    select_option(select, select.__value);
+  });
+  observer.observe(select, {
+    // Listen to option element changes
+    childList: true,
+    subtree: true,
+    // because of <optgroup>
+    // Listen to option element value attribute changes
+    // (doesn't get notified of select value changes,
+    // because that property is not reflected as an attribute)
+    attributes: true,
+    attributeFilter: ["value"]
+  });
+  teardown(() => {
+    observer.disconnect();
+  });
+}
+function bind_select_value(select, get3, set2 = get3) {
+  var batches = /* @__PURE__ */ new WeakSet();
+  var mounting = true;
+  listen_to_event_and_reset_event(select, "change", (is_reset) => {
+    var query = is_reset ? "[selected]" : ":checked";
+    var value;
+    if (select.multiple) {
+      value = [].map.call(select.querySelectorAll(query), get_option_value);
+    } else {
+      var selected_option = select.querySelector(query) ?? // will fall back to first non-disabled option if no option is selected
+      select.querySelector("option:not([disabled])");
+      value = selected_option && get_option_value(selected_option);
+    }
+    set2(value);
+    select.__value = value;
+    if (current_batch !== null) {
+      batches.add(current_batch);
+    }
+  });
+  effect(() => {
+    var value = get3();
+    if (select === document.activeElement) {
+      var batch = (
+        /** @type {Batch} */
+        async_mode_flag ? previous_batch : current_batch
+      );
+      if (batches.has(batch)) {
+        return;
       }
     }
-    dom[STYLE_CACHE] = value;
-  } else if (next_styles) {
-    if (Array.isArray(next_styles)) {
-      update_styles(dom, prev_styles?.[0], next_styles[0]);
-      update_styles(dom, prev_styles?.[1], next_styles[1], "important");
-    } else {
-      update_styles(dom, prev_styles, next_styles);
+    select_option(select, value, mounting);
+    if (mounting && value === void 0) {
+      var selected_option = select.querySelector(":checked");
+      if (selected_option !== null) {
+        value = get_option_value(selected_option);
+        set2(value);
+      }
     }
+    select.__value = value;
+    mounting = false;
+  });
+  init_select(select);
+}
+function get_option_value(option) {
+  if ("__value" in option) {
+    return option.__value;
+  } else {
+    return option.value;
   }
-  return next_styles;
 }
 
 // ../../../node_modules/svelte/src/internal/client/dom/elements/attributes.js
 var IS_CUSTOM_ELEMENT = /* @__PURE__ */ Symbol("is custom element");
 var IS_HTML = /* @__PURE__ */ Symbol("is html");
 var LINK_TAG = IS_XHTML ? "link" : "LINK";
-var PROGRESS_TAG = IS_XHTML ? "progress" : "PROGRESS";
 function remove_input_defaults(input) {
   if (!hydrating) return;
   var already_removed = false;
@@ -5572,16 +5491,6 @@ function remove_input_defaults(input) {
   input[FORM_RESET_HANDLER] = remove_defaults;
   queue_micro_task(remove_defaults);
   add_form_reset_listener();
-}
-function set_value(element2, value) {
-  var attributes = get_attributes(element2);
-  if (attributes.value === (attributes.value = // treat null and undefined the same for the initial value
-  value ?? void 0) || // @ts-expect-error
-  // `progress` elements always need their value set when it's `0`
-  element2.value === value && (value !== 0 || element2.nodeName !== PROGRESS_TAG)) {
-    return;
-  }
-  element2.value = value ?? "";
 }
 function set_attribute2(element2, attribute, value, skip_warning) {
   var attributes = get_attributes(element2);
@@ -6344,12 +6253,6 @@ function onMount(fn) {
     });
   }
 }
-function onDestroy(fn) {
-  if (component_context === null) {
-    lifecycle_outside_component("onDestroy");
-  }
-  onMount(() => () => untrack(fn));
-}
 function init_update_callbacks(context) {
   var l = (
     /** @type {ComponentContextLegacy} */
@@ -6359,7 +6262,7 @@ function init_update_callbacks(context) {
 }
 
 // src/theme.ts
-var STORAGE_KEY = "openbook-dashboard-theme";
+var STORAGE_KEY = "openbook-teacher-theme";
 var DARK_QUERY = "(prefers-color-scheme: dark)";
 function systemTheme() {
   return window.matchMedia(DARK_QUERY).matches ? "dark" : "light";
@@ -6858,207 +6761,6 @@ create_custom_element(
   { mode: "open" }
 );
 
-// src/api/websocket.ts
-var MAX_ATTEMPTS = 5;
-var BASE_DELAY_MS = 250;
-var STABLE_CONNECTION_MS = 4e3;
-var MAX_UNSTABLE_RETRIES = 4;
-var WebSocketServerError = class extends Error {
-  payload;
-  constructor(message, payload = [], cause) {
-    super(message, { cause });
-    this.name = "WebSocketServerError";
-    this.payload = payload;
-  }
-};
-function isWebSocketServerErrorMessage(message) {
-  return typeof message === "object" && message !== null && "action" in message && message.action === "error";
-}
-function formatServerError(payload) {
-  if (!Array.isArray(payload) || payload.length === 0) {
-    return "Unknown WebSocket error.";
-  }
-  return payload.map(({ type, msg, loc }) => {
-    const reason = msg || "Unknown WebSocket error.";
-    const suffix = Array.isArray(loc) && loc.length ? ` (${loc.map(String).join(".")})` : "";
-    return type ? `${reason} [${type}]${suffix}` : `${reason}${suffix}`;
-  }).join("\n");
-}
-var WebSocketClient = class {
-  #url;
-  #socket;
-  #status = "disconnected";
-  #statusListener;
-  #errorHandler;
-  #messageHandlers = /* @__PURE__ */ new Map();
-  #messageQueue = [];
-  #openedAt = 0;
-  #unstableRetries = 0;
-  constructor(url) {
-    this.#url = url;
-  }
-  /** Register a listener for connection status changes (replaces the previous one). */
-  setConnectionStatusListener(listener) {
-    this.#statusListener = listener;
-  }
-  /** Register a handler for generic WebSocket errors (replaces the previous one). */
-  setErrorHandler(handler) {
-    this.#errorHandler = handler;
-  }
-  /** Register a handler for a given received message `action` (replaces the previous one). */
-  setMessageHandler(action2, handler) {
-    this.#messageHandlers.set(action2, handler);
-  }
-  async #setConnectionStatus(status, reconnectInSec = 0) {
-    this.#status = status;
-    if (this.#statusListener) {
-      await this.#statusListener(status, reconnectInSec);
-    }
-  }
-  /**
-   * Connect to the server, retrying up to `MAX_ATTEMPTS` times with increasing
-   * delays. Throws if the connection cannot be established.
-   */
-  async connect() {
-    if (this.#status !== "disconnected") {
-      return;
-    }
-    let lastError = null;
-    let delayMs = BASE_DELAY_MS;
-    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-      lastError = null;
-      try {
-        await this.#setConnectionStatus("connecting");
-        await new Promise((resolve, reject) => {
-          this.#socket = new WebSocket(this.#url);
-          this.#socket.addEventListener("open", async () => {
-            this.#openedAt = Date.now();
-            await this.#setConnectionStatus("connected");
-            for (const message of this.#messageQueue) {
-              await this.#send(message);
-            }
-            this.#messageQueue = [];
-            resolve(void 0);
-          });
-          this.#socket.addEventListener("close", () => {
-            this.#socket = void 0;
-            if (this.#status === "connecting") {
-              reject(new Error("WebSocket connection failed."));
-            }
-            if (this.#status === "disconnected") {
-              return;
-            }
-            const uptime = Date.now() - this.#openedAt;
-            window.setTimeout(async () => {
-              await this.#setConnectionStatus("disconnected");
-              if (uptime < STABLE_CONNECTION_MS) {
-                this.#unstableRetries++;
-                if (this.#unstableRetries > MAX_UNSTABLE_RETRIES) {
-                  if (this.#errorHandler) {
-                    await this.#errorHandler(
-                      new Error("The assistant keeps dropping the connection. Please try again later.")
-                    );
-                  }
-                  return;
-                }
-                await new Promise((r) => setTimeout(r, BASE_DELAY_MS * 2 ** this.#unstableRetries));
-              } else {
-                this.#unstableRetries = 0;
-              }
-              try {
-                await this.connect();
-              } catch (error) {
-                console.error(error);
-                if (this.#errorHandler) {
-                  await this.#errorHandler(error);
-                }
-              }
-            }, 0);
-          });
-          this.#socket.addEventListener("error", async (error) => {
-            console.error(error);
-            if (this.#errorHandler) {
-              await this.#errorHandler(error);
-            }
-          });
-          this.#socket.addEventListener("message", async (event2) => {
-            try {
-              const message = JSON.parse(event2.data);
-              if (!message.action) {
-                throw new Error("Received a WebSocket message without an `action`.");
-              }
-              if (isWebSocketServerErrorMessage(message)) {
-                const error = new WebSocketServerError(
-                  formatServerError(message.payload),
-                  message.payload ?? [],
-                  message
-                );
-                console.error(error);
-                if (this.#errorHandler) {
-                  await this.#errorHandler(error);
-                }
-                return;
-              }
-              const handler = this.#messageHandlers.get(message.action);
-              if (!handler) {
-                console.warn('No handler for WebSocket action "%s".', message.action, message);
-                return;
-              }
-              await handler(message);
-            } catch (error) {
-              console.error(error);
-              if (this.#errorHandler) {
-                await this.#errorHandler(error);
-              }
-            }
-          });
-        });
-      } catch (error) {
-        lastError = error;
-      }
-      if (this.#status === "connected") {
-        return;
-      }
-      await this.#setConnectionStatus("wait_before_retry", delayMs / 1e3);
-      await new Promise((resolve) => setTimeout(resolve, delayMs));
-      delayMs *= 2;
-      console.warn(`WebSocket retry ${attempt}/${MAX_ATTEMPTS} for ${this.#url}.`);
-    }
-    await this.#setConnectionStatus("disconnected");
-    if (lastError instanceof Error) {
-      throw lastError;
-    }
-    throw new Error("WebSocket connection failed.");
-  }
-  /** Disconnect and stop reconnecting until `connect()` is called again. */
-  async disconnect() {
-    if (!this.#socket) {
-      return;
-    }
-    await this.#setConnectionStatus("disconnected");
-    this.#socket.close();
-  }
-  /** Reset the unstable-connection counter and try connecting again. */
-  async retry() {
-    this.#unstableRetries = 0;
-    await this.connect();
-  }
-  /** Send a message, or queue it until the connection is (re)established. */
-  async send(message) {
-    if (this.#status === "connected" && this.#socket) {
-      await this.#send(message);
-    } else {
-      this.#messageQueue.push(message);
-    }
-  }
-  async #send(message) {
-    if (!this.#socket) {
-      return;
-    }
-    this.#socket.send(JSON.stringify(message));
-  }
-};
-
 // src/api/client.ts
 var baseUrlPromise = null;
 async function resolveBaseUrl() {
@@ -7077,16 +6779,6 @@ function getBaseUrl() {
     baseUrlPromise = resolveBaseUrl();
   }
   return baseUrlPromise;
-}
-async function ws(suffix) {
-  const path = suffix.startsWith("/") ? suffix : `/${suffix}`;
-  const wsUrl = new URL(`/ws${path}`, `${await getBaseUrl()}/`);
-  if (wsUrl.protocol === "http:") {
-    wsUrl.protocol = "ws:";
-  } else if (wsUrl.protocol === "https:") {
-    wsUrl.protocol = "wss:";
-  }
-  return new WebSocketClient(wsUrl.toString());
 }
 async function apiGet(path, query = {}) {
   const base = await getBaseUrl();
@@ -7162,44 +6854,9 @@ async function apiSend(method, path, body, options = {}) {
   return await response.json().catch(() => void 0);
 }
 
-// src/api/gamification.ts
+// src/api/courses.ts
 function toList(data) {
   return Array.isArray(data) ? data : data.results;
-}
-function fetchAccountProgress() {
-  return apiGet("/api/gamification/account_progress/me/");
-}
-async function fetchStreak() {
-  const data = await apiGet("/api/gamification/streak/");
-  if (Array.isArray(data)) {
-    return data[0] ?? null;
-  }
-  if ("results" in data) {
-    return data.results[0] ?? null;
-  }
-  return data;
-}
-async function fetchSkillProgress(username) {
-  const query = { _expand: "skill", _page_size: "100", _sort: "skill__name" };
-  if (username) {
-    query.account = username;
-  }
-  const data = await apiGet(
-    "/api/gamification/skill_progress/",
-    query
-  );
-  return toList(data);
-}
-async function fetchCourseProgress(username) {
-  const query = { _expand: "course", _page_size: "100", _sort: "course__name" };
-  if (username) {
-    query.account = username;
-  }
-  const data = await apiGet(
-    "/api/gamification/course_progress/",
-    query
-  );
-  return toList(data);
 }
 async function fetchCurrentUser() {
   const data = await apiGet(
@@ -7213,15 +6870,165 @@ async function fetchCurrentUser() {
   }
   return data;
 }
+async function fetchCourses(username) {
+  const query = { _page_size: "200", _sort: "name" };
+  if (username) {
+    query.created_by = username;
+  }
+  const data = await apiGet("/api/content/courses/", query);
+  return toList(data);
+}
+async function fetchCourse(id) {
+  return apiGet(`/api/content/courses/${encodeURIComponent(id)}/`);
+}
+async function createCourse(fields) {
+  return apiSend("POST", "/api/content/courses/", {
+    text_format: "MD",
+    is_template: false,
+    ...fields
+  });
+}
+async function updateCourse(id, fields) {
+  return apiSend("PATCH", `/api/content/courses/${encodeURIComponent(id)}/`, fields);
+}
+async function deleteCourse(id) {
+  await apiSend("DELETE", `/api/content/courses/${encodeURIComponent(id)}/`);
+}
+async function fetchLibraryGroups() {
+  const data = await apiGet(
+    "/api/content/library_groups/",
+    { _page_size: "200", _sort: "name" }
+  );
+  return toList(data);
+}
 
-// src/data/dashboard.ts
-function toNumber(value, fallback2 = 0) {
-  const numeric = typeof value === "number" ? value : Number(value);
-  return Number.isFinite(numeric) ? numeric : fallback2;
+// src/api/enrollment.ts
+var COURSE_SCOPE_TYPE = "openbook_content.course";
+var STUDENT_ROLE_SLUG = "student";
+function toList2(data) {
+  return Array.isArray(data) ? data : data.results;
 }
-function clampPercent(value) {
-  return Math.min(100, Math.max(0, value));
+async function searchUsers(term) {
+  const query = { _page_size: "25", _sort: "username" };
+  if (term.trim()) {
+    query._search = term.trim();
+  }
+  const data = await apiGet("/api/auth/users/", query);
+  return toList2(data);
 }
+async function findStudentRole(courseId) {
+  const data = await apiGet("/api/auth/roles/", {
+    scope_type: COURSE_SCOPE_TYPE,
+    scope_uuid: courseId,
+    slug: STUDENT_ROLE_SLUG
+  });
+  return toList2(data)[0] ?? null;
+}
+async function ensureStudentRole(courseId) {
+  const existing = await findStudentRole(courseId);
+  if (existing) {
+    return existing;
+  }
+  return apiSend("POST", "/api/auth/roles/", {
+    scope_type: COURSE_SCOPE_TYPE,
+    scope_uuid: courseId,
+    slug: STUDENT_ROLE_SLUG,
+    name: "Student",
+    description: "Enrolled student of this course.",
+    text_format: "MD",
+    priority: 10,
+    is_active: true,
+    permissions: []
+  });
+}
+async function fetchEnrolledStudents(courseId) {
+  const data = await apiGet(
+    "/api/auth/role_assignments/",
+    {
+      scope_type: COURSE_SCOPE_TYPE,
+      scope_uuid: courseId,
+      role: STUDENT_ROLE_SLUG,
+      _expand: "user",
+      _page_size: "200"
+    }
+  );
+  return toList2(data);
+}
+async function enrollStudent(courseId, username) {
+  const role = await ensureStudentRole(courseId);
+  return apiSend("POST", "/api/auth/role_assignments/", {
+    scope_type: COURSE_SCOPE_TYPE,
+    scope_uuid: courseId,
+    role: role.slug,
+    user: username,
+    assignment_method: "manual",
+    is_active: true
+  });
+}
+async function unenrollStudent(assignmentId) {
+  await apiSend("DELETE", `/api/auth/role_assignments/${encodeURIComponent(assignmentId)}/`);
+}
+
+// src/api/content.ts
+function toList3(data) {
+  return Array.isArray(data) ? data : data.results;
+}
+async function fetchTextbooks() {
+  const data = await apiGet("/api/content/textbooks/", {
+    _page_size: "200",
+    _sort: "name"
+  });
+  return toList3(data);
+}
+async function fetchTextbookPages(textbookId) {
+  const data = await apiGet(
+    "/api/content/textbook_pages/",
+    { textbook: textbookId, _sort: "position", _page_size: "500" }
+  );
+  return toList3(data);
+}
+async function fetchMaterials(courseId) {
+  const data = await apiGet(
+    "/api/content/course_materials/",
+    { course: courseId, _expand: "textbook", _sort: "position", _page_size: "200" }
+  );
+  return toList3(data);
+}
+async function addMaterial(courseId, textbookId, position) {
+  return apiSend("POST", "/api/content/course_materials/", {
+    course: courseId,
+    textbook: textbookId,
+    position
+  });
+}
+async function updateMaterialPosition(id, position) {
+  return apiSend("PATCH", `/api/content/course_materials/${encodeURIComponent(id)}/`, {
+    position
+  });
+}
+async function deleteMaterial(id) {
+  await apiSend("DELETE", `/api/content/course_materials/${encodeURIComponent(id)}/`);
+}
+async function fetchPageRanges(materialId) {
+  const data = await apiGet(
+    "/api/content/course_material_page_ranges/",
+    { material: materialId, _expand: "start_page,end_page", _sort: "position", _page_size: "200" }
+  );
+  return toList3(data);
+}
+async function addPageRange(materialId, startPageId, endPageId, position) {
+  return apiSend("POST", "/api/content/course_material_page_ranges/", {
+    material: materialId,
+    start_page: startPageId,
+    end_page: endPageId,
+    position
+  });
+}
+async function deletePageRange(id) {
+  await apiSend("DELETE", `/api/content/course_material_page_ranges/${encodeURIComponent(id)}/`);
+}
+
+// src/data/teacher.ts
 function mapUser(user) {
   if (!user) {
     return null;
@@ -7233,120 +7040,134 @@ function mapUser(user) {
     isAuthenticated: Boolean(user.is_authenticated)
   };
 }
-function levelProgress(points, progress) {
-  const currentMin = toNumber(progress?.current_level_min_points);
-  const nextMin = progress?.next_level_min_points;
-  if (nextMin === null || nextMin === void 0) {
-    return 100;
-  }
-  const span = nextMin - currentMin;
-  return span > 0 ? clampPercent((points - currentMin) / span * 100) : 0;
-}
-function mapStats(progress, streak) {
-  if (!progress && !streak) {
-    return null;
-  }
-  const points = toNumber(progress?.point_total);
+function mapCourse(course) {
   return {
-    points,
-    level: toNumber(progress?.level, 1),
-    levelProgress: levelProgress(points, progress),
-    nextLevelPoints: progress?.next_level_min_points ?? null,
-    currentStreak: toNumber(streak?.current_streak),
-    longestStreak: toNumber(streak?.longest_streak),
-    streakFreezes: toNumber(streak?.streak_freezes),
-    lastActiveDate: streak?.last_active_date ? new Date(streak.last_active_date) : null
+    id: course.id,
+    name: course.name,
+    description: course.description ?? "",
+    group: course.group,
+    materialCount: course.materials?.length ?? 0,
+    isTemplate: Boolean(course.is_template)
   };
 }
-function skillName(skill) {
-  if (typeof skill === "string") {
-    return { name: skill, iconPath: "" };
+function userFullName(user) {
+  if (typeof user === "string") {
+    return { username: user, fullName: user, avatarUrl: null };
   }
-  return { name: skill.name, iconPath: skill.icon_path ?? "" };
-}
-function mapSkills(records) {
-  return records.map((record) => {
-    const { name, iconPath } = skillName(record.skill);
-    return {
-      id: record.id,
-      name,
-      iconPath,
-      level: toNumber(record.level, 1),
-      progress: clampPercent(toNumber(record.progress))
-    };
-  });
-}
-function courseName(course) {
-  return typeof course === "string" ? course : course.name;
-}
-function mapCourses(records) {
-  return records.map((record) => ({
-    id: record.id,
-    name: courseName(record.course),
-    level: toNumber(record.course_level, 1),
-    points: toNumber(record.course_points),
-    progress: clampPercent(toNumber(record.course_progress))
-  }));
-}
-async function loadDashboardData() {
-  const user = await fetchCurrentUser();
-  const username = user?.username ?? null;
-  const [progress, streak, skills, courses] = await Promise.all([
-    fetchAccountProgress(),
-    fetchStreak(),
-    fetchSkillProgress(username),
-    fetchCourseProgress(username)
-  ]);
-  const ownSkills = username ? skills.filter((record) => record.account === username) : skills;
-  const ownCourses = username ? courses.filter((record) => record.account === username) : courses;
   return {
-    user: mapUser(user),
-    stats: mapStats(progress, streak),
-    skills: mapSkills(ownSkills),
-    courses: mapCourses(ownCourses)
+    username: user.username,
+    fullName: user.full_name || user.username,
+    avatarUrl: user.picture ?? null
   };
+}
+function mapStudent(assignment) {
+  const { username, fullName, avatarUrl } = userFullName(assignment.user);
+  return { assignmentId: assignment.id, username, fullName, avatarUrl };
+}
+function textbookName(textbook) {
+  if (typeof textbook === "string") {
+    return { id: textbook, name: textbook };
+  }
+  return { id: textbook.id, name: textbook.name };
+}
+function mapMaterial(material) {
+  const { id, name } = textbookName(material.textbook);
+  return {
+    id: material.id,
+    position: material.position,
+    textbookId: id,
+    textbookName: name,
+    pageRangeCount: material.page_ranges?.length ?? 0
+  };
+}
+function pageName(page) {
+  return typeof page === "string" ? page : page.name;
+}
+function mapPageRange(range) {
+  return {
+    id: range.id,
+    position: range.position,
+    startPageName: pageName(range.start_page),
+    endPageName: pageName(range.end_page)
+  };
+}
+async function loadCurrentUser() {
+  return mapUser(await fetchCurrentUser());
+}
+async function loadCourses(username) {
+  const courses = await fetchCourses(username);
+  return courses.map(mapCourse);
+}
+async function loadStudents(courseId) {
+  const assignments = await fetchEnrolledStudents(courseId);
+  return assignments.map(mapStudent);
+}
+async function loadMaterials(courseId) {
+  const materials = await fetchMaterials(courseId);
+  return materials.map(mapMaterial).sort((a, b) => a.position - b.position);
+}
+async function loadPageRanges(materialId) {
+  const ranges = await fetchPageRanges(materialId);
+  return ranges.map(mapPageRange).sort((a, b) => a.position - b.position);
 }
 
-// src/stores/dashboard.store.ts
+// src/stores/teacher.store.ts
 var initialState = {
   isLoading: true,
   errorMessage: "",
   user: null,
-  stats: null,
-  skills: [],
   courses: []
 };
 var state2 = writable(initialState);
 function toMessage(error) {
   return error instanceof Error ? error.message : String(error);
 }
+var currentUsername = null;
 async function refresh() {
   state2.update((current) => ({ ...current, isLoading: true, errorMessage: "" }));
   try {
-    const data = await loadDashboardData();
-    state2.set({ isLoading: false, errorMessage: "", ...data });
+    const user = await loadCurrentUser();
+    currentUsername = user?.username ?? null;
+    const courses = await loadCourses(currentUsername);
+    state2.set({ isLoading: false, errorMessage: "", user, courses });
   } catch (error) {
     state2.update((current) => ({ ...current, isLoading: false, errorMessage: toMessage(error) }));
   }
 }
-var dashboardStore = {
+async function create(fields) {
+  await createCourse(fields);
+  await refresh();
+}
+async function update2(id, fields) {
+  await updateCourse(id, fields);
+  await refresh();
+}
+async function remove(id) {
+  await deleteCourse(id);
+  await refresh();
+}
+var teacherStore = {
   subscribe: state2.subscribe,
-  refresh
+  refresh,
+  create,
+  update: update2,
+  remove
 };
 
-// src/components/app-frame/DashboardHeader.svelte
-var root = from_html(`<img alt="" class="svelte-1xhay2l"/>`);
-var root_1 = from_html(`<header class="app-header svelte-1xhay2l"><div class="header-left svelte-1xhay2l"><img class="brand-logo svelte-1xhay2l"/> <span class="brand-text svelte-1xhay2l"> </span></div> <div class="header-right svelte-1xhay2l"><button type="button" class="theme-toggle svelte-1xhay2l"> </button> <span class="avatar-mark svelte-1xhay2l" aria-hidden="true"><!></span> <span class="page-label svelte-1xhay2l"> </span> <span class="status-pill svelte-1xhay2l"><span class="status-dot svelte-1xhay2l" aria-hidden="true"></span> </span></div></header>`);
+// src/components/app-frame/TeacherHeader.svelte
+var root = from_html(`<img alt="" class="svelte-oydpbb"/>`);
+var root_1 = from_html(`<span class="user-name svelte-oydpbb"> </span> <span class="avatar-mark svelte-oydpbb" aria-hidden="true"><!></span>`, 1);
+var root_2 = from_html(`<header class="app-header svelte-oydpbb"><div class="header-left svelte-oydpbb"><img class="brand-logo svelte-oydpbb"/> <span class="brand-text svelte-oydpbb"> </span> <span class="page-label svelte-oydpbb"> </span></div> <div class="header-right svelte-oydpbb"><button type="button" class="theme-toggle svelte-oydpbb"> </button> <!></div></header>`);
 var $$css = {
-  hash: "svelte-1xhay2l",
-  code: ".app-header.svelte-1xhay2l {position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0.75rem 1.5rem;background:var(--color-base-100);border-bottom:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);}.header-left.svelte-1xhay2l {display:flex;align-items:center;gap:0.75rem;font-weight:700;letter-spacing:0.05em;}.brand-logo.svelte-1xhay2l {width:2.4rem;height:2.4rem;border-radius:0.6rem;object-fit:contain;}.brand-text.svelte-1xhay2l {font-size:1.05rem;text-transform:uppercase;color:var(--color-base-content);}.header-right.svelte-1xhay2l {display:flex;align-items:center;gap:0.85rem;}.theme-toggle.svelte-1xhay2l {display:grid;place-items:center;width:2rem;height:2rem;border-radius:999px;font-size:1rem;cursor:pointer;background:color-mix(in oklab, var(--color-base-200) 70%, transparent);border:1px solid color-mix(in oklab, var(--color-base-content) 18%, transparent);}.theme-toggle.svelte-1xhay2l:hover {border-color:color-mix(in oklab, var(--color-primary) 50%, transparent);}.theme-toggle.svelte-1xhay2l:focus-visible {outline:2px solid var(--color-primary);outline-offset:2px;}.avatar-mark.svelte-1xhay2l {width:1.9rem;height:1.9rem;border-radius:999px;overflow:hidden;background:color-mix(in oklab, var(--color-base-content) 18%, transparent);}.avatar-mark.svelte-1xhay2l img:where(.svelte-1xhay2l) {width:100%;height:100%;object-fit:cover;}.page-label.svelte-1xhay2l {font-size:0.9rem;color:var(--color-primary);}.status-pill.svelte-1xhay2l {display:inline-flex;align-items:center;gap:0.5rem;padding:0.35rem 0.75rem;border-radius:999px;border:1px solid color-mix(in oklab, var(--color-base-content) 18%, transparent);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;background:color-mix(in oklab, var(--color-base-200) 70%, transparent);color:color-mix(in oklab, var(--color-base-content) 80%, transparent);}.status-dot.svelte-1xhay2l {width:0.5rem;height:0.5rem;border-radius:999px;background:var(--color-success);box-shadow:0 0 12px color-mix(in oklab, var(--color-success) 70%, transparent);}\n\n    @media (max-width: 40rem) {.app-header.svelte-1xhay2l {flex-direction:column;gap:0.75rem;text-align:center;}\n    }"
+  hash: "svelte-oydpbb",
+  code: ".app-header.svelte-oydpbb {display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0.75rem 1.5rem;background:var(--color-base-100);border-bottom:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);}.header-left.svelte-oydpbb {display:flex;align-items:center;gap:0.75rem;font-weight:700;}.brand-logo.svelte-oydpbb {width:2.2rem;height:2.2rem;border-radius:0.5rem;object-fit:contain;}.brand-text.svelte-oydpbb {font-size:1.05rem;text-transform:uppercase;letter-spacing:0.05em;}.page-label.svelte-oydpbb {font-size:0.85rem;font-weight:500;color:var(--color-primary);}.header-right.svelte-oydpbb {display:flex;align-items:center;gap:0.85rem;}.user-name.svelte-oydpbb {font-size:0.9rem;color:color-mix(in oklab, var(--color-base-content) 80%, transparent);}.theme-toggle.svelte-oydpbb {display:grid;place-items:center;width:2rem;height:2rem;border-radius:999px;font-size:1rem;cursor:pointer;background:color-mix(in oklab, var(--color-base-200) 70%, transparent);border:1px solid color-mix(in oklab, var(--color-base-content) 18%, transparent);}.theme-toggle.svelte-oydpbb:hover {border-color:color-mix(in oklab, var(--color-primary) 50%, transparent);}.avatar-mark.svelte-oydpbb {width:1.9rem;height:1.9rem;border-radius:999px;overflow:hidden;background:color-mix(in oklab, var(--color-base-content) 18%, transparent);}.avatar-mark.svelte-oydpbb img:where(.svelte-oydpbb) {width:100%;height:100%;object-fit:cover;}\n\n    @media (max-width: 40rem) {.app-header.svelte-oydpbb {flex-direction:column;gap:0.6rem;text-align:center;}\n    }"
 };
-function DashboardHeader($$anchor, $$props) {
+function TeacherHeader($$anchor, $$props) {
   push($$props, true);
   append_styles($$anchor, $$css);
   const $theme = () => store_get(theme, "$theme", $$stores);
   const [$$stores, $$cleanup] = setup_stores();
-  let user = prop($$props, "user", 7, null), brand = prop($$props, "brand", 7, "ElisaAI"), logoSrc = prop($$props, "logoSrc", 7, "logo.png"), pageLabel = prop($$props, "pageLabel", 7, "Dashboard"), statusLabel = prop($$props, "statusLabel", 7, "System online"), statusDetail = prop($$props, "statusDetail", 7, "v2.0.2.5");
+  let user = prop($$props, "user", 7, null), brand = prop($$props, "brand", 7, "OpenBook"), logoSrc = prop($$props, "logoSrc", 7, "logo.png"), pageLabel = prop($$props, "pageLabel", 7, "Teacher");
   var $$exports = {
     get user() {
       return user();
@@ -7358,7 +7179,7 @@ function DashboardHeader($$anchor, $$props) {
     get brand() {
       return brand();
     },
-    set brand($$value = "ElisaAI") {
+    set brand($$value = "OpenBook") {
       brand($$value);
       flushSync();
     },
@@ -7372,65 +7193,61 @@ function DashboardHeader($$anchor, $$props) {
     get pageLabel() {
       return pageLabel();
     },
-    set pageLabel($$value = "Dashboard") {
+    set pageLabel($$value = "Teacher") {
       pageLabel($$value);
-      flushSync();
-    },
-    get statusLabel() {
-      return statusLabel();
-    },
-    set statusLabel($$value = "System online") {
-      statusLabel($$value);
-      flushSync();
-    },
-    get statusDetail() {
-      return statusDetail();
-    },
-    set statusDetail($$value = "v2.0.2.5") {
-      statusDetail($$value);
       flushSync();
     }
   };
-  var header = root_1();
+  var header = root_2();
   var div = child(header);
   var img = child(div);
   var span = sibling(img, 2);
   var text2 = child(span, true);
   reset(span);
+  var span_1 = sibling(span, 2);
+  var text_1 = child(span_1, true);
+  reset(span_1);
   reset(div);
   var div_1 = sibling(div, 2);
   var button = child(div_1);
-  var text_1 = child(button, true);
+  var text_2 = child(button, true);
   reset(button);
-  var span_1 = sibling(button, 2);
-  var node = child(span_1);
+  var node = sibling(button, 2);
   {
-    var consequent = ($$anchor2) => {
-      var img_1 = root();
-      template_effect(() => set_attribute2(img_1, "src", user().avatarUrl));
-      append($$anchor2, img_1);
+    var consequent_1 = ($$anchor2) => {
+      var fragment = root_1();
+      var span_2 = first_child(fragment);
+      var text_3 = child(span_2, true);
+      reset(span_2);
+      var span_3 = sibling(span_2, 2);
+      var node_1 = child(span_3);
+      {
+        var consequent = ($$anchor3) => {
+          var img_1 = root();
+          template_effect(() => set_attribute2(img_1, "src", user().avatarUrl));
+          append($$anchor3, img_1);
+        };
+        if_block(node_1, ($$render) => {
+          if (user().avatarUrl) $$render(consequent);
+        });
+      }
+      reset(span_3);
+      template_effect(() => set_text(text_3, user().fullName));
+      append($$anchor2, fragment);
     };
     if_block(node, ($$render) => {
-      if (user()?.avatarUrl) $$render(consequent);
+      if (user()) $$render(consequent_1);
     });
   }
-  reset(span_1);
-  var span_2 = sibling(span_1, 2);
-  var text_2 = child(span_2, true);
-  reset(span_2);
-  var span_3 = sibling(span_2, 2);
-  var text_3 = sibling(child(span_3));
-  reset(span_3);
   reset(div_1);
   reset(header);
   template_effect(() => {
     set_attribute2(img, "src", logoSrc());
     set_attribute2(img, "alt", `${brand()} logo`);
     set_text(text2, brand());
+    set_text(text_1, pageLabel());
     set_attribute2(button, "aria-label", $theme() === "dark" ? "Switch to light mode" : "Switch to dark mode");
-    set_text(text_1, $theme() === "dark" ? "\u2600\uFE0F" : "\u{1F319}");
-    set_text(text_2, pageLabel());
-    set_text(text_3, ` ${statusLabel() ?? ""} // ${statusDetail() ?? ""}`);
+    set_text(text_2, $theme() === "dark" ? "\u2600\uFE0F" : "\u{1F319}");
   });
   delegated("click", button, function(...$$args) {
     toggleTheme?.apply(this, $$args);
@@ -7441,1879 +7258,1142 @@ function DashboardHeader($$anchor, $$props) {
   return $$pop;
 }
 delegate(["click"]);
-create_custom_element(
-  DashboardHeader,
-  {
-    user: {},
-    brand: {},
-    logoSrc: {},
-    pageLabel: {},
-    statusLabel: {},
-    statusDetail: {}
-  },
-  [],
-  [],
-  { mode: "open" }
-);
+create_custom_element(TeacherHeader, { user: {}, brand: {}, logoSrc: {}, pageLabel: {} }, [], [], { mode: "open" });
 
-// src/stores/ai-chat.store.ts
-function createAiChatStore() {
-  const { subscribe, update: update2 } = writable({
-    connection: "disconnected",
-    errorMessage: "",
-    messages: []
-  });
-  let socket;
-  async function getChatHistory() {
-    await socket?.send({ action: "get_chat_history", payload: null });
-  }
-  async function connect() {
-    if (!socket) {
-      socket = await ws("/ai/chat");
-      socket.setConnectionStatusListener((status) => {
-        update2((state3) => ({
-          ...state3,
-          connection: status,
-          errorMessage: status === "connected" ? "" : state3.errorMessage
-        }));
-        if (status === "connected") {
-          void getChatHistory();
-        }
-      });
-      socket.setErrorHandler((error) => {
-        const message = error instanceof Error ? error.message : "WebSocket error.";
-        update2((state3) => ({ ...state3, errorMessage: message }));
-      });
-      socket.setMessageHandler("chat_history", (message) => {
-        update2((state3) => ({ ...state3, messages: message.payload.messages }));
-      });
-      socket.setMessageHandler("chat_message", (message) => {
-        update2((state3) => {
-          const index2 = state3.messages.findIndex((m) => m.id === message.payload.id);
-          const messages = index2 === -1 ? [...state3.messages, message.payload] : state3.messages.map((m, i) => i === index2 ? message.payload : m);
-          return { ...state3, messages };
-        });
-      });
-    }
-    await socket.connect();
-  }
-  async function disconnect() {
-    await socket?.disconnect();
-  }
-  async function retry() {
-    update2((state3) => ({ ...state3, errorMessage: "" }));
-    if (socket) {
-      await socket.retry();
-    } else {
-      await connect();
-    }
-  }
-  async function sendChatInput(format, content) {
-    await socket?.send({ action: "chat_input", payload: { format, content } });
-  }
-  return { subscribe, connect, disconnect, retry, getChatHistory, sendChatInput };
-}
-
-// src/components/app-frame/ChatWidget.svelte
-var root2 = from_html(`<img class="avatar svelte-13e87sq" src="logo.png" alt="ElisaAI"/>`);
-var root_12 = from_html(`<div><!> <div> </div></div>`);
-var root_2 = from_html(`<span class="coming-soon svelte-13e87sq"> </span>`);
-var root_3 = from_html(`<section><header class="panel-header svelte-13e87sq" role="toolbar" tabindex="-1" aria-label="Chat window controls"><span class="panel-title svelte-13e87sq"> </span> <div class="panel-actions svelte-13e87sq"><button type="button" class="icon-btn svelte-13e87sq"> </button> <button type="button" class="icon-btn svelte-13e87sq" aria-label="Close chat">\u2715</button></div></header> <div class="panel-body svelte-13e87sq"><div class="message svelte-13e87sq"><img class="avatar svelte-13e87sq" src="logo.png" alt="ElisaAI"/> <div class="bubble svelte-13e87sq">System online. I am <strong>ElisaAI</strong>. Ready to process your queries.
-                    What topic shall we analyse today?</div></div> <!></div> <div class="composer svelte-13e87sq"><!> <form class="composer-row svelte-13e87sq"><button type="button" class="composer-add svelte-13e87sq" aria-label="Add" disabled="">+</button> <input class="composer-input svelte-13e87sq" type="text" placeholder="Message"/> <button type="submit" class="composer-send svelte-13e87sq" aria-label="Send">\u2192</button></form> <p class="disclaimer svelte-13e87sq">ElisaAI may generate misinformation. Please verify all information.</p></div></section>`);
-var root_4 = from_html(`<!> <button type="button" aria-label="Open Quick Chat"><img src="logo.png" alt="" class="svelte-13e87sq"/></button>`, 1);
-var $$css2 = {
-  hash: "svelte-13e87sq",
-  code: ".fab.svelte-13e87sq {position:fixed;right:1.5rem;bottom:1.5rem;z-index:60;width:3.75rem;height:3.75rem;border-radius:999px;padding:0;border:2px solid color-mix(in oklab, var(--color-primary) 60%, transparent);background:var(--color-base-100);cursor:pointer;overflow:hidden;box-shadow:0 0 22px color-mix(in oklab, var(--color-primary) 45%, transparent);transition:transform 0.15s ease;}.fab.svelte-13e87sq:hover {transform:scale(1.06);}.fab.hidden.svelte-13e87sq {display:none;}.fab.svelte-13e87sq img:where(.svelte-13e87sq) {width:100%;height:100%;object-fit:cover;}.panel.svelte-13e87sq {position:fixed;z-index:61;display:flex;flex-direction:column;background:var(--color-base-100);border:1px solid color-mix(in oklab, var(--color-primary) 30%, transparent);box-shadow:0 0 32px color-mix(in oklab, var(--color-primary) 30%, transparent);overflow:hidden;}.panel.floating.svelte-13e87sq {right:1.5rem;bottom:1.5rem;width:22.5rem;height:32rem;max-width:calc(100vw - 2rem);max-height:calc(100vh - 2rem);border-radius:1.25rem;}\n\n    /* Docked, full-height sidebar (expand). */.panel.sidebar.svelte-13e87sq {top:0;right:0;bottom:0;width:min(28rem, 100vw);height:100vh;border-radius:0;border:none;border-left:1px solid color-mix(in oklab, var(--color-primary) 30%, transparent);}.panel-header.svelte-13e87sq {flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0.75rem 1rem;border-bottom:1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);}.panel.floating.svelte-13e87sq .panel-header:where(.svelte-13e87sq) {cursor:grab;}.panel.floating.svelte-13e87sq .panel-header:where(.svelte-13e87sq):active {cursor:grabbing;}.panel-title.svelte-13e87sq {font-weight:700;letter-spacing:0.03em;color:var(--color-base-content);}.panel-actions.svelte-13e87sq {display:flex;gap:0.35rem;}.icon-btn.svelte-13e87sq {display:grid;place-items:center;width:1.75rem;height:1.75rem;border-radius:0.5rem;border:none;background:transparent;color:color-mix(in oklab, var(--color-base-content) 70%, transparent);cursor:pointer;}.icon-btn.svelte-13e87sq:hover {background:color-mix(in oklab, var(--color-base-content) 10%, transparent);color:var(--color-base-content);}.panel-body.svelte-13e87sq {flex:1;min-height:0;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.75rem;}.message.svelte-13e87sq {display:flex;align-items:flex-start;gap:0.6rem;}.message.user.svelte-13e87sq {justify-content:flex-end;}.avatar.svelte-13e87sq {width:2.25rem;height:2.25rem;flex:0 0 auto;border-radius:999px;object-fit:cover;}.bubble.svelte-13e87sq {padding:0.75rem 0.9rem;border-radius:0.9rem;border-top-left-radius:0.25rem;line-height:1.5;color:var(--color-base-content);background:color-mix(in oklab, var(--color-primary) 12%, transparent);border:1px solid color-mix(in oklab, var(--color-primary) 28%, transparent);}.composer.svelte-13e87sq {flex:0 0 auto;display:flex;flex-direction:column;gap:0.4rem;padding:0.75rem;border-top:1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);}.coming-soon.svelte-13e87sq {align-self:center;font-size:0.7rem;color:var(--color-warning);}.composer-row.svelte-13e87sq {display:flex;align-items:center;gap:0.5rem;padding:0.35rem 0.5rem;border-radius:999px;background:color-mix(in oklab, var(--color-base-200) 80%, transparent);border:1px solid color-mix(in oklab, var(--color-primary) 30%, transparent);}.composer-add.svelte-13e87sq,\n    .composer-send.svelte-13e87sq {display:grid;place-items:center;width:1.9rem;height:1.9rem;flex:0 0 auto;border-radius:999px;border:none;cursor:not-allowed;color:var(--color-primary-content);background:color-mix(in oklab, var(--color-primary) 70%, transparent);}.composer-input.svelte-13e87sq {flex:1 1 auto;background:transparent;border:none;color:var(--color-base-content);padding:0.25rem;}.composer-input.svelte-13e87sq:focus {outline:none;}.disclaimer.svelte-13e87sq {text-align:center;font-size:0.65rem;color:color-mix(in oklab, var(--color-base-content) 55%, transparent);}"
-};
-function ChatWidget($$anchor, $$props) {
+// src/components/basic/Modal.svelte
+var root2 = from_html(`<h3 class="text-lg font-bold"> </h3>`);
+var root_12 = from_html(`<button type="button" class="btn">Close</button>`);
+var root_22 = from_html(`<div class="modal modal-open" role="dialog" aria-modal="true"><div class="modal-box"><!> <div class="py-4"><!></div> <div class="modal-action"><!></div></div> <button type="button" class="modal-backdrop" aria-label="Close dialog"></button></div>`);
+function Modal($$anchor, $$props) {
   push($$props, true);
-  append_styles($$anchor, $$css2);
-  let onSidebarChange = prop($$props, "onSidebarChange", 7);
-  let open = state(false);
-  let mode = state("floating");
-  let pos = state(null);
-  let dragOffset = null;
-  const chat = createAiChatStore();
-  let chatState = state(proxy({ connection: "disconnected", errorMessage: "", messages: [] }));
-  let draft = state("");
-  let connectStarted = false;
-  const connected = user_derived(() => get2(chatState).connection === "connected");
-  function ensureConnected() {
-    if (!connectStarted) {
-      connectStarted = true;
-      void chat.connect();
-    }
-  }
-  async function send() {
-    const text2 = get2(draft).trim();
-    if (!text2 || !get2(connected)) {
-      return;
-    }
-    set(draft, "");
-    await chat.sendChatInput("markdown", text2);
-  }
-  function notify() {
-    onSidebarChange()?.(get2(open) && get2(mode) === "sidebar");
-  }
-  onMount(() => {
-    notify();
-    const unsubscribe = chat.subscribe((value) => {
-      set(chatState, value, true);
-    });
-    return () => {
-      unsubscribe();
-      void chat.disconnect();
-    };
-  });
-  function toggle() {
-    set(open, !get2(open));
-    if (get2(open)) {
-      ensureConnected();
-    }
-    notify();
-  }
-  function close() {
-    set(open, false);
-    notify();
-  }
-  function toggleMode() {
-    set(mode, get2(mode) === "floating" ? "sidebar" : "floating", true);
-    set(pos, null);
-    notify();
-  }
-  function onPointerMove(event2) {
-    if (!dragOffset) {
-      return;
-    }
-    const maxX = Math.max(0, window.innerWidth - 360);
-    const maxY = Math.max(0, window.innerHeight - 120);
-    set(
-      pos,
-      {
-        x: Math.min(Math.max(0, event2.clientX - dragOffset.x), maxX),
-        y: Math.min(Math.max(0, event2.clientY - dragOffset.y), maxY)
-      },
-      true
-    );
-  }
-  function onPointerUp() {
-    dragOffset = null;
-    window.removeEventListener("pointermove", onPointerMove);
-    window.removeEventListener("pointerup", onPointerUp);
-  }
-  function startDrag(event2) {
-    if (get2(mode) !== "floating") {
-      return;
-    }
-    const panel = event2.currentTarget.parentElement;
-    if (!panel) {
-      return;
-    }
-    const rect = panel.getBoundingClientRect();
-    dragOffset = { x: event2.clientX - rect.left, y: event2.clientY - rect.top };
-    set(pos, { x: rect.left, y: rect.top }, true);
-    window.addEventListener("pointermove", onPointerMove);
-    window.addEventListener("pointerup", onPointerUp);
-  }
+  let open = prop($$props, "open", 7, false), title = prop($$props, "title", 7, ""), onClose = prop($$props, "onClose", 7), children = prop($$props, "children", 7), actions = prop($$props, "actions", 7);
   var $$exports = {
-    get onSidebarChange() {
-      return onSidebarChange();
+    get open() {
+      return open();
     },
-    set onSidebarChange($$value) {
-      onSidebarChange($$value);
-      flushSync();
-    }
-  };
-  var fragment = root_4();
-  var node = first_child(fragment);
-  {
-    var consequent_2 = ($$anchor2) => {
-      var section = root_3();
-      let classes;
-      var header = child(section);
-      var span = child(header);
-      var text_1 = child(span, true);
-      reset(span);
-      var div = sibling(span, 2);
-      var button = child(div);
-      var text_2 = child(button, true);
-      reset(button);
-      var button_1 = sibling(button, 2);
-      reset(div);
-      reset(header);
-      var div_1 = sibling(header, 2);
-      var node_1 = sibling(child(div_1), 2);
-      each(node_1, 17, () => get2(chatState).messages, (message) => message.id, ($$anchor3, message) => {
-        var div_2 = root_12();
-        let classes_1;
-        var node_2 = child(div_2);
-        {
-          var consequent = ($$anchor4) => {
-            var img = root2();
-            append($$anchor4, img);
-          };
-          if_block(node_2, ($$render) => {
-            if (get2(message).sender === "assistant") $$render(consequent);
-          });
-        }
-        var div_3 = sibling(node_2, 2);
-        let classes_2;
-        var text_3 = child(div_3, true);
-        reset(div_3);
-        reset(div_2);
-        template_effect(() => {
-          classes_1 = set_class(div_2, 1, "message svelte-13e87sq", null, classes_1, { user: get2(message).sender === "user" });
-          classes_2 = set_class(div_3, 1, "bubble svelte-13e87sq", null, classes_2, { user: get2(message).sender === "user" });
-          set_text(text_3, get2(message).content);
-        });
-        append($$anchor3, div_2);
-      });
-      reset(div_1);
-      var div_4 = sibling(div_1, 2);
-      var node_3 = child(div_4);
-      {
-        var consequent_1 = ($$anchor3) => {
-          var span_1 = root_2();
-          var text_4 = child(span_1, true);
-          reset(span_1);
-          template_effect(() => set_text(text_4, get2(chatState).connection === "connecting" ? "Connecting\u2026" : "Offline \u2014 reconnecting\u2026"));
-          append($$anchor3, span_1);
-        };
-        if_block(node_3, ($$render) => {
-          if (!get2(connected)) $$render(consequent_1);
-        });
-      }
-      var form = sibling(node_3, 2);
-      var input = sibling(child(form), 2);
-      remove_input_defaults(input);
-      var button_2 = sibling(input, 2);
-      reset(form);
-      next(2);
-      reset(div_4);
-      reset(section);
-      template_effect(
-        ($0) => {
-          classes = set_class(section, 1, "panel svelte-13e87sq", null, classes, {
-            floating: get2(mode) === "floating",
-            sidebar: get2(mode) === "sidebar"
-          });
-          set_style(section, get2(mode) === "floating" && get2(pos) ? `left:${get2(pos).x}px; top:${get2(pos).y}px; right:auto; bottom:auto;` : "");
-          set_text(text_1, get2(mode) === "sidebar" ? "Quiz Chat" : "Quick Chat");
-          set_attribute2(button, "aria-label", get2(mode) === "sidebar" ? "Float chat" : "Dock chat to sidebar");
-          set_text(text_2, get2(mode) === "sidebar" ? "\u2199" : "\u2197");
-          input.disabled = !get2(connected);
-          button_2.disabled = $0;
-        },
-        [() => !get2(connected) || get2(draft).trim().length === 0]
-      );
-      delegated("pointerdown", header, startDrag);
-      delegated("click", button, toggleMode);
-      delegated("click", button_1, close);
-      event("submit", form, (event2) => {
-        event2.preventDefault();
-        send();
-      });
-      bind_value(input, () => get2(draft), ($$value) => set(draft, $$value));
-      append($$anchor2, section);
-    };
-    if_block(node, ($$render) => {
-      if (get2(open)) $$render(consequent_2);
-    });
-  }
-  var button_3 = sibling(node, 2);
-  let classes_3;
-  template_effect(() => classes_3 = set_class(button_3, 1, "fab svelte-13e87sq", null, classes_3, { hidden: get2(open) }));
-  delegated("click", button_3, toggle);
-  append($$anchor, fragment);
-  return pop($$exports);
-}
-delegate(["pointerdown", "click"]);
-create_custom_element(ChatWidget, { onSidebarChange: {} }, [], [], { mode: "open" });
-
-// src/components/basic/ProgressBar.svelte
-var root3 = from_html(`<div class="progress-track svelte-sbeapt" role="progressbar"><div class="progress-fill svelte-sbeapt"></div></div>`);
-var $$css3 = {
-  hash: "svelte-sbeapt",
-  code: ".progress-track.svelte-sbeapt {height:0.9rem;border-radius:999px;overflow:hidden;background:color-mix(in oklab, var(--color-base-content) 12%, transparent);}.progress-fill.svelte-sbeapt {height:100%;border-radius:999px;background:linear-gradient(90deg, var(--color-warning), var(--color-success));box-shadow:0 0 12px color-mix(in oklab, var(--color-success) 45%, transparent);transition:width 0.3s ease;}"
-};
-function ProgressBar($$anchor, $$props) {
-  push($$props, true);
-  append_styles($$anchor, $$css3);
-  "use strict";
-  let value = prop($$props, "value", 7), label = prop($$props, "label", 7, "");
-  const percent = user_derived(() => Math.min(100, Math.max(0, value())));
-  var $$exports = {
-    get value() {
-      return value();
-    },
-    set value($$value) {
-      value($$value);
+    set open($$value = false) {
+      open($$value);
       flushSync();
     },
-    get label() {
-      return label();
+    get title() {
+      return title();
     },
-    set label($$value = "") {
-      label($$value);
-      flushSync();
-    }
-  };
-  var div = root3();
-  set_attribute2(div, "aria-valuemin", 0);
-  set_attribute2(div, "aria-valuemax", 100);
-  var div_1 = child(div);
-  reset(div);
-  template_effect(
-    ($0) => {
-      set_attribute2(div, "aria-valuenow", $0);
-      set_attribute2(div, "aria-label", label());
-      set_style(div_1, `width: ${get2(percent) ?? ""}%`);
-    },
-    [() => Math.round(get2(percent))]
-  );
-  append($$anchor, div);
-  return pop($$exports);
-}
-create_custom_element(ProgressBar, { value: {}, label: {} }, [], [], { mode: "open" });
-
-// src/components/basic/SegmentedTabs.svelte
-var root4 = from_html(`<button type="button" role="tab"> </button>`);
-var root_13 = from_html(`<div role="tablist" class="seg-tabs svelte-1rwwumd" aria-label="Learning views"></div>`);
-var $$css4 = {
-  hash: "svelte-1rwwumd",
-  code: ".seg-tabs.svelte-1rwwumd {display:inline-flex;gap:0.25rem;}.seg-tab.svelte-1rwwumd {padding:0.25rem 0.75rem;border-radius:0.5rem;font-size:0.85rem;font-weight:600;letter-spacing:0.04em;color:color-mix(in oklab, var(--color-base-content) 65%, transparent);background:transparent;cursor:pointer;}.seg-tab.svelte-1rwwumd:hover:not(:disabled) {color:var(--color-base-content);}.seg-tab.active.svelte-1rwwumd {color:var(--color-primary);background:color-mix(in oklab, var(--color-primary) 16%, transparent);}.seg-tab.svelte-1rwwumd:disabled {cursor:not-allowed;opacity:0.45;}.seg-tab.svelte-1rwwumd:focus-visible {outline:2px solid var(--color-primary);outline-offset:2px;}"
-};
-function SegmentedTabs($$anchor, $$props) {
-  push($$props, true);
-  append_styles($$anchor, $$css4);
-  "use strict";
-  let tabs = prop($$props, "tabs", 7), active = prop($$props, "active", 7), disabledTabs = prop($$props, "disabledTabs", 23, () => []), onSelect = prop($$props, "onSelect", 7);
-  var $$exports = {
-    get tabs() {
-      return tabs();
-    },
-    set tabs($$value) {
-      tabs($$value);
+    set title($$value = "") {
+      title($$value);
       flushSync();
     },
-    get active() {
-      return active();
+    get onClose() {
+      return onClose();
     },
-    set active($$value) {
-      active($$value);
+    set onClose($$value) {
+      onClose($$value);
       flushSync();
     },
-    get disabledTabs() {
-      return disabledTabs();
+    get children() {
+      return children();
     },
-    set disabledTabs($$value = []) {
-      disabledTabs($$value);
+    set children($$value) {
+      children($$value);
       flushSync();
     },
-    get onSelect() {
-      return onSelect();
+    get actions() {
+      return actions();
     },
-    set onSelect($$value) {
-      onSelect($$value);
-      flushSync();
-    }
-  };
-  var div = root_13();
-  each(div, 20, tabs, (tab) => tab, ($$anchor2, tab) => {
-    var button = root4();
-    let classes;
-    var text2 = child(button, true);
-    reset(button);
-    template_effect(
-      ($0) => {
-        classes = set_class(button, 1, "seg-tab svelte-1rwwumd", null, classes, { active: tab === active() });
-        set_attribute2(button, "aria-selected", tab === active());
-        button.disabled = $0;
-        set_text(text2, tab);
-      },
-      [() => disabledTabs().includes(tab)]
-    );
-    delegated("click", button, () => onSelect()?.(tab));
-    append($$anchor2, button);
-  });
-  reset(div);
-  append($$anchor, div);
-  return pop($$exports);
-}
-delegate(["click"]);
-create_custom_element(SegmentedTabs, { tabs: {}, active: {}, disabledTabs: {}, onSelect: {} }, [], [], { mode: "open" });
-
-// src/components/panels/MyLearningPanel.svelte
-var root5 = from_html(`<p class="empty svelte-q1lzti">No courses in progress yet. Enrol in a course to see it here.</p>`);
-var root_14 = from_html(`<span class="tag svelte-q1lzti"> </span>`);
-var root_22 = from_html(`<button type="button" class="course-card svelte-q1lzti"><div class="course-head svelte-q1lzti"><span class="course-name svelte-q1lzti"> </span> <span class="course-bar svelte-q1lzti"><!></span> <span class="course-percent svelte-q1lzti"> </span> <span class="course-go svelte-q1lzti" aria-hidden="true">\u203A</span></div> <div class="course-tags svelte-q1lzti"></div></button>`);
-var root_32 = from_html(`<div class="path-step svelte-q1lzti"><span class="step-num svelte-q1lzti"> </span> <span class="step-title svelte-q1lzti"> </span> <span class="step-status svelte-q1lzti"> </span></div>`);
-var root_42 = from_html(`<div class="repeat-item svelte-q1lzti"><span class="repeat-title svelte-q1lzti"> </span> <span class="repeat-due svelte-q1lzti"> </span></div>`);
-var root_5 = from_html(`<div class="locked svelte-q1lzti"><div class="locked-content svelte-q1lzti" aria-hidden="true"><!></div> <div class="locked-overlay svelte-q1lzti" role="status"><span class="overlay-badge svelte-q1lzti">\u{1F6A7} Coming soon</span> <span class="overlay-note svelte-q1lzti"> </span></div></div>`);
-var root_6 = from_html(`<section class="card panel svelte-q1lzti"><header class="panel-head svelte-q1lzti"><h2 class="panel-title svelte-q1lzti">My Learning</h2> <!></header> <div class="panel-body svelte-q1lzti"><!></div></section>`);
-var $$css5 = {
-  hash: "svelte-q1lzti",
-  code: '\n    /* Fill the grid cell at a fixed height; the body scrolls instead of growing. */.panel.svelte-q1lzti {flex:1;min-height:0;display:flex;flex-direction:column;background:var(--color-base-100);border-radius:1.25rem;padding:1.75rem;box-shadow:0 0 24px color-mix(in oklab, var(--color-primary) 10%, transparent);}.panel-head.svelte-q1lzti {flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding-bottom:1rem;margin-bottom:0.5rem;border-bottom:1px solid color-mix(in oklab, var(--color-base-content) 8%, transparent);}.panel-title.svelte-q1lzti {font-size:1.5rem;font-weight:700;letter-spacing:0.02em;color:var(--color-base-content);}\n\n    /* Scroll area: keeps the card a fixed size regardless of how many courses. */.panel-body.svelte-q1lzti {flex:1;min-height:0;overflow-y:auto;padding-right:0.5rem;display:flex;flex-direction:column;gap:0.75rem;}.panel-body.svelte-q1lzti::-webkit-scrollbar {width:0.5rem;}.panel-body.svelte-q1lzti::-webkit-scrollbar-thumb {border-radius:999px;background:color-mix(in oklab, var(--color-base-content) 20%, transparent);}\n\n    /* A whole course is one clickable card. */.course-card.svelte-q1lzti {display:block;width:100%;text-align:left;cursor:pointer;background:color-mix(in oklab, var(--color-base-200) 50%, transparent);border:1px solid color-mix(in oklab, var(--color-base-content) 8%, transparent);border-radius:1rem;padding:1rem 1.25rem;transition:border-color 0.2s ease, background 0.2s ease;}.course-card.svelte-q1lzti:hover {background:color-mix(in oklab, var(--color-primary) 12%, transparent);border-color:color-mix(in oklab, var(--color-primary) 45%, transparent);}.course-card.svelte-q1lzti:focus-visible {outline:2px solid var(--color-primary);outline-offset:2px;}\n\n    /* Fixed name + percent columns => the 1fr bar column is identical on every row. */.course-head.svelte-q1lzti {display:grid;grid-template-columns:14rem 1fr 3.5rem auto;align-items:center;gap:1rem;}.course-name.svelte-q1lzti {font-size:1.6rem;font-weight:700;color:var(--color-base-content);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}.course-bar.svelte-q1lzti {min-width:0;}.course-percent.svelte-q1lzti {font-weight:700;text-align:right;color:var(--color-base-content);}.course-go.svelte-q1lzti {display:grid;place-items:center;width:2rem;height:2rem;border-radius:999px;font-size:1.2rem;line-height:1;color:var(--color-primary-content);background:var(--color-primary);box-shadow:0 0 12px color-mix(in oklab, var(--color-primary) 45%, transparent);}.course-tags.svelte-q1lzti {display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.75rem;}.tag.svelte-q1lzti {font-size:0.75rem;padding:0.15rem 0.6rem;border-radius:999px;color:color-mix(in oklab, var(--color-base-content) 75%, transparent);background:color-mix(in oklab, var(--color-base-content) 10%, transparent);border:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);}.empty.svelte-q1lzti {color:color-mix(in oklab, var(--color-base-content) 60%, transparent);padding:1.5rem 0;}\n\n    /* Mock content for Path/Repeat, blurred behind a "Coming soon" overlay. */.locked.svelte-q1lzti {position:relative;flex:1;min-height:0;}.locked-content.svelte-q1lzti {display:flex;flex-direction:column;gap:0.75rem;filter:blur(5px);opacity:0.5;pointer-events:none;user-select:none;}.locked-overlay.svelte-q1lzti {position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;text-align:center;}.overlay-badge.svelte-q1lzti {padding:0.4rem 1rem;border-radius:999px;font-weight:700;letter-spacing:0.04em;color:var(--color-warning);background:color-mix(in oklab, var(--color-warning) 16%, transparent);border:1px solid color-mix(in oklab, var(--color-warning) 40%, transparent);}.overlay-note.svelte-q1lzti {font-size:0.85rem;color:color-mix(in oklab, var(--color-base-content) 70%, transparent);}.path-step.svelte-q1lzti,\n    .repeat-item.svelte-q1lzti {display:flex;align-items:center;gap:1rem;padding:0.9rem 1.1rem;border-radius:1rem;background:color-mix(in oklab, var(--color-base-200) 50%, transparent);border:1px solid color-mix(in oklab, var(--color-base-content) 8%, transparent);}.repeat-item.svelte-q1lzti {justify-content:space-between;}.step-num.svelte-q1lzti {display:grid;place-items:center;width:2rem;height:2rem;flex:0 0 auto;border-radius:999px;font-weight:700;color:var(--color-primary-content);background:var(--color-primary);}.step-title.svelte-q1lzti,\n    .repeat-title.svelte-q1lzti {flex:1 1 auto;font-weight:600;color:var(--color-base-content);}.step-status.svelte-q1lzti {font-size:0.8rem;color:color-mix(in oklab, var(--color-base-content) 65%, transparent);}.repeat-due.svelte-q1lzti {flex:0 0 auto;font-size:0.8rem;padding:0.15rem 0.6rem;border-radius:999px;color:var(--color-primary);background:color-mix(in oklab, var(--color-primary) 14%, transparent);}'
-};
-function MyLearningPanel($$anchor, $$props) {
-  push($$props, true);
-  append_styles($$anchor, $$css5);
-  let courses = prop($$props, "courses", 7), skills = prop($$props, "skills", 7), onCourseOpen = prop($$props, "onCourseOpen", 7);
-  const tabs = ["Current", "Path", "Repeat"];
-  let activeTab = state("Current");
-  const isEmpty = user_derived(() => courses().length === 0);
-  const pathSteps = [
-    { step: 1, title: "Foundations", status: "Completed" },
-    { step: 2, title: "Core concepts", status: "In progress" },
-    { step: 3, title: "Hands-on practice", status: "Locked" },
-    { step: 4, title: "Mastery project", status: "Locked" }
-  ];
-  const repeatItems = [
-    { title: "HTML structure", due: "Due today" },
-    { title: "CSS selectors", due: "Due in 2 days" },
-    { title: "JS functions", due: "New" }
-  ];
-  const fallbackPool = [
-    "Grundlagen",
-    "HTML",
-    "CSS",
-    "JavaScript",
-    "SQL",
-    "Datenmodellierung"
-  ];
-  const tagPool = user_derived(() => skills().length > 0 ? skills().map((skill) => skill.name) : fallbackPool);
-  function courseTags(index2) {
-    const pool = get2(tagPool);
-    if (pool.length === 0) {
-      return [];
-    }
-    const count = Math.min(3, pool.length);
-    return Array.from({ length: count }, (_, offset) => pool[(index2 + offset) % pool.length]);
-  }
-  var $$exports = {
-    get courses() {
-      return courses();
-    },
-    set courses($$value) {
-      courses($$value);
-      flushSync();
-    },
-    get skills() {
-      return skills();
-    },
-    set skills($$value) {
-      skills($$value);
-      flushSync();
-    },
-    get onCourseOpen() {
-      return onCourseOpen();
-    },
-    set onCourseOpen($$value) {
-      onCourseOpen($$value);
-      flushSync();
-    }
-  };
-  var section = root_6();
-  var header = child(section);
-  var node = sibling(child(header), 2);
-  SegmentedTabs(node, {
-    get tabs() {
-      return tabs;
-    },
-    get active() {
-      return get2(activeTab);
-    },
-    onSelect: (tab) => set(activeTab, tab, true)
-  });
-  reset(header);
-  var div = sibling(header, 2);
-  var node_1 = child(div);
-  {
-    var consequent_1 = ($$anchor2) => {
-      var fragment = comment();
-      var node_2 = first_child(fragment);
-      {
-        var consequent = ($$anchor3) => {
-          var p = root5();
-          append($$anchor3, p);
-        };
-        var alternate = ($$anchor3) => {
-          var fragment_1 = comment();
-          var node_3 = first_child(fragment_1);
-          each(node_3, 19, courses, (course) => course.id, ($$anchor4, course, index2) => {
-            var button = root_22();
-            var div_1 = child(button);
-            var span = child(div_1);
-            var text2 = child(span, true);
-            reset(span);
-            var span_1 = sibling(span, 2);
-            var node_4 = child(span_1);
-            {
-              let $0 = user_derived(() => `${get2(course).name} progress`);
-              ProgressBar(node_4, {
-                get value() {
-                  return get2(course).progress;
-                },
-                get label() {
-                  return get2($0);
-                }
-              });
-            }
-            reset(span_1);
-            var span_2 = sibling(span_1, 2);
-            var text_1 = child(span_2);
-            reset(span_2);
-            next(2);
-            reset(div_1);
-            var div_2 = sibling(div_1, 2);
-            each(div_2, 20, () => courseTags(get2(index2)), (tag2) => tag2, ($$anchor5, tag2) => {
-              var span_3 = root_14();
-              var text_2 = child(span_3, true);
-              reset(span_3);
-              template_effect(() => set_text(text_2, tag2));
-              append($$anchor5, span_3);
-            });
-            reset(div_2);
-            reset(button);
-            template_effect(
-              ($0) => {
-                set_text(text2, get2(course).name);
-                set_text(text_1, `${$0 ?? ""}%`);
-              },
-              [() => Math.round(get2(course).progress)]
-            );
-            delegated("click", button, () => onCourseOpen()?.(get2(course)));
-            append($$anchor4, button);
-          });
-          append($$anchor3, fragment_1);
-        };
-        if_block(node_2, ($$render) => {
-          if (get2(isEmpty)) $$render(consequent);
-          else $$render(alternate, -1);
-        });
-      }
-      append($$anchor2, fragment);
-    };
-    var alternate_2 = ($$anchor2) => {
-      var div_3 = root_5();
-      var div_4 = child(div_3);
-      var node_5 = child(div_4);
-      {
-        var consequent_2 = ($$anchor3) => {
-          var fragment_2 = comment();
-          var node_6 = first_child(fragment_2);
-          each(node_6, 17, () => pathSteps, (item) => item.step, ($$anchor4, item) => {
-            var div_5 = root_32();
-            var span_4 = child(div_5);
-            var text_3 = child(span_4, true);
-            reset(span_4);
-            var span_5 = sibling(span_4, 2);
-            var text_4 = child(span_5, true);
-            reset(span_5);
-            var span_6 = sibling(span_5, 2);
-            var text_5 = child(span_6, true);
-            reset(span_6);
-            reset(div_5);
-            template_effect(() => {
-              set_text(text_3, get2(item).step);
-              set_text(text_4, get2(item).title);
-              set_text(text_5, get2(item).status);
-            });
-            append($$anchor4, div_5);
-          });
-          append($$anchor3, fragment_2);
-        };
-        var alternate_1 = ($$anchor3) => {
-          var fragment_3 = comment();
-          var node_7 = first_child(fragment_3);
-          each(node_7, 17, () => repeatItems, (item) => item.title, ($$anchor4, item) => {
-            var div_6 = root_42();
-            var span_7 = child(div_6);
-            var text_6 = child(span_7, true);
-            reset(span_7);
-            var span_8 = sibling(span_7, 2);
-            var text_7 = child(span_8, true);
-            reset(span_8);
-            reset(div_6);
-            template_effect(() => {
-              set_text(text_6, get2(item).title);
-              set_text(text_7, get2(item).due);
-            });
-            append($$anchor4, div_6);
-          });
-          append($$anchor3, fragment_3);
-        };
-        if_block(node_5, ($$render) => {
-          if (get2(activeTab) === "Path") $$render(consequent_2);
-          else $$render(alternate_1, -1);
-        });
-      }
-      reset(div_4);
-      var div_7 = sibling(div_4, 2);
-      var span_9 = sibling(child(div_7), 2);
-      var text_8 = child(span_9);
-      reset(span_9);
-      reset(div_7);
-      reset(div_3);
-      template_effect(() => set_text(text_8, `${get2(activeTab) ?? ""} mode is in the works.`));
-      append($$anchor2, div_3);
-    };
-    if_block(node_1, ($$render) => {
-      if (get2(activeTab) === "Current") $$render(consequent_1);
-      else $$render(alternate_2, -1);
-    });
-  }
-  reset(div);
-  reset(section);
-  append($$anchor, section);
-  return pop($$exports);
-}
-delegate(["click"]);
-create_custom_element(MyLearningPanel, { courses: {}, skills: {}, onCourseOpen: {} }, [], [], { mode: "open" });
-
-// src/components/basic/StatTile.svelte
-var root6 = from_html(`<div class="stat-tile svelte-de708j"><span class="stat-icon svelte-de708j" aria-hidden="true"> </span> <span class="stat-value svelte-de708j"> </span> <span class="sr-only svelte-de708j"> </span></div>`);
-var $$css6 = {
-  hash: "svelte-de708j",
-  code: ".stat-tile.svelte-de708j {display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.35rem;text-align:center;}.stat-icon.svelte-de708j {display:block;width:100%;text-align:center;font-size:1.5rem;line-height:1;}.stat-value.svelte-de708j {display:block;width:100%;text-align:center;font-weight:700;font-size:1.1rem;color:var(--color-base-content);}.sr-only.svelte-de708j {position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0, 0, 0, 0);white-space:nowrap;border:0;}"
-};
-function StatTile($$anchor, $$props) {
-  push($$props, true);
-  append_styles($$anchor, $$css6);
-  "use strict";
-  let icon = prop($$props, "icon", 7), value = prop($$props, "value", 7), label = prop($$props, "label", 7);
-  var $$exports = {
-    get icon() {
-      return icon();
-    },
-    set icon($$value) {
-      icon($$value);
-      flushSync();
-    },
-    get value() {
-      return value();
-    },
-    set value($$value) {
-      value($$value);
-      flushSync();
-    },
-    get label() {
-      return label();
-    },
-    set label($$value) {
-      label($$value);
-      flushSync();
-    }
-  };
-  var div = root6();
-  var span = child(div);
-  var text2 = child(span, true);
-  reset(span);
-  var span_1 = sibling(span, 2);
-  var text_1 = child(span_1, true);
-  reset(span_1);
-  var span_2 = sibling(span_1, 2);
-  var text_2 = child(span_2, true);
-  reset(span_2);
-  reset(div);
-  template_effect(() => {
-    set_attribute2(div, "title", label());
-    set_text(text2, icon());
-    set_text(text_1, value());
-    set_text(text_2, label());
-  });
-  append($$anchor, div);
-  return pop($$exports);
-}
-create_custom_element(StatTile, { icon: {}, value: {}, label: {} }, [], [], { mode: "open" });
-
-// src/components/panels/StatsPanel.svelte
-var root7 = from_html(`<img alt="" class="svelte-1tag4vz"/>`);
-var root_15 = from_html(`<section class="card panel svelte-1tag4vz"><header class="panel-head svelte-1tag4vz"><h2 class="panel-title svelte-1tag4vz">My Stats</h2> <button type="button" class="btn btn-outline btn-sm">Go to Profile</button></header> <div class="identity svelte-1tag4vz"><span class="avatar-mark svelte-1tag4vz" aria-hidden="true"><!></span> <div class="identity-text svelte-1tag4vz"><span class="username svelte-1tag4vz"> </span> <div class="level-row svelte-1tag4vz"><span class="level-label svelte-1tag4vz"> </span> <div class="level-bar svelte-1tag4vz"><!></div> <span class="level-points svelte-1tag4vz"> </span></div></div></div> <div class="stat-grid svelte-1tag4vz"><!> <!> <!> <!></div></section>`);
-var $$css7 = {
-  hash: "svelte-1tag4vz",
-  code: ".panel.svelte-1tag4vz {background:var(--color-base-100);border-radius:1rem;padding:1.5rem;box-shadow:0 0 24px color-mix(in oklab, var(--color-primary) 10%, transparent);}.panel-head.svelte-1tag4vz {display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.25rem;}.panel-title.svelte-1tag4vz {font-size:1.3rem;font-weight:700;color:var(--color-base-content);}.identity.svelte-1tag4vz {display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;}.avatar-mark.svelte-1tag4vz {width:3.5rem;height:3.5rem;flex:0 0 auto;border-radius:999px;overflow:hidden;background:color-mix(in oklab, var(--color-base-content) 18%, transparent);box-shadow:0 0 16px color-mix(in oklab, var(--color-primary) 35%, transparent);}.avatar-mark.svelte-1tag4vz img:where(.svelte-1tag4vz) {width:100%;height:100%;object-fit:cover;}.identity-text.svelte-1tag4vz {flex:1 1 auto;min-width:0;}.username.svelte-1tag4vz {display:block;font-size:1.1rem;font-weight:600;color:var(--color-base-content);}.level-row.svelte-1tag4vz {display:flex;align-items:center;gap:0.6rem;margin-top:0.35rem;}.level-label.svelte-1tag4vz {font-size:0.8rem;white-space:nowrap;color:color-mix(in oklab, var(--color-base-content) 70%, transparent);}.level-bar.svelte-1tag4vz {flex:1 1 auto;}.level-points.svelte-1tag4vz {font-weight:700;color:var(--color-base-content);}.stat-grid.svelte-1tag4vz {display:grid;grid-template-columns:repeat(4, 1fr);gap:0.75rem;}"
-};
-function StatsPanel($$anchor, $$props) {
-  push($$props, true);
-  append_styles($$anchor, $$css7);
-  let user = prop($$props, "user", 7), stats = prop($$props, "stats", 7), onProfile = prop($$props, "onProfile", 7);
-  const numberFormat = new Intl.NumberFormat();
-  const username = user_derived(() => user()?.username ?? "user");
-  const points = user_derived(() => stats()?.points ?? 0);
-  const level = user_derived(() => stats()?.level ?? 1);
-  const levelProgress2 = user_derived(() => stats()?.levelProgress ?? 0);
-  const nextLevelPoints = user_derived(() => stats()?.nextLevelPoints ?? get2(points));
-  function format(value) {
-    return numberFormat.format(value);
-  }
-  var $$exports = {
-    get user() {
-      return user();
-    },
-    set user($$value) {
-      user($$value);
-      flushSync();
-    },
-    get stats() {
-      return stats();
-    },
-    set stats($$value) {
-      stats($$value);
-      flushSync();
-    },
-    get onProfile() {
-      return onProfile();
-    },
-    set onProfile($$value) {
-      onProfile($$value);
-      flushSync();
-    }
-  };
-  var section = root_15();
-  var header = child(section);
-  var button = sibling(child(header), 2);
-  reset(header);
-  var div = sibling(header, 2);
-  var span = child(div);
-  var node = child(span);
-  {
-    var consequent = ($$anchor2) => {
-      var img = root7();
-      template_effect(() => set_attribute2(img, "src", user().avatarUrl));
-      append($$anchor2, img);
-    };
-    if_block(node, ($$render) => {
-      if (user()?.avatarUrl) $$render(consequent);
-    });
-  }
-  reset(span);
-  var div_1 = sibling(span, 2);
-  var span_1 = child(div_1);
-  var text2 = child(span_1, true);
-  reset(span_1);
-  var div_2 = sibling(span_1, 2);
-  var span_2 = child(div_2);
-  var text_1 = child(span_2);
-  reset(span_2);
-  var div_3 = sibling(span_2, 2);
-  var node_1 = child(div_3);
-  {
-    let $0 = user_derived(() => `Level ${get2(level)} progress`);
-    ProgressBar(node_1, {
-      get value() {
-        return get2(levelProgress2);
-      },
-      get label() {
-        return get2($0);
-      }
-    });
-  }
-  reset(div_3);
-  var span_3 = sibling(div_3, 2);
-  var text_2 = child(span_3, true);
-  reset(span_3);
-  reset(div_2);
-  reset(div_1);
-  reset(div);
-  var div_4 = sibling(div, 2);
-  var node_2 = child(div_4);
-  {
-    let $0 = user_derived(() => format(stats()?.currentStreak ?? 0));
-    StatTile(node_2, {
-      icon: "\u{1F525}",
-      get value() {
-        return get2($0);
-      },
-      label: "Current streak"
-    });
-  }
-  var node_3 = sibling(node_2, 2);
-  {
-    let $0 = user_derived(() => format(stats()?.longestStreak ?? 0));
-    StatTile(node_3, {
-      icon: "\u{1F3C6}",
-      get value() {
-        return get2($0);
-      },
-      label: "Longest streak"
-    });
-  }
-  var node_4 = sibling(node_3, 2);
-  {
-    let $0 = user_derived(() => format(get2(points)));
-    StatTile(node_4, {
-      icon: "\u{1F3AF}",
-      get value() {
-        return get2($0);
-      },
-      label: "Total points"
-    });
-  }
-  var node_5 = sibling(node_4, 2);
-  {
-    let $0 = user_derived(() => format(get2(level)));
-    StatTile(node_5, {
-      icon: "\u{1F3C5}",
-      get value() {
-        return get2($0);
-      },
-      label: "Level"
-    });
-  }
-  reset(div_4);
-  reset(section);
-  template_effect(
-    ($0) => {
-      set_text(text2, get2(username));
-      set_text(text_1, `Level ${get2(level) ?? ""}`);
-      set_text(text_2, $0);
-    },
-    [() => format(get2(nextLevelPoints))]
-  );
-  delegated("click", button, () => onProfile()?.());
-  append($$anchor, section);
-  return pop($$exports);
-}
-delegate(["click"]);
-create_custom_element(StatsPanel, { user: {}, stats: {}, onProfile: {} }, [], [], { mode: "open" });
-
-// src/components/basic/RadarChart.svelte
-var root8 = from_html(`<p class="empty svelte-1lqrtdt">No skill data yet.</p>`);
-var root_16 = from_svg(`<polygon></polygon>`);
-var root_23 = from_svg(`<line class="spoke svelte-1lqrtdt"></line>`);
-var root_33 = from_svg(`<circle r="3.5" class="vertex svelte-1lqrtdt"></circle>`);
-var root_43 = from_svg(`<text class="label svelte-1lqrtdt" font-size="13" dominant-baseline="middle"> </text>`);
-var root_52 = from_svg(`<svg class="radar svelte-1lqrtdt" role="img" aria-label="Skill matrix"><!><!><polygon class="value svelte-1lqrtdt"></polygon><!><!></svg>`);
-var $$css8 = {
-  hash: "svelte-1lqrtdt",
-  code: ".radar.svelte-1lqrtdt {width:100%;max-width:24rem;height:auto;margin:0 auto;display:block;}.ring.svelte-1lqrtdt {fill:none;stroke:color-mix(in oklab, var(--color-base-content) 14%, transparent);stroke-width:1;}.ring.outer.svelte-1lqrtdt {stroke:color-mix(in oklab, var(--color-base-content) 24%, transparent);}.spoke.svelte-1lqrtdt {stroke:color-mix(in oklab, var(--color-base-content) 14%, transparent);stroke-width:1;}.value.svelte-1lqrtdt {fill:color-mix(in oklab, var(--color-success) 30%, transparent);stroke:var(--color-success);stroke-width:2;stroke-linejoin:round;}.vertex.svelte-1lqrtdt {fill:var(--color-success);}.label.svelte-1lqrtdt {fill:color-mix(in oklab, var(--color-base-content) 80%, transparent);font-weight:600;}.empty.svelte-1lqrtdt {text-align:center;color:color-mix(in oklab, var(--color-base-content) 60%, transparent);padding:2rem 0;}"
-};
-function RadarChart($$anchor, $$props) {
-  push($$props, true);
-  append_styles($$anchor, $$css8);
-  "use strict";
-  let data = prop($$props, "data", 7), max = prop($$props, "max", 7, 6);
-  const size = 320;
-  const center = size / 2;
-  const radius = 100;
-  const labelDistance = radius + 24;
-  const rings = [0.25, 0.5, 0.75, 1];
-  const pad = 40;
-  const viewBox = `${-pad} ${-pad} ${size + pad * 2} ${size + pad * 2}`;
-  const axes = user_derived(() => data().slice(0, max()));
-  function point(index2, count, distance) {
-    const angle = Math.PI * 2 * index2 / count - Math.PI / 2;
-    return {
-      x: center + distance * Math.cos(angle),
-      y: center + distance * Math.sin(angle)
-    };
-  }
-  function clamp(value) {
-    return Math.min(100, Math.max(0, value));
-  }
-  function polygon(points) {
-    return points.map((p) => `${p.x},${p.y}`).join(" ");
-  }
-  const ringShapes = user_derived(() => rings.map((ratio) => polygon(get2(axes).map((_, i) => point(i, get2(axes).length, radius * ratio)))));
-  const spokes = user_derived(() => get2(axes).map((_, i) => point(i, get2(axes).length, radius)));
-  const valuePoints = user_derived(() => get2(axes).map((axis, i) => point(i, get2(axes).length, radius * clamp(axis.value) / 100)));
-  const valueShape = user_derived(() => polygon(get2(valuePoints)));
-  const labels = user_derived(() => get2(axes).map((axis, i) => ({
-    ...point(i, get2(axes).length, labelDistance),
-    label: axis.label
-  })));
-  var $$exports = {
-    get data() {
-      return data();
-    },
-    set data($$value) {
-      data($$value);
-      flushSync();
-    },
-    get max() {
-      return max();
-    },
-    set max($$value = 6) {
-      max($$value);
+    set actions($$value) {
+      actions($$value);
       flushSync();
     }
   };
   var fragment = comment();
   var node = first_child(fragment);
   {
-    var consequent = ($$anchor2) => {
-      var p_1 = root8();
-      append($$anchor2, p_1);
-    };
-    var alternate = ($$anchor2) => {
-      var svg = root_52();
-      set_attribute2(svg, "viewBox", viewBox);
-      var node_1 = child(svg);
-      each(node_1, 17, () => get2(ringShapes), index, ($$anchor3, ring, i) => {
-        var polygon_1 = root_16();
-        let classes;
-        template_effect(() => {
-          set_attribute2(polygon_1, "points", get2(ring));
-          classes = set_class(polygon_1, 0, "ring svelte-1lqrtdt", null, classes, { outer: i === get2(ringShapes).length - 1 });
+    var consequent_2 = ($$anchor2) => {
+      var div = root_22();
+      var div_1 = child(div);
+      var node_1 = child(div_1);
+      {
+        var consequent = ($$anchor3) => {
+          var h3 = root2();
+          var text2 = child(h3, true);
+          reset(h3);
+          template_effect(() => set_text(text2, title()));
+          append($$anchor3, h3);
+        };
+        if_block(node_1, ($$render) => {
+          if (title()) $$render(consequent);
         });
-        append($$anchor3, polygon_1);
-      });
-      var node_2 = sibling(node_1);
-      each(node_2, 17, () => get2(spokes), index, ($$anchor3, spoke) => {
-        var line = root_23();
-        set_attribute2(line, "x1", center);
-        set_attribute2(line, "y1", center);
-        template_effect(() => {
-          set_attribute2(line, "x2", get2(spoke).x);
-          set_attribute2(line, "y2", get2(spoke).y);
+      }
+      var div_2 = sibling(node_1, 2);
+      var node_2 = child(div_2);
+      snippet(node_2, children);
+      reset(div_2);
+      var div_3 = sibling(div_2, 2);
+      var node_3 = child(div_3);
+      {
+        var consequent_1 = ($$anchor3) => {
+          var fragment_1 = comment();
+          var node_4 = first_child(fragment_1);
+          snippet(node_4, actions);
+          append($$anchor3, fragment_1);
+        };
+        var alternate = ($$anchor3) => {
+          var button = root_12();
+          delegated("click", button, function(...$$args) {
+            onClose()?.apply(this, $$args);
+          });
+          append($$anchor3, button);
+        };
+        if_block(node_3, ($$render) => {
+          if (actions()) $$render(consequent_1);
+          else $$render(alternate, -1);
         });
-        append($$anchor3, line);
+      }
+      reset(div_3);
+      reset(div_1);
+      var button_1 = sibling(div_1, 2);
+      reset(div);
+      delegated("click", button_1, function(...$$args) {
+        onClose()?.apply(this, $$args);
       });
-      var polygon_2 = sibling(node_2);
-      var node_3 = sibling(polygon_2);
-      each(node_3, 17, () => get2(valuePoints), index, ($$anchor3, vertex) => {
-        var circle = root_33();
-        template_effect(() => {
-          set_attribute2(circle, "cx", get2(vertex).x);
-          set_attribute2(circle, "cy", get2(vertex).y);
-        });
-        append($$anchor3, circle);
-      });
-      var node_4 = sibling(node_3);
-      each(node_4, 17, () => get2(labels), index, ($$anchor3, item) => {
-        var text2 = root_43();
-        var text_1 = child(text2, true);
-        reset(text2);
-        template_effect(() => {
-          set_attribute2(text2, "x", get2(item).x);
-          set_attribute2(text2, "y", get2(item).y);
-          set_attribute2(text2, "text-anchor", get2(item).x < center - 1 ? "end" : get2(item).x > center + 1 ? "start" : "middle");
-          set_text(text_1, get2(item).label);
-        });
-        append($$anchor3, text2);
-      });
-      reset(svg);
-      template_effect(() => set_attribute2(polygon_2, "points", get2(valueShape)));
-      append($$anchor2, svg);
+      append($$anchor2, div);
     };
     if_block(node, ($$render) => {
-      if (get2(axes).length === 0) $$render(consequent);
-      else $$render(alternate, -1);
+      if (open()) $$render(consequent_2);
     });
   }
   append($$anchor, fragment);
   return pop($$exports);
 }
-create_custom_element(RadarChart, { data: {}, max: {} }, [], [], { mode: "open" });
+delegate(["click"]);
+create_custom_element(Modal, { open: {}, title: {}, onClose: {}, children: {}, actions: {} }, [], [], { mode: "open" });
 
-// src/components/panels/SkillMatrixPanel.svelte
-var root9 = from_html(`<section class="card panel svelte-168eojm"><h2 class="panel-title svelte-168eojm">Skill Matrix</h2> <div class="matrix-body svelte-168eojm"><div class="matrix-chart svelte-168eojm" aria-hidden="true"><!></div> <div class="matrix-overlay svelte-168eojm" role="status"><span class="overlay-badge svelte-168eojm">\u{1F6A7} Coming soon</span> <span class="overlay-note svelte-168eojm">The skill matrix is still being calibrated.</span></div></div></section>`);
-var $$css9 = {
-  hash: "svelte-168eojm",
-  code: "\n    /* Fill the remaining height of the right column and centre the radar. */.panel.svelte-168eojm {flex:1;min-height:0;display:flex;flex-direction:column;background:var(--color-base-100);border-radius:1.25rem;padding:1.75rem;box-shadow:0 0 24px color-mix(in oklab, var(--color-primary) 10%, transparent);}.panel-title.svelte-168eojm {font-size:1.5rem;font-weight:700;margin-bottom:1rem;color:var(--color-base-content);}\n\n    /* Centre the radar in the remaining space without stretching its aspect ratio. */.matrix-body.svelte-168eojm {position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;}\n\n    /* The chart still renders; it is just blurred while the feature is unfinished. */.matrix-chart.svelte-168eojm {display:flex;align-items:center;justify-content:center;width:100%;filter:blur(6px);opacity:0.55;pointer-events:none;user-select:none;}.matrix-overlay.svelte-168eojm {position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;text-align:center;padding:1rem;}.overlay-badge.svelte-168eojm {padding:0.4rem 1rem;border-radius:999px;font-weight:700;letter-spacing:0.04em;color:var(--color-warning);background:color-mix(in oklab, var(--color-warning) 16%, transparent);border:1px solid color-mix(in oklab, var(--color-warning) 40%, transparent);}.overlay-note.svelte-168eojm {font-size:0.85rem;color:color-mix(in oklab, var(--color-base-content) 70%, transparent);}"
+// src/components/pages/CourseListPage.svelte
+var root3 = from_html(`<div class="status svelte-13rmcj5" role="status" aria-live="polite"><span class="loading loading-spinner loading-lg"></span> <p>Loading your courses\u2026</p></div>`);
+var root_13 = from_html(`<div class="status svelte-13rmcj5" role="alert"><p class="error svelte-13rmcj5"> </p> <button type="button" class="btn btn-sm">Retry</button></div>`);
+var root_23 = from_html(`<div class="status svelte-13rmcj5"><p>No courses yet. Create your first course to get started.</p> <button type="button" class="btn btn-primary btn-sm">+ New course</button></div>`);
+var root_3 = from_html(`<p class="desc svelte-13rmcj5"> </p>`);
+var root_4 = from_html(`<button type="button" class="btn btn-sm btn-error">Confirm delete</button> <button type="button" class="btn btn-sm btn-ghost">Cancel</button>`, 1);
+var root_5 = from_html(`<button type="button" class="btn btn-sm btn-ghost">Delete</button>`);
+var root_6 = from_html(`<li class="card bg-base-100 shadow-sm"><div class="card-body"><h2 class="card-title"> </h2> <!> <p class="meta svelte-13rmcj5"> </p> <div class="card-actions"><button type="button" class="btn btn-sm btn-primary">Manage</button> <!></div></div></li>`);
+var root_7 = from_html(`<ul class="course-grid svelte-13rmcj5"></ul>`);
+var root_8 = from_html(`<div class="alert alert-error mb-3"><span> </span></div>`);
+var root_9 = from_html(`<option> </option>`);
+var root_10 = from_html(`<!> <label class="form-control w-full"><span class="label-text">Course name</span> <input class="input input-bordered w-full" type="text" placeholder="e.g. Introduction to Databases"/></label> <label class="form-control w-full mt-3"><span class="label-text">Description</span> <textarea class="textarea textarea-bordered w-full" rows="3"></textarea></label> <label class="form-control w-full mt-3"><span class="label-text">Library group</span> <select class="select select-bordered w-full"></select></label>`, 1);
+var root_11 = from_html(`<span class="loading loading-spinner loading-sm"></span>`);
+var root_122 = from_html(`<button type="button" class="btn btn-ghost">Cancel</button> <button type="button" class="btn btn-primary"><!> Create</button>`, 1);
+var root_132 = from_html(`<div class="page svelte-13rmcj5"><header class="top svelte-13rmcj5"><h1 class="title svelte-13rmcj5">My Courses</h1> <button type="button" class="btn btn-primary">+ New course</button></header> <!></div> <!>`, 1);
+var $$css2 = {
+  hash: "svelte-13rmcj5",
+  code: ".page.svelte-13rmcj5 {width:90%;max-width:80rem;margin:0 auto;padding:1.5rem 0 2rem;display:flex;flex-direction:column;gap:1.25rem;}.top.svelte-13rmcj5 {display:flex;align-items:center;justify-content:space-between;gap:1rem;}.title.svelte-13rmcj5 {font-size:clamp(1.4rem, 3vw, 2rem);font-weight:800;}.course-grid.svelte-13rmcj5 {list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill, minmax(18rem, 1fr));gap:1rem;}.desc.svelte-13rmcj5 {font-size:0.9rem;color:color-mix(in oklab, var(--color-base-content) 75%, transparent);}.meta.svelte-13rmcj5 {font-size:0.8rem;color:color-mix(in oklab, var(--color-base-content) 60%, transparent);}.status.svelte-13rmcj5 {display:flex;flex-direction:column;align-items:center;gap:1rem;padding:4rem 0;color:color-mix(in oklab, var(--color-base-content) 70%, transparent);}.error.svelte-13rmcj5 {color:var(--color-error);font-weight:600;text-align:center;}"
 };
-function SkillMatrixPanel($$anchor, $$props) {
+function CourseListPage($$anchor, $$props) {
   push($$props, true);
-  append_styles($$anchor, $$css9);
-  let skills = prop($$props, "skills", 7);
-  const axes = user_derived(() => skills().map((skill) => ({ label: skill.name, value: skill.progress })));
-  var $$exports = {
-    get skills() {
-      return skills();
-    },
-    set skills($$value) {
-      skills($$value);
-      flushSync();
-    }
-  };
-  var section = root9();
-  var div = sibling(child(section), 2);
-  var div_1 = child(div);
-  var node = child(div_1);
-  RadarChart(node, {
-    get data() {
-      return get2(axes);
-    }
-  });
-  reset(div_1);
-  next(2);
-  reset(div);
-  reset(section);
-  append($$anchor, section);
-  return pop($$exports);
-}
-create_custom_element(SkillMatrixPanel, { skills: {} }, [], [], { mode: "open" });
-
-// src/components/pages/DashboardPage.svelte
-var root10 = from_html(`<div class="status svelte-wafcro" role="status" aria-live="polite"><span class="loading loading-spinner loading-lg"></span> <p>Loading your dashboard\u2026</p></div>`);
-var root_17 = from_html(`<div class="status svelte-wafcro" role="alert"><p class="error svelte-wafcro"> </p> <button type="button" class="btn btn-primary btn-sm">Retry</button></div>`);
-var root_24 = from_html(`<div class="grid svelte-wafcro"><div class="grid-main svelte-wafcro"><!></div> <div class="grid-side svelte-wafcro"><!> <!></div></div>`);
-var root_34 = from_html(`<div class="dashboard svelte-wafcro"><header class="top svelte-wafcro"><h1 class="title svelte-wafcro"> </h1></header> <!></div>`);
-var $$css10 = {
-  hash: "svelte-wafcro",
-  code: "\n    /* Fill ~90% of the viewport with little margin around the edges. */.dashboard.svelte-wafcro {flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:1.25rem;width:90%;max-width:110rem;margin:0 auto;padding:1.25rem 0 0.5rem;}.top.svelte-wafcro {flex:0 0 auto;text-align:center;}.title.svelte-wafcro {font-size:clamp(1.6rem, 3.5vw, 2.6rem);font-weight:800;letter-spacing:0.04em;color:var(--color-base-content);text-shadow:0 0 24px color-mix(in oklab, var(--color-primary) 45%, transparent);}\n\n    /* Stretch so both columns share the available height. */.grid.svelte-wafcro {flex:1;min-height:0;display:grid;grid-template-columns:2fr 1fr;gap:1.25rem;align-items:stretch;}.grid-main.svelte-wafcro {display:flex;min-height:0;}.grid-side.svelte-wafcro {display:flex;flex-direction:column;gap:1.25rem;min-height:0;}.status.svelte-wafcro {display:flex;flex-direction:column;align-items:center;gap:1rem;padding:4rem 0;color:color-mix(in oklab, var(--color-base-content) 70%, transparent);}.error.svelte-wafcro {color:var(--color-error);font-weight:600;text-align:center;}\n\n    @media (max-width: 60rem) {.grid.svelte-wafcro {grid-template-columns:1fr;}\n    }"
-};
-function DashboardPage($$anchor, $$props) {
-  push($$props, true);
-  append_styles($$anchor, $$css10);
-  let state3 = state(proxy({
-    isLoading: true,
-    errorMessage: "",
-    user: null,
-    stats: null,
-    skills: [],
-    courses: []
-  }));
+  append_styles($$anchor, $$css2);
+  let state3 = state(proxy({ isLoading: true, errorMessage: "", user: null, courses: [] }));
+  let showCreate = state(false);
+  let groups = state(proxy([]));
+  let name = state("");
+  let description = state("");
+  let groupId = state("");
+  let saving = state(false);
+  let formError = state("");
+  let deletingId = state(null);
   onMount(() => {
-    const unsubscribe = dashboardStore.subscribe((value) => {
+    const unsubscribe = teacherStore.subscribe((value) => {
       set(state3, value, true);
     });
-    dashboardStore.refresh();
+    teacherStore.refresh();
     return unsubscribe;
   });
-  const handle = user_derived(() => get2(state3).user?.username ? `@${get2(state3).user.username}` : "@user");
-  var div = root_34();
-  var header = child(div);
-  var h1 = child(header);
-  var text2 = child(h1);
-  reset(h1);
-  reset(header);
-  var node = sibling(header, 2);
-  {
-    var consequent = ($$anchor2) => {
-      var div_1 = root10();
-      append($$anchor2, div_1);
-    };
-    var consequent_1 = ($$anchor2) => {
-      var div_2 = root_17();
-      var p = child(div_2);
-      var text_1 = child(p, true);
-      reset(p);
-      var button = sibling(p, 2);
-      reset(div_2);
-      template_effect(() => set_text(text_1, get2(state3).errorMessage));
-      delegated("click", button, () => dashboardStore.refresh());
-      append($$anchor2, div_2);
-    };
-    var alternate = ($$anchor2) => {
-      var div_3 = root_24();
-      var div_4 = child(div_3);
-      var node_1 = child(div_4);
-      MyLearningPanel(node_1, {
-        get courses() {
-          return get2(state3).courses;
-        },
-        get skills() {
-          return get2(state3).skills;
-        },
-        onCourseOpen: (course) => push2(`/chat/${course.id}`)
-      });
-      reset(div_4);
-      var div_5 = sibling(div_4, 2);
-      var node_2 = child(div_5);
-      StatsPanel(node_2, {
-        get user() {
-          return get2(state3).user;
-        },
-        get stats() {
-          return get2(state3).stats;
-        },
-        onProfile: () => push2("/profile")
-      });
-      var node_3 = sibling(node_2, 2);
-      SkillMatrixPanel(node_3, {
-        get skills() {
-          return get2(state3).skills;
-        }
-      });
-      reset(div_5);
-      reset(div_3);
-      append($$anchor2, div_3);
-    };
-    if_block(node, ($$render) => {
-      if (get2(state3).isLoading) $$render(consequent);
-      else if (get2(state3).errorMessage) $$render(consequent_1, 1);
-      else $$render(alternate, -1);
-    });
-  }
-  reset(div);
-  template_effect(() => set_text(text2, `${get2(handle) ?? ""} Dashboard`));
-  append($$anchor, div);
-  pop();
-}
-delegate(["click"]);
-create_custom_element(DashboardPage, {}, [], [], { mode: "open" });
-
-// src/api/profile.ts
-async function saveProfile(username, fields, picture) {
-  const path = `/api/auth/users/${encodeURIComponent(username)}/`;
-  if (picture) {
-    const form = new FormData();
-    form.set("first_name", fields.firstName);
-    form.set("last_name", fields.lastName);
-    form.set("description", fields.description);
-    form.set("picture", picture);
-    await apiSend("PATCH", path, form, { formData: true });
-    return;
-  }
-  await apiSend("PATCH", path, {
-    first_name: fields.firstName,
-    last_name: fields.lastName,
-    description: fields.description
-  });
-}
-async function fetchEmailAddresses() {
-  const response = await apiGet("/auth-api/browser/v1/account/email");
-  return response.data ?? [];
-}
-async function requestEmailChange(email) {
-  await apiSend("POST", "/auth-api/browser/v1/account/email", { email });
-}
-
-// src/components/pages/ProfileEditPage.svelte
-var root11 = from_html(`<div class="status svelte-1u1012d" role="status" aria-live="polite"><span class="loading loading-spinner loading-lg"></span> <p>Loading your profile\u2026</p></div>`);
-var root_18 = from_html(`<div class="status svelte-1u1012d" role="alert"><p class="error svelte-1u1012d"> </p></div>`);
-var root_25 = from_html(`<img alt="" class="svelte-1u1012d"/>`);
-var root_35 = from_html(`<span class="badge badge-sm badge-primary">primary</span>`);
-var root_44 = from_html(`<li class="svelte-1u1012d"> <span> </span> <!></li>`);
-var root_53 = from_html(`<ul class="email-list svelte-1u1012d"></ul>`);
-var root_62 = from_html(`<p class="error svelte-1u1012d" role="alert"> </p>`);
-var root_7 = from_html(`<p class="success svelte-1u1012d" role="status"> </p>`);
-var root_8 = from_html(`<span class="loading loading-spinner loading-sm"></span>`);
-var root_9 = from_html(`<form class="card form svelte-1u1012d"><div class="avatar-row svelte-1u1012d"><span class="avatar-mark svelte-1u1012d" aria-hidden="true"><!></span> <div class="avatar-actions svelte-1u1012d"><label class="field-label svelte-1u1012d" for="picture">Profile picture</label> <input id="picture" class="file-input file-input-bordered file-input-sm" type="file" accept="image/*"/></div></div> <label class="field svelte-1u1012d"><span class="field-label svelte-1u1012d">Username</span> <input class="input input-bordered" type="text" readonly=""/> <span class="hint svelte-1u1012d">Username cannot be changed.</span></label> <div class="two-col svelte-1u1012d"><label class="field svelte-1u1012d"><span class="field-label svelte-1u1012d">First name</span> <input class="input input-bordered" type="text" autocomplete="given-name"/></label> <label class="field svelte-1u1012d"><span class="field-label svelte-1u1012d">Last name</span> <input class="input input-bordered" type="text" autocomplete="family-name"/></label></div> <label class="field svelte-1u1012d"><span class="field-label svelte-1u1012d">Description</span> <textarea class="textarea textarea-bordered" rows="4"></textarea></label> <label class="field svelte-1u1012d"><span class="field-label svelte-1u1012d">E-mail</span> <input class="input input-bordered" type="email" autocomplete="email"/> <span class="hint svelte-1u1012d">Changing your e-mail sends a verification link; it activates after you confirm.</span></label> <!> <!> <!> <div class="actions svelte-1u1012d"><button type="submit" class="btn btn-primary"><!> Save changes</button></div></form>`);
-var root_10 = from_html(`<div class="profile svelte-1u1012d"><header class="head svelte-1u1012d"><h1 class="title svelte-1u1012d">Edit Profile</h1> <button type="button" class="btn btn-ghost btn-sm">\u2190 Back to Dashboard</button></header> <!></div>`);
-var $$css11 = {
-  hash: "svelte-1u1012d",
-  code: ".profile.svelte-1u1012d {flex:1;min-height:0;overflow-y:auto;max-width:42rem;width:100%;margin:0 auto;padding:2rem 1.5rem 1rem;display:flex;flex-direction:column;gap:1.5rem;}.head.svelte-1u1012d {display:flex;align-items:center;justify-content:space-between;gap:1rem;}.title.svelte-1u1012d {font-size:1.6rem;font-weight:800;color:var(--color-base-content);}.form.svelte-1u1012d {background:var(--color-base-100);border-radius:1rem;padding:1.5rem;display:flex;flex-direction:column;gap:1.1rem;box-shadow:0 0 24px color-mix(in oklab, var(--color-primary) 10%, transparent);}.avatar-row.svelte-1u1012d {display:flex;align-items:center;gap:1rem;}.avatar-mark.svelte-1u1012d {width:4rem;height:4rem;flex:0 0 auto;border-radius:999px;overflow:hidden;background:color-mix(in oklab, var(--color-base-content) 18%, transparent);box-shadow:0 0 16px color-mix(in oklab, var(--color-primary) 30%, transparent);}.avatar-mark.svelte-1u1012d img:where(.svelte-1u1012d) {width:100%;height:100%;object-fit:cover;}.avatar-actions.svelte-1u1012d {display:flex;flex-direction:column;gap:0.35rem;}.field.svelte-1u1012d {display:flex;flex-direction:column;gap:0.35rem;}.field-label.svelte-1u1012d {font-size:0.85rem;font-weight:600;color:color-mix(in oklab, var(--color-base-content) 80%, transparent);}.two-col.svelte-1u1012d {display:grid;grid-template-columns:1fr 1fr;gap:1rem;}.hint.svelte-1u1012d {font-size:0.75rem;color:color-mix(in oklab, var(--color-base-content) 60%, transparent);}.email-list.svelte-1u1012d {list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0.35rem;font-size:0.85rem;color:var(--color-base-content);}.email-list.svelte-1u1012d li:where(.svelte-1u1012d) {display:flex;align-items:center;gap:0.5rem;}.error.svelte-1u1012d {color:var(--color-error);font-weight:600;}.success.svelte-1u1012d {color:var(--color-success);font-weight:600;}.status.svelte-1u1012d {display:flex;flex-direction:column;align-items:center;gap:1rem;padding:4rem 0;color:color-mix(in oklab, var(--color-base-content) 70%, transparent);}.actions.svelte-1u1012d {display:flex;justify-content:flex-end;}\n\n    @media (max-width: 40rem) {.two-col.svelte-1u1012d {grid-template-columns:1fr;}\n    }"
-};
-function ProfileEditPage($$anchor, $$props) {
-  push($$props, true);
-  append_styles($$anchor, $$css11);
-  let isLoading = state(true);
-  let isSaving = state(false);
-  let errorMessage = state("");
-  let successMessage = state("");
-  let username = state("");
-  let firstName = state("");
-  let lastName = state("");
-  let description = state("");
-  let email = state("");
-  let originalEmail = state("");
-  let currentPictureUrl = state(null);
-  let previewUrl = state(null);
-  let pictureFile = state(null);
-  let emails = state(proxy([]));
-  const previewSrc = user_derived(() => get2(previewUrl) ?? get2(currentPictureUrl));
-  async function load() {
-    const user = await fetchCurrentUser();
-    if (!user || !user.is_authenticated) {
-      throw new Error("You are not signed in. Please log in to edit your profile.");
+  async function openCreate() {
+    set(name, "");
+    set(description, "");
+    set(groupId, "");
+    set(formError, "");
+    set(showCreate, true);
+    try {
+      set(groups, await fetchLibraryGroups(), true);
+      if (get2(groups).length > 0 && get2(groups)[0]) {
+        set(groupId, get2(groups)[0].id, true);
+      }
+    } catch (error) {
+      set(formError, error instanceof Error ? error.message : String(error), true);
     }
-    set(username, user.username, true);
-    set(firstName, user.first_name ?? "", true);
-    set(lastName, user.last_name ?? "", true);
-    set(description, user.description ?? "", true);
-    set(email, user.email ?? "", true);
-    set(originalEmail, user.email ?? "", true);
-    set(currentPictureUrl, user.picture ?? null, true);
-    set(emails, await fetchEmailAddresses().catch(() => []), true);
   }
-  onMount(() => {
-    load().catch((error) => {
-      set(errorMessage, error instanceof Error ? error.message : String(error), true);
-    }).finally(() => {
-      set(isLoading, false);
-    });
-  });
-  onDestroy(() => {
-    if (get2(previewUrl)) {
-      URL.revokeObjectURL(get2(previewUrl));
-    }
-  });
-  function onPickFile(event2) {
-    const input = event2.currentTarget;
-    const file = input.files?.[0] ?? null;
-    if (get2(previewUrl)) {
-      URL.revokeObjectURL(get2(previewUrl));
-    }
-    set(pictureFile, file, true);
-    set(previewUrl, file ? URL.createObjectURL(file) : null, true);
-  }
-  async function save2() {
-    if (!get2(username) || get2(isSaving)) {
+  async function submitCreate() {
+    if (!get2(name).trim()) {
+      set(formError, "Please enter a course name.");
       return;
     }
-    set(isSaving, true);
-    set(errorMessage, "");
-    set(successMessage, "");
+    if (!get2(groupId)) {
+      set(formError, "Please choose a library group.");
+      return;
+    }
+    set(saving, true);
+    set(formError, "");
     try {
-      await saveProfile(
-        get2(username),
-        {
-          firstName: get2(firstName),
-          lastName: get2(lastName),
-          description: get2(description)
-        },
-        get2(pictureFile)
-      );
-      let message = "Profile saved.";
-      if (get2(email) && get2(email) !== get2(originalEmail)) {
-        await requestEmailChange(get2(email));
-        message += " A verification link was sent to the new e-mail address.";
-      }
-      if (get2(previewUrl)) {
-        URL.revokeObjectURL(get2(previewUrl));
-      }
-      set(pictureFile, null);
-      set(previewUrl, null);
-      await dashboardStore.refresh();
-      await load();
-      set(successMessage, message, true);
+      await teacherStore.create({
+        name: get2(name).trim(),
+        description: get2(description).trim(),
+        group: get2(groupId)
+      });
+      set(showCreate, false);
     } catch (error) {
-      set(errorMessage, error instanceof Error ? error.message : String(error), true);
+      set(formError, error instanceof Error ? error.message : String(error), true);
     } finally {
-      set(isSaving, false);
+      set(saving, false);
     }
   }
-  var div = root_10();
+  async function confirmDelete(id) {
+    try {
+      await teacherStore.remove(id);
+    } finally {
+      set(deletingId, null);
+    }
+  }
+  var fragment = root_132();
+  var div = first_child(fragment);
   var header = child(div);
   var button = sibling(child(header), 2);
   reset(header);
   var node = sibling(header, 2);
   {
     var consequent = ($$anchor2) => {
-      var div_1 = root11();
+      var div_1 = root3();
       append($$anchor2, div_1);
     };
     var consequent_1 = ($$anchor2) => {
-      var div_2 = root_18();
+      var div_2 = root_13();
       var p = child(div_2);
       var text2 = child(p, true);
       reset(p);
+      var button_1 = sibling(p, 2);
       reset(div_2);
-      template_effect(() => set_text(text2, get2(errorMessage)));
+      template_effect(() => set_text(text2, get2(state3).errorMessage));
+      delegated("click", button_1, () => teacherStore.refresh());
       append($$anchor2, div_2);
     };
-    var alternate = ($$anchor2) => {
-      var form = root_9();
-      var div_3 = child(form);
-      var span = child(div_3);
-      var node_1 = child(span);
-      {
-        var consequent_2 = ($$anchor3) => {
-          var img = root_25();
-          template_effect(() => set_attribute2(img, "src", get2(previewSrc)));
-          append($$anchor3, img);
-        };
-        if_block(node_1, ($$render) => {
-          if (get2(previewSrc)) $$render(consequent_2);
-        });
-      }
-      reset(span);
-      var div_4 = sibling(span, 2);
-      var input_1 = sibling(child(div_4), 2);
-      reset(div_4);
+    var consequent_2 = ($$anchor2) => {
+      var div_3 = root_23();
+      var button_2 = sibling(child(div_3), 2);
       reset(div_3);
-      var label = sibling(div_3, 2);
-      var input_2 = sibling(child(label), 2);
-      remove_input_defaults(input_2);
-      next(2);
-      reset(label);
-      var div_5 = sibling(label, 2);
-      var label_1 = child(div_5);
-      var input_3 = sibling(child(label_1), 2);
-      remove_input_defaults(input_3);
-      reset(label_1);
-      var label_2 = sibling(label_1, 2);
-      var input_4 = sibling(child(label_2), 2);
-      remove_input_defaults(input_4);
-      reset(label_2);
-      reset(div_5);
-      var label_3 = sibling(div_5, 2);
-      var textarea = sibling(child(label_3), 2);
-      remove_textarea_child(textarea);
-      reset(label_3);
-      var label_4 = sibling(label_3, 2);
-      var input_5 = sibling(child(label_4), 2);
-      remove_input_defaults(input_5);
-      next(2);
-      reset(label_4);
-      var node_2 = sibling(label_4, 2);
-      {
-        var consequent_4 = ($$anchor3) => {
-          var ul = root_53();
-          each(ul, 21, () => get2(emails), (entry) => entry.email, ($$anchor4, entry) => {
-            var li = root_44();
-            var text_1 = child(li);
-            var span_1 = sibling(text_1);
-            var text_2 = child(span_1, true);
-            reset(span_1);
-            var node_3 = sibling(span_1, 2);
-            {
-              var consequent_3 = ($$anchor5) => {
-                var span_2 = root_35();
-                append($$anchor5, span_2);
-              };
-              if_block(node_3, ($$render) => {
-                if (get2(entry).primary) $$render(consequent_3);
-              });
-            }
-            reset(li);
-            template_effect(() => {
-              set_text(text_1, `${get2(entry).email ?? ""} `);
-              set_class(span_1, 1, `badge badge-sm ${get2(entry).verified ? "badge-success" : "badge-warning"}`);
-              set_text(text_2, get2(entry).verified ? "verified" : "unverified");
-            });
-            append($$anchor4, li);
+      delegated("click", button_2, openCreate);
+      append($$anchor2, div_3);
+    };
+    var alternate_1 = ($$anchor2) => {
+      var ul = root_7();
+      each(ul, 21, () => get2(state3).courses, (course) => course.id, ($$anchor3, course) => {
+        var li = root_6();
+        var div_4 = child(li);
+        var h2 = child(div_4);
+        var text_1 = child(h2, true);
+        reset(h2);
+        var node_1 = sibling(h2, 2);
+        {
+          var consequent_3 = ($$anchor4) => {
+            var p_1 = root_3();
+            var text_2 = child(p_1, true);
+            reset(p_1);
+            template_effect(() => set_text(text_2, get2(course).description));
+            append($$anchor4, p_1);
+          };
+          if_block(node_1, ($$render) => {
+            if (get2(course).description) $$render(consequent_3);
           });
-          reset(ul);
-          append($$anchor3, ul);
-        };
-        if_block(node_2, ($$render) => {
-          if (get2(emails).length > 0) $$render(consequent_4);
+        }
+        var p_2 = sibling(node_1, 2);
+        var text_3 = child(p_2);
+        reset(p_2);
+        var div_5 = sibling(p_2, 2);
+        var button_3 = child(div_5);
+        var node_2 = sibling(button_3, 2);
+        {
+          var consequent_4 = ($$anchor4) => {
+            var fragment_1 = root_4();
+            var button_4 = first_child(fragment_1);
+            var button_5 = sibling(button_4, 2);
+            delegated("click", button_4, () => confirmDelete(get2(course).id));
+            delegated("click", button_5, () => set(deletingId, null));
+            append($$anchor4, fragment_1);
+          };
+          var alternate = ($$anchor4) => {
+            var button_6 = root_5();
+            delegated("click", button_6, () => set(deletingId, get2(course).id, true));
+            append($$anchor4, button_6);
+          };
+          if_block(node_2, ($$render) => {
+            if (get2(deletingId) === get2(course).id) $$render(consequent_4);
+            else $$render(alternate, -1);
+          });
+        }
+        reset(div_5);
+        reset(div_4);
+        reset(li);
+        template_effect(() => {
+          set_text(text_1, get2(course).name);
+          set_text(text_3, `${get2(course).materialCount ?? ""} material(s)`);
         });
-      }
-      var node_4 = sibling(node_2, 2);
+        delegated("click", button_3, () => push2(`/courses/${get2(course).id}`));
+        append($$anchor3, li);
+      });
+      reset(ul);
+      append($$anchor2, ul);
+    };
+    if_block(node, ($$render) => {
+      if (get2(state3).isLoading) $$render(consequent);
+      else if (get2(state3).errorMessage) $$render(consequent_1, 1);
+      else if (get2(state3).courses.length === 0) $$render(consequent_2, 2);
+      else $$render(alternate_1, -1);
+    });
+  }
+  reset(div);
+  var node_3 = sibling(div, 2);
+  {
+    const children = ($$anchor2) => {
+      var fragment_2 = root_10();
+      var node_4 = first_child(fragment_2);
       {
         var consequent_5 = ($$anchor3) => {
-          var p_1 = root_62();
-          var text_3 = child(p_1, true);
-          reset(p_1);
-          template_effect(() => set_text(text_3, get2(errorMessage)));
-          append($$anchor3, p_1);
+          var div_6 = root_8();
+          var span = child(div_6);
+          var text_4 = child(span, true);
+          reset(span);
+          reset(div_6);
+          template_effect(() => set_text(text_4, get2(formError)));
+          append($$anchor3, div_6);
         };
         if_block(node_4, ($$render) => {
-          if (get2(errorMessage)) $$render(consequent_5);
+          if (get2(formError)) $$render(consequent_5);
         });
       }
-      var node_5 = sibling(node_4, 2);
+      var label = sibling(node_4, 2);
+      var input = sibling(child(label), 2);
+      remove_input_defaults(input);
+      reset(label);
+      var label_1 = sibling(label, 2);
+      var textarea = sibling(child(label_1), 2);
+      remove_textarea_child(textarea);
+      reset(label_1);
+      var label_2 = sibling(label_1, 2);
+      var select = sibling(child(label_2), 2);
+      each(select, 21, () => get2(groups), (group) => group.id, ($$anchor3, group) => {
+        var option = root_9();
+        var text_5 = child(option, true);
+        reset(option);
+        var option_value = {};
+        template_effect(() => {
+          set_text(text_5, get2(group).name);
+          if (option_value !== (option_value = get2(group).id)) {
+            option.value = (option.__value = get2(group).id) ?? "";
+          }
+        });
+        append($$anchor3, option);
+      });
+      reset(select);
+      reset(label_2);
+      bind_value(input, () => get2(name), ($$value) => set(name, $$value));
+      bind_value(textarea, () => get2(description), ($$value) => set(description, $$value));
+      bind_select_value(select, () => get2(groupId), ($$value) => set(groupId, $$value));
+      append($$anchor2, fragment_2);
+    };
+    const actions = ($$anchor2) => {
+      var fragment_3 = root_122();
+      var button_7 = first_child(fragment_3);
+      var button_8 = sibling(button_7, 2);
+      var node_5 = child(button_8);
       {
         var consequent_6 = ($$anchor3) => {
-          var p_2 = root_7();
-          var text_4 = child(p_2, true);
-          reset(p_2);
-          template_effect(() => set_text(text_4, get2(successMessage)));
-          append($$anchor3, p_2);
+          var span_1 = root_11();
+          append($$anchor3, span_1);
         };
         if_block(node_5, ($$render) => {
-          if (get2(successMessage)) $$render(consequent_6);
-        });
-      }
-      var div_6 = sibling(node_5, 2);
-      var button_1 = child(div_6);
-      var node_6 = child(button_1);
-      {
-        var consequent_7 = ($$anchor3) => {
-          var span_3 = root_8();
-          append($$anchor3, span_3);
-        };
-        if_block(node_6, ($$render) => {
-          if (get2(isSaving)) $$render(consequent_7);
+          if (get2(saving)) $$render(consequent_6);
         });
       }
       next();
-      reset(button_1);
-      reset(div_6);
-      reset(form);
+      reset(button_8);
       template_effect(() => {
-        set_value(input_2, get2(username));
-        button_1.disabled = get2(isSaving);
+        button_7.disabled = get2(saving);
+        button_8.disabled = get2(saving);
       });
-      event("submit", form, (event2) => {
-        event2.preventDefault();
-        save2();
-      });
-      delegated("change", input_1, onPickFile);
-      bind_value(input_3, () => get2(firstName), ($$value) => set(firstName, $$value));
-      bind_value(input_4, () => get2(lastName), ($$value) => set(lastName, $$value));
-      bind_value(textarea, () => get2(description), ($$value) => set(description, $$value));
-      bind_value(input_5, () => get2(email), ($$value) => set(email, $$value));
-      append($$anchor2, form);
+      delegated("click", button_7, () => set(showCreate, false));
+      delegated("click", button_8, submitCreate);
+      append($$anchor2, fragment_3);
     };
-    if_block(node, ($$render) => {
-      if (get2(isLoading)) $$render(consequent);
-      else if (get2(errorMessage) && !get2(username)) $$render(consequent_1, 1);
-      else $$render(alternate, -1);
+    Modal(node_3, {
+      get open() {
+        return get2(showCreate);
+      },
+      title: "New course",
+      onClose: () => set(showCreate, false),
+      children,
+      actions,
+      $$slots: { default: true, actions: true }
     });
   }
-  reset(div);
-  delegated("click", button, () => push2("/"));
-  append($$anchor, div);
+  delegated("click", button, openCreate);
+  append($$anchor, fragment);
   pop();
 }
-delegate(["click", "change"]);
-create_custom_element(ProfileEditPage, {}, [], [], { mode: "open" });
+delegate(["click"]);
+create_custom_element(CourseListPage, {}, [], [], { mode: "open" });
 
-// src/components/pages/CourseChatPage.svelte
-var root12 = from_html(`<span class="soon svelte-nqv0rv">soon</span>`);
-var root_19 = from_html(`<button type="button" class="nav-item svelte-nqv0rv"><span class="nav-icon svelte-nqv0rv" aria-hidden="true"> </span> <span class="nav-label svelte-nqv0rv"> </span> <!></button>`);
-var root_26 = from_html(`<img class="avatar svelte-nqv0rv" src="logo.png" alt="ElisaAI assistant"/>`);
-var root_36 = from_html(`<div><!> <div> </div></div>`);
-var root_45 = from_html(`<div class="error-overlay svelte-nqv0rv" role="alert"><div class="error-card svelte-nqv0rv"><span class="error-icon svelte-nqv0rv" aria-hidden="true">\u{1F50C}</span> <h2 class="error-title svelte-nqv0rv">Assistant unavailable</h2> <p class="error-text svelte-nqv0rv"> </p> <button type="button" class="btn btn-primary">Retry</button></div></div>`);
-var root_54 = from_html(`<div class="chat-screen svelte-nqv0rv"><aside class="sidebar svelte-nqv0rv"><button type="button" class="back svelte-nqv0rv">\u2190 Dashboard</button> <button type="button" class="content-cta svelte-nqv0rv"><span aria-hidden="true">\u{1F4D6}</span> <span>Content</span></button> <nav class="nav svelte-nqv0rv" aria-label="Sections"></nav></aside> <main class="conversation svelte-nqv0rv"><div class="messages svelte-nqv0rv"><div class="message svelte-nqv0rv"><img class="avatar svelte-nqv0rv" src="logo.png" alt="ElisaAI assistant"/> <div class="bubble svelte-nqv0rv">System online. I am <strong>ElisaAI</strong>. Ready to help you with <strong> </strong> \u2014 what topic shall we analyse today?</div></div> <!></div> <div class="composer svelte-nqv0rv"><span><span class="status-dot svelte-nqv0rv" aria-hidden="true"></span> </span> <form class="composer-row svelte-nqv0rv"><button type="button" class="composer-add svelte-nqv0rv" aria-label="Add attachment" disabled="">+</button> <input class="composer-input svelte-nqv0rv" type="text"/> <button type="submit" class="composer-send svelte-nqv0rv" aria-label="Send message">\u2192</button></form> <p class="disclaimer svelte-nqv0rv">ElisaAI 2026 // ElisaAI may generate misinformation. Please verify all information.</p></div> <!></main></div>`);
-var $$css12 = {
-  hash: "svelte-nqv0rv",
-  code: ".chat-screen.svelte-nqv0rv {flex:1;min-height:0;overflow:hidden;display:grid;grid-template-columns:16rem 1fr;grid-template-rows:minmax(0, 1fr);width:100%;}\n\n    /* Sidebar stays put; only the conversation scrolls. */.sidebar.svelte-nqv0rv {min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:1.5rem;padding:1.5rem 1rem;border-right:1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);background:color-mix(in oklab, var(--color-base-100) 60%, transparent);}.back.svelte-nqv0rv {align-self:flex-start;background:none;border:none;cursor:pointer;font-weight:600;color:var(--color-primary);}.back.svelte-nqv0rv:focus-visible {outline:2px solid var(--color-primary);outline-offset:2px;}.content-cta.svelte-nqv0rv {display:flex;align-items:center;justify-content:center;gap:0.5rem;padding:0.85rem 1rem;border-radius:0.85rem;border:1px solid color-mix(in oklab, var(--color-primary) 55%, transparent);font-size:1.05rem;font-weight:700;cursor:pointer;color:var(--color-primary-content);background:var(--color-primary);box-shadow:0 0 18px color-mix(in oklab, var(--color-primary) 45%, transparent);transition:transform 0.12s ease;}.content-cta.svelte-nqv0rv:hover {transform:translateY(-2px);}.content-cta.svelte-nqv0rv:focus-visible {outline:2px solid var(--color-base-content);outline-offset:2px;}.nav.svelte-nqv0rv {display:flex;flex-direction:column;gap:0.35rem;}.nav-item.svelte-nqv0rv {display:flex;align-items:center;gap:0.75rem;padding:0.65rem 0.75rem;border-radius:0.75rem;background:transparent;border:none;color:var(--color-base-content);cursor:pointer;}.nav-item.svelte-nqv0rv:hover:not(:disabled) {background:color-mix(in oklab, var(--color-primary) 14%, transparent);}.nav-item.svelte-nqv0rv:focus-visible {outline:2px solid var(--color-primary);outline-offset:2px;}.nav-item.svelte-nqv0rv:disabled {cursor:not-allowed;opacity:0.6;}.nav-icon.svelte-nqv0rv {font-size:1.1rem;}.nav-label.svelte-nqv0rv {flex:1 1 auto;text-align:left;font-weight:600;}.soon.svelte-nqv0rv {font-size:0.65rem;text-transform:uppercase;letter-spacing:0.06em;color:color-mix(in oklab, var(--color-base-content) 50%, transparent);}.conversation.svelte-nqv0rv {position:relative;display:flex;flex-direction:column;min-height:0;background:var(--color-base-200);}.messages.svelte-nqv0rv {flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:1.25rem;padding:2rem clamp(1rem, 6vw, 6rem);}.message.svelte-nqv0rv {display:flex;align-items:flex-start;gap:0.85rem;max-width:56rem;}.message.user.svelte-nqv0rv {margin-left:auto;justify-content:flex-end;}.avatar.svelte-nqv0rv {width:2.75rem;height:2.75rem;flex:0 0 auto;border-radius:999px;object-fit:cover;}.bubble.svelte-nqv0rv {padding:1rem 1.25rem;border-radius:1rem;border-top-left-radius:0.25rem;line-height:1.55;color:var(--color-base-content);background:color-mix(in oklab, var(--color-base-100) 85%, transparent);border:1px solid color-mix(in oklab, var(--color-primary) 30%, transparent);box-shadow:0 0 18px color-mix(in oklab, var(--color-primary) 12%, transparent);white-space:pre-wrap;}.bubble.user.svelte-nqv0rv {color:var(--color-primary-content);background:var(--color-primary);border-color:transparent;border-top-left-radius:1rem;border-bottom-right-radius:0.25rem;}.composer.svelte-nqv0rv {flex:0 0 auto;display:flex;flex-direction:column;gap:0.5rem;padding:1rem clamp(1rem, 6vw, 6rem) 1.25rem;}.status.svelte-nqv0rv {align-self:center;display:inline-flex;align-items:center;gap:0.4rem;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.06em;color:color-mix(in oklab, var(--color-base-content) 60%, transparent);}.status-dot.svelte-nqv0rv {width:0.5rem;height:0.5rem;border-radius:999px;background:color-mix(in oklab, var(--color-base-content) 40%, transparent);}.status.online.svelte-nqv0rv {color:var(--color-success);}\n\n    /* Centered overlay shown when the assistant connection gives up. */.error-overlay.svelte-nqv0rv {position:absolute;inset:0;z-index:5;display:grid;place-items:center;padding:1.5rem;background:color-mix(in oklab, var(--color-base-300) 55%, transparent);backdrop-filter:blur(4px);}.error-card.svelte-nqv0rv {display:flex;flex-direction:column;align-items:center;gap:0.85rem;max-width:26rem;width:100%;text-align:center;padding:2rem;border-radius:1.25rem;background:var(--color-base-100);border:1px solid color-mix(in oklab, var(--color-warning) 35%, transparent);box-shadow:0 0 40px color-mix(in oklab, var(--color-warning) 18%, transparent);}.error-icon.svelte-nqv0rv {font-size:2.5rem;line-height:1;}.error-title.svelte-nqv0rv {font-size:1.3rem;font-weight:700;color:var(--color-base-content);}.error-text.svelte-nqv0rv {line-height:1.5;color:color-mix(in oklab, var(--color-base-content) 75%, transparent);}.status.online.svelte-nqv0rv .status-dot:where(.svelte-nqv0rv) {background:var(--color-success);box-shadow:0 0 10px color-mix(in oklab, var(--color-success) 70%, transparent);}.composer-row.svelte-nqv0rv {display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0.75rem;border-radius:999px;background:color-mix(in oklab, var(--color-base-100) 80%, transparent);border:1px solid color-mix(in oklab, var(--color-primary) 35%, transparent);box-shadow:0 0 18px color-mix(in oklab, var(--color-primary) 12%, transparent);}.composer-add.svelte-nqv0rv,\n    .composer-send.svelte-nqv0rv {display:grid;place-items:center;width:2.25rem;height:2.25rem;flex:0 0 auto;border-radius:999px;border:none;font-size:1.2rem;cursor:pointer;color:var(--color-primary-content);background:color-mix(in oklab, var(--color-primary) 70%, transparent);}.composer-add.svelte-nqv0rv:disabled,\n    .composer-send.svelte-nqv0rv:disabled {cursor:not-allowed;opacity:0.6;}.composer-input.svelte-nqv0rv {flex:1 1 auto;background:transparent;border:none;color:var(--color-base-content);font-size:1rem;padding:0.5rem 0.25rem;}.composer-input.svelte-nqv0rv:focus {outline:none;}.disclaimer.svelte-nqv0rv {text-align:center;font-size:0.7rem;letter-spacing:0.04em;color:color-mix(in oklab, var(--color-base-content) 55%, transparent);}\n\n    @media (max-width: 48rem) {.chat-screen.svelte-nqv0rv {grid-template-columns:1fr;}.sidebar.svelte-nqv0rv {display:none;}\n    }"
-};
-function CourseChatPage($$anchor, $$props) {
+// src/components/panels/OverviewPanel.svelte
+var root4 = from_html(`<div class="alert alert-error"><span> </span></div>`);
+var root_14 = from_html(`<div class="alert alert-success"><span> </span></div>`);
+var root_24 = from_html(`<span class="loading loading-spinner loading-sm"></span>`);
+var root_32 = from_html(`<div class="card bg-base-100 shadow-sm"><div class="card-body"><!> <!> <label class="form-control w-full"><span class="label-text">Course name</span> <input class="input input-bordered w-full" type="text"/></label> <label class="form-control w-full mt-3"><span class="label-text">Description</span> <textarea class="textarea textarea-bordered w-full" rows="5"></textarea></label> <div class="card-actions justify-end mt-4"><button type="button" class="btn btn-primary"><!> Save changes</button></div></div></div>`);
+function OverviewPanel($$anchor, $$props) {
   push($$props, true);
-  append_styles($$anchor, $$css12);
-  let params = prop($$props, "params", 7);
-  let state3 = state(proxy({
-    isLoading: true,
-    errorMessage: "",
-    user: null,
-    stats: null,
-    skills: [],
-    courses: []
-  }));
-  const chat = createAiChatStore();
-  let chatState = state(proxy({ connection: "disconnected", errorMessage: "", messages: [] }));
-  let draft = state("");
-  onMount(() => {
-    const unsubscribeDashboard = dashboardStore.subscribe((value) => {
-      set(state3, value, true);
-    });
-    if (get2(state3).courses.length === 0) {
-      dashboardStore.refresh();
-    }
-    const unsubscribeChat = chat.subscribe((value) => {
-      set(chatState, value, true);
-    });
-    void chat.connect();
-    return () => {
-      unsubscribeDashboard();
-      unsubscribeChat();
-      void chat.disconnect();
-    };
-  });
-  const courseName2 = user_derived(() => get2(state3).courses.find((course) => course.id === params()?.id)?.name ?? "this course");
-  const navItems = user_derived(() => [
-    { icon: "\u{1F3AE}", label: "Games" },
-    {
-      icon: "\u{1F9E0}",
-      label: "Quizzes",
-      to: `/quiz/${params()?.id ?? ""}`
-    },
-    { icon: "\u{1F393}", label: "Exams" },
-    { icon: "\u{1F4AC}", label: "Chats" }
-  ]);
-  const connected = user_derived(() => get2(chatState).connection === "connected");
-  const statusLabel = user_derived(() => get2(chatState).connection === "connected" ? "Online" : get2(chatState).connection === "connecting" ? "Connecting\u2026" : get2(chatState).connection === "wait_before_retry" ? "Reconnecting\u2026" : "Offline");
-  async function send() {
-    const text2 = get2(draft).trim();
-    if (!text2 || !get2(connected)) {
+  let course = prop($$props, "course", 7), onSaved = prop($$props, "onSaved", 7);
+  let name = state(proxy(course().name));
+  let description = state(proxy(course().description ?? ""));
+  let saving = state(false);
+  let message = state("");
+  let error = state("");
+  async function save2() {
+    if (!get2(name).trim()) {
+      set(error, "Course name is required.");
       return;
     }
-    set(draft, "");
-    await chat.sendChatInput("markdown", text2);
+    set(saving, true);
+    set(error, "");
+    set(message, "");
+    try {
+      await updateCourse(course().id, {
+        name: get2(name).trim(),
+        description: get2(description).trim()
+      });
+      set(message, "Saved.");
+      onSaved()();
+    } catch (e) {
+      set(error, e instanceof Error ? e.message : String(e), true);
+    } finally {
+      set(saving, false);
+    }
   }
   var $$exports = {
-    get params() {
-      return params();
+    get course() {
+      return course();
     },
-    set params($$value) {
-      params($$value);
+    set course($$value) {
+      course($$value);
+      flushSync();
+    },
+    get onSaved() {
+      return onSaved();
+    },
+    set onSaved($$value) {
+      onSaved($$value);
       flushSync();
     }
   };
-  var div = root_54();
-  var aside = child(div);
-  var button = child(aside);
-  var button_1 = sibling(button, 2);
-  var nav = sibling(button_1, 2);
-  each(nav, 21, () => get2(navItems), (item) => item.label, ($$anchor2, item) => {
-    var button_2 = root_19();
-    var span = child(button_2);
-    var text_1 = child(span, true);
-    reset(span);
-    var span_1 = sibling(span, 2);
-    var text_2 = child(span_1, true);
-    reset(span_1);
-    var node = sibling(span_1, 2);
-    {
-      var consequent = ($$anchor3) => {
-        var span_2 = root12();
-        append($$anchor3, span_2);
-      };
-      if_block(node, ($$render) => {
-        if (!get2(item).to) $$render(consequent);
-      });
-    }
-    reset(button_2);
-    template_effect(() => {
-      button_2.disabled = !get2(item).to;
-      set_text(text_1, get2(item).icon);
-      set_text(text_2, get2(item).label);
+  var div = root_32();
+  var div_1 = child(div);
+  var node = child(div_1);
+  {
+    var consequent = ($$anchor2) => {
+      var div_2 = root4();
+      var span = child(div_2);
+      var text2 = child(span, true);
+      reset(span);
+      reset(div_2);
+      template_effect(() => set_text(text2, get2(error)));
+      append($$anchor2, div_2);
+    };
+    if_block(node, ($$render) => {
+      if (get2(error)) $$render(consequent);
     });
-    delegated("click", button_2, () => get2(item).to && push2(get2(item).to));
-    append($$anchor2, button_2);
-  });
-  reset(nav);
-  reset(aside);
-  var main = sibling(aside, 2);
-  var div_1 = child(main);
-  var div_2 = child(div_1);
-  var div_3 = sibling(child(div_2), 2);
-  var strong = sibling(child(div_3), 3);
-  var text_3 = child(strong, true);
-  reset(strong);
-  next();
-  reset(div_3);
-  reset(div_2);
-  var node_1 = sibling(div_2, 2);
-  each(node_1, 17, () => get2(chatState).messages, (message) => message.id, ($$anchor2, message) => {
-    var div_4 = root_36();
-    let classes;
-    var node_2 = child(div_4);
-    {
-      var consequent_1 = ($$anchor3) => {
-        var img = root_26();
-        append($$anchor3, img);
-      };
-      if_block(node_2, ($$render) => {
-        if (get2(message).sender === "assistant") $$render(consequent_1);
-      });
-    }
-    var div_5 = sibling(node_2, 2);
-    let classes_1;
-    var text_4 = child(div_5, true);
-    reset(div_5);
-    reset(div_4);
-    template_effect(() => {
-      classes = set_class(div_4, 1, "message svelte-nqv0rv", null, classes, { user: get2(message).sender === "user" });
-      classes_1 = set_class(div_5, 1, "bubble svelte-nqv0rv", null, classes_1, { user: get2(message).sender === "user" });
-      set_text(text_4, get2(message).content);
+  }
+  var node_1 = sibling(node, 2);
+  {
+    var consequent_1 = ($$anchor2) => {
+      var div_3 = root_14();
+      var span_1 = child(div_3);
+      var text_1 = child(span_1, true);
+      reset(span_1);
+      reset(div_3);
+      template_effect(() => set_text(text_1, get2(message)));
+      append($$anchor2, div_3);
+    };
+    if_block(node_1, ($$render) => {
+      if (get2(message)) $$render(consequent_1);
     });
-    append($$anchor2, div_4);
-  });
-  reset(div_1);
-  var div_6 = sibling(div_1, 2);
-  var span_3 = child(div_6);
-  let classes_2;
-  var text_5 = sibling(child(span_3));
-  reset(span_3);
-  var form = sibling(span_3, 2);
-  var input = sibling(child(form), 2);
+  }
+  var label = sibling(node_1, 2);
+  var input = sibling(child(label), 2);
   remove_input_defaults(input);
-  var button_3 = sibling(input, 2);
-  reset(form);
-  next(2);
+  reset(label);
+  var label_1 = sibling(label, 2);
+  var textarea = sibling(child(label_1), 2);
+  remove_textarea_child(textarea);
+  reset(label_1);
+  var div_4 = sibling(label_1, 2);
+  var button = child(div_4);
+  var node_2 = child(button);
+  {
+    var consequent_2 = ($$anchor2) => {
+      var span_2 = root_24();
+      append($$anchor2, span_2);
+    };
+    if_block(node_2, ($$render) => {
+      if (get2(saving)) $$render(consequent_2);
+    });
+  }
+  next();
+  reset(button);
+  reset(div_4);
+  reset(div_1);
+  reset(div);
+  template_effect(() => button.disabled = get2(saving));
+  bind_value(input, () => get2(name), ($$value) => set(name, $$value));
+  bind_value(textarea, () => get2(description), ($$value) => set(description, $$value));
+  delegated("click", button, save2);
+  append($$anchor, div);
+  return pop($$exports);
+}
+delegate(["click"]);
+create_custom_element(OverviewPanel, { course: {}, onSaved: {} }, [], [], { mode: "open" });
+
+// src/components/panels/StudentsPanel.svelte
+var root5 = from_html(`<div class="alert alert-error"><span> </span></div>`);
+var root_15 = from_html(`<span class="loading loading-spinner"></span>`);
+var root_25 = from_html(`<p class="muted svelte-7pyorm">No students enrolled yet.</p>`);
+var root_33 = from_html(`<tr><td> </td><td class="muted svelte-7pyorm"> </td><td class="text-right"><button type="button" class="btn btn-xs btn-ghost text-error">Remove</button></td></tr>`);
+var root_42 = from_html(`<table class="table table-sm"><thead><tr><th>Name</th><th>Username</th><th></th></tr></thead><tbody></tbody></table>`);
+var root_52 = from_html(`<span class="loading loading-spinner loading-sm"></span>`);
+var root_62 = from_html(`<span class="badge badge-ghost">Enrolled</span>`);
+var root_72 = from_html(`<button type="button" class="btn btn-xs btn-primary">Enrol</button>`);
+var root_82 = from_html(`<li class="svelte-7pyorm"><span><strong> </strong> <span class="muted svelte-7pyorm"> </span></span> <!></li>`);
+var root_92 = from_html(`<ul class="result-list svelte-7pyorm"></ul>`);
+var root_102 = from_html(`<div class="grid svelte-7pyorm"><div class="card bg-base-100 shadow-sm"><div class="card-body"><h2 class="card-title">Enrolled students</h2> <!> <!></div></div> <div class="card bg-base-100 shadow-sm"><div class="card-body"><h2 class="card-title">Enrol a student</h2> <div class="search-row svelte-7pyorm"><input class="input input-bordered w-full" type="text" placeholder="Search by name or username"/> <button type="button" class="btn btn-primary"><!> Search</button></div> <!></div></div></div>`);
+var $$css3 = {
+  hash: "svelte-7pyorm",
+  code: ".grid.svelte-7pyorm {display:grid;grid-template-columns:1fr 1fr;gap:1rem;}.search-row.svelte-7pyorm {display:flex;gap:0.5rem;}.result-list.svelte-7pyorm {list-style:none;margin:0.75rem 0 0;padding:0;display:flex;flex-direction:column;gap:0.4rem;}.result-list.svelte-7pyorm li:where(.svelte-7pyorm) {display:flex;align-items:center;justify-content:space-between;gap:0.5rem;padding:0.4rem 0.6rem;border-radius:0.5rem;background:color-mix(in oklab, var(--color-base-200) 60%, transparent);}.muted.svelte-7pyorm {color:color-mix(in oklab, var(--color-base-content) 60%, transparent);font-size:0.85rem;}\n\n    @media (max-width: 55rem) {.grid.svelte-7pyorm {grid-template-columns:1fr;}\n    }"
+};
+function StudentsPanel($$anchor, $$props) {
+  push($$props, true);
+  append_styles($$anchor, $$css3);
+  let courseId = prop($$props, "courseId", 7);
+  let students = state(proxy([]));
+  let isLoading = state(true);
+  let error = state("");
+  let term = state("");
+  let results = state(proxy([]));
+  let searching = state(false);
+  let busyUser = state(null);
+  async function load() {
+    set(isLoading, true);
+    set(error, "");
+    try {
+      set(students, await loadStudents(courseId()), true);
+    } catch (e) {
+      set(error, e instanceof Error ? e.message : String(e), true);
+    } finally {
+      set(isLoading, false);
+    }
+  }
+  user_effect(() => {
+    void courseId();
+    load();
+  });
+  const enrolledUsernames = user_derived(() => new Set(get2(students).map((s) => s.username)));
+  async function runSearch() {
+    set(searching, true);
+    try {
+      set(results, await searchUsers(get2(term)), true);
+    } catch (e) {
+      set(error, e instanceof Error ? e.message : String(e), true);
+    } finally {
+      set(searching, false);
+    }
+  }
+  async function enroll(username) {
+    set(busyUser, username, true);
+    set(error, "");
+    try {
+      await enrollStudent(courseId(), username);
+      await load();
+    } catch (e) {
+      set(error, e instanceof Error ? e.message : String(e), true);
+    } finally {
+      set(busyUser, null);
+    }
+  }
+  async function unenroll(student) {
+    set(busyUser, student.username, true);
+    set(error, "");
+    try {
+      await unenrollStudent(student.assignmentId);
+      await load();
+    } catch (e) {
+      set(error, e instanceof Error ? e.message : String(e), true);
+    } finally {
+      set(busyUser, null);
+    }
+  }
+  var $$exports = {
+    get courseId() {
+      return courseId();
+    },
+    set courseId($$value) {
+      courseId($$value);
+      flushSync();
+    }
+  };
+  var div = root_102();
+  var div_1 = child(div);
+  var div_2 = child(div_1);
+  var node = sibling(child(div_2), 2);
+  {
+    var consequent = ($$anchor2) => {
+      var div_3 = root5();
+      var span = child(div_3);
+      var text2 = child(span, true);
+      reset(span);
+      reset(div_3);
+      template_effect(() => set_text(text2, get2(error)));
+      append($$anchor2, div_3);
+    };
+    if_block(node, ($$render) => {
+      if (get2(error)) $$render(consequent);
+    });
+  }
+  var node_1 = sibling(node, 2);
+  {
+    var consequent_1 = ($$anchor2) => {
+      var span_1 = root_15();
+      append($$anchor2, span_1);
+    };
+    var consequent_2 = ($$anchor2) => {
+      var p = root_25();
+      append($$anchor2, p);
+    };
+    var alternate = ($$anchor2) => {
+      var table = root_42();
+      var tbody = sibling(child(table));
+      each(tbody, 21, () => get2(students), (student) => student.assignmentId, ($$anchor3, student) => {
+        var tr = root_33();
+        var td = child(tr);
+        var text_1 = child(td, true);
+        reset(td);
+        var td_1 = sibling(td);
+        var text_2 = child(td_1);
+        reset(td_1);
+        var td_2 = sibling(td_1);
+        var button = child(td_2);
+        reset(td_2);
+        reset(tr);
+        template_effect(() => {
+          set_text(text_1, get2(student).fullName);
+          set_text(text_2, `@${get2(student).username ?? ""}`);
+          button.disabled = get2(busyUser) === get2(student).username;
+        });
+        delegated("click", button, () => unenroll(get2(student)));
+        append($$anchor3, tr);
+      });
+      reset(tbody);
+      reset(table);
+      append($$anchor2, table);
+    };
+    if_block(node_1, ($$render) => {
+      if (get2(isLoading)) $$render(consequent_1);
+      else if (get2(students).length === 0) $$render(consequent_2, 1);
+      else $$render(alternate, -1);
+    });
+  }
+  reset(div_2);
+  reset(div_1);
+  var div_4 = sibling(div_1, 2);
+  var div_5 = child(div_4);
+  var div_6 = sibling(child(div_5), 2);
+  var input = child(div_6);
+  remove_input_defaults(input);
+  var button_1 = sibling(input, 2);
+  var node_2 = child(button_1);
+  {
+    var consequent_3 = ($$anchor2) => {
+      var span_2 = root_52();
+      append($$anchor2, span_2);
+    };
+    if_block(node_2, ($$render) => {
+      if (get2(searching)) $$render(consequent_3);
+    });
+  }
+  next();
+  reset(button_1);
   reset(div_6);
   var node_3 = sibling(div_6, 2);
   {
-    var consequent_2 = ($$anchor2) => {
-      var div_7 = root_45();
-      var div_8 = child(div_7);
-      var p = sibling(child(div_8), 4);
-      var text_6 = child(p, true);
-      reset(p);
-      var button_4 = sibling(p, 2);
-      reset(div_8);
-      reset(div_7);
-      template_effect(() => set_text(text_6, get2(chatState).errorMessage));
-      delegated("click", button_4, () => chat.retry());
-      append($$anchor2, div_7);
+    var consequent_5 = ($$anchor2) => {
+      var ul = root_92();
+      each(ul, 21, () => get2(results), (user) => user.username, ($$anchor3, user) => {
+        var li = root_82();
+        var span_3 = child(li);
+        var strong = child(span_3);
+        var text_3 = child(strong, true);
+        reset(strong);
+        var span_4 = sibling(strong, 2);
+        var text_4 = child(span_4);
+        reset(span_4);
+        reset(span_3);
+        var node_4 = sibling(span_3, 2);
+        {
+          var consequent_4 = ($$anchor4) => {
+            var span_5 = root_62();
+            append($$anchor4, span_5);
+          };
+          var d = user_derived(() => get2(enrolledUsernames).has(get2(user).username));
+          var alternate_1 = ($$anchor4) => {
+            var button_2 = root_72();
+            template_effect(() => button_2.disabled = get2(busyUser) === get2(user).username);
+            delegated("click", button_2, () => enroll(get2(user).username));
+            append($$anchor4, button_2);
+          };
+          if_block(node_4, ($$render) => {
+            if (get2(d)) $$render(consequent_4);
+            else $$render(alternate_1, -1);
+          });
+        }
+        reset(li);
+        template_effect(() => {
+          set_text(text_3, get2(user).full_name || get2(user).username);
+          set_text(text_4, `@${get2(user).username ?? ""}`);
+        });
+        append($$anchor3, li);
+      });
+      reset(ul);
+      append($$anchor2, ul);
     };
     if_block(node_3, ($$render) => {
-      if (get2(chatState).errorMessage) $$render(consequent_2);
+      if (get2(results).length > 0) $$render(consequent_5);
     });
   }
-  reset(main);
+  reset(div_5);
+  reset(div_4);
   reset(div);
-  template_effect(
-    ($0) => {
-      set_text(text_3, get2(courseName2));
-      classes_2 = set_class(span_3, 1, "status svelte-nqv0rv", null, classes_2, { online: get2(connected) });
-      set_text(text_5, ` ${get2(statusLabel) ?? ""}`);
-      set_attribute2(input, "placeholder", get2(connected) ? "Message" : "Connecting\u2026");
-      input.disabled = !get2(connected);
-      button_3.disabled = $0;
-    },
-    [() => !get2(connected) || get2(draft).trim().length === 0]
-  );
-  delegated("click", button, () => push2("/"));
-  delegated("click", button_1, () => push2(`/content/${params()?.id ?? ""}`));
-  event("submit", form, (event2) => {
-    event2.preventDefault();
-    send();
-  });
-  bind_value(input, () => get2(draft), ($$value) => set(draft, $$value));
+  template_effect(() => button_1.disabled = get2(searching));
+  delegated("keydown", input, (e) => e.key === "Enter" && runSearch());
+  bind_value(input, () => get2(term), ($$value) => set(term, $$value));
+  delegated("click", button_1, runSearch);
   append($$anchor, div);
   return pop($$exports);
 }
-delegate(["click"]);
-create_custom_element(CourseChatPage, { params: {} }, [], [], { mode: "open" });
+delegate(["click", "keydown"]);
+create_custom_element(StudentsPanel, { courseId: {} }, [], [], { mode: "open" });
 
-// src/components/pages/QuizPage.svelte
-var root13 = from_html(`<div class="progress-track svelte-10mivl5" aria-hidden="true"><div class="progress-fill svelte-10mivl5"></div></div>`);
-var root_110 = from_html(`<section class="stage result svelte-10mivl5"><h1 class="course svelte-10mivl5"> </h1> <div class="score-ring svelte-10mivl5"> </div> <p class="result-text svelte-10mivl5"> </p> <div class="result-actions svelte-10mivl5"><button type="button" class="btn btn-primary">Try again</button> <button type="button" class="btn btn-ghost">Back to Dashboard</button></div></section>`);
-var root_27 = from_html(`<button type="button"><span class="letter svelte-10mivl5"> </span> <span class="text svelte-10mivl5"> </span></button>`);
-var root_37 = from_html(`<section class="stage svelte-10mivl5"><h1 class="course svelte-10mivl5"> </h1> <span class="progress-pill svelte-10mivl5"> </span> <h2 class="prompt svelte-10mivl5"> </h2> <div class="answers svelte-10mivl5"></div></section>`);
-var root_46 = from_html(`<div class="quiz svelte-10mivl5"><header class="quiz-top svelte-10mivl5"><button type="button" class="content-btn svelte-10mivl5">\u2190 Back</button> <!></header> <!></div>`);
-var $$css13 = {
-  hash: "svelte-10mivl5",
-  code: '.quiz.svelte-10mivl5 {flex:1;min-height:0;display:flex;flex-direction:column;width:100%;background:radial-gradient(120% 70% at 50% 0%, color-mix(in oklab, var(--color-primary) 8%, transparent), transparent 55%),\n            var(--color-base-200);}.quiz-top.svelte-10mivl5 {flex:0 0 auto;display:flex;align-items:center;gap:1.5rem;padding:1.25rem 1.5rem;}.content-btn.svelte-10mivl5 {flex:0 0 auto;padding:0.5rem 1.25rem;border-radius:0.75rem;font-weight:600;color:color-mix(in oklab, var(--color-base-content) 80%, transparent);background:color-mix(in oklab, var(--color-base-100) 70%, transparent);border:1px solid color-mix(in oklab, var(--color-base-content) 14%, transparent);cursor:pointer;}.content-btn.svelte-10mivl5:hover {border-color:color-mix(in oklab, var(--color-primary) 45%, transparent);}.progress-track.svelte-10mivl5 {flex:1 1 auto;height:0.5rem;border-radius:999px;overflow:hidden;background:color-mix(in oklab, var(--color-base-content) 12%, transparent);}.progress-fill.svelte-10mivl5 {height:100%;border-radius:999px;background:linear-gradient(90deg, var(--color-primary), var(--color-success));transition:width 0.3s ease;}.stage.svelte-10mivl5 {flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.25rem;width:90%;max-width:64rem;margin:0 auto;padding:1rem 0 2.5rem;}.course.svelte-10mivl5 {font-size:clamp(1.3rem, 2.4vw, 1.9rem);font-weight:700;text-align:center;color:var(--color-base-content);text-shadow:0 0 20px color-mix(in oklab, var(--color-primary) 40%, transparent);}.progress-pill.svelte-10mivl5 {padding:0.3rem 1rem;border-radius:999px;font-weight:700;color:var(--color-primary);background:color-mix(in oklab, var(--color-primary) 16%, transparent);border:1px solid color-mix(in oklab, var(--color-primary) 35%, transparent);}.prompt.svelte-10mivl5 {font-size:clamp(1.7rem, 3.6vw, 2.8rem);font-weight:800;text-align:center;color:var(--color-base-content);text-shadow:0 0 22px color-mix(in oklab, var(--color-primary) 35%, transparent);margin:0.5rem 0 1rem;}.answers.svelte-10mivl5 {width:100%;display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;}\n\n    /* Answer colours map to DaisyUI semantic tokens (no hardcoded hex). */.answer.svelte-10mivl5 {display:flex;align-items:center;gap:1rem;padding:1.4rem 1.5rem;border-radius:1rem;border:none;font-family:ui-monospace, "SF Mono", Menlo, monospace;font-size:1.2rem;font-weight:700;cursor:pointer;transition:transform 0.12s ease, opacity 0.2s ease, box-shadow 0.2s ease;box-shadow:0 6px 18px color-mix(in oklab, var(--color-base-content) 14%, transparent);}.answer.svelte-10mivl5:hover:not(:disabled) {transform:translateY(-3px);}.answer.svelte-10mivl5:focus-visible {outline:3px solid var(--color-base-content);outline-offset:3px;}.letter.svelte-10mivl5 {display:grid;place-items:center;width:2.1rem;height:2.1rem;flex:0 0 auto;border-radius:0.6rem;font-family:inherit;background:color-mix(in oklab, currentColor 18%, transparent);}.text.svelte-10mivl5 {flex:1 1 auto;text-align:center;}.answer.c0.svelte-10mivl5 {background:var(--color-error);color:var(--color-error-content);}.answer.c1.svelte-10mivl5 {background:var(--color-info);color:var(--color-info-content);}.answer.c2.svelte-10mivl5 {background:var(--color-warning);color:var(--color-warning-content);}.answer.c3.svelte-10mivl5 {background:var(--color-success);color:var(--color-success-content);}.answer.dim.svelte-10mivl5 {opacity:0.35;}.answer.correct.svelte-10mivl5 {outline:4px solid var(--color-base-content);outline-offset:3px;transform:translateY(-3px);}.answer.wrong.svelte-10mivl5 {opacity:0.65;text-decoration:line-through;}.result.svelte-10mivl5 {justify-content:center;}.score-ring.svelte-10mivl5 {display:grid;place-items:center;width:9rem;height:9rem;border-radius:999px;font-size:2rem;font-weight:800;color:var(--color-base-content);background:color-mix(in oklab, var(--color-primary) 14%, transparent);border:4px solid color-mix(in oklab, var(--color-primary) 55%, transparent);box-shadow:0 0 28px color-mix(in oklab, var(--color-primary) 35%, transparent);}.result-text.svelte-10mivl5 {font-size:1.2rem;font-weight:600;color:color-mix(in oklab, var(--color-base-content) 80%, transparent);}.result-actions.svelte-10mivl5 {display:flex;gap:1rem;}\n\n    @media (max-width: 40rem) {.answers.svelte-10mivl5 {grid-template-columns:1fr;}\n    }'
+// src/components/panels/ContentPanel.svelte
+var root6 = from_html(`<div class="alert alert-error"><span> </span></div>`);
+var root_16 = from_html(`<option> </option>`);
+var root_26 = from_html(`<span class="loading loading-spinner loading-sm"></span>`);
+var root_34 = from_html(`<span class="loading loading-spinner"></span>`);
+var root_43 = from_html(`<p class="muted svelte-1doqfep">No materials yet. Add a textbook to start building this course.</p>`);
+var root_53 = from_html(`<li class="svelte-1doqfep"><span> </span> <button type="button" class="btn btn-xs btn-ghost text-error">\xD7</button></li>`);
+var root_63 = from_html(`<ul class="range-list svelte-1doqfep"></ul>`);
+var root_73 = from_html(`<p class="muted svelte-1doqfep">No page ranges yet \u2014 the whole textbook is used.</p>`);
+var root_83 = from_html(`<!> <div class="range-add svelte-1doqfep"><label class="svelte-1doqfep"><span class="label-text">From</span> <select class="select select-bordered select-sm"></select></label> <label class="svelte-1doqfep"><span class="label-text">To</span> <select class="select select-bordered select-sm"></select></label> <button type="button" class="btn btn-sm btn-primary">Add range</button></div>`, 1);
+var root_93 = from_html(`<div class="ranges svelte-1doqfep"><!></div>`);
+var root_103 = from_html(`<li class="material svelte-1doqfep"><div class="material-head svelte-1doqfep"><span class="pos svelte-1doqfep"> </span> <span class="name svelte-1doqfep"> </span> <span class="muted svelte-1doqfep"> </span> <span class="material-actions svelte-1doqfep"><button type="button" class="btn btn-xs btn-ghost" aria-label="Move up">\u2191</button> <button type="button" class="btn btn-xs btn-ghost" aria-label="Move down">\u2193</button> <button type="button" class="btn btn-xs btn-ghost"> </button> <button type="button" class="btn btn-xs btn-ghost text-error">Remove</button></span></div> <!></li>`);
+var root_112 = from_html(`<ol class="material-list svelte-1doqfep"></ol>`);
+var root_123 = from_html(`<div class="card bg-base-100 shadow-sm"><div class="card-body"><h2 class="card-title">Course content</h2> <p class="muted svelte-1doqfep">Attach textbooks and define which page ranges belong to this course.</p> <!> <div class="add-row svelte-1doqfep"><select class="select select-bordered"></select> <button type="button" class="btn btn-primary"><!> Add textbook</button></div> <!></div></div>`);
+var $$css4 = {
+  hash: "svelte-1doqfep",
+  code: ".add-row.svelte-1doqfep {display:flex;gap:0.5rem;margin:0.5rem 0 1rem;}.material-list.svelte-1doqfep {list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0.5rem;}.material.svelte-1doqfep {border:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);border-radius:0.6rem;padding:0.6rem 0.8rem;}.material-head.svelte-1doqfep {display:flex;align-items:center;gap:0.75rem;}.pos.svelte-1doqfep {display:grid;place-items:center;width:1.6rem;height:1.6rem;border-radius:999px;font-size:0.8rem;font-weight:700;background:color-mix(in oklab, var(--color-primary) 20%, transparent);color:var(--color-primary);}.name.svelte-1doqfep {font-weight:600;}.material-actions.svelte-1doqfep {margin-left:auto;display:flex;gap:0.25rem;}.ranges.svelte-1doqfep {margin-top:0.75rem;padding-top:0.75rem;border-top:1px dashed color-mix(in oklab, var(--color-base-content) 15%, transparent);}.range-list.svelte-1doqfep {list-style:none;margin:0 0 0.75rem;padding:0;display:flex;flex-direction:column;gap:0.3rem;}.range-list.svelte-1doqfep li:where(.svelte-1doqfep) {display:flex;align-items:center;justify-content:space-between;gap:0.5rem;font-size:0.9rem;}.range-add.svelte-1doqfep {display:flex;align-items:flex-end;gap:0.5rem;flex-wrap:wrap;}.range-add.svelte-1doqfep label:where(.svelte-1doqfep) {display:flex;flex-direction:column;gap:0.15rem;}.muted.svelte-1doqfep {color:color-mix(in oklab, var(--color-base-content) 60%, transparent);font-size:0.85rem;}"
 };
-function QuizPage($$anchor, $$props) {
+function ContentPanel($$anchor, $$props) {
   push($$props, true);
-  append_styles($$anchor, $$css13);
-  let params = prop($$props, "params", 7);
-  let state3 = state(proxy({
-    isLoading: true,
-    errorMessage: "",
-    user: null,
-    stats: null,
-    skills: [],
-    courses: []
-  }));
-  onMount(() => {
-    const unsubscribe = dashboardStore.subscribe((value) => {
-      set(state3, value, true);
-    });
-    if (get2(state3).courses.length === 0) {
-      dashboardStore.refresh();
-    }
-    return unsubscribe;
-  });
-  const courseTitle = user_derived(() => get2(state3).courses.find((course) => course.id === params()?.id)?.name ?? "HTML, beginners");
-  const questions = [
-    {
-      prompt: "How do you start a HTML file?",
-      options: [
-        { text: "<html>", correct: true },
-        { text: "<htm>", correct: false },
-        { text: "<hml>", correct: false },
-        { text: "<hm>", correct: false }
-      ]
-    },
-    {
-      prompt: "Which tag holds the page title?",
-      options: [
-        { text: "<title>", correct: true },
-        { text: "<head>", correct: false },
-        { text: "<h1>", correct: false },
-        { text: "<meta>", correct: false }
-      ]
-    },
-    {
-      prompt: "Which tag creates a hyperlink?",
-      options: [
-        { text: "<a>", correct: true },
-        { text: "<link>", correct: false },
-        { text: "<href>", correct: false },
-        { text: "<nav>", correct: false }
-      ]
-    },
-    {
-      prompt: "Which tag inserts an image?",
-      options: [
-        { text: "<img>", correct: true },
-        { text: "<image>", correct: false },
-        { text: "<src>", correct: false },
-        { text: "<pic>", correct: false }
-      ]
-    },
-    {
-      prompt: "Which tag defines a list item?",
-      options: [
-        { text: "<li>", correct: true },
-        { text: "<ul>", correct: false },
-        { text: "<ol>", correct: false },
-        { text: "<item>", correct: false }
-      ]
-    }
-  ];
-  const letters = ["A", "B", "C", "D"];
-  let index2 = state(0);
-  let selected = state(null);
-  let score = state(0);
-  let finished = state(false);
-  let timer = null;
-  const current = user_derived(() => questions[get2(index2)]);
-  const answered = user_derived(() => get2(selected) !== null);
-  const progressPct = user_derived(() => (get2(index2) + (get2(selected) !== null ? 1 : 0)) / questions.length * 100);
-  function advance() {
-    timer = null;
-    if (get2(index2) === questions.length - 1) {
-      set(finished, true);
-    } else {
-      set(index2, get2(index2) + 1);
-      set(selected, null);
+  append_styles($$anchor, $$css4);
+  let courseId = prop($$props, "courseId", 7);
+  let materials = state(proxy([]));
+  let textbooks = state(proxy([]));
+  let isLoading = state(true);
+  let error = state("");
+  let newTextbookId = state("");
+  let addingMaterial = state(false);
+  let expandedId = state(null);
+  let ranges = state(proxy([]));
+  let rangesLoading = state(false);
+  let pages = state(proxy([]));
+  let startPageId = state("");
+  let endPageId = state("");
+  let addingRange = state(false);
+  async function load() {
+    set(isLoading, true);
+    set(error, "");
+    try {
+      await (async ($$value) => {
+        var $$array = to_array($$value, 2);
+        set(materials, $$array[0], true);
+        set(textbooks, $$array[1], true);
+      })(await Promise.all([loadMaterials(courseId()), fetchTextbooks()]));
+      if (get2(textbooks).length > 0 && get2(textbooks)[0] && !get2(newTextbookId)) {
+        set(newTextbookId, get2(textbooks)[0].id, true);
+      }
+    } catch (e) {
+      set(error, e instanceof Error ? e.message : String(e), true);
+    } finally {
+      set(isLoading, false);
     }
   }
-  function choose(optionIndex) {
-    if (get2(selected) !== null) {
+  user_effect(() => {
+    void courseId();
+    load();
+  });
+  function nextPosition() {
+    return get2(materials).reduce((max, m) => Math.max(max, m.position), 0) + 1;
+  }
+  async function onAddMaterial() {
+    if (!get2(newTextbookId)) {
       return;
     }
-    set(selected, optionIndex, true);
-    if (get2(current).options[optionIndex].correct) {
-      set(score, get2(score) + 1);
+    set(addingMaterial, true);
+    set(error, "");
+    try {
+      await addMaterial(courseId(), get2(newTextbookId), nextPosition());
+      await load();
+    } catch (e) {
+      set(error, e instanceof Error ? e.message : String(e), true);
+    } finally {
+      set(addingMaterial, false);
     }
-    timer = setTimeout(advance, 950);
   }
-  function restart() {
-    set(index2, 0);
-    set(selected, null);
-    set(score, 0);
-    set(finished, false);
-  }
-  onDestroy(() => {
-    if (timer) {
-      clearTimeout(timer);
+  async function onDeleteMaterial(id) {
+    set(error, "");
+    try {
+      await deleteMaterial(id);
+      if (get2(expandedId) === id) {
+        set(expandedId, null);
+      }
+      await load();
+    } catch (e) {
+      set(error, e instanceof Error ? e.message : String(e), true);
     }
-  });
+  }
+  async function move2(index2, direction) {
+    const target = index2 + direction;
+    const a = get2(materials)[index2];
+    const b = get2(materials)[target];
+    if (!a || !b) {
+      return;
+    }
+    set(error, "");
+    try {
+      await Promise.all([
+        updateMaterialPosition(a.id, b.position),
+        updateMaterialPosition(b.id, a.position)
+      ]);
+      await load();
+    } catch (e) {
+      set(error, e instanceof Error ? e.message : String(e), true);
+    }
+  }
+  async function toggleExpand(material) {
+    if (get2(expandedId) === material.id) {
+      set(expandedId, null);
+      return;
+    }
+    set(expandedId, material.id, true);
+    set(rangesLoading, true);
+    set(startPageId, "");
+    set(endPageId, "");
+    try {
+      await (async ($$value) => {
+        var $$array_1 = to_array($$value, 2);
+        set(ranges, $$array_1[0], true);
+        set(pages, $$array_1[1], true);
+      })(await Promise.all([
+        loadPageRanges(material.id),
+        fetchTextbookPages(material.textbookId)
+      ]));
+      if (get2(pages).length > 0 && get2(pages)[0]) {
+        set(startPageId, get2(pages)[0].id, true);
+        set(endPageId, get2(pages)[get2(pages).length - 1]?.id ?? get2(pages)[0].id, true);
+      }
+    } catch (e) {
+      set(error, e instanceof Error ? e.message : String(e), true);
+    } finally {
+      set(rangesLoading, false);
+    }
+  }
+  async function onAddRange(materialId) {
+    if (!get2(startPageId) || !get2(endPageId)) {
+      return;
+    }
+    set(addingRange, true);
+    set(error, "");
+    try {
+      const position = get2(ranges).reduce((max, r) => Math.max(max, r.position), 0) + 1;
+      await addPageRange(materialId, get2(startPageId), get2(endPageId), position);
+      set(ranges, await loadPageRanges(materialId), true);
+    } catch (e) {
+      set(error, e instanceof Error ? e.message : String(e), true);
+    } finally {
+      set(addingRange, false);
+    }
+  }
+  async function onDeleteRange(materialId, rangeId) {
+    set(error, "");
+    try {
+      await deletePageRange(rangeId);
+      set(ranges, await loadPageRanges(materialId), true);
+    } catch (e) {
+      set(error, e instanceof Error ? e.message : String(e), true);
+    }
+  }
   var $$exports = {
-    get params() {
-      return params();
+    get courseId() {
+      return courseId();
     },
-    set params($$value) {
-      params($$value);
+    set courseId($$value) {
+      courseId($$value);
       flushSync();
     }
   };
-  var div = root_46();
-  var header = child(div);
-  var button = child(header);
-  var node = sibling(button, 2);
+  var div = root_123();
+  var div_1 = child(div);
+  var node = sibling(child(div_1), 4);
   {
     var consequent = ($$anchor2) => {
-      var div_1 = root13();
-      var div_2 = child(div_1);
-      reset(div_1);
-      template_effect(() => set_style(div_2, `width: ${get2(progressPct) ?? ""}%`));
-      append($$anchor2, div_1);
+      var div_2 = root6();
+      var span = child(div_2);
+      var text2 = child(span, true);
+      reset(span);
+      reset(div_2);
+      template_effect(() => set_text(text2, get2(error)));
+      append($$anchor2, div_2);
     };
     if_block(node, ($$render) => {
-      if (!get2(finished)) $$render(consequent);
+      if (get2(error)) $$render(consequent);
     });
   }
-  reset(header);
-  var node_1 = sibling(header, 2);
+  var div_3 = sibling(node, 2);
+  var select = child(div_3);
+  each(select, 21, () => get2(textbooks), (textbook) => textbook.id, ($$anchor2, textbook) => {
+    var option = root_16();
+    var text_1 = child(option, true);
+    reset(option);
+    var option_value = {};
+    template_effect(() => {
+      set_text(text_1, get2(textbook).name);
+      if (option_value !== (option_value = get2(textbook).id)) {
+        option.value = (option.__value = get2(textbook).id) ?? "";
+      }
+    });
+    append($$anchor2, option);
+  });
+  reset(select);
+  var button = sibling(select, 2);
+  var node_1 = child(button);
   {
     var consequent_1 = ($$anchor2) => {
-      var section = root_110();
-      var h1 = child(section);
-      var text2 = child(h1, true);
-      reset(h1);
-      var div_3 = sibling(h1, 2);
-      var text_1 = child(div_3);
-      reset(div_3);
-      var p = sibling(div_3, 2);
-      var text_2 = child(p, true);
-      reset(p);
-      var div_4 = sibling(p, 2);
-      var button_1 = child(div_4);
-      var button_2 = sibling(button_1, 2);
-      reset(div_4);
-      reset(section);
-      template_effect(() => {
-        set_text(text2, get2(courseTitle));
-        set_text(text_1, `${get2(score) ?? ""}/${questions.length ?? ""}`);
-        set_text(text_2, get2(score) === questions.length ? "Perfect! \u{1F389}" : "Nice work \u2014 keep practising!");
-      });
-      delegated("click", button_1, restart);
-      delegated("click", button_2, () => push2("/"));
-      append($$anchor2, section);
-    };
-    var alternate = ($$anchor2) => {
-      var section_1 = root_37();
-      var h1_1 = child(section_1);
-      var text_3 = child(h1_1, true);
-      reset(h1_1);
-      var span = sibling(h1_1, 2);
-      var text_4 = child(span);
-      reset(span);
-      var h2 = sibling(span, 2);
-      var text_5 = child(h2, true);
-      reset(h2);
-      var div_5 = sibling(h2, 2);
-      each(div_5, 23, () => get2(current).options, (option) => option.text, ($$anchor3, option, optionIndex) => {
-        var button_3 = root_27();
-        let classes;
-        var span_1 = child(button_3);
-        var text_6 = child(span_1, true);
-        reset(span_1);
-        var span_2 = sibling(span_1, 2);
-        var text_7 = child(span_2, true);
-        reset(span_2);
-        reset(button_3);
-        template_effect(() => {
-          classes = set_class(button_3, 1, `answer c${get2(optionIndex) ?? ""}`, "svelte-10mivl5", classes, {
-            correct: get2(answered) && get2(option).correct,
-            wrong: get2(answered) && get2(optionIndex) === get2(selected) && !get2(option).correct,
-            dim: get2(answered) && !get2(option).correct && get2(optionIndex) !== get2(selected)
-          });
-          button_3.disabled = get2(answered);
-          set_text(text_6, letters[get2(optionIndex)]);
-          set_text(text_7, get2(option).text);
-        });
-        delegated("click", button_3, () => choose(get2(optionIndex)));
-        append($$anchor3, button_3);
-      });
-      reset(div_5);
-      reset(section_1);
-      template_effect(() => {
-        set_text(text_3, get2(courseTitle));
-        set_text(text_4, `Question ${get2(index2) + 1} / ${questions.length ?? ""}`);
-        set_text(text_5, get2(current).prompt);
-      });
-      append($$anchor2, section_1);
+      var span_1 = root_26();
+      append($$anchor2, span_1);
     };
     if_block(node_1, ($$render) => {
-      if (get2(finished)) $$render(consequent_1);
-      else $$render(alternate, -1);
+      if (get2(addingMaterial)) $$render(consequent_1);
     });
   }
+  next();
+  reset(button);
+  reset(div_3);
+  var node_2 = sibling(div_3, 2);
+  {
+    var consequent_2 = ($$anchor2) => {
+      var span_2 = root_34();
+      append($$anchor2, span_2);
+    };
+    var consequent_3 = ($$anchor2) => {
+      var p = root_43();
+      append($$anchor2, p);
+    };
+    var alternate_2 = ($$anchor2) => {
+      var ol = root_112();
+      each(ol, 23, () => get2(materials), (material) => material.id, ($$anchor3, material, index2) => {
+        var li = root_103();
+        var div_4 = child(li);
+        var span_3 = child(div_4);
+        var text_2 = child(span_3, true);
+        reset(span_3);
+        var span_4 = sibling(span_3, 2);
+        var text_3 = child(span_4, true);
+        reset(span_4);
+        var span_5 = sibling(span_4, 2);
+        var text_4 = child(span_5);
+        reset(span_5);
+        var span_6 = sibling(span_5, 2);
+        var button_1 = child(span_6);
+        var button_2 = sibling(button_1, 2);
+        var button_3 = sibling(button_2, 2);
+        var text_5 = child(button_3, true);
+        reset(button_3);
+        var button_4 = sibling(button_3, 2);
+        reset(span_6);
+        reset(div_4);
+        var node_3 = sibling(div_4, 2);
+        {
+          var consequent_6 = ($$anchor4) => {
+            var div_5 = root_93();
+            var node_4 = child(div_5);
+            {
+              var consequent_4 = ($$anchor5) => {
+                var span_7 = root_26();
+                append($$anchor5, span_7);
+              };
+              var alternate_1 = ($$anchor5) => {
+                var fragment = root_83();
+                var node_5 = first_child(fragment);
+                {
+                  var consequent_5 = ($$anchor6) => {
+                    var ul = root_63();
+                    each(ul, 21, () => get2(ranges), (range) => range.id, ($$anchor7, range) => {
+                      var li_1 = root_53();
+                      var span_8 = child(li_1);
+                      var text_6 = child(span_8);
+                      reset(span_8);
+                      var button_5 = sibling(span_8, 2);
+                      reset(li_1);
+                      template_effect(() => set_text(text_6, `${get2(range).startPageName ?? ""} \u2192 ${get2(range).endPageName ?? ""}`));
+                      delegated("click", button_5, () => onDeleteRange(get2(material).id, get2(range).id));
+                      append($$anchor7, li_1);
+                    });
+                    reset(ul);
+                    append($$anchor6, ul);
+                  };
+                  var alternate = ($$anchor6) => {
+                    var p_1 = root_73();
+                    append($$anchor6, p_1);
+                  };
+                  if_block(node_5, ($$render) => {
+                    if (get2(ranges).length > 0) $$render(consequent_5);
+                    else $$render(alternate, -1);
+                  });
+                }
+                var div_6 = sibling(node_5, 2);
+                var label = child(div_6);
+                var select_1 = sibling(child(label), 2);
+                each(select_1, 21, () => get2(pages), (page) => page.id, ($$anchor6, page) => {
+                  var option_1 = root_16();
+                  var text_7 = child(option_1, true);
+                  reset(option_1);
+                  var option_1_value = {};
+                  template_effect(() => {
+                    set_text(text_7, get2(page).name);
+                    if (option_1_value !== (option_1_value = get2(page).id)) {
+                      option_1.value = (option_1.__value = get2(page).id) ?? "";
+                    }
+                  });
+                  append($$anchor6, option_1);
+                });
+                reset(select_1);
+                reset(label);
+                var label_1 = sibling(label, 2);
+                var select_2 = sibling(child(label_1), 2);
+                each(select_2, 21, () => get2(pages), (page) => page.id, ($$anchor6, page) => {
+                  var option_2 = root_16();
+                  var text_8 = child(option_2, true);
+                  reset(option_2);
+                  var option_2_value = {};
+                  template_effect(() => {
+                    set_text(text_8, get2(page).name);
+                    if (option_2_value !== (option_2_value = get2(page).id)) {
+                      option_2.value = (option_2.__value = get2(page).id) ?? "";
+                    }
+                  });
+                  append($$anchor6, option_2);
+                });
+                reset(select_2);
+                reset(label_1);
+                var button_6 = sibling(label_1, 2);
+                reset(div_6);
+                template_effect(() => button_6.disabled = get2(addingRange) || get2(pages).length === 0);
+                bind_select_value(select_1, () => get2(startPageId), ($$value) => set(startPageId, $$value));
+                bind_select_value(select_2, () => get2(endPageId), ($$value) => set(endPageId, $$value));
+                delegated("click", button_6, () => onAddRange(get2(material).id));
+                append($$anchor5, fragment);
+              };
+              if_block(node_4, ($$render) => {
+                if (get2(rangesLoading)) $$render(consequent_4);
+                else $$render(alternate_1, -1);
+              });
+            }
+            reset(div_5);
+            append($$anchor4, div_5);
+          };
+          if_block(node_3, ($$render) => {
+            if (get2(expandedId) === get2(material).id) $$render(consequent_6);
+          });
+        }
+        reset(li);
+        template_effect(() => {
+          set_text(text_2, get2(index2) + 1);
+          set_text(text_3, get2(material).textbookName);
+          set_text(text_4, `${get2(material).pageRangeCount ?? ""} range(s)`);
+          button_1.disabled = get2(index2) === 0;
+          button_2.disabled = get2(index2) === get2(materials).length - 1;
+          set_text(text_5, get2(expandedId) === get2(material).id ? "Hide pages" : "Edit pages");
+        });
+        delegated("click", button_1, () => move2(get2(index2), -1));
+        delegated("click", button_2, () => move2(get2(index2), 1));
+        delegated("click", button_3, () => toggleExpand(get2(material)));
+        delegated("click", button_4, () => onDeleteMaterial(get2(material).id));
+        append($$anchor3, li);
+      });
+      reset(ol);
+      append($$anchor2, ol);
+    };
+    if_block(node_2, ($$render) => {
+      if (get2(isLoading)) $$render(consequent_2);
+      else if (get2(materials).length === 0) $$render(consequent_3, 1);
+      else $$render(alternate_2, -1);
+    });
+  }
+  reset(div_1);
   reset(div);
-  delegated("click", button, () => window.history.back());
+  template_effect(() => button.disabled = get2(addingMaterial) || !get2(newTextbookId));
+  bind_select_value(select, () => get2(newTextbookId), ($$value) => set(newTextbookId, $$value));
+  delegated("click", button, onAddMaterial);
   append($$anchor, div);
   return pop($$exports);
 }
 delegate(["click"]);
-create_custom_element(QuizPage, { params: {} }, [], [], { mode: "open" });
+create_custom_element(ContentPanel, { courseId: {} }, [], [], { mode: "open" });
 
-// src/components/pages/ContentPage.svelte
-var root14 = from_html(`<button type="button" class="toc-link svelte-uyhh09"> </button>`);
-var root_111 = from_html(`<div class="content-screen svelte-uyhh09"><aside class="toc svelte-uyhh09"><button type="button" class="back svelte-uyhh09">\u2190 Back to chat</button> <p class="toc-label svelte-uyhh09">On this page</p> <nav class="toc-nav svelte-uyhh09" aria-label="Table of contents"></nav></aside> <main class="article svelte-uyhh09"><header class="article-head svelte-uyhh09"><p class="eyebrow svelte-uyhh09">Course content</p> <h1 class="article-title svelte-uyhh09"> </h1> <p class="placeholder-note svelte-uyhh09">\u{1F4DD} Sample content \u2014 the authored course material will appear here.</p></header> <section id="overview" class="block svelte-uyhh09"><h2 class="svelte-uyhh09">Overview</h2> <p>Welcome to <strong> </strong>. This page collects the course material in a
-                readable, wiki-style format so you can browse concepts, examples and summaries at your own pace.</p></section> <section id="getting-started" class="block svelte-uyhh09"><h2 class="svelte-uyhh09">Getting started</h2> <p>Work through the sections in order. Each concept builds on the previous one.</p> <div class="callout svelte-uyhh09">\u{1F4A1} Tip: open the AI tutor (the chat icon) any time you want a concept explained differently.</div></section> <section id="key-concepts" class="block svelte-uyhh09"><h2 class="svelte-uyhh09">Key concepts</h2> <ul class="svelte-uyhh09"><li> </li> <li>How the pieces fit together in practice.</li> <li>Common mistakes and how to avoid them.</li></ul></section> <section id="example" class="block svelte-uyhh09"><h2 class="svelte-uyhh09">Example</h2> <p>A minimal example you can adapt:</p> <pre class="code svelte-uyhh09"><code> </code></pre></section> <section id="summary" class="block svelte-uyhh09"><h2 class="svelte-uyhh09">Summary</h2> <p> </p> <div class="actions svelte-uyhh09"><button type="button" class="btn btn-primary">Take the quiz</button> <button type="button" class="btn btn-ghost">Ask the tutor</button></div></section></main></div>`);
-var $$css14 = {
-  hash: "svelte-uyhh09",
-  code: '.content-screen.svelte-uyhh09 {flex:1;min-height:0;overflow:hidden;display:grid;grid-template-columns:15rem minmax(0, 1fr);grid-template-rows:minmax(0, 1fr);width:100%;}\n\n    /* Sidebar stays put; it never scrolls. */.toc.svelte-uyhh09 {min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:1rem;padding:1.5rem 1rem;border-right:1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);background:color-mix(in oklab, var(--color-base-100) 60%, transparent);}.back.svelte-uyhh09 {align-self:flex-start;background:none;border:none;cursor:pointer;font-weight:600;color:var(--color-primary);}.back.svelte-uyhh09:focus-visible {outline:2px solid var(--color-primary);outline-offset:2px;}.toc-label.svelte-uyhh09 {font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:color-mix(in oklab, var(--color-base-content) 55%, transparent);}.toc-nav.svelte-uyhh09 {display:flex;flex-direction:column;gap:0.15rem;}.toc-link.svelte-uyhh09 {text-align:left;padding:0.4rem 0.6rem;border-radius:0.5rem;border:none;background:transparent;color:color-mix(in oklab, var(--color-base-content) 75%, transparent);cursor:pointer;}.toc-link.svelte-uyhh09:hover {background:color-mix(in oklab, var(--color-primary) 14%, transparent);color:var(--color-base-content);}.article.svelte-uyhh09 {min-height:0;overflow-y:auto;padding:2.5rem 0;}\n\n    /* Content text spans ~90% of the content view. */.article.svelte-uyhh09 > :where(.svelte-uyhh09) {width:90%;margin-left:auto;margin-right:auto;}.article-head.svelte-uyhh09 {margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);}.eyebrow.svelte-uyhh09 {font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--color-primary);}.article-title.svelte-uyhh09 {font-size:clamp(2rem, 4vw, 2.8rem);font-weight:800;color:var(--color-base-content);text-shadow:0 0 22px color-mix(in oklab, var(--color-primary) 30%, transparent);}.placeholder-note.svelte-uyhh09 {margin-top:0.5rem;font-size:0.85rem;color:color-mix(in oklab, var(--color-base-content) 60%, transparent);}.block.svelte-uyhh09 {margin-bottom:2.25rem;line-height:1.7;color:color-mix(in oklab, var(--color-base-content) 90%, transparent);}.block.svelte-uyhh09 h2:where(.svelte-uyhh09) {font-size:1.5rem;font-weight:700;margin-bottom:0.6rem;color:var(--color-base-content);}.block.svelte-uyhh09 ul:where(.svelte-uyhh09) {margin:0.5rem 0 0 1.25rem;display:flex;flex-direction:column;gap:0.35rem;}.callout.svelte-uyhh09 {margin-top:0.75rem;padding:0.9rem 1.1rem;border-radius:0.75rem;background:color-mix(in oklab, var(--color-primary) 12%, transparent);border-left:3px solid var(--color-primary);}.code.svelte-uyhh09 {margin-top:0.75rem;padding:1rem 1.25rem;border-radius:0.75rem;overflow-x:auto;font-family:ui-monospace, "SF Mono", Menlo, monospace;font-size:0.9rem;color:var(--color-base-content);background:color-mix(in oklab, var(--color-base-content) 8%, transparent);border:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);}.actions.svelte-uyhh09 {display:flex;gap:0.75rem;margin-top:1rem;}\n\n    @media (max-width: 48rem) {.content-screen.svelte-uyhh09 {grid-template-columns:1fr;}.toc.svelte-uyhh09 {display:none;}\n    }'
+// src/components/pages/CourseDetailPage.svelte
+var root7 = from_html(`<div class="status svelte-1dzggpi" role="status" aria-live="polite"><span class="loading loading-spinner loading-lg"></span></div>`);
+var root_17 = from_html(`<div class="status svelte-1dzggpi" role="alert"><p class="error svelte-1dzggpi"> </p> <button type="button" class="btn btn-sm">Retry</button></div>`);
+var root_27 = from_html(`<header class="top"><h1 class="title svelte-1dzggpi"> </h1></header> <div role="tablist" class="tabs tabs-bordered"><button role="tab">Overview</button> <button role="tab">Students</button> <button role="tab">Content</button></div> <section class="panel-area svelte-1dzggpi"><!></section>`, 1);
+var root_35 = from_html(`<div class="page svelte-1dzggpi"><nav class="crumbs svelte-1dzggpi"><button type="button" class="btn btn-ghost btn-sm">&larr; My Courses</button></nav> <!></div>`);
+var $$css5 = {
+  hash: "svelte-1dzggpi",
+  code: ".page.svelte-1dzggpi {width:90%;max-width:70rem;margin:0 auto;padding:1.25rem 0 2rem;display:flex;flex-direction:column;gap:1rem;}.crumbs.svelte-1dzggpi {display:flex;}.title.svelte-1dzggpi {font-size:clamp(1.4rem, 3vw, 2rem);font-weight:800;}.panel-area.svelte-1dzggpi {margin-top:0.5rem;}.status.svelte-1dzggpi {display:flex;flex-direction:column;align-items:center;gap:1rem;padding:4rem 0;color:color-mix(in oklab, var(--color-base-content) 70%, transparent);}.error.svelte-1dzggpi {color:var(--color-error);font-weight:600;text-align:center;}"
 };
-function ContentPage($$anchor, $$props) {
+function CourseDetailPage($$anchor, $$props) {
   push($$props, true);
-  append_styles($$anchor, $$css14);
+  append_styles($$anchor, $$css5);
   let params = prop($$props, "params", 7);
-  let state3 = state(proxy({
-    isLoading: true,
-    errorMessage: "",
-    user: null,
-    stats: null,
-    skills: [],
-    courses: []
-  }));
-  onMount(() => {
-    const unsubscribe = dashboardStore.subscribe((value) => {
-      set(state3, value, true);
-    });
-    if (get2(state3).courses.length === 0) {
-      dashboardStore.refresh();
+  const courseId = user_derived(() => params()?.id ?? "");
+  let tab = state("overview");
+  let course = state(null);
+  let isLoading = state(true);
+  let errorMessage = state("");
+  async function load() {
+    if (!get2(courseId)) {
+      return;
     }
-    return unsubscribe;
-  });
-  const courseTitle = user_derived(() => get2(state3).courses.find((course) => course.id === params()?.id)?.name ?? "Course");
-  const sections = [
-    { id: "overview", title: "Overview" },
-    { id: "getting-started", title: "Getting started" },
-    { id: "key-concepts", title: "Key concepts" },
-    { id: "example", title: "Example" },
-    { id: "summary", title: "Summary" }
-  ];
-  function scrollTo2(id) {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    set(isLoading, true);
+    set(errorMessage, "");
+    try {
+      set(course, await fetchCourse(get2(courseId)), true);
+    } catch (error) {
+      set(errorMessage, error instanceof Error ? error.message : String(error), true);
+    } finally {
+      set(isLoading, false);
+    }
   }
+  user_effect(() => {
+    void get2(courseId);
+    load();
+  });
   var $$exports = {
     get params() {
       return params();
@@ -9323,120 +8403,126 @@ function ContentPage($$anchor, $$props) {
       flushSync();
     }
   };
-  var div = root_111();
-  var aside = child(div);
-  var button = child(aside);
-  var nav = sibling(button, 4);
-  each(nav, 21, () => sections, (section) => section.id, ($$anchor2, section) => {
-    var button_1 = root14();
-    var text2 = child(button_1, true);
-    reset(button_1);
-    template_effect(() => set_text(text2, get2(section).title));
-    delegated("click", button_1, () => scrollTo2(get2(section).id));
-    append($$anchor2, button_1);
-  });
+  var div = root_35();
+  var nav = child(div);
+  var button = child(nav);
   reset(nav);
-  reset(aside);
-  var main = sibling(aside, 2);
-  var header = child(main);
-  var h1 = sibling(child(header), 2);
-  var text_1 = child(h1, true);
-  reset(h1);
-  next(2);
-  reset(header);
-  var section_1 = sibling(header, 2);
-  var p = sibling(child(section_1), 2);
-  var strong = sibling(child(p));
-  var text_2 = child(strong, true);
-  reset(strong);
-  next();
-  reset(p);
-  reset(section_1);
-  var section_2 = sibling(section_1, 4);
-  var ul = sibling(child(section_2), 2);
-  var li = child(ul);
-  var text_3 = child(li);
-  reset(li);
-  next(4);
-  reset(ul);
-  reset(section_2);
-  var section_3 = sibling(section_2, 2);
-  var pre = sibling(child(section_3), 4);
-  var code = child(pre);
-  var text_4 = child(code);
-  reset(code);
-  reset(pre);
-  reset(section_3);
-  var section_4 = sibling(section_3, 2);
-  var p_1 = sibling(child(section_4), 2);
-  var text_5 = child(p_1);
-  reset(p_1);
-  var div_1 = sibling(p_1, 2);
-  var button_2 = child(div_1);
-  var button_3 = sibling(button_2, 2);
-  reset(div_1);
-  reset(section_4);
-  reset(main);
+  var node = sibling(nav, 2);
+  {
+    var consequent = ($$anchor2) => {
+      var div_1 = root7();
+      append($$anchor2, div_1);
+    };
+    var consequent_1 = ($$anchor2) => {
+      var div_2 = root_17();
+      var p = child(div_2);
+      var text2 = child(p, true);
+      reset(p);
+      var button_1 = sibling(p, 2);
+      reset(div_2);
+      template_effect(() => set_text(text2, get2(errorMessage)));
+      delegated("click", button_1, load);
+      append($$anchor2, div_2);
+    };
+    var consequent_4 = ($$anchor2) => {
+      var fragment = root_27();
+      var header = first_child(fragment);
+      var h1 = child(header);
+      var text_1 = child(h1, true);
+      reset(h1);
+      reset(header);
+      var div_3 = sibling(header, 2);
+      var button_2 = child(div_3);
+      let classes;
+      var button_3 = sibling(button_2, 2);
+      let classes_1;
+      var button_4 = sibling(button_3, 2);
+      let classes_2;
+      reset(div_3);
+      var section = sibling(div_3, 2);
+      var node_1 = child(section);
+      {
+        var consequent_2 = ($$anchor3) => {
+          OverviewPanel($$anchor3, {
+            get course() {
+              return get2(course);
+            },
+            onSaved: load
+          });
+        };
+        var consequent_3 = ($$anchor3) => {
+          StudentsPanel($$anchor3, {
+            get courseId() {
+              return get2(courseId);
+            }
+          });
+        };
+        var alternate = ($$anchor3) => {
+          ContentPanel($$anchor3, {
+            get courseId() {
+              return get2(courseId);
+            }
+          });
+        };
+        if_block(node_1, ($$render) => {
+          if (get2(tab) === "overview") $$render(consequent_2);
+          else if (get2(tab) === "students") $$render(consequent_3, 1);
+          else $$render(alternate, -1);
+        });
+      }
+      reset(section);
+      template_effect(() => {
+        set_text(text_1, get2(course).name);
+        classes = set_class(button_2, 1, "tab", null, classes, { "tab-active": get2(tab) === "overview" });
+        classes_1 = set_class(button_3, 1, "tab", null, classes_1, { "tab-active": get2(tab) === "students" });
+        classes_2 = set_class(button_4, 1, "tab", null, classes_2, { "tab-active": get2(tab) === "content" });
+      });
+      delegated("click", button_2, () => set(tab, "overview"));
+      delegated("click", button_3, () => set(tab, "students"));
+      delegated("click", button_4, () => set(tab, "content"));
+      append($$anchor2, fragment);
+    };
+    if_block(node, ($$render) => {
+      if (get2(isLoading)) $$render(consequent);
+      else if (get2(errorMessage)) $$render(consequent_1, 1);
+      else if (get2(course)) $$render(consequent_4, 2);
+    });
+  }
   reset(div);
-  template_effect(() => {
-    set_text(text_1, get2(courseTitle));
-    set_text(text_2, get2(courseTitle));
-    set_text(text_3, `The fundamentals and core vocabulary of ${get2(courseTitle) ?? ""}.`);
-    set_text(text_4, `<!DOCTYPE html>
-<html>
-  <head><title>${get2(courseTitle) ?? ""}</title></head>
-  <body>Hello, learner!</body>
-</html>`);
-    set_text(text_5, `You now have a map of ${get2(courseTitle) ?? ""}. Test yourself with the quiz, or ask the tutor to go deeper
-                on any section.`);
-  });
-  delegated("click", button, () => push2(`/chat/${params()?.id ?? ""}`));
-  delegated("click", button_2, () => push2(`/quiz/${params()?.id ?? ""}`));
-  delegated("click", button_3, () => push2(`/chat/${params()?.id ?? ""}`));
+  delegated("click", button, () => push2("/"));
   append($$anchor, div);
   return pop($$exports);
 }
 delegate(["click"]);
-create_custom_element(ContentPage, { params: {} }, [], [], { mode: "open" });
+create_custom_element(CourseDetailPage, { params: {} }, [], [], { mode: "open" });
 
 // src/components/routes.ts
 var routes_default = {
-  "/": DashboardPage,
-  "/profile": ProfileEditPage,
-  "/chat/:id": CourseChatPage,
-  "/quiz/:id": QuizPage,
-  "/content/:id": ContentPage,
-  "*": DashboardPage
+  "/": CourseListPage,
+  "/courses/:id": CourseDetailPage,
+  "*": CourseListPage
 };
 
-// src/components/DashboardApp.svelte
-var root15 = from_html(`<div><!> <main class="shell-content svelte-1w96du5"><!></main> <footer class="shell-footer svelte-1w96du5"><span>Copyright 2026 | OpenBook</span></footer> <!></div>`);
-var $$css15 = {
-  hash: "svelte-1w96du5",
-  code: "\n    /* Lock the shell to the viewport so only inner page areas scroll. */.shell.svelte-1w96du5 {flex:1;height:100vh;min-height:0;overflow:hidden;display:flex;flex-direction:column;transition:padding-right 0.25s ease;}\n\n    /* Make room for the docked chat sidebar so nothing is hidden behind it. */.shell.chat-docked.svelte-1w96du5 {padding-right:min(28rem, 100vw);}.shell-content.svelte-1w96du5 {flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;}.shell-footer.svelte-1w96du5 {margin-top:auto;padding:1rem 1.5rem 1.5rem;text-align:center;font-size:0.75rem;letter-spacing:0.08em;text-transform:uppercase;color:color-mix(in oklab, var(--color-base-content) 60%, transparent);border-top:1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);}"
+// src/components/TeacherApp.svelte
+var root8 = from_html(`<div class="shell svelte-x3gxcj"><!> <main class="shell-content svelte-x3gxcj"><!></main> <footer class="shell-footer svelte-x3gxcj"><span>Copyright 2026 | OpenBook</span></footer></div>`);
+var $$css6 = {
+  hash: "svelte-x3gxcj",
+  code: ".shell.svelte-x3gxcj {flex:1;min-height:100vh;display:flex;flex-direction:column;}.shell-content.svelte-x3gxcj {flex:1;display:flex;flex-direction:column;}.shell-footer.svelte-x3gxcj {margin-top:auto;padding:1rem 1.5rem 1.5rem;text-align:center;font-size:0.75rem;letter-spacing:0.08em;text-transform:uppercase;color:color-mix(in oklab, var(--color-base-content) 60%, transparent);border-top:1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);}"
 };
-function DashboardApp($$anchor, $$props) {
+function TeacherApp($$anchor, $$props) {
   push($$props, true);
-  append_styles($$anchor, $$css15);
-  let state3 = state(proxy({
-    isLoading: true,
-    errorMessage: "",
-    user: null,
-    stats: null,
-    skills: [],
-    courses: []
-  }));
-  let chatDocked = state(false);
-  const onChatPage = user_derived(() => (router.location ?? "").startsWith("/chat"));
+  append_styles($$anchor, $$css6);
+  let state3 = state(proxy({ isLoading: true, errorMessage: "", user: null, courses: [] }));
   onMount(() => {
-    return dashboardStore.subscribe((value) => {
+    const unsubscribe = teacherStore.subscribe((value) => {
       set(state3, value, true);
     });
+    teacherStore.refresh();
+    return unsubscribe;
   });
-  var div = root15();
-  let classes;
+  var div = root8();
   var node = child(div);
-  DashboardHeader(node, {
+  TeacherHeader(node, {
     get user() {
       return get2(state3).user;
     }
@@ -9449,23 +8535,14 @@ function DashboardApp($$anchor, $$props) {
     }
   });
   reset(main);
-  var node_2 = sibling(main, 4);
-  {
-    var consequent = ($$anchor2) => {
-      ChatWidget($$anchor2, { onSidebarChange: (docked) => set(chatDocked, docked, true) });
-    };
-    if_block(node_2, ($$render) => {
-      if (!get2(onChatPage)) $$render(consequent);
-    });
-  }
+  next(2);
   reset(div);
-  template_effect(() => classes = set_class(div, 1, "shell svelte-1w96du5", null, classes, { "chat-docked": get2(chatDocked) && !get2(onChatPage) }));
   append($$anchor, div);
   pop();
 }
-create_custom_element(DashboardApp, {}, [], [], { mode: "open" });
+create_custom_element(TeacherApp, {}, [], [], { mode: "open" });
 
 // src/index.ts
 initTheme();
-mount(DashboardApp, { target: document.body });
+mount(TeacherApp, { target: document.body });
 //# sourceMappingURL=bundle.js.map

@@ -3,10 +3,10 @@
   "private": true,
   "packageManager": "npm@11.x",
   "scripts": {
-    "clean": "npm run clean:admin && npm run clean:app && npm run clean:dashboard",
-    "build": "npm run build:admin && npm run build:app && npm run build:dashboard",
-    "lint": "npm run lint:admin  && npm run lint:app && npm run lint:dashboard",
-    "watch": "conc -n admin,app,dashboard -c auto \"npm run watch:admin\" \"npm run watch:app\" \"npm run watch:dashboard\"",
+    "clean": "npm run clean:admin && npm run clean:app && npm run clean:dashboard && npm run clean:teacher",
+    "build": "npm run build:admin && npm run build:app && npm run build:dashboard && npm run build:teacher",
+    "lint": "npm run lint:admin  && npm run lint:app && npm run lint:dashboard && npm run lint:teacher",
+    "watch": "conc -n admin,app,dashboard,teacher -c auto \"npm run watch:admin\" \"npm run watch:app\" \"npm run watch:dashboard\" \"npm run watch:teacher\"",
     "build:admin": "cd admin && npm run build",
     "clean:admin": "cd admin && npm run clean",
     "lint:admin": "cd admin && npm run lint",
@@ -18,6 +18,10 @@
     "build:dashboard": "cd dashboard && npm run build",
     "clean:dashboard": "cd dashboard && npm run clean",
     "lint:dashboard": "cd dashboard && npm run lint",
-    "watch:dashboard": "cd dashboard && npm run watch"
+    "watch:dashboard": "cd dashboard && npm run watch",
+    "build:teacher": "cd teacher && npm run build",
+    "clean:teacher": "cd teacher && npm run clean",
+    "lint:teacher": "cd teacher && npm run lint",
+    "watch:teacher": "cd teacher && npm run watch"
   }
 }
