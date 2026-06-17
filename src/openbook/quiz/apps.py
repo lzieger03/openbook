@@ -12,5 +12,5 @@ from django.utils.translation import gettext_lazy as _
 
 class QuizConfig(AppConfig):
     name = "openbook.quiz"
-    label = "quiz"
+    label = "openbook_quiz"
     verbose_name = _("Quiz")
