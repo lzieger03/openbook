@@ -8,6 +8,14 @@
  * License, or (at your option) any later version.
  */
 
+<<<<<<< HEAD
+/* Hide Alpine-controlled UI until Alpine has initialized it. */
+[x-cloak] {
+    display: none !important;
+}
+
+=======
+>>>>>>> origin/frontend-ai-integration-test
 /* Adopt styling of DjangoQL Searchbar for Django Unfold Admin */
 #searchbar {
     height: auto !important;
@@ -40,4 +48,8 @@
  */
 textarea {
     font-family: monospace !important;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/frontend-ai-integration-test

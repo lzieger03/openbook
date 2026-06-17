@@ -1406,6 +1406,8 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+<<<<<<< HEAD
+=======
     "/api/gamification/account_progress/": {
         parameters: {
             query?: never;
@@ -1726,6 +1728,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+>>>>>>> origin/frontend-ai-integration-test
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1757,6 +1760,8 @@ export interface components {
             /** Format: date-time */
             readonly modified_at: string | null;
         };
+<<<<<<< HEAD
+=======
         /** @description Account Progress */
         AccountProgress: {
             /** Format: uuid */
@@ -1785,6 +1790,7 @@ export interface components {
          * @enum {string}
          */
         ActivityTypeEnum: "CHAT_MESSAGE_SENT" | "QUIZ_ANSWERED" | "QUIZ_COMPLETED" | "CONTENT_VIEWED" | "MODULE_COMPLETED" | "GAME_PLAYED";
+>>>>>>> origin/frontend-ai-integration-test
         AllowedPermission: {
             id: number;
             perm: string;
@@ -1952,6 +1958,8 @@ export interface components {
             /** Format: date-time */
             readonly modified_at: string | null;
         };
+<<<<<<< HEAD
+=======
         /** @description Course Progress */
         CourseProgress: {
             /** Format: uuid */
@@ -1966,6 +1974,7 @@ export interface components {
             /** Format: decimal */
             course_progress?: string;
         };
+>>>>>>> origin/frontend-ai-integration-test
         /** @description Current User */
         CurrentUser: {
             readonly id: number;
@@ -2226,6 +2235,8 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["AccessRequest"][];
         };
+<<<<<<< HEAD
+=======
         PaginatedAccountProgressList: {
             /** @example 123 */
             count: number;
@@ -2241,6 +2252,7 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["AccountProgress"][];
         };
+>>>>>>> origin/frontend-ai-integration-test
         PaginatedAllowedRolePermissionList: {
             /** @example 123 */
             count: number;
@@ -2316,6 +2328,8 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["CourseMaterialPageRange"][];
         };
+<<<<<<< HEAD
+=======
         PaginatedCourseProgressList: {
             /** @example 123 */
             count: number;
@@ -2331,6 +2345,7 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["CourseProgress"][];
         };
+>>>>>>> origin/frontend-ai-integration-test
         PaginatedCurrentUserList: {
             /** @example 123 */
             count: number;
@@ -2526,6 +2541,8 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["PermissionText"][];
         };
+<<<<<<< HEAD
+=======
         PaginatedRewardEventLogList: {
             /** @example 123 */
             count: number;
@@ -2556,6 +2573,7 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["Reward"][];
         };
+>>>>>>> origin/frontend-ai-integration-test
         PaginatedRoleAssignmentList: {
             /** @example 123 */
             count: number;
@@ -2601,6 +2619,8 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["Site"][];
         };
+<<<<<<< HEAD
+=======
         PaginatedSkillList: {
             /** @example 123 */
             count: number;
@@ -2631,6 +2651,7 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["SkillProgress"][];
         };
+>>>>>>> origin/frontend-ai-integration-test
         PaginatedTextbookList: {
             /** @example 123 */
             count: number;
@@ -3117,6 +3138,8 @@ export interface components {
             /** Translated Name */
             name: string;
         };
+<<<<<<< HEAD
+=======
         /** @description Record a learning activity */
         RecordActivityRequest: {
             activity_type: components["schemas"]["ActivityTypeEnum"];
@@ -3147,6 +3170,7 @@ export interface components {
             readonly created_at: string;
             context?: unknown;
         };
+>>>>>>> origin/frontend-ai-integration-test
         /** @description Role */
         Role: {
             /** Format: uuid */
@@ -3243,6 +3267,8 @@ export interface components {
             brand_color?: string;
             auth_config: number;
         };
+<<<<<<< HEAD
+=======
         /** @description Skill */
         Skill: {
             /** Format: uuid */
@@ -3271,6 +3297,7 @@ export interface components {
             last_active_date: string | null;
             streak_freezes: number;
         };
+>>>>>>> origin/frontend-ai-integration-test
         /**
          * @description * `TEXT` - Plain Text
          *     * `HTML` - HTML
@@ -3344,6 +3371,8 @@ export interface components {
             /** Format: date-time */
             readonly modified_at: string | null;
         };
+<<<<<<< HEAD
+=======
         TriggerRewardEventLogRequest: {
             account?: string;
             /** Format: uuid */
@@ -3355,6 +3384,7 @@ export interface components {
             reward_event_log: components["schemas"]["RewardEventLog"];
             point_total: number;
         };
+>>>>>>> origin/frontend-ai-integration-test
         /** @description User */
         User: {
             readonly id: number;
@@ -7261,6 +7291,8 @@ export interface operations {
             };
         };
     };
+<<<<<<< HEAD
+=======
     gamification_account_progress_list: {
         parameters: {
             query?: {
@@ -7789,4 +7821,5 @@ export interface operations {
             };
         };
     };
+>>>>>>> origin/frontend-ai-integration-test
 }

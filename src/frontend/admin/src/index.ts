@@ -12,6 +12,11 @@
 import TinyMDE from "tiny-markdown-editor/dist/tiny-mde.js";
 import "tiny-markdown-editor/dist/tiny-mde.css";
 
+<<<<<<< HEAD
+import "./style.css";
+
+(window as any).TinyMDE  = TinyMDE;
+=======
 import * as ckeditor from 'ckeditor5';
 import "ckeditor5/ckeditor5.css";
 
@@ -19,3 +24,4 @@ import "./style.css";
 
 (window as any).TinyMDE  = TinyMDE;
 (window as any).ckeditor = ckeditor;
+>>>>>>> origin/frontend-ai-integration-test
