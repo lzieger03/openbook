@@ -131,8 +131,9 @@ class AssistantDocumentAdmin(CustomModelAdmin):
 
         if not obj.file_data:
             obj.chunks.all().delete()
-            obj.mark_indexed(chunk_count=0)
             obj.index_status = AssistantDocument.IndexStatusChoices.PENDING
+            obj.index_error = ""
+            obj.chunk_count = 0
             obj.indexed_at = None
             obj.save(
                 update_fields=[
