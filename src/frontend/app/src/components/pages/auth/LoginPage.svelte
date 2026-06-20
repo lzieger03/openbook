@@ -38,6 +38,13 @@ Full-screen login form shown to unauthenticated users.
 
         const result = await auth.login(usernameOrEmail, password);
 
+        if (result.success) {
+            // Let the server decide where to go based on the user's role
+            // (teachers -> /teacher/, students -> /dashboard/index.html).
+            window.location.href = "/post-login-redirect/";
+            return;
+        }
+
         if (!result.success) {
             for (const error of result.errors) {
                 if (error.param) {

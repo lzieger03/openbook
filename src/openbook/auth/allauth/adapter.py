@@ -19,6 +19,7 @@ from django.http                      import HttpRequest
 from django.utils.text                import format_lazy as _f
 
 from openbook.core.models.site        import Site
+from ..login_redirect                 import login_redirect_url_for_user
 from ..models.auth_config             import AuthConfig
 from ..models.signup_group_assignment import SignupGroupAssignment
 
@@ -77,6 +78,15 @@ class AccountAdapter(DefaultAccountAdapter):
 
         saved_user.groups.set(groups)
         return saved_user
+
+    def get_login_redirect_url(self, request: HttpRequest) -> str:
+        """
+        Redirect users to the matching frontend after login depending on their role.
+
+        Teachers (members of the ``Teacher`` Django group) are sent to the teacher
+        frontend, everyone else (students) to the gamification dashboard.
+        """
+        return login_redirect_url_for_user(request.user)
 
     def authenticate(self, request, **credentials):
         """

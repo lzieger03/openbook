@@ -21,6 +21,8 @@ from rest_framework.permissions      import IsAuthenticatedOrReadOnly
 from rest_framework.routers          import DefaultRouter as DRFDefaultRouter
 
 from .admin                          import admin_site
+from .auth.login_redirect            import post_login_redirect
+from .auth.login_redirect            import serve_teacher_frontend
 from .assistant.routes               import register_api_routes as register_assistant_api_routes
 from .auth.routes                    import register_api_routes as register_auth_api_routes
 from .core.routes                    import register_api_routes as register_core_api_routes
@@ -54,6 +56,9 @@ urlpatterns = [
     path("accounts/",         include("allauth.urls")),
     path("auth-api/",         include("allauth.headless.urls")),
 
+    # Role-based redirect after login (used by the SPA after a headless login)
+    path("post-login-redirect/", post_login_redirect, name="post-login-redirect"),
+
     # Single Page App
     path("",                  RedirectView.as_view(url=settings.OB_ROOT_REDIRECT)),
 ]
@@ -81,10 +86,7 @@ if settings.DEBUG:
 
     urlpatterns += static("dashboard/", document_root=f"{settings.BASE_DIR}/frontend/dashboard/dist/openbook/dashboard")
 
-    # Teacher microfrontend
-    urlpatterns += [re_path(r"^teacher/$", serve, kwargs={
-        "path":          "index.html",
-        "document_root": f"{settings.BASE_DIR}/frontend/teacher/dist/openbook/teacher"
-    })]
+    # Teacher microfrontend (entry point restricted to teachers)
+    urlpatterns += [re_path(r"^teacher/(?P<path>index\.html)?$", serve_teacher_frontend)]
 
     urlpatterns += static("teacher/", document_root=f"{settings.BASE_DIR}/frontend/teacher/dist/openbook/teacher")

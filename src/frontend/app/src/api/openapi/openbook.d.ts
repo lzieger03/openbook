@@ -3097,9 +3097,9 @@ export interface components {
             /** Active */
             is_active?: boolean;
             permissions?: string[];
-            role_assignments?: string[];
-            enrollment_methods?: string[];
-            access_requests?: string[];
+            readonly role_assignments?: string[];
+            readonly enrollment_methods?: string[];
+            readonly access_requests?: string[];
             readonly created_by?: string;
             /** Format: date-time */
             readonly created_at?: string | null;
@@ -3301,9 +3301,9 @@ export interface components {
             /** Active */
             is_active?: boolean;
             permissions: string[];
-            role_assignments: string[];
-            enrollment_methods: string[];
-            access_requests: string[];
+            readonly role_assignments: string[];
+            readonly enrollment_methods: string[];
+            readonly access_requests: string[];
             readonly created_by: string;
             /** Format: date-time */
             readonly created_at: string | null;
@@ -3775,7 +3775,7 @@ export interface operations {
                 modified_at__lte?: string;
                 modified_by?: string;
                 role?: string;
-                scope_type?: number;
+                scope_type?: string;
                 scope_uuid?: string;
                 user?: string;
             };
@@ -4030,7 +4030,7 @@ export interface operations {
                 /** @description Which field to use when ordering the results. */
                 _sort?: string;
                 permission?: number;
-                scope_type?: number;
+                scope_type?: string;
             };
             header?: never;
             path?: never;
@@ -4478,7 +4478,7 @@ export interface operations {
                 modified_by?: string;
                 name?: string;
                 role?: string;
-                scope_type?: number;
+                scope_type?: string;
                 scope_uuid?: string;
             };
             header?: never;
@@ -4865,7 +4865,7 @@ export interface operations {
                 modified_at__lte?: string;
                 modified_by?: string;
                 role?: string;
-                scope_type?: number;
+                scope_type?: string;
                 scope_uuid?: string;
                 start_date?: string;
                 start_date__gte?: string;
@@ -5077,7 +5077,7 @@ export interface operations {
                 priority?: number;
                 priority__gte?: number;
                 priority__lte?: number;
-                scope_type?: number;
+                scope_type?: string;
                 scope_uuid?: string;
                 slug?: string;
             };
@@ -5901,7 +5901,7 @@ export interface operations {
                 modified_at__lte?: string;
                 modified_by?: string;
                 name?: string;
-                owner?: number;
+                owner?: string;
                 slug?: string;
             };
             header?: never;
@@ -6105,7 +6105,7 @@ export interface operations {
                 modified_at__lte?: string;
                 modified_by?: string;
                 name?: string;
-                owner?: number;
+                owner?: string;
                 parent?: string;
                 slug?: string;
             };

@@ -98,10 +98,22 @@ export class AuthStore extends ReadableStore<AuthenticationStatus> {
             ? { email: usernameOrEmail, password }
             : { username: usernameOrEmail, password };
 
-        const result = await loginBackend.POST({
+        const attempt = () => loginBackend.POST({
             params: { path: { client: "browser" } },
             body:   credentials,
         });
+
+        let result = await attempt();
+
+        // 409 = a session already exists, e.g. a *different* user is still logged
+        // in. Log that session out and retry, so switching accounts actually takes
+        // effect instead of silently keeping the previous user (and their role)
+        // signed in — which would send e.g. a student to the teacher frontend.
+        const conflict = (result.error as { status?: number } | undefined)?.status === 409;
+        if (conflict) {
+            await this.logout();
+            result = await attempt();
+        }
 
         if (!result.error) {
             await this.recheckAuthSession();
@@ -109,14 +121,20 @@ export class AuthStore extends ReadableStore<AuthenticationStatus> {
         }
 
         const errorBody = result.error as { status?: number; errors?: { code: string; param?: string; message: string }[] } | undefined;
-
-        // 409 = session conflict, e.g. already logged in — recheck and treat as success
-        if (errorBody?.status === 409) {
-            await this.recheckAuthSession();
-            return { success: true };
-        }
-
         return { success: false, errors: errorBody?.errors ?? [] };
+    }
+
+    /**
+     * Logs out the current session and rechecks the auth status afterwards.
+     */
+    async logout(): Promise<void> {
+        const sessionBackend = await api.auth("/auth-api/{client}/v1/auth/session", "error-return");
+
+        await sessionBackend.DELETE({
+            params: { path: { client: "browser" } },
+        });
+
+        await this.recheckAuthSession();
     }
 }
 
