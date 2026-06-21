@@ -25,6 +25,7 @@ from .auth.routes                    import register_api_routes as register_auth
 from .core.routes                    import register_api_routes as register_core_api_routes
 from .content.routes                 import register_api_routes as register_course_api_routes
 from .learning.routes                import register_api_routes as register_learning_api_routes
+from .gamification.routes            import register_api_routes as register_gamification_api_routes
 
 # Overwrite permission class for API root view, since it uses the default from settings.py,
 # which would only allow authenticated users to see the API documentation.
@@ -35,6 +36,7 @@ register_auth_api_routes(api_router, "auth")
 register_core_api_routes(api_router, "core")
 register_course_api_routes(api_router, "content")
 register_learning_api_routes(api_router, "learning")
+register_gamification_api_routes(api_router, "gamification")
 
 urlpatterns = [
     # REST API
