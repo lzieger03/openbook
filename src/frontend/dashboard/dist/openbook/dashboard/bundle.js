@@ -1059,11 +1059,11 @@ var Batch = class _Batch {
     var effects = collected_effects = [];
     var render_effects = [];
     var updates = legacy_updates = [];
-    for (const root16 of roots) {
+    for (const root15 of roots) {
       try {
-        this.#traverse(root16, effects, render_effects);
+        this.#traverse(root15, effects, render_effects);
       } catch (e) {
-        reset_all(root16);
+        reset_all(root15);
         if (!this.#is_deferred()) this.discard();
         throw e;
       }
@@ -1136,9 +1136,9 @@ var Batch = class _Batch {
    * @param {Effect[]} effects
    * @param {Effect[]} render_effects
    */
-  #traverse(root16, effects, render_effects) {
-    root16.f ^= CLEAN;
-    var effect2 = root16.first;
+  #traverse(root15, effects, render_effects) {
+    root15.f ^= CLEAN;
+    var effect2 = root15.first;
     while (effect2 !== null) {
       var flags2 = effect2.f;
       var is_branch = (flags2 & (BRANCH_EFFECT | ROOT_EFFECT)) !== 0;
@@ -1375,8 +1375,8 @@ var Batch = class _Batch {
         }
         if (batch.#roots.length > 0 && !batch.#decrement_queued) {
           batch.apply();
-          for (var root16 of batch.#roots) {
-            batch.#traverse(root16, [], []);
+          for (var root15 of batch.#roots) {
+            batch.#traverse(root15, [], []);
           }
           batch.#roots = [];
         }
@@ -3677,7 +3677,7 @@ function is_dirty(reaction) {
   }
   return false;
 }
-function schedule_possible_effect_self_invalidation(signal, effect2, root16 = true) {
+function schedule_possible_effect_self_invalidation(signal, effect2, root15 = true) {
   var reactions = signal.reactions;
   if (reactions === null) return;
   if (!async_mode_flag && current_sources !== null && current_sources.has(signal)) {
@@ -3693,7 +3693,7 @@ function schedule_possible_effect_self_invalidation(signal, effect2, root16 = tr
         false
       );
     } else if (effect2 === reaction) {
-      if (root16) {
+      if (root15) {
         set_signal_status(reaction, DIRTY);
       } else if ((reaction.f & CLEAN) !== 0) {
         set_signal_status(reaction, MAYBE_DIRTY);
@@ -4345,63 +4345,6 @@ function from_html(content, flags2) {
     return clone;
   };
 }
-// @__NO_SIDE_EFFECTS__
-function from_namespace(content, flags2, ns = "svg") {
-  var has_start = !content.startsWith("<!>");
-  var is_fragment = (flags2 & TEMPLATE_FRAGMENT) !== 0;
-  var wrapped = `<${ns}>${has_start ? content : "<!>" + content}</${ns}>`;
-  var node;
-  return () => {
-    if (hydrating) {
-      assign_nodes(hydrate_node, null);
-      return hydrate_node;
-    }
-    if (!node) {
-      var fragment = (
-        /** @type {DocumentFragment} */
-        create_fragment_from_html(wrapped)
-      );
-      var root16 = (
-        /** @type {Element} */
-        get_first_child(fragment)
-      );
-      if (is_fragment) {
-        node = document.createDocumentFragment();
-        while (get_first_child(root16)) {
-          node.appendChild(
-            /** @type {TemplateNode} */
-            get_first_child(root16)
-          );
-        }
-      } else {
-        node = /** @type {Element} */
-        get_first_child(root16);
-      }
-    }
-    var clone = (
-      /** @type {TemplateNode} */
-      node.cloneNode(true)
-    );
-    if (is_fragment) {
-      var start = (
-        /** @type {TemplateNode} */
-        get_first_child(clone)
-      );
-      var end = (
-        /** @type {TemplateNode} */
-        clone.lastChild
-      );
-      assign_nodes(start, end);
-    } else {
-      assign_nodes(clone, clone);
-    }
-    return clone;
-  };
-}
-// @__NO_SIDE_EFFECTS__
-function from_svg(content, flags2) {
-  return /* @__PURE__ */ from_namespace(content, flags2, "svg");
-}
 function comment() {
   if (hydrating) {
     assign_nodes(hydrate_node, null);
@@ -4824,9 +4767,6 @@ function if_block(node, fn, elseif = false) {
 }
 
 // ../../../node_modules/svelte/src/internal/client/dom/blocks/each.js
-function index(_, i) {
-  return i;
-}
 function pause_effects(state3, to_destroy, controlled_anchor) {
   var transitions = [];
   var length = to_destroy.length;
@@ -5334,16 +5274,16 @@ function component(node, get_component, render_fn) {
 // ../../../node_modules/svelte/src/internal/client/dom/css.js
 function append_styles(anchor, css) {
   effect(() => {
-    var root16 = anchor.getRootNode();
+    var root15 = anchor.getRootNode();
     var target = (
       /** @type {ShadowRoot} */
-      root16.host ? (
+      root15.host ? (
         /** @type {ShadowRoot} */
-        root16
+        root15
       ) : (
         /** @type {Document} */
-        root16.head ?? /** @type {Document} */
-        root16.ownerDocument.head
+        root15.head ?? /** @type {Document} */
+        root15.ownerDocument.head
       )
     );
     if (!target.querySelector("#" + css.hash)) {
@@ -8291,146 +8231,19 @@ function StatsPanel($$anchor, $$props) {
 delegate(["click"]);
 create_custom_element(StatsPanel, { user: {}, stats: {}, onProfile: {} }, [], [], { mode: "open" });
 
-// src/components/basic/RadarChart.svelte
-var root8 = from_html(`<p class="empty svelte-1lqrtdt">No skill data yet.</p>`);
-var root_16 = from_svg(`<polygon></polygon>`);
-var root_23 = from_svg(`<line class="spoke svelte-1lqrtdt"></line>`);
-var root_33 = from_svg(`<circle r="3.5" class="vertex svelte-1lqrtdt"></circle>`);
-var root_43 = from_svg(`<text class="label svelte-1lqrtdt" font-size="13" dominant-baseline="middle"> </text>`);
-var root_52 = from_svg(`<svg class="radar svelte-1lqrtdt" role="img" aria-label="Skill matrix"><!><!><polygon class="value svelte-1lqrtdt"></polygon><!><!></svg>`);
-var $$css8 = {
-  hash: "svelte-1lqrtdt",
-  code: ".radar.svelte-1lqrtdt {width:100%;max-width:24rem;height:auto;margin:0 auto;display:block;}.ring.svelte-1lqrtdt {fill:none;stroke:color-mix(in oklab, var(--color-base-content) 14%, transparent);stroke-width:1;}.ring.outer.svelte-1lqrtdt {stroke:color-mix(in oklab, var(--color-base-content) 24%, transparent);}.spoke.svelte-1lqrtdt {stroke:color-mix(in oklab, var(--color-base-content) 14%, transparent);stroke-width:1;}.value.svelte-1lqrtdt {fill:color-mix(in oklab, var(--color-success) 30%, transparent);stroke:var(--color-success);stroke-width:2;stroke-linejoin:round;}.vertex.svelte-1lqrtdt {fill:var(--color-success);}.label.svelte-1lqrtdt {fill:color-mix(in oklab, var(--color-base-content) 80%, transparent);font-weight:600;}.empty.svelte-1lqrtdt {text-align:center;color:color-mix(in oklab, var(--color-base-content) 60%, transparent);padding:2rem 0;}"
-};
-function RadarChart($$anchor, $$props) {
-  push($$props, true);
-  append_styles($$anchor, $$css8);
-  "use strict";
-  let data = prop($$props, "data", 7), max = prop($$props, "max", 7, 6);
-  const size = 320;
-  const center = size / 2;
-  const radius = 100;
-  const labelDistance = radius + 24;
-  const rings = [0.25, 0.5, 0.75, 1];
-  const pad = 40;
-  const viewBox = `${-pad} ${-pad} ${size + pad * 2} ${size + pad * 2}`;
-  const axes = user_derived(() => data().slice(0, max()));
-  function point(index2, count, distance) {
-    const angle = Math.PI * 2 * index2 / count - Math.PI / 2;
-    return {
-      x: center + distance * Math.cos(angle),
-      y: center + distance * Math.sin(angle)
-    };
-  }
-  function clamp(value) {
-    return Math.min(100, Math.max(0, value));
-  }
-  function polygon(points) {
-    return points.map((p) => `${p.x},${p.y}`).join(" ");
-  }
-  const ringShapes = user_derived(() => rings.map((ratio) => polygon(get2(axes).map((_, i) => point(i, get2(axes).length, radius * ratio)))));
-  const spokes = user_derived(() => get2(axes).map((_, i) => point(i, get2(axes).length, radius)));
-  const valuePoints = user_derived(() => get2(axes).map((axis, i) => point(i, get2(axes).length, radius * clamp(axis.value) / 100)));
-  const valueShape = user_derived(() => polygon(get2(valuePoints)));
-  const labels = user_derived(() => get2(axes).map((axis, i) => ({
-    ...point(i, get2(axes).length, labelDistance),
-    label: axis.label
-  })));
-  var $$exports = {
-    get data() {
-      return data();
-    },
-    set data($$value) {
-      data($$value);
-      flushSync();
-    },
-    get max() {
-      return max();
-    },
-    set max($$value = 6) {
-      max($$value);
-      flushSync();
-    }
-  };
-  var fragment = comment();
-  var node = first_child(fragment);
-  {
-    var consequent = ($$anchor2) => {
-      var p_1 = root8();
-      append($$anchor2, p_1);
-    };
-    var alternate = ($$anchor2) => {
-      var svg = root_52();
-      set_attribute2(svg, "viewBox", viewBox);
-      var node_1 = child(svg);
-      each(node_1, 17, () => get2(ringShapes), index, ($$anchor3, ring, i) => {
-        var polygon_1 = root_16();
-        let classes;
-        template_effect(() => {
-          set_attribute2(polygon_1, "points", get2(ring));
-          classes = set_class(polygon_1, 0, "ring svelte-1lqrtdt", null, classes, { outer: i === get2(ringShapes).length - 1 });
-        });
-        append($$anchor3, polygon_1);
-      });
-      var node_2 = sibling(node_1);
-      each(node_2, 17, () => get2(spokes), index, ($$anchor3, spoke) => {
-        var line = root_23();
-        set_attribute2(line, "x1", center);
-        set_attribute2(line, "y1", center);
-        template_effect(() => {
-          set_attribute2(line, "x2", get2(spoke).x);
-          set_attribute2(line, "y2", get2(spoke).y);
-        });
-        append($$anchor3, line);
-      });
-      var polygon_2 = sibling(node_2);
-      var node_3 = sibling(polygon_2);
-      each(node_3, 17, () => get2(valuePoints), index, ($$anchor3, vertex) => {
-        var circle = root_33();
-        template_effect(() => {
-          set_attribute2(circle, "cx", get2(vertex).x);
-          set_attribute2(circle, "cy", get2(vertex).y);
-        });
-        append($$anchor3, circle);
-      });
-      var node_4 = sibling(node_3);
-      each(node_4, 17, () => get2(labels), index, ($$anchor3, item) => {
-        var text2 = root_43();
-        var text_1 = child(text2, true);
-        reset(text2);
-        template_effect(() => {
-          set_attribute2(text2, "x", get2(item).x);
-          set_attribute2(text2, "y", get2(item).y);
-          set_attribute2(text2, "text-anchor", get2(item).x < center - 1 ? "end" : get2(item).x > center + 1 ? "start" : "middle");
-          set_text(text_1, get2(item).label);
-        });
-        append($$anchor3, text2);
-      });
-      reset(svg);
-      template_effect(() => set_attribute2(polygon_2, "points", get2(valueShape)));
-      append($$anchor2, svg);
-    };
-    if_block(node, ($$render) => {
-      if (get2(axes).length === 0) $$render(consequent);
-      else $$render(alternate, -1);
-    });
-  }
-  append($$anchor, fragment);
-  return pop($$exports);
-}
-create_custom_element(RadarChart, { data: {}, max: {} }, [], [], { mode: "open" });
-
 // src/components/panels/SkillMatrixPanel.svelte
-var root9 = from_html(`<section class="card panel svelte-168eojm"><h2 class="panel-title svelte-168eojm">Skill Matrix</h2> <div class="matrix-body svelte-168eojm"><div class="matrix-chart svelte-168eojm" aria-hidden="true"><!></div> <div class="matrix-overlay svelte-168eojm" role="status"><span class="overlay-badge svelte-168eojm">\u{1F6A7} Coming soon</span> <span class="overlay-note svelte-168eojm">The skill matrix is still being calibrated.</span></div></div></section>`);
-var $$css9 = {
+var root8 = from_html(`<p class="empty svelte-168eojm">No skills yet. Complete tasks and quizzes in your courses to earn skills.</p>`);
+var root_16 = from_html(`<div class="skill-row svelte-168eojm"><div class="skill-head svelte-168eojm"><span class="skill-name svelte-168eojm"> </span> <span class="skill-level svelte-168eojm"> </span></div> <div class="skill-bar svelte-168eojm"><!> <span class="skill-percent svelte-168eojm"> </span></div></div>`);
+var root_23 = from_html(`<section class="card panel svelte-168eojm"><h2 class="panel-title svelte-168eojm">Skills</h2> <div class="panel-body svelte-168eojm"><!></div></section>`);
+var $$css8 = {
   hash: "svelte-168eojm",
-  code: "\r\n    /* Fill the remaining height of the right column and centre the radar. */.panel.svelte-168eojm {flex:1;min-height:0;display:flex;flex-direction:column;background:var(--color-base-100);border-radius:1.25rem;padding:1.75rem;box-shadow:0 0 24px color-mix(in oklab, var(--color-primary) 10%, transparent);}.panel-title.svelte-168eojm {font-size:1.5rem;font-weight:700;margin-bottom:1rem;color:var(--color-base-content);}\r\n\r\n    /* Centre the radar in the remaining space without stretching its aspect ratio. */.matrix-body.svelte-168eojm {position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;}\r\n\r\n    /* The chart still renders; it is just blurred while the feature is unfinished. */.matrix-chart.svelte-168eojm {display:flex;align-items:center;justify-content:center;width:100%;filter:blur(6px);opacity:0.55;pointer-events:none;user-select:none;}.matrix-overlay.svelte-168eojm {position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;text-align:center;padding:1rem;}.overlay-badge.svelte-168eojm {padding:0.4rem 1rem;border-radius:999px;font-weight:700;letter-spacing:0.04em;color:var(--color-warning);background:color-mix(in oklab, var(--color-warning) 16%, transparent);border:1px solid color-mix(in oklab, var(--color-warning) 40%, transparent);}.overlay-note.svelte-168eojm {font-size:0.85rem;color:color-mix(in oklab, var(--color-base-content) 70%, transparent);}"
+  code: '\n    /* Fill the remaining height of the right column; the body scrolls if needed. */.panel.svelte-168eojm {flex:1;min-height:0;display:flex;flex-direction:column;background:var(--color-base-100);border-radius:1.25rem;padding:1.75rem;box-shadow:0 0 24px color-mix(in oklab, var(--color-primary) 10%, transparent);}.panel-title.svelte-168eojm {flex:0 0 auto;font-size:1.5rem;font-weight:700;margin-bottom:1rem;color:var(--color-base-content);}.panel-body.svelte-168eojm {flex:1;min-height:0;overflow-y:auto;padding-right:0.5rem;display:flex;flex-direction:column;gap:0.75rem;}.panel-body.svelte-168eojm::-webkit-scrollbar {width:0.5rem;}.panel-body.svelte-168eojm::-webkit-scrollbar-thumb {border-radius:999px;background:color-mix(in oklab, var(--color-base-content) 20%, transparent);}\n\n    /* One skill per card, mirroring the course cards in "My Learning". */.skill-row.svelte-168eojm {background:color-mix(in oklab, var(--color-base-200) 50%, transparent);border:1px solid color-mix(in oklab, var(--color-base-content) 8%, transparent);border-radius:1rem;padding:0.9rem 1.1rem;}.skill-head.svelte-168eojm {display:flex;align-items:center;justify-content:space-between;gap:0.75rem;margin-bottom:0.6rem;}.skill-name.svelte-168eojm {font-size:1.05rem;font-weight:700;color:var(--color-base-content);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}.skill-level.svelte-168eojm {flex:0 0 auto;font-size:0.75rem;font-weight:700;letter-spacing:0.03em;padding:0.15rem 0.6rem;border-radius:999px;color:var(--color-primary-content);background:var(--color-primary);box-shadow:0 0 12px color-mix(in oklab, var(--color-primary) 40%, transparent);}.skill-bar.svelte-168eojm {display:grid;grid-template-columns:1fr 3rem;align-items:center;gap:0.75rem;}.skill-percent.svelte-168eojm {font-weight:700;text-align:right;color:var(--color-base-content);}.empty.svelte-168eojm {color:color-mix(in oklab, var(--color-base-content) 60%, transparent);padding:1.5rem 0;}'
 };
 function SkillMatrixPanel($$anchor, $$props) {
   push($$props, true);
-  append_styles($$anchor, $$css9);
+  append_styles($$anchor, $$css8);
   let skills = prop($$props, "skills", 7);
-  const axes = user_derived(() => skills().map((skill) => ({ label: skill.name, value: skill.progress })));
+  const isEmpty = user_derived(() => skills().length === 0);
   var $$exports = {
     get skills() {
       return skills();
@@ -8440,17 +8253,62 @@ function SkillMatrixPanel($$anchor, $$props) {
       flushSync();
     }
   };
-  var section = root9();
+  var section = root_23();
   var div = sibling(child(section), 2);
-  var div_1 = child(div);
-  var node = child(div_1);
-  RadarChart(node, {
-    get data() {
-      return get2(axes);
-    }
-  });
-  reset(div_1);
-  next(2);
+  var node = child(div);
+  {
+    var consequent = ($$anchor2) => {
+      var p = root8();
+      append($$anchor2, p);
+    };
+    var alternate = ($$anchor2) => {
+      var fragment = comment();
+      var node_1 = first_child(fragment);
+      each(node_1, 17, skills, (skill) => skill.id, ($$anchor3, skill) => {
+        var div_1 = root_16();
+        var div_2 = child(div_1);
+        var span = child(div_2);
+        var text2 = child(span, true);
+        reset(span);
+        var span_1 = sibling(span, 2);
+        var text_1 = child(span_1);
+        reset(span_1);
+        reset(div_2);
+        var div_3 = sibling(div_2, 2);
+        var node_2 = child(div_3);
+        {
+          let $0 = user_derived(() => `${get2(skill).name} progress`);
+          ProgressBar(node_2, {
+            get value() {
+              return get2(skill).progress;
+            },
+            get label() {
+              return get2($0);
+            }
+          });
+        }
+        var span_2 = sibling(node_2, 2);
+        var text_2 = child(span_2);
+        reset(span_2);
+        reset(div_3);
+        reset(div_1);
+        template_effect(
+          ($0) => {
+            set_text(text2, get2(skill).name);
+            set_text(text_1, `Lv ${get2(skill).level ?? ""}`);
+            set_text(text_2, `${$0 ?? ""}%`);
+          },
+          [() => Math.round(get2(skill).progress)]
+        );
+        append($$anchor3, div_1);
+      });
+      append($$anchor2, fragment);
+    };
+    if_block(node, ($$render) => {
+      if (get2(isEmpty)) $$render(consequent);
+      else $$render(alternate, -1);
+    });
+  }
   reset(div);
   reset(section);
   append($$anchor, section);
@@ -8459,17 +8317,17 @@ function SkillMatrixPanel($$anchor, $$props) {
 create_custom_element(SkillMatrixPanel, { skills: {} }, [], [], { mode: "open" });
 
 // src/components/pages/DashboardPage.svelte
-var root10 = from_html(`<div class="status svelte-wafcro" role="status" aria-live="polite"><span class="loading loading-spinner loading-lg"></span> <p>Loading your dashboard\u2026</p></div>`);
+var root9 = from_html(`<div class="status svelte-wafcro" role="status" aria-live="polite"><span class="loading loading-spinner loading-lg"></span> <p>Loading your dashboard\u2026</p></div>`);
 var root_17 = from_html(`<div class="status svelte-wafcro" role="alert"><p class="error svelte-wafcro"> </p> <button type="button" class="btn btn-primary btn-sm">Retry</button></div>`);
 var root_24 = from_html(`<div class="grid svelte-wafcro"><div class="grid-main svelte-wafcro"><!></div> <div class="grid-side svelte-wafcro"><!> <!></div></div>`);
-var root_34 = from_html(`<div class="dashboard svelte-wafcro"><header class="top svelte-wafcro"><h1 class="title svelte-wafcro"> </h1></header> <!></div>`);
-var $$css10 = {
+var root_33 = from_html(`<div class="dashboard svelte-wafcro"><header class="top svelte-wafcro"><h1 class="title svelte-wafcro"> </h1></header> <!></div>`);
+var $$css9 = {
   hash: "svelte-wafcro",
   code: "\r\n    /* Fill ~90% of the viewport with little margin around the edges. */.dashboard.svelte-wafcro {flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:1.25rem;width:90%;max-width:110rem;margin:0 auto;padding:1.25rem 0 0.5rem;}.top.svelte-wafcro {flex:0 0 auto;text-align:center;}.title.svelte-wafcro {font-size:clamp(1.6rem, 3.5vw, 2.6rem);font-weight:800;letter-spacing:0.04em;color:var(--color-base-content);text-shadow:0 0 24px color-mix(in oklab, var(--color-primary) 45%, transparent);}\r\n\r\n    /* Stretch so both columns share the available height. */.grid.svelte-wafcro {flex:1;min-height:0;display:grid;grid-template-columns:2fr 1fr;gap:1.25rem;align-items:stretch;}.grid-main.svelte-wafcro {display:flex;min-height:0;}.grid-side.svelte-wafcro {display:flex;flex-direction:column;gap:1.25rem;min-height:0;}.status.svelte-wafcro {display:flex;flex-direction:column;align-items:center;gap:1rem;padding:4rem 0;color:color-mix(in oklab, var(--color-base-content) 70%, transparent);}.error.svelte-wafcro {color:var(--color-error);font-weight:600;text-align:center;}\r\n\r\n    @media (max-width: 60rem) {.grid.svelte-wafcro {grid-template-columns:1fr;}\r\n    }"
 };
 function DashboardPage($$anchor, $$props) {
   push($$props, true);
-  append_styles($$anchor, $$css10);
+  append_styles($$anchor, $$css9);
   let state3 = state(proxy({
     isLoading: true,
     errorMessage: "",
@@ -8486,7 +8344,7 @@ function DashboardPage($$anchor, $$props) {
     return unsubscribe;
   });
   const handle = user_derived(() => get2(state3).user?.username ? `@${get2(state3).user.username}` : "@user");
-  var div = root_34();
+  var div = root_33();
   var header = child(div);
   var h1 = child(header);
   var text2 = child(h1);
@@ -8495,7 +8353,7 @@ function DashboardPage($$anchor, $$props) {
   var node = sibling(header, 2);
   {
     var consequent = ($$anchor2) => {
-      var div_1 = root10();
+      var div_1 = root9();
       append($$anchor2, div_1);
     };
     var consequent_1 = ($$anchor2) => {
@@ -8585,24 +8443,24 @@ async function requestEmailChange(email) {
 }
 
 // src/components/pages/ProfileEditPage.svelte
-var root11 = from_html(`<div class="status svelte-1u1012d" role="status" aria-live="polite"><span class="loading loading-spinner loading-lg"></span> <p>Loading your profile\u2026</p></div>`);
+var root10 = from_html(`<div class="status svelte-1u1012d" role="status" aria-live="polite"><span class="loading loading-spinner loading-lg"></span> <p>Loading your profile\u2026</p></div>`);
 var root_18 = from_html(`<div class="status svelte-1u1012d" role="alert"><p class="error svelte-1u1012d"> </p></div>`);
 var root_25 = from_html(`<img alt="" class="svelte-1u1012d"/>`);
-var root_35 = from_html(`<span class="badge badge-sm badge-primary">primary</span>`);
-var root_44 = from_html(`<li class="svelte-1u1012d"> <span> </span> <!></li>`);
-var root_53 = from_html(`<ul class="email-list svelte-1u1012d"></ul>`);
+var root_34 = from_html(`<span class="badge badge-sm badge-primary">primary</span>`);
+var root_43 = from_html(`<li class="svelte-1u1012d"> <span> </span> <!></li>`);
+var root_52 = from_html(`<ul class="email-list svelte-1u1012d"></ul>`);
 var root_62 = from_html(`<p class="error svelte-1u1012d" role="alert"> </p>`);
 var root_7 = from_html(`<p class="success svelte-1u1012d" role="status"> </p>`);
 var root_8 = from_html(`<span class="loading loading-spinner loading-sm"></span>`);
 var root_9 = from_html(`<form class="card form svelte-1u1012d"><div class="avatar-row svelte-1u1012d"><span class="avatar-mark svelte-1u1012d" aria-hidden="true"><!></span> <div class="avatar-actions svelte-1u1012d"><label class="field-label svelte-1u1012d" for="picture">Profile picture</label> <input id="picture" class="file-input file-input-bordered file-input-sm" type="file" accept="image/*"/></div></div> <label class="field svelte-1u1012d"><span class="field-label svelte-1u1012d">Username</span> <input class="input input-bordered" type="text" readonly=""/> <span class="hint svelte-1u1012d">Username cannot be changed.</span></label> <div class="two-col svelte-1u1012d"><label class="field svelte-1u1012d"><span class="field-label svelte-1u1012d">First name</span> <input class="input input-bordered" type="text" autocomplete="given-name"/></label> <label class="field svelte-1u1012d"><span class="field-label svelte-1u1012d">Last name</span> <input class="input input-bordered" type="text" autocomplete="family-name"/></label></div> <label class="field svelte-1u1012d"><span class="field-label svelte-1u1012d">Description</span> <textarea class="textarea textarea-bordered" rows="4"></textarea></label> <label class="field svelte-1u1012d"><span class="field-label svelte-1u1012d">E-mail</span> <input class="input input-bordered" type="email" autocomplete="email"/> <span class="hint svelte-1u1012d">Changing your e-mail sends a verification link; it activates after you confirm.</span></label> <!> <!> <!> <div class="actions svelte-1u1012d"><button type="submit" class="btn btn-primary"><!> Save changes</button></div></form>`);
 var root_10 = from_html(`<div class="profile svelte-1u1012d"><header class="head svelte-1u1012d"><h1 class="title svelte-1u1012d">Edit Profile</h1> <button type="button" class="btn btn-ghost btn-sm">\u2190 Back to Dashboard</button></header> <!></div>`);
-var $$css11 = {
+var $$css10 = {
   hash: "svelte-1u1012d",
   code: ".profile.svelte-1u1012d {flex:1;min-height:0;overflow-y:auto;max-width:42rem;width:100%;margin:0 auto;padding:2rem 1.5rem 1rem;display:flex;flex-direction:column;gap:1.5rem;}.head.svelte-1u1012d {display:flex;align-items:center;justify-content:space-between;gap:1rem;}.title.svelte-1u1012d {font-size:1.6rem;font-weight:800;color:var(--color-base-content);}.form.svelte-1u1012d {background:var(--color-base-100);border-radius:1rem;padding:1.5rem;display:flex;flex-direction:column;gap:1.1rem;box-shadow:0 0 24px color-mix(in oklab, var(--color-primary) 10%, transparent);}.avatar-row.svelte-1u1012d {display:flex;align-items:center;gap:1rem;}.avatar-mark.svelte-1u1012d {width:4rem;height:4rem;flex:0 0 auto;border-radius:999px;overflow:hidden;background:color-mix(in oklab, var(--color-base-content) 18%, transparent);box-shadow:0 0 16px color-mix(in oklab, var(--color-primary) 30%, transparent);}.avatar-mark.svelte-1u1012d img:where(.svelte-1u1012d) {width:100%;height:100%;object-fit:cover;}.avatar-actions.svelte-1u1012d {display:flex;flex-direction:column;gap:0.35rem;}.field.svelte-1u1012d {display:flex;flex-direction:column;gap:0.35rem;}.field-label.svelte-1u1012d {font-size:0.85rem;font-weight:600;color:color-mix(in oklab, var(--color-base-content) 80%, transparent);}.two-col.svelte-1u1012d {display:grid;grid-template-columns:1fr 1fr;gap:1rem;}.hint.svelte-1u1012d {font-size:0.75rem;color:color-mix(in oklab, var(--color-base-content) 60%, transparent);}.email-list.svelte-1u1012d {list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0.35rem;font-size:0.85rem;color:var(--color-base-content);}.email-list.svelte-1u1012d li:where(.svelte-1u1012d) {display:flex;align-items:center;gap:0.5rem;}.error.svelte-1u1012d {color:var(--color-error);font-weight:600;}.success.svelte-1u1012d {color:var(--color-success);font-weight:600;}.status.svelte-1u1012d {display:flex;flex-direction:column;align-items:center;gap:1rem;padding:4rem 0;color:color-mix(in oklab, var(--color-base-content) 70%, transparent);}.actions.svelte-1u1012d {display:flex;justify-content:flex-end;}\r\n\r\n    @media (max-width: 40rem) {.two-col.svelte-1u1012d {grid-template-columns:1fr;}\r\n    }"
 };
 function ProfileEditPage($$anchor, $$props) {
   push($$props, true);
-  append_styles($$anchor, $$css11);
+  append_styles($$anchor, $$css10);
   let isLoading = state(true);
   let isSaving = state(false);
   let errorMessage = state("");
@@ -8696,7 +8554,7 @@ function ProfileEditPage($$anchor, $$props) {
   var node = sibling(header, 2);
   {
     var consequent = ($$anchor2) => {
-      var div_1 = root11();
+      var div_1 = root10();
       append($$anchor2, div_1);
     };
     var consequent_1 = ($$anchor2) => {
@@ -8755,9 +8613,9 @@ function ProfileEditPage($$anchor, $$props) {
       var node_2 = sibling(label_4, 2);
       {
         var consequent_4 = ($$anchor3) => {
-          var ul = root_53();
+          var ul = root_52();
           each(ul, 21, () => get2(emails), (entry) => entry.email, ($$anchor4, entry) => {
-            var li = root_44();
+            var li = root_43();
             var text_1 = child(li);
             var span_1 = sibling(text_1);
             var text_2 = child(span_1, true);
@@ -8765,7 +8623,7 @@ function ProfileEditPage($$anchor, $$props) {
             var node_3 = sibling(span_1, 2);
             {
               var consequent_3 = ($$anchor5) => {
-                var span_2 = root_35();
+                var span_2 = root_34();
                 append($$anchor5, span_2);
               };
               if_block(node_3, ($$render) => {
@@ -8859,19 +8717,19 @@ delegate(["click", "change"]);
 create_custom_element(ProfileEditPage, {}, [], [], { mode: "open" });
 
 // src/components/pages/CourseChatPage.svelte
-var root12 = from_html(`<span class="soon svelte-nqv0rv">soon</span>`);
+var root11 = from_html(`<span class="soon svelte-nqv0rv">soon</span>`);
 var root_19 = from_html(`<button type="button" class="nav-item svelte-nqv0rv"><span class="nav-icon svelte-nqv0rv" aria-hidden="true"> </span> <span class="nav-label svelte-nqv0rv"> </span> <!></button>`);
 var root_26 = from_html(`<img class="avatar svelte-nqv0rv" src="logo.png" alt="ElisaAI assistant"/>`);
-var root_36 = from_html(`<div><!> <div> </div></div>`);
-var root_45 = from_html(`<div class="error-overlay svelte-nqv0rv" role="alert"><div class="error-card svelte-nqv0rv"><span class="error-icon svelte-nqv0rv" aria-hidden="true">\u{1F50C}</span> <h2 class="error-title svelte-nqv0rv">Assistant unavailable</h2> <p class="error-text svelte-nqv0rv"> </p> <button type="button" class="btn btn-primary">Retry</button></div></div>`);
-var root_54 = from_html(`<div class="chat-screen svelte-nqv0rv"><aside class="sidebar svelte-nqv0rv"><button type="button" class="back svelte-nqv0rv">\u2190 Dashboard</button> <button type="button" class="content-cta svelte-nqv0rv"><span aria-hidden="true">\u{1F4D6}</span> <span>Content</span></button> <nav class="nav svelte-nqv0rv" aria-label="Sections"></nav></aside> <main class="conversation svelte-nqv0rv"><div class="messages svelte-nqv0rv"><div class="message svelte-nqv0rv"><img class="avatar svelte-nqv0rv" src="logo.png" alt="ElisaAI assistant"/> <div class="bubble svelte-nqv0rv">System online. I am <strong>ElisaAI</strong>. Ready to help you with <strong> </strong> \u2014 what topic shall we analyse today?</div></div> <!></div> <div class="composer svelte-nqv0rv"><span><span class="status-dot svelte-nqv0rv" aria-hidden="true"></span> </span> <form class="composer-row svelte-nqv0rv"><button type="button" class="composer-add svelte-nqv0rv" aria-label="Add attachment" disabled="">+</button> <input class="composer-input svelte-nqv0rv" type="text"/> <button type="submit" class="composer-send svelte-nqv0rv" aria-label="Send message">\u2192</button></form> <p class="disclaimer svelte-nqv0rv">ElisaAI 2026 // ElisaAI may generate misinformation. Please verify all information.</p></div> <!></main></div>`);
-var $$css12 = {
+var root_35 = from_html(`<div><!> <div> </div></div>`);
+var root_44 = from_html(`<div class="error-overlay svelte-nqv0rv" role="alert"><div class="error-card svelte-nqv0rv"><span class="error-icon svelte-nqv0rv" aria-hidden="true">\u{1F50C}</span> <h2 class="error-title svelte-nqv0rv">Assistant unavailable</h2> <p class="error-text svelte-nqv0rv"> </p> <button type="button" class="btn btn-primary">Retry</button></div></div>`);
+var root_53 = from_html(`<div class="chat-screen svelte-nqv0rv"><aside class="sidebar svelte-nqv0rv"><button type="button" class="back svelte-nqv0rv">\u2190 Dashboard</button> <button type="button" class="content-cta svelte-nqv0rv"><span aria-hidden="true">\u{1F4D6}</span> <span>Content</span></button> <nav class="nav svelte-nqv0rv" aria-label="Sections"></nav></aside> <main class="conversation svelte-nqv0rv"><div class="messages svelte-nqv0rv"><div class="message svelte-nqv0rv"><img class="avatar svelte-nqv0rv" src="logo.png" alt="ElisaAI assistant"/> <div class="bubble svelte-nqv0rv">System online. I am <strong>ElisaAI</strong>. Ready to help you with <strong> </strong> \u2014 what topic shall we analyse today?</div></div> <!></div> <div class="composer svelte-nqv0rv"><span><span class="status-dot svelte-nqv0rv" aria-hidden="true"></span> </span> <form class="composer-row svelte-nqv0rv"><button type="button" class="composer-add svelte-nqv0rv" aria-label="Add attachment" disabled="">+</button> <input class="composer-input svelte-nqv0rv" type="text"/> <button type="submit" class="composer-send svelte-nqv0rv" aria-label="Send message">\u2192</button></form> <p class="disclaimer svelte-nqv0rv">ElisaAI 2026 // ElisaAI may generate misinformation. Please verify all information.</p></div> <!></main></div>`);
+var $$css11 = {
   hash: "svelte-nqv0rv",
   code: ".chat-screen.svelte-nqv0rv {flex:1;min-height:0;overflow:hidden;display:grid;grid-template-columns:16rem 1fr;grid-template-rows:minmax(0, 1fr);width:100%;}\r\n\r\n    /* Sidebar stays put; only the conversation scrolls. */.sidebar.svelte-nqv0rv {min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:1.5rem;padding:1.5rem 1rem;border-right:1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);background:color-mix(in oklab, var(--color-base-100) 60%, transparent);}.back.svelte-nqv0rv {align-self:flex-start;background:none;border:none;cursor:pointer;font-weight:600;color:var(--color-primary);}.back.svelte-nqv0rv:focus-visible {outline:2px solid var(--color-primary);outline-offset:2px;}.content-cta.svelte-nqv0rv {display:flex;align-items:center;justify-content:center;gap:0.5rem;padding:0.85rem 1rem;border-radius:0.85rem;border:1px solid color-mix(in oklab, var(--color-primary) 55%, transparent);font-size:1.05rem;font-weight:700;cursor:pointer;color:var(--color-primary-content);background:var(--color-primary);box-shadow:0 0 18px color-mix(in oklab, var(--color-primary) 45%, transparent);transition:transform 0.12s ease;}.content-cta.svelte-nqv0rv:hover {transform:translateY(-2px);}.content-cta.svelte-nqv0rv:focus-visible {outline:2px solid var(--color-base-content);outline-offset:2px;}.nav.svelte-nqv0rv {display:flex;flex-direction:column;gap:0.35rem;}.nav-item.svelte-nqv0rv {display:flex;align-items:center;gap:0.75rem;padding:0.65rem 0.75rem;border-radius:0.75rem;background:transparent;border:none;color:var(--color-base-content);cursor:pointer;}.nav-item.svelte-nqv0rv:hover:not(:disabled) {background:color-mix(in oklab, var(--color-primary) 14%, transparent);}.nav-item.svelte-nqv0rv:focus-visible {outline:2px solid var(--color-primary);outline-offset:2px;}.nav-item.svelte-nqv0rv:disabled {cursor:not-allowed;opacity:0.6;}.nav-icon.svelte-nqv0rv {font-size:1.1rem;}.nav-label.svelte-nqv0rv {flex:1 1 auto;text-align:left;font-weight:600;}.soon.svelte-nqv0rv {font-size:0.65rem;text-transform:uppercase;letter-spacing:0.06em;color:color-mix(in oklab, var(--color-base-content) 50%, transparent);}.conversation.svelte-nqv0rv {position:relative;display:flex;flex-direction:column;min-height:0;background:var(--color-base-200);}.messages.svelte-nqv0rv {flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:1.25rem;padding:2rem clamp(1rem, 6vw, 6rem);}.message.svelte-nqv0rv {display:flex;align-items:flex-start;gap:0.85rem;max-width:56rem;}.message.user.svelte-nqv0rv {margin-left:auto;justify-content:flex-end;}.avatar.svelte-nqv0rv {width:2.75rem;height:2.75rem;flex:0 0 auto;border-radius:999px;object-fit:cover;}.bubble.svelte-nqv0rv {padding:1rem 1.25rem;border-radius:1rem;border-top-left-radius:0.25rem;line-height:1.55;color:var(--color-base-content);background:color-mix(in oklab, var(--color-base-100) 85%, transparent);border:1px solid color-mix(in oklab, var(--color-primary) 30%, transparent);box-shadow:0 0 18px color-mix(in oklab, var(--color-primary) 12%, transparent);white-space:pre-wrap;}.bubble.user.svelte-nqv0rv {color:var(--color-primary-content);background:var(--color-primary);border-color:transparent;border-top-left-radius:1rem;border-bottom-right-radius:0.25rem;}.composer.svelte-nqv0rv {flex:0 0 auto;display:flex;flex-direction:column;gap:0.5rem;padding:1rem clamp(1rem, 6vw, 6rem) 1.25rem;}.status.svelte-nqv0rv {align-self:center;display:inline-flex;align-items:center;gap:0.4rem;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.06em;color:color-mix(in oklab, var(--color-base-content) 60%, transparent);}.status-dot.svelte-nqv0rv {width:0.5rem;height:0.5rem;border-radius:999px;background:color-mix(in oklab, var(--color-base-content) 40%, transparent);}.status.online.svelte-nqv0rv {color:var(--color-success);}\r\n\r\n    /* Centered overlay shown when the assistant connection gives up. */.error-overlay.svelte-nqv0rv {position:absolute;inset:0;z-index:5;display:grid;place-items:center;padding:1.5rem;background:color-mix(in oklab, var(--color-base-300) 55%, transparent);backdrop-filter:blur(4px);}.error-card.svelte-nqv0rv {display:flex;flex-direction:column;align-items:center;gap:0.85rem;max-width:26rem;width:100%;text-align:center;padding:2rem;border-radius:1.25rem;background:var(--color-base-100);border:1px solid color-mix(in oklab, var(--color-warning) 35%, transparent);box-shadow:0 0 40px color-mix(in oklab, var(--color-warning) 18%, transparent);}.error-icon.svelte-nqv0rv {font-size:2.5rem;line-height:1;}.error-title.svelte-nqv0rv {font-size:1.3rem;font-weight:700;color:var(--color-base-content);}.error-text.svelte-nqv0rv {line-height:1.5;color:color-mix(in oklab, var(--color-base-content) 75%, transparent);}.status.online.svelte-nqv0rv .status-dot:where(.svelte-nqv0rv) {background:var(--color-success);box-shadow:0 0 10px color-mix(in oklab, var(--color-success) 70%, transparent);}.composer-row.svelte-nqv0rv {display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0.75rem;border-radius:999px;background:color-mix(in oklab, var(--color-base-100) 80%, transparent);border:1px solid color-mix(in oklab, var(--color-primary) 35%, transparent);box-shadow:0 0 18px color-mix(in oklab, var(--color-primary) 12%, transparent);}.composer-add.svelte-nqv0rv,\r\n    .composer-send.svelte-nqv0rv {display:grid;place-items:center;width:2.25rem;height:2.25rem;flex:0 0 auto;border-radius:999px;border:none;font-size:1.2rem;cursor:pointer;color:var(--color-primary-content);background:color-mix(in oklab, var(--color-primary) 70%, transparent);}.composer-add.svelte-nqv0rv:disabled,\r\n    .composer-send.svelte-nqv0rv:disabled {cursor:not-allowed;opacity:0.6;}.composer-input.svelte-nqv0rv {flex:1 1 auto;background:transparent;border:none;color:var(--color-base-content);font-size:1rem;padding:0.5rem 0.25rem;}.composer-input.svelte-nqv0rv:focus {outline:none;}.disclaimer.svelte-nqv0rv {text-align:center;font-size:0.7rem;letter-spacing:0.04em;color:color-mix(in oklab, var(--color-base-content) 55%, transparent);}\r\n\r\n    @media (max-width: 48rem) {.chat-screen.svelte-nqv0rv {grid-template-columns:1fr;}.sidebar.svelte-nqv0rv {display:none;}\r\n    }"
 };
 function CourseChatPage($$anchor, $$props) {
   push($$props, true);
-  append_styles($$anchor, $$css12);
+  append_styles($$anchor, $$css11);
   let params = prop($$props, "params", 7);
   let state3 = state(proxy({
     isLoading: true,
@@ -8932,7 +8790,7 @@ function CourseChatPage($$anchor, $$props) {
       flushSync();
     }
   };
-  var div = root_54();
+  var div = root_53();
   var aside = child(div);
   var button = child(aside);
   var button_1 = sibling(button, 2);
@@ -8948,7 +8806,7 @@ function CourseChatPage($$anchor, $$props) {
     var node = sibling(span_1, 2);
     {
       var consequent = ($$anchor3) => {
-        var span_2 = root12();
+        var span_2 = root11();
         append($$anchor3, span_2);
       };
       if_block(node, ($$render) => {
@@ -8978,7 +8836,7 @@ function CourseChatPage($$anchor, $$props) {
   reset(div_2);
   var node_1 = sibling(div_2, 2);
   each(node_1, 17, () => get2(chatState).messages, (message) => message.id, ($$anchor2, message) => {
-    var div_4 = root_36();
+    var div_4 = root_35();
     let classes;
     var node_2 = child(div_4);
     {
@@ -9018,7 +8876,7 @@ function CourseChatPage($$anchor, $$props) {
   var node_3 = sibling(div_6, 2);
   {
     var consequent_2 = ($$anchor2) => {
-      var div_7 = root_45();
+      var div_7 = root_44();
       var div_8 = child(div_7);
       var p = sibling(child(div_8), 4);
       var text_6 = child(p, true);
@@ -9061,18 +8919,18 @@ delegate(["click"]);
 create_custom_element(CourseChatPage, { params: {} }, [], [], { mode: "open" });
 
 // src/components/pages/QuizPage.svelte
-var root13 = from_html(`<div class="progress-track svelte-10mivl5" aria-hidden="true"><div class="progress-fill svelte-10mivl5"></div></div>`);
+var root12 = from_html(`<div class="progress-track svelte-10mivl5" aria-hidden="true"><div class="progress-fill svelte-10mivl5"></div></div>`);
 var root_110 = from_html(`<section class="stage result svelte-10mivl5"><h1 class="course svelte-10mivl5"> </h1> <div class="score-ring svelte-10mivl5"> </div> <p class="result-text svelte-10mivl5"> </p> <div class="result-actions svelte-10mivl5"><button type="button" class="btn btn-primary">Try again</button> <button type="button" class="btn btn-ghost">Back to Dashboard</button></div></section>`);
 var root_27 = from_html(`<button type="button"><span class="letter svelte-10mivl5"> </span> <span class="text svelte-10mivl5"> </span></button>`);
-var root_37 = from_html(`<section class="stage svelte-10mivl5"><h1 class="course svelte-10mivl5"> </h1> <span class="progress-pill svelte-10mivl5"> </span> <h2 class="prompt svelte-10mivl5"> </h2> <div class="answers svelte-10mivl5"></div></section>`);
-var root_46 = from_html(`<div class="quiz svelte-10mivl5"><header class="quiz-top svelte-10mivl5"><button type="button" class="content-btn svelte-10mivl5">\u2190 Back</button> <!></header> <!></div>`);
-var $$css13 = {
+var root_36 = from_html(`<section class="stage svelte-10mivl5"><h1 class="course svelte-10mivl5"> </h1> <span class="progress-pill svelte-10mivl5"> </span> <h2 class="prompt svelte-10mivl5"> </h2> <div class="answers svelte-10mivl5"></div></section>`);
+var root_45 = from_html(`<div class="quiz svelte-10mivl5"><header class="quiz-top svelte-10mivl5"><button type="button" class="content-btn svelte-10mivl5">\u2190 Back</button> <!></header> <!></div>`);
+var $$css12 = {
   hash: "svelte-10mivl5",
   code: '.quiz.svelte-10mivl5 {flex:1;min-height:0;display:flex;flex-direction:column;width:100%;background:radial-gradient(120% 70% at 50% 0%, color-mix(in oklab, var(--color-primary) 8%, transparent), transparent 55%),\r\n            var(--color-base-200);}.quiz-top.svelte-10mivl5 {flex:0 0 auto;display:flex;align-items:center;gap:1.5rem;padding:1.25rem 1.5rem;}.content-btn.svelte-10mivl5 {flex:0 0 auto;padding:0.5rem 1.25rem;border-radius:0.75rem;font-weight:600;color:color-mix(in oklab, var(--color-base-content) 80%, transparent);background:color-mix(in oklab, var(--color-base-100) 70%, transparent);border:1px solid color-mix(in oklab, var(--color-base-content) 14%, transparent);cursor:pointer;}.content-btn.svelte-10mivl5:hover {border-color:color-mix(in oklab, var(--color-primary) 45%, transparent);}.progress-track.svelte-10mivl5 {flex:1 1 auto;height:0.5rem;border-radius:999px;overflow:hidden;background:color-mix(in oklab, var(--color-base-content) 12%, transparent);}.progress-fill.svelte-10mivl5 {height:100%;border-radius:999px;background:linear-gradient(90deg, var(--color-primary), var(--color-success));transition:width 0.3s ease;}.stage.svelte-10mivl5 {flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.25rem;width:90%;max-width:64rem;margin:0 auto;padding:1rem 0 2.5rem;}.course.svelte-10mivl5 {font-size:clamp(1.3rem, 2.4vw, 1.9rem);font-weight:700;text-align:center;color:var(--color-base-content);text-shadow:0 0 20px color-mix(in oklab, var(--color-primary) 40%, transparent);}.progress-pill.svelte-10mivl5 {padding:0.3rem 1rem;border-radius:999px;font-weight:700;color:var(--color-primary);background:color-mix(in oklab, var(--color-primary) 16%, transparent);border:1px solid color-mix(in oklab, var(--color-primary) 35%, transparent);}.prompt.svelte-10mivl5 {font-size:clamp(1.7rem, 3.6vw, 2.8rem);font-weight:800;text-align:center;color:var(--color-base-content);text-shadow:0 0 22px color-mix(in oklab, var(--color-primary) 35%, transparent);margin:0.5rem 0 1rem;}.answers.svelte-10mivl5 {width:100%;display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;}\r\n\r\n    /* Answer colours map to DaisyUI semantic tokens (no hardcoded hex). */.answer.svelte-10mivl5 {display:flex;align-items:center;gap:1rem;padding:1.4rem 1.5rem;border-radius:1rem;border:none;font-family:ui-monospace, "SF Mono", Menlo, monospace;font-size:1.2rem;font-weight:700;cursor:pointer;transition:transform 0.12s ease, opacity 0.2s ease, box-shadow 0.2s ease;box-shadow:0 6px 18px color-mix(in oklab, var(--color-base-content) 14%, transparent);}.answer.svelte-10mivl5:hover:not(:disabled) {transform:translateY(-3px);}.answer.svelte-10mivl5:focus-visible {outline:3px solid var(--color-base-content);outline-offset:3px;}.letter.svelte-10mivl5 {display:grid;place-items:center;width:2.1rem;height:2.1rem;flex:0 0 auto;border-radius:0.6rem;font-family:inherit;background:color-mix(in oklab, currentColor 18%, transparent);}.text.svelte-10mivl5 {flex:1 1 auto;text-align:center;}.answer.c0.svelte-10mivl5 {background:var(--color-error);color:var(--color-error-content);}.answer.c1.svelte-10mivl5 {background:var(--color-info);color:var(--color-info-content);}.answer.c2.svelte-10mivl5 {background:var(--color-warning);color:var(--color-warning-content);}.answer.c3.svelte-10mivl5 {background:var(--color-success);color:var(--color-success-content);}.answer.dim.svelte-10mivl5 {opacity:0.35;}.answer.correct.svelte-10mivl5 {outline:4px solid var(--color-base-content);outline-offset:3px;transform:translateY(-3px);}.answer.wrong.svelte-10mivl5 {opacity:0.65;text-decoration:line-through;}.result.svelte-10mivl5 {justify-content:center;}.score-ring.svelte-10mivl5 {display:grid;place-items:center;width:9rem;height:9rem;border-radius:999px;font-size:2rem;font-weight:800;color:var(--color-base-content);background:color-mix(in oklab, var(--color-primary) 14%, transparent);border:4px solid color-mix(in oklab, var(--color-primary) 55%, transparent);box-shadow:0 0 28px color-mix(in oklab, var(--color-primary) 35%, transparent);}.result-text.svelte-10mivl5 {font-size:1.2rem;font-weight:600;color:color-mix(in oklab, var(--color-base-content) 80%, transparent);}.result-actions.svelte-10mivl5 {display:flex;gap:1rem;}\r\n\r\n    @media (max-width: 40rem) {.answers.svelte-10mivl5 {grid-template-columns:1fr;}\r\n    }'
 };
 function QuizPage($$anchor, $$props) {
   push($$props, true);
-  append_styles($$anchor, $$css13);
+  append_styles($$anchor, $$css12);
   let params = prop($$props, "params", 7);
   let state3 = state(proxy({
     isLoading: true,
@@ -9187,13 +9045,13 @@ function QuizPage($$anchor, $$props) {
       flushSync();
     }
   };
-  var div = root_46();
+  var div = root_45();
   var header = child(div);
   var button = child(header);
   var node = sibling(button, 2);
   {
     var consequent = ($$anchor2) => {
-      var div_1 = root13();
+      var div_1 = root12();
       var div_2 = child(div_1);
       reset(div_1);
       template_effect(() => set_style(div_2, `width: ${get2(progressPct) ?? ""}%`));
@@ -9232,7 +9090,7 @@ function QuizPage($$anchor, $$props) {
       append($$anchor2, section);
     };
     var alternate = ($$anchor2) => {
-      var section_1 = root_37();
+      var section_1 = root_36();
       var h1_1 = child(section_1);
       var text_3 = child(h1_1, true);
       reset(h1_1);
@@ -9289,16 +9147,16 @@ delegate(["click"]);
 create_custom_element(QuizPage, { params: {} }, [], [], { mode: "open" });
 
 // src/components/pages/ContentPage.svelte
-var root14 = from_html(`<button type="button" class="toc-link svelte-uyhh09"> </button>`);
+var root13 = from_html(`<button type="button" class="toc-link svelte-uyhh09"> </button>`);
 var root_111 = from_html(`<div class="content-screen svelte-uyhh09"><aside class="toc svelte-uyhh09"><button type="button" class="back svelte-uyhh09">\u2190 Back to chat</button> <p class="toc-label svelte-uyhh09">On this page</p> <nav class="toc-nav svelte-uyhh09" aria-label="Table of contents"></nav></aside> <main class="article svelte-uyhh09"><header class="article-head svelte-uyhh09"><p class="eyebrow svelte-uyhh09">Course content</p> <h1 class="article-title svelte-uyhh09"> </h1> <p class="placeholder-note svelte-uyhh09">\u{1F4DD} Sample content \u2014 the authored course material will appear here.</p></header> <section id="overview" class="block svelte-uyhh09"><h2 class="svelte-uyhh09">Overview</h2> <p>Welcome to <strong> </strong>. This page collects the course material in a
                 readable, wiki-style format so you can browse concepts, examples and summaries at your own pace.</p></section> <section id="getting-started" class="block svelte-uyhh09"><h2 class="svelte-uyhh09">Getting started</h2> <p>Work through the sections in order. Each concept builds on the previous one.</p> <div class="callout svelte-uyhh09">\u{1F4A1} Tip: open the AI tutor (the chat icon) any time you want a concept explained differently.</div></section> <section id="key-concepts" class="block svelte-uyhh09"><h2 class="svelte-uyhh09">Key concepts</h2> <ul class="svelte-uyhh09"><li> </li> <li>How the pieces fit together in practice.</li> <li>Common mistakes and how to avoid them.</li></ul></section> <section id="example" class="block svelte-uyhh09"><h2 class="svelte-uyhh09">Example</h2> <p>A minimal example you can adapt:</p> <pre class="code svelte-uyhh09"><code> </code></pre></section> <section id="summary" class="block svelte-uyhh09"><h2 class="svelte-uyhh09">Summary</h2> <p> </p> <div class="actions svelte-uyhh09"><button type="button" class="btn btn-primary">Take the quiz</button> <button type="button" class="btn btn-ghost">Ask the tutor</button></div></section></main></div>`);
-var $$css14 = {
+var $$css13 = {
   hash: "svelte-uyhh09",
   code: '.content-screen.svelte-uyhh09 {flex:1;min-height:0;overflow:hidden;display:grid;grid-template-columns:15rem minmax(0, 1fr);grid-template-rows:minmax(0, 1fr);width:100%;}\r\n\r\n    /* Sidebar stays put; it never scrolls. */.toc.svelte-uyhh09 {min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:1rem;padding:1.5rem 1rem;border-right:1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);background:color-mix(in oklab, var(--color-base-100) 60%, transparent);}.back.svelte-uyhh09 {align-self:flex-start;background:none;border:none;cursor:pointer;font-weight:600;color:var(--color-primary);}.back.svelte-uyhh09:focus-visible {outline:2px solid var(--color-primary);outline-offset:2px;}.toc-label.svelte-uyhh09 {font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:color-mix(in oklab, var(--color-base-content) 55%, transparent);}.toc-nav.svelte-uyhh09 {display:flex;flex-direction:column;gap:0.15rem;}.toc-link.svelte-uyhh09 {text-align:left;padding:0.4rem 0.6rem;border-radius:0.5rem;border:none;background:transparent;color:color-mix(in oklab, var(--color-base-content) 75%, transparent);cursor:pointer;}.toc-link.svelte-uyhh09:hover {background:color-mix(in oklab, var(--color-primary) 14%, transparent);color:var(--color-base-content);}.article.svelte-uyhh09 {min-height:0;overflow-y:auto;padding:2.5rem 0;}\r\n\r\n    /* Content text spans ~90% of the content view. */.article.svelte-uyhh09 > :where(.svelte-uyhh09) {width:90%;margin-left:auto;margin-right:auto;}.article-head.svelte-uyhh09 {margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);}.eyebrow.svelte-uyhh09 {font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--color-primary);}.article-title.svelte-uyhh09 {font-size:clamp(2rem, 4vw, 2.8rem);font-weight:800;color:var(--color-base-content);text-shadow:0 0 22px color-mix(in oklab, var(--color-primary) 30%, transparent);}.placeholder-note.svelte-uyhh09 {margin-top:0.5rem;font-size:0.85rem;color:color-mix(in oklab, var(--color-base-content) 60%, transparent);}.block.svelte-uyhh09 {margin-bottom:2.25rem;line-height:1.7;color:color-mix(in oklab, var(--color-base-content) 90%, transparent);}.block.svelte-uyhh09 h2:where(.svelte-uyhh09) {font-size:1.5rem;font-weight:700;margin-bottom:0.6rem;color:var(--color-base-content);}.block.svelte-uyhh09 ul:where(.svelte-uyhh09) {margin:0.5rem 0 0 1.25rem;display:flex;flex-direction:column;gap:0.35rem;}.callout.svelte-uyhh09 {margin-top:0.75rem;padding:0.9rem 1.1rem;border-radius:0.75rem;background:color-mix(in oklab, var(--color-primary) 12%, transparent);border-left:3px solid var(--color-primary);}.code.svelte-uyhh09 {margin-top:0.75rem;padding:1rem 1.25rem;border-radius:0.75rem;overflow-x:auto;font-family:ui-monospace, "SF Mono", Menlo, monospace;font-size:0.9rem;color:var(--color-base-content);background:color-mix(in oklab, var(--color-base-content) 8%, transparent);border:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);}.actions.svelte-uyhh09 {display:flex;gap:0.75rem;margin-top:1rem;}\r\n\r\n    @media (max-width: 48rem) {.content-screen.svelte-uyhh09 {grid-template-columns:1fr;}.toc.svelte-uyhh09 {display:none;}\r\n    }'
 };
 function ContentPage($$anchor, $$props) {
   push($$props, true);
-  append_styles($$anchor, $$css14);
+  append_styles($$anchor, $$css13);
   let params = prop($$props, "params", 7);
   let state3 = state(proxy({
     isLoading: true,
@@ -9342,7 +9200,7 @@ function ContentPage($$anchor, $$props) {
   var button = child(aside);
   var nav = sibling(button, 4);
   each(nav, 21, () => sections, (section) => section.id, ($$anchor2, section) => {
-    var button_1 = root14();
+    var button_1 = root13();
     var text2 = child(button_1, true);
     reset(button_1);
     template_effect(() => set_text(text2, get2(section).title));
@@ -9424,14 +9282,14 @@ var routes_default = {
 };
 
 // src/components/DashboardApp.svelte
-var root15 = from_html(`<div><!> <main class="shell-content svelte-1w96du5"><!></main> <footer class="shell-footer svelte-1w96du5"><span>Copyright 2026 | OpenBook</span></footer> <!></div>`);
-var $$css15 = {
+var root14 = from_html(`<div><!> <main class="shell-content svelte-1w96du5"><!></main> <footer class="shell-footer svelte-1w96du5"><span>Copyright 2026 | OpenBook</span></footer> <!></div>`);
+var $$css14 = {
   hash: "svelte-1w96du5",
   code: "\r\n    /* Lock the shell to the viewport so only inner page areas scroll. */.shell.svelte-1w96du5 {flex:1;height:100vh;min-height:0;overflow:hidden;display:flex;flex-direction:column;transition:padding-right 0.25s ease;}\r\n\r\n    /* Make room for the docked chat sidebar so nothing is hidden behind it. */.shell.chat-docked.svelte-1w96du5 {padding-right:min(28rem, 100vw);}.shell-content.svelte-1w96du5 {flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;}.shell-footer.svelte-1w96du5 {margin-top:auto;padding:1rem 1.5rem 1.5rem;text-align:center;font-size:0.75rem;letter-spacing:0.08em;text-transform:uppercase;color:color-mix(in oklab, var(--color-base-content) 60%, transparent);border-top:1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);}"
 };
 function DashboardApp($$anchor, $$props) {
   push($$props, true);
-  append_styles($$anchor, $$css15);
+  append_styles($$anchor, $$css14);
   let state3 = state(proxy({
     isLoading: true,
     errorMessage: "",
@@ -9447,7 +9305,7 @@ function DashboardApp($$anchor, $$props) {
       set(state3, value, true);
     });
   });
-  var div = root15();
+  var div = root14();
   let classes;
   var node = child(div);
   DashboardHeader(node, {

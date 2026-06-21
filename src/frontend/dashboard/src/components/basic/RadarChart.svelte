@@ -33,9 +33,11 @@ so axis labels near the edges are never clipped.
     const labelDistance = radius + 24;
     const rings = [0.25, 0.5, 0.75, 1];
 
-    // Even padding around a square chart so edge labels fit without clipping.
-    const pad = 40;
-    const viewBox = `${-pad} ${-pad} ${size + pad * 2} ${size + pad * 2}`;
+    // Padding around the square chart so edge labels fit without clipping. The
+    // left/right labels are the widest, so the horizontal padding is larger.
+    const padX = 110;
+    const padY = 44;
+    const viewBox = `${-padX} ${-padY} ${size + padX * 2} ${size + padY * 2}`;
 
     const axes = $derived(data.slice(0, max));
 
@@ -106,10 +108,12 @@ so axis labels near the edges are never clipped.
 <style>
     .radar {
         width: 100%;
-        max-width: 24rem;
+        max-width: 28rem;
         height: auto;
         margin: 0 auto;
         display: block;
+        /* Safety net so long axis labels are never hard-clipped. */
+        overflow: visible;
     }
 
     .ring {

@@ -22,7 +22,9 @@ from openbook.drf.viewsets import with_flex_fields_parameters
 
 from ..models.account_progress import AccountProgress
 from ..models.course_progress import CourseProgress
+from ..models.skill import Skill
 from ..services.course import award_course_points
+from ..services.skill import award_skill_progress
 
 
 class CourseProgressSerializer(FlexFieldsModelSerializer):
@@ -58,10 +60,22 @@ class CourseProgressFilter(FilterSet):
 
 
 class AwardCoursePointsRequestSerializer(Serializer):
-    account = UserField(required=False)
-    course  = PrimaryKeyRelatedField(queryset=Course.objects.all())
-    points  = IntegerField()
-    context = JSONField(required=False)
+    account      = UserField(required=False)
+    course       = PrimaryKeyRelatedField(queryset=Course.objects.all())
+    points       = IntegerField()
+    # Optionally also advance skills. ``skill`` targets one specific skill (e.g. the
+    # skill a quiz question trains); when omitted, every skill the course teaches is
+    # advanced. ``skill_points`` is the progress (in %) added per skill; it defaults
+    # to the course ``points`` when not given.
+    skill        = PrimaryKeyRelatedField(queryset=Skill.objects.all(), required=False)
+    skill_points = IntegerField(required=False)
+    context      = JSONField(required=False)
+
+
+class AwardedSkillSerializer(Serializer):
+    skill          = CharField()
+    skill_level    = IntegerField()
+    skill_progress = DecimalField(max_digits=5, decimal_places=2)
 
 
 class AwardCoursePointsResponseSerializer(Serializer):
@@ -71,6 +85,7 @@ class AwardCoursePointsResponseSerializer(Serializer):
     course_progress = DecimalField(max_digits=5, decimal_places=2)
     point_total     = IntegerField()
     level           = IntegerField()
+    skills          = AwardedSkillSerializer(many=True)
 
 
 @extend_schema(
@@ -124,14 +139,31 @@ class CourseProgressViewSet(ReadOnlyModelViewSet):
                 "account": "Only staff users can award course points to other accounts.",
             })
 
-        course  = serializer.validated_data["course"]
-        points  = serializer.validated_data["points"]
-        context = serializer.validated_data.get("context", {})
+        course       = serializer.validated_data["course"]
+        points       = serializer.validated_data["points"]
+        skill        = serializer.validated_data.get("skill")
+        skill_points = serializer.validated_data.get("skill_points", points)
+        context      = serializer.validated_data.get("context", {})
 
         try:
             state = award_course_points(account.id, course.id, points, context=context)
         except ValueError as error:
             raise ValidationError({"points": str(error)})
+
+        # Advance the skills trained in this course. A specific skill (e.g. the one a
+        # quiz question targets) takes precedence; otherwise every skill the course
+        # teaches grows. Skipped silently when nothing to award.
+        target_skills = [skill] if skill else list(course.skills.all())
+        awarded_skills = []
+
+        if skill_points > 0:
+            for target in target_skills:
+                skill_state = award_skill_progress(account.id, target.id, skill_points)
+                awarded_skills.append({
+                    "skill":          target.name,
+                    "skill_level":    skill_state["skill_level"],
+                    "skill_progress": skill_state["skill_progress"],
+                })
 
         account_progress = AccountProgress.objects.get_or_create(
             account=account,
@@ -146,6 +178,7 @@ class CourseProgressViewSet(ReadOnlyModelViewSet):
                 "course_progress": state["course_progress"],
                 "point_total":     account_progress.point_total,
                 "level":           account_progress.level,
+                "skills":          awarded_skills,
             },
             status=201,
         )

@@ -68,7 +68,7 @@ class CourseAdmin(CustomModelAdmin):
     ordering            = ["group", "name"]
     readonly_fields     = [*created_modified_by_fields]
     prepopulated_fields = {"slug": ["name"]}
-    filter_horizontal   = ["public_permissions",]
+    filter_horizontal   = ["public_permissions", "skills"]
     inlines             = [_CourseMaterialInline, RoleInline, RoleAssignmentInline, EnrollmentMethodInline, AccessRequestInline]
 
     fieldsets = [
@@ -78,6 +78,10 @@ class CourseAdmin(CustomModelAdmin):
         (_("Description"), {
             "classes": ["tab"],
             "fields": ["description", "text_format"], # Description, Text Format, AI Notes
+        }),
+        (_("Skills"), {
+            "classes": ["tab"],
+            "fields": ["skills"],
         }),
         permissions_fieldset,
         created_modified_by_fieldset,
@@ -90,6 +94,10 @@ class CourseAdmin(CustomModelAdmin):
         (_("Description"), {
             "classes": ["tab"],
             "fields": ["description", "text_format"], # Description, Text Format, AI Notes
+        }),
+        (_("Skills"), {
+            "classes": ["tab"],
+            "fields": ["skills"],
         }),
         permissions_fieldset,
     ]
