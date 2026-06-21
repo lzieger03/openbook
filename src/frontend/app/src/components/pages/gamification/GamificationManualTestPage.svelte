@@ -92,6 +92,16 @@ Manual test page for gamification reward triggering and live user-impact checks.
     let customEventType = $state("");
     let contextJson = $state(JSON.stringify({source: "manual-gamification-test-page"}, null, 2));
 
+    type CourseRecord = {
+        id: string;
+        name: string;
+    };
+
+    let courses = $state([] as CourseRecord[]);
+    let awardCourseId = $state("");
+    let awardPoints = $state(10);
+    let isAwarding = $state(false);
+
     let currentPointTotal = $state<number | null>(null);
     let currentLevel = $state<number | null>(null);
     let currentStreak = $state<number | null>(null);
@@ -219,6 +229,63 @@ Manual test page for gamification reward triggering and live user-impact checks.
 
         if (!selectedRewardId && rewards.length > 0) {
             selectedRewardId = rewards[0].id;
+        }
+    }
+
+    async function loadCourses(): Promise<void> {
+        const data = await requestJson("/api/content/courses/?_page_size=200&_sort=name");
+        courses = Array.isArray(data?.results)
+            ? data.results.map((course: any) => ({id: String(course.id), name: String(course.name)}))
+            : [];
+
+        if (!awardCourseId && courses.length > 0) {
+            awardCourseId = courses[0].id;
+        }
+    }
+
+    async function awardCoursePoints(courseId: string, points: number): Promise<void> {
+        infoMessage = "";
+        errorMessage = "";
+
+        if (!courseId) {
+            errorMessage = "Bitte einen Kurs auswählen.";
+            return;
+        }
+
+        if (!Number.isFinite(points) || points === 0) {
+            errorMessage = "Bitte eine Punktzahl ungleich 0 angeben.";
+            return;
+        }
+
+        isAwarding = true;
+
+        try {
+            const body: Record<string, unknown> = {
+                course: courseId,
+                points,
+                context: {source: "manual-gamification-test-page"},
+            };
+
+            if (isStaff && targetUsername !== currentUsername) {
+                body.account = targetUsername;
+            }
+
+            const response = await requestJson("/api/gamification/course_progress/award/", {
+                method: "POST",
+                body: JSON.stringify(body),
+            });
+
+            // Refresh so the course bar, point total and event log all reflect the award.
+            await refreshTargetData();
+
+            infoMessage =
+                `+${points} Kurspunkte auf „${response.course}". ` +
+                `Kurs: Level ${response.course_level}, ${response.course_points} Punkte, Balken ${Number(response.course_progress).toFixed(2)} %. ` +
+                `Global: ${response.point_total} Punkte, Level ${response.level}.`;
+        } catch (error) {
+            errorMessage = toErrorMessage(error);
+        } finally {
+            isAwarding = false;
         }
     }
 
@@ -465,6 +532,7 @@ Manual test page for gamification reward triggering and live user-impact checks.
         try {
             await loadCurrentUser();
             await loadRewards();
+            await loadCourses();
 
             if (isStaff) {
                 await searchUsers();
@@ -596,6 +664,35 @@ Manual test page for gamification reward triggering and live user-impact checks.
             <section class="panel full-width">
                 <h2>5) Kursfortschritt ({targetUsername})</h2>
 
+                <div class="award-box">
+                    <p class="award-hint">
+                        Vergib Kurspunkte und beobachte, wie sich der Balken füllt und das globale Level/Punkte
+                        (Abschnitt 3) mitwächst.
+                    </p>
+                    <div class="award-row">
+                        <select bind:value={awardCourseId} aria-label="Kurs">
+                            {#each courses as course}
+                                <option value={course.id}>{course.name}</option>
+                            {/each}
+                        </select>
+                        <input
+                            type="number"
+                            bind:value={awardPoints}
+                            min="1"
+                            step="1"
+                            aria-label="Punkte"
+                        />
+                        <button
+                            type="button"
+                            class="primary"
+                            onclick={() => awardCoursePoints(awardCourseId, awardPoints)}
+                            disabled={isAwarding || !awardCourseId}
+                        >
+                            {isAwarding ? "Vergebe ..." : "Kurspunkte vergeben"}
+                        </button>
+                    </div>
+                </div>
+
                 {#if courseProgressRows.length === 0}
                     <p>Kein Kursfortschritt gefunden.</p>
                 {:else}
@@ -611,6 +708,21 @@ Manual test page for gamification reward triggering and live user-impact checks.
                                 </div>
 
                                 <progress class="progress progress-accent w-full" value={progress.course_progress} max="100"></progress>
+
+                                {#if typeof progress.course !== "string"}
+                                    <div class="card-award-row">
+                                        {#each [5, 10, 25] as quick}
+                                            <button
+                                                type="button"
+                                                class="quick"
+                                                onclick={() => awardCoursePoints((progress.course as CourseProgressCourse).id, quick)}
+                                                disabled={isAwarding}
+                                            >
+                                                +{quick}
+                                            </button>
+                                        {/each}
+                                    </div>
+                                {/if}
                             </article>
                         {/each}
                     </div>
@@ -846,6 +958,52 @@ Manual test page for gamification reward triggering and live user-impact checks.
 
     .course-progress-card :global(.progress) {
         width: 100%;
+    }
+
+    .award-box {
+        margin: 0.25rem 0 1rem 0;
+        padding: 0.75rem;
+        border: 1px dashed rgb(194, 221, 248);
+        border-radius: 0.5rem;
+        background: rgb(247, 251, 255);
+    }
+
+    .award-hint {
+        margin: 0 0 0.6rem 0;
+        color: rgb(80, 80, 80);
+    }
+
+    .award-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .award-row select {
+        flex: 1 1 220px;
+        width: auto;
+    }
+
+    .award-row input[type="number"] {
+        width: 7rem;
+    }
+
+    .award-row button.primary {
+        margin-top: 0;
+    }
+
+    .card-award-row {
+        display: flex;
+        gap: 0.4rem;
+        margin-top: 0.6rem;
+    }
+
+    .card-award-row .quick {
+        padding: 0.25rem 0.6rem;
+        border-radius: 999px;
+        background: rgb(239, 247, 255);
+        border-color: rgb(194, 221, 248);
     }
 
     table {

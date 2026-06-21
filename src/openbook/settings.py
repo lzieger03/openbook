@@ -325,8 +325,13 @@ HEADLESS_FRONTEND_URLS = {
 # See: https://django-allauth.readthedocs.io/en/latest/socialaccount/providers/saml.html#guidelines
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+
+# Secure cookies require HTTPS. In local development (DEBUG=True) the app is served
+# over plain HTTP, where browsers refuse to send "Secure" cookies — which silently
+# breaks session/CSRF auth (you appear logged in to the SPA but API calls are
+# anonymous). Only enforce Secure cookies in production, where traffic is HTTPS.
+CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
 
 # Django Unfold Admin
 CRISPY_TEMPLATE_PACK = "unfold_crispy"

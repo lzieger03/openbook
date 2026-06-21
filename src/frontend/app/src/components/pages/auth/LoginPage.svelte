@@ -39,7 +39,18 @@ Full-screen login form shown to unauthenticated users.
         const result = await auth.login(usernameOrEmail, password);
 
         if (result.success) {
-            // Let the server decide where to go based on the user's role
+            // If the user deep-linked into a specific in-app page (e.g.
+            // #/gamification-test), stay in the app and render it. The auth store
+            // already updated reactively, so ApplicationFrame swaps the login form
+            // for the requested route — this also lets teachers/admins reach app
+            // pages instead of always being bounced to a role frontend.
+            const hashRoute = window.location.hash.replace(/^#/, "");
+
+            if (hashRoute && hashRoute !== "/") {
+                return;
+            }
+
+            // Otherwise let the server decide where to go based on the user's role
             // (teachers -> /teacher/, students -> /dashboard/index.html).
             window.location.href = "/post-login-redirect/";
             return;

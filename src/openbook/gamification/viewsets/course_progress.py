@@ -4,13 +4,25 @@
 from django_filters.filters import CharFilter
 from django_filters.filterset import FilterSet
 from drf_spectacular.utils import extend_schema
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.serializers import CharField
+from rest_framework.serializers import DecimalField
+from rest_framework.serializers import IntegerField
+from rest_framework.serializers import JSONField
+from rest_framework.serializers import PrimaryKeyRelatedField
+from rest_framework.serializers import Serializer
+from rest_framework.serializers import ValidationError
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from openbook.auth.serializers.user import UserField
+from openbook.content.models.course import Course
 from openbook.drf.flex_serializers import FlexFieldsModelSerializer
 from openbook.drf.viewsets import with_flex_fields_parameters
 
+from ..models.account_progress import AccountProgress
 from ..models.course_progress import CourseProgress
+from ..services.course import award_course_points
 
 
 class CourseProgressSerializer(FlexFieldsModelSerializer):
@@ -45,6 +57,22 @@ class CourseProgressFilter(FilterSet):
         return queryset.filter(account__username=value)
 
 
+class AwardCoursePointsRequestSerializer(Serializer):
+    account = UserField(required=False)
+    course  = PrimaryKeyRelatedField(queryset=Course.objects.all())
+    points  = IntegerField()
+    context = JSONField(required=False)
+
+
+class AwardCoursePointsResponseSerializer(Serializer):
+    course          = CharField()
+    course_points   = IntegerField()
+    course_level    = IntegerField()
+    course_progress = DecimalField(max_digits=5, decimal_places=2)
+    point_total     = IntegerField()
+    level           = IntegerField()
+
+
 @extend_schema(
     extensions={
         "x-app-name": "Gamification",
@@ -72,3 +100,52 @@ class CourseProgressViewSet(ReadOnlyModelViewSet):
             return queryset
 
         return queryset.filter(account=user)
+
+    @extend_schema(
+        operation_id = "gamification_course_progress_award",
+        summary      = "Award Course Points",
+        request      = AwardCoursePointsRequestSerializer,
+        responses    = AwardCoursePointsResponseSerializer,
+    )
+    @action(detail=False, methods=["post"], url_path="award")
+    def award(self, request):
+        """
+        Award points to a learner inside a course. Updates the per-course progress
+        (points, level and the progress bar) and feeds the same points into the
+        global level and point system.
+        """
+        serializer = AwardCoursePointsRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        account = serializer.validated_data.get("account", request.user)
+
+        if account != request.user and not request.user.is_staff:
+            raise ValidationError({
+                "account": "Only staff users can award course points to other accounts.",
+            })
+
+        course  = serializer.validated_data["course"]
+        points  = serializer.validated_data["points"]
+        context = serializer.validated_data.get("context", {})
+
+        try:
+            state = award_course_points(account.id, course.id, points, context=context)
+        except ValueError as error:
+            raise ValidationError({"points": str(error)})
+
+        account_progress = AccountProgress.objects.get_or_create(
+            account=account,
+            defaults={"point_total": 0, "level": 1},
+        )[0]
+
+        return Response(
+            {
+                "course":          course.name,
+                "course_points":   state["course_points"],
+                "course_level":    state["course_level"],
+                "course_progress": state["course_progress"],
+                "point_total":     account_progress.point_total,
+                "level":           account_progress.level,
+            },
+            status=201,
+        )

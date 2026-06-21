@@ -1,6 +1,8 @@
 # OpenBook: Interactive Online Textbooks - Server
 # © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 
+from decimal                  import Decimal
+
 from django.db                import models
 from django.utils.translation import gettext_lazy as _
 
@@ -45,3 +47,41 @@ class LevelThreshold(UUIDMixin):
         )
 
         return threshold.level if threshold else 1
+
+    @classmethod
+    def progress_to_next_level(cls, points):
+        """
+        Return the progress (0–100) from the current level's threshold towards the
+        next one. Resets to 0 on each level-up and is full (100) once the highest
+        configured level has been reached. This is the value rendered as a progress
+        bar both for an account and for a single course.
+        """
+        level = cls.level_for_points(points)
+
+        current_threshold = (
+            cls.objects
+            .filter(level__lte=level)
+            .order_by("-level")
+            .first()
+        )
+        next_threshold = (
+            cls.objects
+            .filter(level__gt=level)
+            .order_by("level")
+            .first()
+        )
+
+        # No higher level defined (max level reached) => the bar is full.
+        if next_threshold is None:
+            return Decimal("100.00")
+
+        current_min = current_threshold.min_points if current_threshold else 0
+        span        = next_threshold.min_points - current_min
+
+        if span <= 0:
+            return Decimal("0.00")
+
+        percent = (Decimal(points - current_min) / Decimal(span)) * 100
+        percent = max(Decimal(0), min(Decimal(100), percent))
+
+        return percent.quantize(Decimal("0.01"))
