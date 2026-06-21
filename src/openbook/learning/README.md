@@ -139,9 +139,21 @@ MemoryEntry.objects.create(
 
 ---
 
+## Gamification
+
+- **Streak**: Jeder Schreibzugriff auf `LearningState` (Seite öffnen / Kapitel abschließen)
+  meldet eine Lernaktivität (`CONTENT_VIEWED`) an die Gamification-App und hält damit den
+  Tages-Streak aktuell. Gibt keine Punkte. Siehe `signals.py`.
+- **Kursabschluss (offen)**: Soll eine **explizite** Aktion sein (Button am Kursende →
+  Orchestrator → DB) und `COURSE_COMPLETION` (200 Punkte) vergeben. Der konkrete Endpoint
+  ist noch nicht gebaut — Vertrag wird mit dem Orchestrator-Team geklärt. Wichtig: NICHT
+  automatisch aus `completed_pages` ableiten (würde Page-Ranges ignorieren).
+
+---
+
 ## Noch offen
 
-- **Tests** — am Ende
-- **Signals für Gamification** — nach Absprache mit Lars/Ledejna
+- **Kursabschluss-Endpoint** — expliziter Andockpunkt für den Orchestrator (siehe Gamification)
+- **Quiz-Punktevergabe** — noch nicht definiert (ob/wieviel Punkte pro Quiz)
 - **Quiz-Zuordnung zu Kapitel** — klärt sich mit dem Orchestrator
 - **Gedächtniseintrag-Modell** — KI schreibt Notizen über Lernverhalten nach jeder Session
