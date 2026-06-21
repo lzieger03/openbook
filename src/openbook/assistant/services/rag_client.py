@@ -6,6 +6,7 @@
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 
+from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -15,6 +16,7 @@ from sqlite_vec import serialize_float32
 
 from openbook.assistant.models import AssistantDocument
 from openbook.assistant.models import AssistantDocumentChunk
+from openbook.assistant.services.prompt_builder import PromptBuilder
 from openbook.assistant.services.vector_index import DOCUMENTS_TABLE
 from openbook.assistant.services.vector_index import delete_document_vectors
 from openbook.assistant.services.vector_index import get_vector_connection
@@ -25,9 +27,32 @@ if TYPE_CHECKING:
     from .llm_client import LLM_Client
 
 
+@dataclass(frozen=True)
+class RagSource:
+    """Describe one document chunk used as RAG context."""
+
+    chunk_id: str
+    document_id: str
+    document_title: str
+    position: int
+
+
+@dataclass(frozen=True)
+class RagQueryResult:
+    """Bundle an assistant answer with the RAG sources used to produce it."""
+
+    answer: str
+    sources: tuple[RagSource, ...]
+
+
 class RagClient:
-    def __init__(self, assistant: "LLM_Client"):
+    def __init__(
+        self,
+        assistant: "LLM_Client",
+        prompt_builder: PromptBuilder | None = None,
+    ):
         self.assistant = assistant
+        self.prompt_builder = prompt_builder or PromptBuilder()
         self.text_data = None
 
     def load_data(
@@ -129,15 +154,29 @@ class RagClient:
         self,
         query: str,
         course: "Course | None" = None,
+        learning_context: str = "",
     ) -> str:
-        """Run a RAG query through sqlite-vec on Django's database connection."""
+        """Run a RAG query and return only the generated answer text."""
+        return self.perform_rag_query_with_sources(
+            query=query,
+            course=course,
+            learning_context=learning_context,
+        ).answer
+
+    def perform_rag_query_with_sources(
+        self,
+        query: str,
+        course: "Course | None" = None,
+        learning_context: str = "",
+    ) -> RagQueryResult:
+        """Run a RAG query and return the generated answer with used sources."""
         connection = get_vector_connection()
         if connection is None:
             raise RuntimeError("RAG vector search currently requires Django's SQLite backend.")
 
         chunk_queryset = AssistantDocumentChunk.objects.filter(
             parent__index_status=AssistantDocument.IndexStatusChoices.INDEXED,
-        )
+        ).select_related("parent")
         course_id = ""
 
         if course is None:
@@ -175,22 +214,32 @@ class RagClient:
             str(chunk.id): chunk
             for chunk in chunk_queryset.filter(id__in=chunk_ids)
         }
-        top_contexts = [
-            chunks_by_id[chunk_id].content
+        top_chunks = [
+            chunks_by_id[chunk_id]
             for chunk_id in chunk_ids
             if chunk_id in chunks_by_id
         ]
+        top_contexts = [chunk.content for chunk in top_chunks]
         if not top_contexts:
             raise RuntimeError("No matching assistant context was found.")
 
         context = "\n\n".join(top_contexts)
-
-        prompt = f"""
-            Du bist ein hilfreicher Assistent.
-            Beantworte die folgende Frage basierend auf diesem Kontext:
-            \n\n{context}\n\nFrage: {query}
-        """.strip()
-        return self.assistant.get_user_message(prompt)
+        prompt = self.prompt_builder.build_course_question_prompt(
+            query=query,
+            document_context=context,
+            learning_context=learning_context,
+        )
+        answer = self.assistant.get_user_message(prompt)
+        sources = tuple(
+            RagSource(
+                chunk_id=str(chunk.id),
+                document_id=str(chunk.parent_id),
+                document_title=chunk.parent.title,
+                position=chunk.position,
+            )
+            for chunk in top_chunks
+        )
+        return RagQueryResult(answer=answer, sources=sources)
 
     def _insert_vector_index(
         self,

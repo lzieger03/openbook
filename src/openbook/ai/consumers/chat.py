@@ -8,24 +8,16 @@
 
 from __future__ import annotations
 
-<<<<<<< HEAD
-from asgiref.sync            import sync_to_async
-=======
-import asyncio
-
->>>>>>> origin/frontend-ai-integration-test
+from asgiref.sync             import sync_to_async
 from chanx.channels.websocket import AsyncJsonWebsocketConsumer
 from chanx.core.decorators    import channel, ws_handler
 from chanx.messages.incoming  import PingMessage
 from chanx.messages.outgoing  import PongMessage
 from datetime                 import datetime, UTC
-from uuid                     import uuid4
+from uuid                     import UUID, uuid4
 
-<<<<<<< HEAD
 from openbook.assistant.services.orchestrator import AssistantOrchestrator
 
-=======
->>>>>>> origin/frontend-ai-integration-test
 from ..messages.chat          import (
     ChatHistory,
     ChatHistoryPayload,
@@ -33,6 +25,11 @@ from ..messages.chat          import (
     ChatMessage,
     ChatMessagePayload,
     GetChatHistory,
+    LearningEventStatus,
+    LearningEventStatusPayload,
+    LearningPageCompleted,
+    LearningPageOpened,
+    LearningQuizResult,
 )
 
 @channel(
@@ -96,7 +93,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         self.chat_history.append(user_message.payload)
         await self.send_message(user_message)
 
-<<<<<<< HEAD
         response_id = str(uuid4())
         await self.send_message(ChatMessage(
             payload = ChatMessagePayload(
@@ -107,7 +103,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 severity   = "info",
                 guardRails = {"findings": "none", "explanation": ""},
                 format     = "markdown",
-                content    = "Ich suche in den indexierten Dokumenten und formuliere eine Antwort.",
+                content    = "Ich pruefe den Dokumentkontext und formuliere eine Antwort.",
                 finished   = False,
             ),
         ))
@@ -123,50 +119,13 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             response_type     = "system"
             response_severity = "error"
 
-=======
-        # Fake streaming LLM response
-        response_string  = f"Fake response: {message.payload.content}"
-        response_tokens  = response_string.split(" ")
-        response_partial = ""
-        response_id      = str(uuid4())
-
-        for response_token in response_tokens:
-            if not response_partial:
-                response_partial = response_token
-            else:
-                response_partial += f" {response_token}"
-
-            response_message = ChatMessage(
-                payload = ChatMessagePayload(
-                    id         = response_id,
-                    datetime   = datetime.now(UTC),
-                    sender     = "assistant",
-                    type       = "normal",
-                    severity   = "info",
-                    guardRails = {"findings": "none", "explanation": ""},
-                    format     = "markdown",
-                    content    = response_partial,
-                    finished   = False,
-                ),
-            )
-
-            await self.send_message(response_message)
-            await asyncio.sleep(0.25)
-
-        # Send final response and log it to the chat history
->>>>>>> origin/frontend-ai-integration-test
         response_message = ChatMessage(
             payload = ChatMessagePayload(
                 id         = response_id,
                 datetime   = datetime.now(UTC),
                 sender     = "assistant",
-<<<<<<< HEAD
                 type       = response_type,
                 severity   = response_severity,
-=======
-                type       = "normal",
-                severity   = "info",
->>>>>>> origin/frontend-ai-integration-test
                 guardRails = {"findings": "none", "explanation": ""},
                 format     = "markdown",
                 content    = response_string,
@@ -177,7 +136,74 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         self.chat_history.append(response_message.payload)
         return response_message
 
-<<<<<<< HEAD
+    @ws_handler(
+        summary     = "Handle Page Opened",
+        description = "Store the last opened page in the learning model",
+    )
+    async def handle_learning_page_opened(
+        self,
+        message: LearningPageOpened,
+    ) -> LearningEventStatus:
+        """
+        Store that the current user opened a course page.
+        """
+        return await self._run_learning_event(
+            event="learning_page_opened",
+            callback=lambda: self._record_page_opened(message.payload.page_id),
+        )
+
+    @ws_handler(
+        summary     = "Handle Page Completed",
+        description = "Store a completed page in the learning model",
+    )
+    async def handle_learning_page_completed(
+        self,
+        message: LearningPageCompleted,
+    ) -> LearningEventStatus:
+        """
+        Store that the current user completed a course page.
+        """
+        return await self._run_learning_event(
+            event="learning_page_completed",
+            callback=lambda: self._mark_page_completed(message.payload.page_id),
+        )
+
+    @ws_handler(
+        summary     = "Handle Quiz Result",
+        description = "Store a quiz result in the learning model",
+    )
+    async def handle_learning_quiz_result(
+        self,
+        message: LearningQuizResult,
+    ) -> LearningEventStatus:
+        """
+        Store the current user's quiz result for a course page.
+        """
+        return await self._run_learning_event(
+            event="learning_quiz_result",
+            callback=lambda: self._record_quiz_result(
+                page_id=message.payload.page_id,
+                score=message.payload.score,
+                attempts=message.payload.attempts,
+            ),
+        )
+
+    async def _run_learning_event(self, event: str, callback) -> LearningEventStatus:
+        """Run a blocking learning event and convert the result into an acknowledgement."""
+        try:
+            await sync_to_async(callback)()
+            return LearningEventStatus(
+                payload=LearningEventStatusPayload(event=event, success=True),
+            )
+        except Exception as error:
+            return LearningEventStatus(
+                payload=LearningEventStatusPayload(
+                    event=event,
+                    success=False,
+                    message=str(error),
+                ),
+            )
+
     def _answer_chat_query(self, query: str) -> str:
         """Run the blocking assistant stack outside the async event loop."""
         course_id = self.scope.get("url_route", {}).get("kwargs", {}).get("course_id")
@@ -188,5 +214,41 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             course=course_id,
         )
         return str(answer or "")
-=======
->>>>>>> origin/frontend-ai-integration-test
+
+    def _record_page_opened(self, page_id: UUID) -> None:
+        """Store that the current user opened a course page."""
+        AssistantOrchestrator().record_page_opened(
+            user=self.scope.get("user"),
+            course=self._get_required_course_id(),
+            page=page_id,
+        )
+
+    def _mark_page_completed(self, page_id: UUID) -> None:
+        """Store that the current user completed a course page."""
+        AssistantOrchestrator().mark_page_completed(
+            user=self.scope.get("user"),
+            course=self._get_required_course_id(),
+            page=page_id,
+        )
+
+    def _record_quiz_result(
+        self,
+        page_id: UUID,
+        score: float,
+        attempts: int | None,
+    ) -> None:
+        """Store the current user's quiz result for a course page."""
+        AssistantOrchestrator().record_quiz_result(
+            user=self.scope.get("user"),
+            course=self._get_required_course_id(),
+            page=page_id,
+            score=score,
+            attempts=attempts,
+        )
+
+    def _get_required_course_id(self):
+        """Return the course id from the course-scoped WebSocket route."""
+        course_id = self.scope.get("url_route", {}).get("kwargs", {}).get("course_id")
+        if course_id is None:
+            raise ValueError("Learning events require a course-scoped chat WebSocket.")
+        return course_id
