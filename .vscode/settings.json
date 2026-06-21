@@ -23,13 +23,8 @@
     "python.analysis.typeCheckingMode": "off",
     "debugpy.debugJustMyCode": false,
     "cSpell.language": "en,de,en-GB,de-DE",
-<<<<<<< HEAD
     "python-envs.defaultEnvManager": "ms-python.python:poetry",
     "python-envs.defaultPackageManager": "ms-python.python:poetry",
-=======
-    "python-envs.defaultEnvManager": "ms-python.python:venv",
-    "python-envs.defaultPackageManager": "ms-python.python:pip",
->>>>>>> origin/frontend-ai-integration-test
     "files.associations": {
         "renovate.json": "jsonc",
         "renovate.json5": "jsonc",

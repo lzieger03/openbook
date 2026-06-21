@@ -9,7 +9,7 @@
  */
 
 /**
- * AI chat store backed by the WebSocket API (channel `/ws/ai/chat`).
+ * AI chat store backed by the WebSocket API.
  *
  * IMPORTANT: the message typings below must match the Python side. There is no
  * tool yet to generate them from the server's AsyncAPI spec, so when the Python
@@ -77,11 +77,52 @@ export interface ChatHistory {
     payload: ChatHistoryPayload;
 }
 
+export interface LearningPagePayload {
+    page_id: string;
+}
+
+export interface LearningQuizResultPayload {
+    page_id: string;
+    score: number;
+    attempts?: number | null;
+}
+
+export interface LearningEventStatusPayload {
+    event: string;
+    success: boolean;
+    message: string;
+}
+
+export interface LearningPageOpened {
+    action: "learning_page_opened";
+    payload: LearningPagePayload;
+}
+
+export interface LearningPageCompleted {
+    action: "learning_page_completed";
+    payload: LearningPagePayload;
+}
+
+export interface LearningQuizResult {
+    action: "learning_quiz_result";
+    payload: LearningQuizResultPayload;
+}
+
+export interface LearningEventStatus {
+    action: "learning_event_status";
+    payload: LearningEventStatusPayload;
+}
+
 /** Messages the client sends to the server. */
-export type SentMessages = GetChatHistory | ChatInput;
+export type SentMessages =
+    | GetChatHistory
+    | ChatInput
+    | LearningPageOpened
+    | LearningPageCompleted
+    | LearningQuizResult;
 
 /** Messages the server sends to the client. */
-export type ReceivedMessages = ChatHistory | ChatMessage;
+export type ReceivedMessages = ChatHistory | ChatMessage | LearningEventStatus;
 
 // ── Store ─────────────────────────────────────────────────────────────────────
 
@@ -98,13 +139,18 @@ export interface AiChatStore {
     retry: () => Promise<void>;
     getChatHistory: () => Promise<void>;
     sendChatInput: (format: ChatMessageFormat, content: string) => Promise<void>;
+    recordPageOpened: (pageId: string) => Promise<void>;
+    markPageCompleted: (pageId: string) => Promise<void>;
+    recordQuizResult: (pageId: string, score: number, attempts?: number) => Promise<void>;
 }
+
+type CourseIdSource = string | (() => string | undefined);
 
 /**
  * Create an independent AI chat store. Each UI surface (full page, widget) gets
  * its own instance; connect() on mount, disconnect() on unmount.
  */
-export function createAiChatStore(): AiChatStore {
+export function createAiChatStore(courseId?: CourseIdSource): AiChatStore {
     const {subscribe, update} = writable<AiChatState>({
         connection: "disconnected",
         errorMessage: "",
@@ -119,7 +165,11 @@ export function createAiChatStore(): AiChatStore {
 
     async function connect(): Promise<void> {
         if (!socket) {
-            socket = await ws<SentMessages, ReceivedMessages>("/ai/chat");
+            const resolvedCourseId = typeof courseId === "function" ? courseId() : courseId;
+            const channel = resolvedCourseId
+                ? `/ai/courses/${encodeURIComponent(resolvedCourseId)}/chat`
+                : "/ai/chat";
+            socket = await ws<SentMessages, ReceivedMessages>(channel);
 
             socket.setConnectionStatusListener((status) => {
                 update((state) => ({
@@ -152,6 +202,13 @@ export function createAiChatStore(): AiChatStore {
                     return {...state, messages};
                 });
             });
+
+            socket.setMessageHandler("learning_event_status", (message: LearningEventStatus) => {
+                update((state) => ({
+                    ...state,
+                    errorMessage: message.payload.success ? state.errorMessage : message.payload.message,
+                }));
+            });
         }
 
         await socket.connect();
@@ -176,5 +233,34 @@ export function createAiChatStore(): AiChatStore {
         await socket?.send({action: "chat_input", payload: {format, content}});
     }
 
-    return {subscribe, connect, disconnect, retry, getChatHistory, sendChatInput};
+    async function recordPageOpened(pageId: string): Promise<void> {
+        await socket?.send({action: "learning_page_opened", payload: {page_id: pageId}});
+    }
+
+    async function markPageCompleted(pageId: string): Promise<void> {
+        await socket?.send({action: "learning_page_completed", payload: {page_id: pageId}});
+    }
+
+    async function recordQuizResult(
+        pageId: string,
+        score: number,
+        attempts?: number,
+    ): Promise<void> {
+        await socket?.send({
+            action: "learning_quiz_result",
+            payload: {page_id: pageId, score, attempts: attempts ?? null},
+        });
+    }
+
+    return {
+        subscribe,
+        connect,
+        disconnect,
+        retry,
+        getChatHistory,
+        sendChatInput,
+        recordPageOpened,
+        markPageCompleted,
+        recordQuizResult,
+    };
 }

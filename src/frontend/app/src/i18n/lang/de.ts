@@ -49,8 +49,6 @@ const i18n: I18N = {
         Title: "Startseite",
     },
 
-<<<<<<< HEAD
-=======
     Login: {
         Title:    "Anmeldung",
         Subtitle: "Anmelden, um fortzufahren",
@@ -68,7 +66,6 @@ const i18n: I18N = {
         },
     },
 
->>>>>>> origin/frontend-ai-integration-test
     AiChat: {
         PanelAriaLabel: "KI-Chat",
         StreamingResponseAriaLabel: "Antwort wird übertragen",

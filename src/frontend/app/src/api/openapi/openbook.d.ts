@@ -4,6 +4,62 @@
  */
 
 export interface paths {
+    "/api/assistant/documents/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List
+         * @description Assistant documents available to the current user.
+         */
+        get: operations["assistant_documents_list"];
+        put?: never;
+        /**
+         * Create
+         * @description Assistant documents available to the current user.
+         */
+        post: operations["assistant_documents_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assistant/documents/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Retrieve
+         * @description Assistant documents available to the current user.
+         */
+        get: operations["assistant_documents_retrieve"];
+        /**
+         * Update
+         * @description Assistant documents available to the current user.
+         */
+        put: operations["assistant_documents_update"];
+        post?: never;
+        /**
+         * Delete
+         * @description Assistant documents available to the current user.
+         */
+        delete: operations["assistant_documents_destroy"];
+        options?: never;
+        head?: never;
+        /**
+         * Partial Update
+         * @description Assistant documents available to the current user.
+         */
+        patch: operations["assistant_documents_partial_update"];
+        trace?: never;
+    };
     "/api/auth/access_requests/": {
         parameters: {
             query?: never;
@@ -1406,8 +1462,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-<<<<<<< HEAD
-=======
     "/api/gamification/account_progress/": {
         parameters: {
             query?: never;
@@ -1728,7 +1782,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
->>>>>>> origin/frontend-ai-integration-test
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1760,8 +1813,6 @@ export interface components {
             /** Format: date-time */
             readonly modified_at: string | null;
         };
-<<<<<<< HEAD
-=======
         /** @description Account Progress */
         AccountProgress: {
             /** Format: uuid */
@@ -1790,7 +1841,6 @@ export interface components {
          * @enum {string}
          */
         ActivityTypeEnum: "CHAT_MESSAGE_SENT" | "QUIZ_ANSWERED" | "QUIZ_COMPLETED" | "CONTENT_VIEWED" | "MODULE_COMPLETED" | "GAME_PLAYED";
->>>>>>> origin/frontend-ai-integration-test
         AllowedPermission: {
             id: number;
             perm: string;
@@ -1817,6 +1867,34 @@ export interface components {
          * @enum {string}
          */
         AssignmentMethodEnum: "manual" | "self-enrollment" | "access-request";
+        /** @description Serializer for course-scoped assistant documents. */
+        AssistantDocument: {
+            /** Format: uuid */
+            readonly id: string;
+            /**
+             * Format: uuid
+             * @description Course that owns this assistant document. Empty documents are global.
+             */
+            course?: string | null;
+            title?: string;
+            /** Format: uri */
+            file_data?: string;
+            readonly file_name: string;
+            readonly file_size: number | null;
+            readonly mime_type: string;
+            readonly index_status: components["schemas"]["IndexStatusEnum"];
+            readonly index_error: string;
+            /** Format: date-time */
+            readonly indexed_at: string | null;
+            readonly embedding_model: string;
+            readonly chunk_count: number;
+            readonly created_by: string;
+            /** Format: date-time */
+            readonly created_at: string | null;
+            readonly modified_by: string;
+            /** Format: date-time */
+            readonly modified_at: string | null;
+        };
         /** @description Authentication Token */
         AuthToken: {
             /** Format: uuid */
@@ -1958,8 +2036,6 @@ export interface components {
             /** Format: date-time */
             readonly modified_at: string | null;
         };
-<<<<<<< HEAD
-=======
         /** @description Course Progress */
         CourseProgress: {
             /** Format: uuid */
@@ -1974,7 +2050,6 @@ export interface components {
             /** Format: decimal */
             course_progress?: string;
         };
->>>>>>> origin/frontend-ai-integration-test
         /** @description Current User */
         CurrentUser: {
             readonly id: number;
@@ -2143,6 +2218,14 @@ export interface components {
             /** Format: date-time */
             readonly modified_at: string | null;
         };
+        /**
+         * @description * `pending` - Pending
+         *     * `indexing` - Indexing
+         *     * `indexed` - Indexed
+         *     * `failed` - Failed
+         * @enum {string}
+         */
+        IndexStatusEnum: "pending" | "indexing" | "indexed" | "failed";
         /** @description Language */
         Language: {
             /** Language Code */
@@ -2235,8 +2318,6 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["AccessRequest"][];
         };
-<<<<<<< HEAD
-=======
         PaginatedAccountProgressList: {
             /** @example 123 */
             count: number;
@@ -2252,7 +2333,6 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["AccountProgress"][];
         };
->>>>>>> origin/frontend-ai-integration-test
         PaginatedAllowedRolePermissionList: {
             /** @example 123 */
             count: number;
@@ -2267,6 +2347,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["AllowedRolePermission"][];
+        };
+        PaginatedAssistantDocumentList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?_page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?_page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["AssistantDocument"][];
         };
         PaginatedAuthTokenList: {
             /** @example 123 */
@@ -2328,8 +2423,6 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["CourseMaterialPageRange"][];
         };
-<<<<<<< HEAD
-=======
         PaginatedCourseProgressList: {
             /** @example 123 */
             count: number;
@@ -2345,7 +2438,6 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["CourseProgress"][];
         };
->>>>>>> origin/frontend-ai-integration-test
         PaginatedCurrentUserList: {
             /** @example 123 */
             count: number;
@@ -2541,8 +2633,6 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["PermissionText"][];
         };
-<<<<<<< HEAD
-=======
         PaginatedRewardEventLogList: {
             /** @example 123 */
             count: number;
@@ -2573,7 +2663,6 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["Reward"][];
         };
->>>>>>> origin/frontend-ai-integration-test
         PaginatedRoleAssignmentList: {
             /** @example 123 */
             count: number;
@@ -2619,8 +2708,6 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["Site"][];
         };
-<<<<<<< HEAD
-=======
         PaginatedSkillList: {
             /** @example 123 */
             count: number;
@@ -2651,7 +2738,6 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["SkillProgress"][];
         };
->>>>>>> origin/frontend-ai-integration-test
         PaginatedTextbookList: {
             /** @example 123 */
             count: number;
@@ -2717,6 +2803,34 @@ export interface components {
             decision?: components["schemas"]["DecisionEnum"];
             /** Format: date-time */
             readonly decision_date?: string | null;
+            readonly created_by?: string;
+            /** Format: date-time */
+            readonly created_at?: string | null;
+            readonly modified_by?: string;
+            /** Format: date-time */
+            readonly modified_at?: string | null;
+        };
+        /** @description Serializer for course-scoped assistant documents. */
+        PatchedAssistantDocument: {
+            /** Format: uuid */
+            readonly id?: string;
+            /**
+             * Format: uuid
+             * @description Course that owns this assistant document. Empty documents are global.
+             */
+            course?: string | null;
+            title?: string;
+            /** Format: uri */
+            file_data?: string;
+            readonly file_name?: string;
+            readonly file_size?: number | null;
+            readonly mime_type?: string;
+            readonly index_status?: components["schemas"]["IndexStatusEnum"];
+            readonly index_error?: string;
+            /** Format: date-time */
+            readonly indexed_at?: string | null;
+            readonly embedding_model?: string;
+            readonly chunk_count?: number;
             readonly created_by?: string;
             /** Format: date-time */
             readonly created_at?: string | null;
@@ -2983,9 +3097,9 @@ export interface components {
             /** Active */
             is_active?: boolean;
             permissions?: string[];
-            role_assignments?: string[];
-            enrollment_methods?: string[];
-            access_requests?: string[];
+            readonly role_assignments?: string[];
+            readonly enrollment_methods?: string[];
+            readonly access_requests?: string[];
             readonly created_by?: string;
             /** Format: date-time */
             readonly created_at?: string | null;
@@ -3138,8 +3252,6 @@ export interface components {
             /** Translated Name */
             name: string;
         };
-<<<<<<< HEAD
-=======
         /** @description Record a learning activity */
         RecordActivityRequest: {
             activity_type: components["schemas"]["ActivityTypeEnum"];
@@ -3170,7 +3282,6 @@ export interface components {
             readonly created_at: string;
             context?: unknown;
         };
->>>>>>> origin/frontend-ai-integration-test
         /** @description Role */
         Role: {
             /** Format: uuid */
@@ -3190,9 +3301,9 @@ export interface components {
             /** Active */
             is_active?: boolean;
             permissions: string[];
-            role_assignments: string[];
-            enrollment_methods: string[];
-            access_requests: string[];
+            readonly role_assignments: string[];
+            readonly enrollment_methods: string[];
+            readonly access_requests: string[];
             readonly created_by: string;
             /** Format: date-time */
             readonly created_at: string | null;
@@ -3267,8 +3378,6 @@ export interface components {
             brand_color?: string;
             auth_config: number;
         };
-<<<<<<< HEAD
-=======
         /** @description Skill */
         Skill: {
             /** Format: uuid */
@@ -3297,7 +3406,6 @@ export interface components {
             last_active_date: string | null;
             streak_freezes: number;
         };
->>>>>>> origin/frontend-ai-integration-test
         /**
          * @description * `TEXT` - Plain Text
          *     * `HTML` - HTML
@@ -3371,8 +3479,6 @@ export interface components {
             /** Format: date-time */
             readonly modified_at: string | null;
         };
-<<<<<<< HEAD
-=======
         TriggerRewardEventLogRequest: {
             account?: string;
             /** Format: uuid */
@@ -3384,7 +3490,6 @@ export interface components {
             reward_event_log: components["schemas"]["RewardEventLog"];
             point_total: number;
         };
->>>>>>> origin/frontend-ai-integration-test
         /** @description User */
         User: {
             readonly id: number;
@@ -3422,6 +3527,219 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    assistant_documents_list: {
+        parameters: {
+            query?: {
+                /** @description Relationships to be expanded in the response */
+                _expand?: string;
+                /** @description Fields to be included in the response */
+                _fields?: string;
+                /** @description Fields to be removed from the response */
+                _omit?: string;
+                /** @description A page number within the paginated result set. */
+                _page?: number;
+                /** @description Number of results to return per page. */
+                _page_size?: number;
+                /** @description A search term. */
+                _search?: string;
+                /** @description Which field to use when ordering the results. */
+                _sort?: string;
+                course?: string;
+                course__isnull?: boolean;
+                created_at?: string;
+                created_at__gte?: string;
+                created_at__lte?: string;
+                created_by?: string;
+                file_name?: string;
+                /**
+                 * @description * `pending` - Pending
+                 *     * `indexing` - Indexing
+                 *     * `indexed` - Indexed
+                 *     * `failed` - Failed
+                 */
+                index_status?: "failed" | "indexed" | "indexing" | "pending";
+                mime_type?: string;
+                modified_at?: string;
+                modified_at__gte?: string;
+                modified_at__lte?: string;
+                modified_by?: string;
+                title?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedAssistantDocumentList"];
+                };
+            };
+        };
+    };
+    assistant_documents_create: {
+        parameters: {
+            query?: {
+                /** @description Relationships to be expanded in the response */
+                _expand?: string;
+                /** @description Fields to be included in the response */
+                _fields?: string;
+                /** @description Fields to be removed from the response */
+                _omit?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["AssistantDocument"];
+                "application/x-www-form-urlencoded": components["schemas"]["AssistantDocument"];
+                "multipart/form-data": components["schemas"]["AssistantDocument"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantDocument"];
+                };
+            };
+        };
+    };
+    assistant_documents_retrieve: {
+        parameters: {
+            query?: {
+                /** @description Relationships to be expanded in the response */
+                _expand?: string;
+                /** @description Fields to be included in the response */
+                _fields?: string;
+                /** @description Fields to be removed from the response */
+                _omit?: string;
+            };
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this Assistant Document. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantDocument"];
+                };
+            };
+        };
+    };
+    assistant_documents_update: {
+        parameters: {
+            query?: {
+                /** @description Relationships to be expanded in the response */
+                _expand?: string;
+                /** @description Fields to be included in the response */
+                _fields?: string;
+                /** @description Fields to be removed from the response */
+                _omit?: string;
+            };
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this Assistant Document. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["AssistantDocument"];
+                "application/x-www-form-urlencoded": components["schemas"]["AssistantDocument"];
+                "multipart/form-data": components["schemas"]["AssistantDocument"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantDocument"];
+                };
+            };
+        };
+    };
+    assistant_documents_destroy: {
+        parameters: {
+            query?: {
+                /** @description Relationships to be expanded in the response */
+                _expand?: string;
+                /** @description Fields to be included in the response */
+                _fields?: string;
+                /** @description Fields to be removed from the response */
+                _omit?: string;
+            };
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this Assistant Document. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    assistant_documents_partial_update: {
+        parameters: {
+            query?: {
+                /** @description Relationships to be expanded in the response */
+                _expand?: string;
+                /** @description Fields to be included in the response */
+                _fields?: string;
+                /** @description Fields to be removed from the response */
+                _omit?: string;
+            };
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this Assistant Document. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedAssistantDocument"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedAssistantDocument"];
+                "multipart/form-data": components["schemas"]["PatchedAssistantDocument"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantDocument"];
+                };
+            };
+        };
+    };
     auth_access_requests_list: {
         parameters: {
             query?: {
@@ -3457,7 +3775,7 @@ export interface operations {
                 modified_at__lte?: string;
                 modified_by?: string;
                 role?: string;
-                scope_type?: number;
+                scope_type?: string;
                 scope_uuid?: string;
                 user?: string;
             };
@@ -3712,7 +4030,7 @@ export interface operations {
                 /** @description Which field to use when ordering the results. */
                 _sort?: string;
                 permission?: number;
-                scope_type?: number;
+                scope_type?: string;
             };
             header?: never;
             path?: never;
@@ -4160,7 +4478,7 @@ export interface operations {
                 modified_by?: string;
                 name?: string;
                 role?: string;
-                scope_type?: number;
+                scope_type?: string;
                 scope_uuid?: string;
             };
             header?: never;
@@ -4547,7 +4865,7 @@ export interface operations {
                 modified_at__lte?: string;
                 modified_by?: string;
                 role?: string;
-                scope_type?: number;
+                scope_type?: string;
                 scope_uuid?: string;
                 start_date?: string;
                 start_date__gte?: string;
@@ -4759,7 +5077,7 @@ export interface operations {
                 priority?: number;
                 priority__gte?: number;
                 priority__lte?: number;
-                scope_type?: number;
+                scope_type?: string;
                 scope_uuid?: string;
                 slug?: string;
             };
@@ -5583,7 +5901,7 @@ export interface operations {
                 modified_at__lte?: string;
                 modified_by?: string;
                 name?: string;
-                owner?: number;
+                owner?: string;
                 slug?: string;
             };
             header?: never;
@@ -5787,7 +6105,7 @@ export interface operations {
                 modified_at__lte?: string;
                 modified_by?: string;
                 name?: string;
-                owner?: number;
+                owner?: string;
                 parent?: string;
                 slug?: string;
             };
@@ -7291,8 +7609,6 @@ export interface operations {
             };
         };
     };
-<<<<<<< HEAD
-=======
     gamification_account_progress_list: {
         parameters: {
             query?: {
@@ -7821,5 +8137,4 @@ export interface operations {
             };
         };
     };
->>>>>>> origin/frontend-ai-integration-test
 }

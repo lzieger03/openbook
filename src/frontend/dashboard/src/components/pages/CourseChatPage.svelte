@@ -36,8 +36,8 @@ sidebar, minimised icon) can be layered on later.
         courses: [],
     });
 
-    // AI chat over WebSocket (channel /ws/ai/chat).
-    const chat = createAiChatStore();
+    // AI chat over the course-scoped WebSocket channel.
+    const chat = createAiChatStore(() => params?.id);
     let chatState = $state<AiChatState>({connection: "disconnected", errorMessage: "", messages: []});
     let draft = $state("");
 

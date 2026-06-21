@@ -48,8 +48,6 @@ export default {
         Title: "Home",
     },
 
-<<<<<<< HEAD
-=======
     Login: {
         Title:    "Login",
         Subtitle: "Sign in to continue",
@@ -67,7 +65,6 @@ export default {
         },
     },
 
->>>>>>> origin/frontend-ai-integration-test
     AiChat: {
         PanelAriaLabel: "AI chat",
         StreamingResponseAriaLabel: "Streaming response",

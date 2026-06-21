@@ -21,13 +21,10 @@ export type AuthenticationStatus =
     authSchemas["SessionGoneResponse"]    |
     undefined;
 
-<<<<<<< HEAD
-=======
 export type LoginResult =
     | { success: true }
     | { success: false; errors: { code: string; param?: string; message: string }[] };
 
->>>>>>> origin/frontend-ai-integration-test
 /**
  * Svelte readable store that periodically checks the authentication status of the user's
  * session with the backend. It tracks whether the user is logged in, logged out, or if
@@ -39,11 +36,8 @@ export class AuthStore extends ReadableStore<AuthenticationStatus> {
      */
     backend!: ClientWrapper<authPaths, "/auth-api/{client}/v1/auth/session">;
 
-<<<<<<< HEAD
-=======
     private _initPromise: Promise<void> | null = null;
 
->>>>>>> origin/frontend-ai-integration-test
     /**
      * Initializes the authentication store with an initial status of `undefined`.
      * The real status becomes available once `init()` was called and will then
@@ -56,10 +50,6 @@ export class AuthStore extends ReadableStore<AuthenticationStatus> {
     /**
      * Initializes the client API wrapper, runs the initial session check, and
      * registers a periodic interval to keep checking the session status.
-<<<<<<< HEAD
-     */
-    async init() {
-=======
      * Safe to call multiple times — initialization only runs once.
      */
     init(): Promise<void> {
@@ -70,7 +60,6 @@ export class AuthStore extends ReadableStore<AuthenticationStatus> {
     }
 
     private async _doInit(): Promise<void> {
->>>>>>> origin/frontend-ai-integration-test
         this.backend = await api.auth("/auth-api/{client}/v1/auth/session", "error-return");
         await this.recheckAuthSession();
 
@@ -97,9 +86,6 @@ export class AuthStore extends ReadableStore<AuthenticationStatus> {
 
         this.set(response.data || response.error);
     }
-<<<<<<< HEAD
-}
-=======
 
     /**
      * Logs in with a username/email and password. Automatically rechecks the
@@ -112,10 +98,22 @@ export class AuthStore extends ReadableStore<AuthenticationStatus> {
             ? { email: usernameOrEmail, password }
             : { username: usernameOrEmail, password };
 
-        const result = await loginBackend.POST({
+        const attempt = () => loginBackend.POST({
             params: { path: { client: "browser" } },
             body:   credentials,
         });
+
+        let result = await attempt();
+
+        // 409 = a session already exists, e.g. a *different* user is still logged
+        // in. Log that session out and retry, so switching accounts actually takes
+        // effect instead of silently keeping the previous user (and their role)
+        // signed in — which would send e.g. a student to the teacher frontend.
+        const conflict = (result.error as { status?: number } | undefined)?.status === 409;
+        if (conflict) {
+            await this.logout();
+            result = await attempt();
+        }
 
         if (!result.error) {
             await this.recheckAuthSession();
@@ -123,16 +121,21 @@ export class AuthStore extends ReadableStore<AuthenticationStatus> {
         }
 
         const errorBody = result.error as { status?: number; errors?: { code: string; param?: string; message: string }[] } | undefined;
-
-        // 409 = session conflict, e.g. already logged in — recheck and treat as success
-        if (errorBody?.status === 409) {
-            await this.recheckAuthSession();
-            return { success: true };
-        }
-
         return { success: false, errors: errorBody?.errors ?? [] };
+    }
+
+    /**
+     * Logs out the current session and rechecks the auth status afterwards.
+     */
+    async logout(): Promise<void> {
+        const sessionBackend = await api.auth("/auth-api/{client}/v1/auth/session", "error-return");
+
+        await sessionBackend.DELETE({
+            params: { path: { client: "browser" } },
+        });
+
+        await this.recheckAuthSession();
     }
 }
 
 export const auth = new AuthStore();
->>>>>>> origin/frontend-ai-integration-test
