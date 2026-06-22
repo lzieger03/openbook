@@ -2233,6 +2233,87 @@
       }
     }
   }
+  .stack\! {
+    @layer daisyui.l1.l2.l3 {
+      display: inline-grid !important;
+      grid-template-columns: 3px 4px 1fr 4px 3px !important;
+      grid-template-rows: 3px 4px 1fr 4px 3px !important;
+      & > * {
+        height: 100% !important;
+        width: 100% !important;
+        &:nth-child(n + 2) {
+          width: 100% !important;
+          opacity: 70% !important;
+        }
+        &:nth-child(2) {
+          z-index: 2 !important;
+          opacity: 90% !important;
+        }
+        &:nth-child(1) {
+          z-index: 3 !important;
+          width: 100% !important;
+        }
+      }
+    }
+    @layer daisyui.l1.l2 {
+      &, &.stack-bottom {
+        > * {
+          grid-column: 3 / 4 !important;
+          grid-row: 3 / 6 !important;
+          &:nth-child(2) {
+            grid-column: 2 / 5 !important;
+            grid-row: 2 / 5 !important;
+          }
+          &:nth-child(1) {
+            grid-column: 1 / 6 !important;
+            grid-row: 1 / 4 !important;
+          }
+        }
+      }
+      &.stack-top {
+        > * {
+          grid-column: 3 / 4 !important;
+          grid-row: 1 / 4 !important;
+          &:nth-child(2) {
+            grid-column: 2 / 5 !important;
+            grid-row: 2 / 5 !important;
+          }
+          &:nth-child(1) {
+            grid-column: 1 / 6 !important;
+            grid-row: 3 / 6 !important;
+          }
+        }
+      }
+      &.stack-start {
+        > * {
+          grid-column: 1 / 4 !important;
+          grid-row: 3 / 4 !important;
+          &:nth-child(2) {
+            grid-column: 2 / 5 !important;
+            grid-row: 2 / 5 !important;
+          }
+          &:nth-child(1) {
+            grid-column: 3 / 6 !important;
+            grid-row: 1 / 6 !important;
+          }
+        }
+      }
+      &.stack-end {
+        > * {
+          grid-column: 3 / 6 !important;
+          grid-row: 3 / 4 !important;
+          &:nth-child(2) {
+            grid-column: 2 / 5 !important;
+            grid-row: 2 / 5 !important;
+          }
+          &:nth-child(1) {
+            grid-column: 1 / 4 !important;
+            grid-row: 1 / 6 !important;
+          }
+        }
+      }
+    }
+  }
   .modal-backdrop {
     @layer daisyui.l1.l2.l3 {
       grid-column-start: 1;
@@ -2483,6 +2564,31 @@
       box-shadow: 0 2px 3px -1px currentColor;
       @supports (color: color-mix(in lab, red, red)) {
         box-shadow: 0 2px 3px -1px color-mix(in oklab, currentColor calc(var(--depth) * 100%), #0000);
+      }
+    }
+  }
+  .status\! {
+    @layer daisyui.l1.l2.l3 {
+      display: inline-block !important;
+      aspect-ratio: 1 / 1 !important;
+      width: calc(0.25rem * 2) !important;
+      height: calc(0.25rem * 2) !important;
+      border-radius: var(--radius-selector) !important;
+      background-color: var(--color-base-content) !important;
+      @supports (color: color-mix(in lab, red, red)) {
+        background-color: color-mix(in oklab, var(--color-base-content) 20%, transparent) !important;
+      }
+      background-position: center !important;
+      background-repeat: no-repeat !important;
+      vertical-align: middle !important;
+      color: color-mix(in srgb, #000 30%, transparent) !important;
+      @supports (color: color-mix(in lab, red, red)) {
+        color: color-mix(in oklab, var(--color-black) 30%, transparent) !important;
+      }
+      background-image: radial-gradient( circle at 35% 30%, oklch(1 0 0 / calc(var(--depth) * 0.5)), #0000 ) !important;
+      box-shadow: 0 2px 3px -1px currentColor !important;
+      @supports (color: color-mix(in lab, red, red)) {
+        box-shadow: 0 2px 3px -1px color-mix(in oklab, currentColor calc(var(--depth) * 100%), #0000) !important;
       }
     }
   }

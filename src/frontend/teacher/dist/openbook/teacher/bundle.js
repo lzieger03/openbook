@@ -7225,24 +7225,6 @@ async function updateMaterialPosition(id, position) {
 async function deleteMaterial(id) {
   await apiSend("DELETE", `/api/content/course_materials/${encodeURIComponent(id)}/`);
 }
-async function fetchPageRanges(materialId) {
-  const data = await apiGet(
-    "/api/content/course_material_page_ranges/",
-    { material: materialId, _expand: "start_page,end_page", _sort: "position", _page_size: "200" }
-  );
-  return toList3(data);
-}
-async function addPageRange(materialId, startPageId, endPageId, position) {
-  return apiSend("POST", "/api/content/course_material_page_ranges/", {
-    material: materialId,
-    start_page: startPageId,
-    end_page: endPageId,
-    position
-  });
-}
-async function deletePageRange(id) {
-  await apiSend("DELETE", `/api/content/course_material_page_ranges/${encodeURIComponent(id)}/`);
-}
 
 // src/data/teacher.ts
 function mapUser(user) {
@@ -7296,17 +7278,6 @@ function mapMaterial(material) {
     pageRangeCount: material.page_ranges?.length ?? 0
   };
 }
-function pageName(page) {
-  return typeof page === "string" ? page : page.name;
-}
-function mapPageRange(range) {
-  return {
-    id: range.id,
-    position: range.position,
-    startPageName: pageName(range.start_page),
-    endPageName: pageName(range.end_page)
-  };
-}
 async function loadCurrentUser() {
   return mapUser(await fetchCurrentUser());
 }
@@ -7321,10 +7292,6 @@ async function loadStudents(courseId) {
 async function loadMaterials(courseId) {
   const materials = await fetchMaterials(courseId);
   return materials.map(mapMaterial).sort((a, b) => a.position - b.position);
-}
-async function loadPageRanges(materialId) {
-  const ranges = await fetchPageRanges(materialId);
-  return ranges.map(mapPageRange).sort((a, b) => a.position - b.position);
 }
 
 // src/stores/teacher.store.ts
@@ -7376,7 +7343,7 @@ var root_1 = from_html(`<span class="user-name svelte-oydpbb"> </span> <span cla
 var root_2 = from_html(`<header class="app-header svelte-oydpbb"><div class="header-left svelte-oydpbb"><img class="brand-logo svelte-oydpbb"/> <span class="brand-text svelte-oydpbb"> </span> <span class="page-label svelte-oydpbb"> </span></div> <div class="header-right svelte-oydpbb"><button type="button" class="theme-toggle svelte-oydpbb"> </button> <!></div></header>`);
 var $$css = {
   hash: "svelte-oydpbb",
-  code: ".app-header.svelte-oydpbb {display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0.75rem 1.5rem;background:var(--color-base-100);border-bottom:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);}.header-left.svelte-oydpbb {display:flex;align-items:center;gap:0.75rem;font-weight:700;}.brand-logo.svelte-oydpbb {width:2.2rem;height:2.2rem;border-radius:0.5rem;object-fit:contain;}.brand-text.svelte-oydpbb {font-size:1.05rem;text-transform:uppercase;letter-spacing:0.05em;}.page-label.svelte-oydpbb {font-size:0.85rem;font-weight:500;color:var(--color-primary);}.header-right.svelte-oydpbb {display:flex;align-items:center;gap:0.85rem;}.user-name.svelte-oydpbb {font-size:0.9rem;color:color-mix(in oklab, var(--color-base-content) 80%, transparent);}.theme-toggle.svelte-oydpbb {display:grid;place-items:center;width:2rem;height:2rem;border-radius:999px;font-size:1rem;cursor:pointer;background:color-mix(in oklab, var(--color-base-200) 70%, transparent);border:1px solid color-mix(in oklab, var(--color-base-content) 18%, transparent);}.theme-toggle.svelte-oydpbb:hover {border-color:color-mix(in oklab, var(--color-primary) 50%, transparent);}.avatar-mark.svelte-oydpbb {width:1.9rem;height:1.9rem;border-radius:999px;overflow:hidden;background:color-mix(in oklab, var(--color-base-content) 18%, transparent);}.avatar-mark.svelte-oydpbb img:where(.svelte-oydpbb) {width:100%;height:100%;object-fit:cover;}\n\n    @media (max-width: 40rem) {.app-header.svelte-oydpbb {flex-direction:column;gap:0.6rem;text-align:center;}\n    }"
+  code: ".app-header.svelte-oydpbb {display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0.75rem 1.5rem;background:var(--color-base-100);border-bottom:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);}.header-left.svelte-oydpbb {display:flex;align-items:center;gap:0.75rem;font-weight:700;}.brand-logo.svelte-oydpbb {width:2.2rem;height:2.2rem;border-radius:0.5rem;object-fit:contain;}.brand-text.svelte-oydpbb {font-size:1.05rem;text-transform:uppercase;letter-spacing:0.05em;}.page-label.svelte-oydpbb {font-size:0.85rem;font-weight:500;color:var(--color-primary);}.header-right.svelte-oydpbb {display:flex;align-items:center;gap:0.85rem;}.user-name.svelte-oydpbb {font-size:0.9rem;color:color-mix(in oklab, var(--color-base-content) 80%, transparent);}.theme-toggle.svelte-oydpbb {display:grid;place-items:center;width:2rem;height:2rem;border-radius:999px;font-size:1rem;cursor:pointer;background:color-mix(in oklab, var(--color-base-200) 70%, transparent);border:1px solid color-mix(in oklab, var(--color-base-content) 18%, transparent);}.theme-toggle.svelte-oydpbb:hover {border-color:color-mix(in oklab, var(--color-primary) 50%, transparent);}.avatar-mark.svelte-oydpbb {width:1.9rem;height:1.9rem;border-radius:999px;overflow:hidden;background:color-mix(in oklab, var(--color-base-content) 18%, transparent);}.avatar-mark.svelte-oydpbb img:where(.svelte-oydpbb) {width:100%;height:100%;object-fit:cover;}\r\n\r\n    @media (max-width: 40rem) {.app-header.svelte-oydpbb {flex-direction:column;gap:0.6rem;text-align:center;}\r\n    }"
 };
 function TeacherHeader($$anchor, $$props) {
   push($$props, true);
@@ -7602,7 +7569,7 @@ var root_14 = from_html(`<button type="button" class="btn btn-ghost">Cancel</but
 var root_15 = from_html(`<div class="page svelte-13rmcj5"><header class="top svelte-13rmcj5"><h1 class="title svelte-13rmcj5">My Courses</h1> <button type="button" class="btn btn-primary">+ New course</button></header> <!></div> <!>`, 1);
 var $$css2 = {
   hash: "svelte-13rmcj5",
-  code: ".page.svelte-13rmcj5 {width:90%;max-width:80rem;margin:0 auto;padding:1.5rem 0 2rem;display:flex;flex-direction:column;gap:1.25rem;}.top.svelte-13rmcj5 {display:flex;align-items:center;justify-content:space-between;gap:1rem;}.title.svelte-13rmcj5 {font-size:clamp(1.4rem, 3vw, 2rem);font-weight:800;}.course-grid.svelte-13rmcj5 {list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill, minmax(18rem, 1fr));gap:1rem;}.desc.svelte-13rmcj5 {font-size:0.9rem;color:color-mix(in oklab, var(--color-base-content) 75%, transparent);}.meta.svelte-13rmcj5 {font-size:0.8rem;color:color-mix(in oklab, var(--color-base-content) 60%, transparent);}.status.svelte-13rmcj5 {display:flex;flex-direction:column;align-items:center;gap:1rem;padding:4rem 0;color:color-mix(in oklab, var(--color-base-content) 70%, transparent);}.error.svelte-13rmcj5 {color:var(--color-error);font-weight:600;text-align:center;}.settings-grid.svelte-13rmcj5 {display:grid;grid-template-columns:minmax(0, 1fr) auto;align-items:end;gap:1rem;}\n\n    @media (max-width: 42rem) {.settings-grid.svelte-13rmcj5 {grid-template-columns:1fr;}\n    }"
+  code: ".page.svelte-13rmcj5 {width:90%;max-width:80rem;margin:0 auto;padding:1.5rem 0 2rem;display:flex;flex-direction:column;gap:1.25rem;}.top.svelte-13rmcj5 {display:flex;align-items:center;justify-content:space-between;gap:1rem;}.title.svelte-13rmcj5 {font-size:clamp(1.4rem, 3vw, 2rem);font-weight:800;}.course-grid.svelte-13rmcj5 {list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill, minmax(18rem, 1fr));gap:1rem;}.desc.svelte-13rmcj5 {font-size:0.9rem;color:color-mix(in oklab, var(--color-base-content) 75%, transparent);}.meta.svelte-13rmcj5 {font-size:0.8rem;color:color-mix(in oklab, var(--color-base-content) 60%, transparent);}.status.svelte-13rmcj5 {display:flex;flex-direction:column;align-items:center;gap:1rem;padding:4rem 0;color:color-mix(in oklab, var(--color-base-content) 70%, transparent);}.error.svelte-13rmcj5 {color:var(--color-error);font-weight:600;text-align:center;}.settings-grid.svelte-13rmcj5 {display:grid;grid-template-columns:minmax(0, 1fr) auto;align-items:end;gap:1rem;}\r\n\r\n    @media (max-width: 42rem) {.settings-grid.svelte-13rmcj5 {grid-template-columns:1fr;}\r\n    }"
 };
 function CourseListPage($$anchor, $$props) {
   push($$props, true);
@@ -7993,7 +7960,7 @@ var root_32 = from_html(`<span class="loading loading-spinner loading-sm"></span
 var root_42 = from_html(`<div class="card bg-base-100 shadow-sm"><div class="card-body"><!> <!> <div class="settings-grid svelte-eq1s9p"><label class="form-control w-full"><span class="label-text">Course name</span> <input class="input input-bordered w-full" type="text"/></label> <label class="form-control w-full"><span class="label-text">Slug</span> <input class="input input-bordered w-full" type="text"/></label></div> <label class="form-control w-full mt-3"><span class="label-text">Description</span> <textarea class="textarea textarea-bordered w-full" rows="5"></textarea></label> <div class="settings-grid mt-3 svelte-eq1s9p"><label class="form-control w-full"><span class="label-text">Library group</span> <select class="select select-bordered w-full"></select></label> <label class="form-control w-full"><span class="label-text">Text format</span> <select class="select select-bordered w-full"><option>Markdown</option><option>HTML</option><option>Plain text</option></select></label></div> <label class="label mt-3 cursor-pointer justify-start gap-3"><input class="checkbox checkbox-primary" type="checkbox"/> <span class="label-text">Template course</span></label> <dl class="meta-grid mt-4 svelte-eq1s9p"><div><dt class="svelte-eq1s9p">ID</dt> <dd class="svelte-eq1s9p"> </dd></div> <div><dt class="svelte-eq1s9p">Owner</dt> <dd class="svelte-eq1s9p"> </dd></div> <div><dt class="svelte-eq1s9p">Created by</dt> <dd class="svelte-eq1s9p"> </dd></div> <div><dt class="svelte-eq1s9p">Created at</dt> <dd class="svelte-eq1s9p"> </dd></div> <div><dt class="svelte-eq1s9p">Modified at</dt> <dd class="svelte-eq1s9p"> </dd></div></dl> <div class="card-actions justify-end mt-4"><button type="button" class="btn btn-primary"><!> Save changes</button></div></div></div>`);
 var $$css3 = {
   hash: "svelte-eq1s9p",
-  code: ".settings-grid.svelte-eq1s9p {display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:1rem;}.meta-grid.svelte-eq1s9p {display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:0.75rem 1rem;padding-top:1rem;border-top:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);}dt.svelte-eq1s9p {font-size:0.75rem;font-weight:700;text-transform:uppercase;color:color-mix(in oklab, var(--color-base-content) 58%, transparent);}dd.svelte-eq1s9p {min-width:0;overflow-wrap:anywhere;color:color-mix(in oklab, var(--color-base-content) 78%, transparent);}\n\n    @media (max-width: 48rem) {.settings-grid.svelte-eq1s9p,\n        .meta-grid.svelte-eq1s9p {grid-template-columns:1fr;}\n    }"
+  code: ".settings-grid.svelte-eq1s9p {display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:1rem;}.meta-grid.svelte-eq1s9p {display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:0.75rem 1rem;padding-top:1rem;border-top:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);}dt.svelte-eq1s9p {font-size:0.75rem;font-weight:700;text-transform:uppercase;color:color-mix(in oklab, var(--color-base-content) 58%, transparent);}dd.svelte-eq1s9p {min-width:0;overflow-wrap:anywhere;color:color-mix(in oklab, var(--color-base-content) 78%, transparent);}\r\n\r\n    @media (max-width: 48rem) {.settings-grid.svelte-eq1s9p,\r\n        .meta-grid.svelte-eq1s9p {grid-template-columns:1fr;}\r\n    }"
 };
 function OverviewPanel($$anchor, $$props) {
   push($$props, true);
@@ -8241,7 +8208,7 @@ var root_92 = from_html(`<ul class="result-list svelte-7pyorm"></ul>`);
 var root_102 = from_html(`<div class="grid svelte-7pyorm"><div class="card bg-base-100 shadow-sm"><div class="card-body"><h2 class="card-title">Enrolled students</h2> <!> <!></div></div> <div class="card bg-base-100 shadow-sm"><div class="card-body"><h2 class="card-title">Enrol a student</h2> <div class="search-row svelte-7pyorm"><input class="input input-bordered w-full" type="text" placeholder="Search by name or username"/> <button type="button" class="btn btn-primary"><!> Search</button></div> <!></div></div></div>`);
 var $$css4 = {
   hash: "svelte-7pyorm",
-  code: ".grid.svelte-7pyorm {display:grid;grid-template-columns:1fr 1fr;gap:1rem;}.search-row.svelte-7pyorm {display:flex;gap:0.5rem;}.result-list.svelte-7pyorm {list-style:none;margin:0.75rem 0 0;padding:0;display:flex;flex-direction:column;gap:0.4rem;}.result-list.svelte-7pyorm li:where(.svelte-7pyorm) {display:flex;align-items:center;justify-content:space-between;gap:0.5rem;padding:0.4rem 0.6rem;border-radius:0.5rem;background:color-mix(in oklab, var(--color-base-200) 60%, transparent);}.muted.svelte-7pyorm {color:color-mix(in oklab, var(--color-base-content) 60%, transparent);font-size:0.85rem;}\n\n    @media (max-width: 55rem) {.grid.svelte-7pyorm {grid-template-columns:1fr;}\n    }"
+  code: ".grid.svelte-7pyorm {display:grid;grid-template-columns:1fr 1fr;gap:1rem;}.search-row.svelte-7pyorm {display:flex;gap:0.5rem;}.result-list.svelte-7pyorm {list-style:none;margin:0.75rem 0 0;padding:0;display:flex;flex-direction:column;gap:0.4rem;}.result-list.svelte-7pyorm li:where(.svelte-7pyorm) {display:flex;align-items:center;justify-content:space-between;gap:0.5rem;padding:0.4rem 0.6rem;border-radius:0.5rem;background:color-mix(in oklab, var(--color-base-200) 60%, transparent);}.muted.svelte-7pyorm {color:color-mix(in oklab, var(--color-base-content) 60%, transparent);font-size:0.85rem;}\r\n\r\n    @media (max-width: 55rem) {.grid.svelte-7pyorm {grid-template-columns:1fr;}\r\n    }"
 };
 function StudentsPanel($$anchor, $$props) {
   push($$props, true);
@@ -13958,22 +13925,19 @@ var root_26 = from_html(`<span class="loading loading-spinner loading-sm"></span
 var root_34 = from_html(`<option> </option>`);
 var root_44 = from_html(`<span class="loading loading-spinner"></span>`);
 var root_53 = from_html(`<p class="muted svelte-1doqfep">No materials yet. Create material above to start building this course.</p>`);
-var root_63 = from_html(`<li class="svelte-1doqfep"><span> </span> <button type="button" class="btn btn-xs btn-ghost text-error">\xD7</button></li>`);
-var root_73 = from_html(`<ul class="range-list svelte-1doqfep"></ul>`);
-var root_83 = from_html(`<p class="muted svelte-1doqfep">No page ranges yet \u2014 the whole textbook is used.</p>`);
-var root_93 = from_html(`<div class="alert alert-success alert-sm"><span> </span></div>`);
-var root_103 = from_html(`<span class="loading loading-spinner loading-xs"></span>`);
-var root_112 = from_html(`<textarea class="textarea textarea-bordered editor-source svelte-1doqfep" placeholder="Write Markdown, HTML, or import a .md/.html/.txt file."></textarea>`);
-var root_123 = from_html(`<iframe class="preview-frame svelte-1doqfep" title="HTML preview" sandbox=""></iframe>`);
-var root_133 = from_html(`<div class="preview-prose svelte-1doqfep"></div>`);
-var root_142 = from_html(`<!> <div class="range-add svelte-1doqfep"><label class="svelte-1doqfep"><span class="label-text">From</span> <select class="select select-bordered select-sm"></select></label> <label class="svelte-1doqfep"><span class="label-text">To</span> <select class="select select-bordered select-sm"></select></label> <button type="button" class="btn btn-sm btn-primary">Add range</button></div> <div class="page-editor svelte-1doqfep"><div class="editor-head svelte-1doqfep"><div><h3 class="svelte-1doqfep">Page editor</h3> <p class="muted svelte-1doqfep">Edit Markdown, HTML, or plain text content for the selected textbook page.</p></div> <label class="btn btn-sm btn-ghost">Import file <input class="sr-only" type="file" accept=".md,.markdown,.html,.htm,.txt,text/markdown,text/html,text/plain"/></label></div> <!> <div class="editor-grid svelte-1doqfep"><label class="form-control w-full"><span class="label-text">Existing page</span> <select class="select select-bordered select-sm"><option>Select page</option><!></select></label> <label class="form-control w-full"><span class="label-text">Create page</span> <div class="join w-full"><input class="input input-bordered input-sm join-item flex-1" type="text" placeholder="New page title"/> <button type="button" class="btn btn-sm btn-primary join-item"><!> Add</button></div></label></div> <div class="editor-grid mt-3 svelte-1doqfep"><label class="form-control w-full"><span class="label-text">Page title</span> <input class="input input-bordered input-sm w-full" type="text"/></label> <label class="form-control w-full"><span class="label-text">Format</span> <select class="select select-bordered select-sm w-full"><option>Markdown</option><option>HTML</option><option>Plain text</option></select></label></div> <div class="editor-tabs mt-3 svelte-1doqfep"><button type="button">Edit</button> <button type="button">Preview</button></div> <!> <div class="editor-actions svelte-1doqfep"><span class="muted svelte-1doqfep"> </span> <button type="button" class="btn btn-sm btn-primary"><!> Save page</button></div></div>`, 1);
-var root_152 = from_html(`<div class="ranges svelte-1doqfep"><!></div>`);
-var root_162 = from_html(`<li class="material svelte-1doqfep"><div class="material-head svelte-1doqfep"><span class="pos svelte-1doqfep"> </span> <span class="name svelte-1doqfep"> </span> <span class="muted svelte-1doqfep"> </span> <span class="material-actions svelte-1doqfep"><button type="button" class="btn btn-xs btn-ghost" aria-label="Move up">\u2191</button> <button type="button" class="btn btn-xs btn-ghost" aria-label="Move down">\u2193</button> <button type="button" class="btn btn-xs btn-ghost"> </button> <button type="button" class="btn btn-xs btn-ghost text-error">Remove</button></span></div> <!></li>`);
-var root_172 = from_html(`<ol class="material-list svelte-1doqfep"></ol>`);
-var root_182 = from_html(`<div class="card bg-base-100 shadow-sm"><div class="card-body"><h2 class="card-title">Course content</h2> <p class="muted svelte-1doqfep">Attach textbooks and define which page ranges belong to this course.</p> <!> <!> <div class="material-tools svelte-1doqfep"><section class="material-create svelte-1doqfep" aria-labelledby="create-material-title"><div class="section-head svelte-1doqfep"><h3 id="create-material-title" class="svelte-1doqfep">Create material</h3></div> <div class="material-form-grid svelte-1doqfep"><label class="form-control w-full"><span class="label-text">Material name</span> <input class="input input-bordered w-full" type="text" placeholder="e.g. Chapter 1"/></label> <label class="form-control w-full"><span class="label-text">Slug</span> <input class="input input-bordered w-full" type="text"/></label> <label class="form-control w-full"><span class="label-text">Format</span> <select class="select select-bordered w-full"><option>Markdown</option><option>HTML</option><option>Plain text</option></select></label> <label class="form-control w-full material-description svelte-1doqfep"><span class="label-text">Description</span> <textarea class="textarea textarea-bordered w-full" rows="3"></textarea></label></div> <div class="tool-actions svelte-1doqfep"><button type="button" class="btn btn-primary"><!> Create material</button></div></section> <section class="material-attach svelte-1doqfep" aria-labelledby="attach-material-title"><div class="section-head svelte-1doqfep"><h3 id="attach-material-title" class="svelte-1doqfep">Attach existing textbook</h3></div> <div class="add-row svelte-1doqfep"><select class="select select-bordered svelte-1doqfep"></select> <button type="button" class="btn btn-ghost"><!> Attach</button></div></section></div> <!></div></div>`);
+var root_63 = from_html(`<div class="alert alert-success alert-sm"><span> </span></div>`);
+var root_73 = from_html(`<span class="loading loading-spinner loading-xs"></span>`);
+var root_83 = from_html(`<textarea class="textarea textarea-bordered editor-source svelte-1doqfep" placeholder="Write Markdown, HTML, or import a .md/.html/.txt file."></textarea>`);
+var root_93 = from_html(`<iframe class="preview-frame svelte-1doqfep" title="HTML preview" sandbox=""></iframe>`);
+var root_103 = from_html(`<div class="preview-prose svelte-1doqfep"></div>`);
+var root_112 = from_html(`<div class="page-editor svelte-1doqfep"><div class="editor-head svelte-1doqfep"><div><h3 class="svelte-1doqfep">Page editor</h3> <p class="muted svelte-1doqfep">Edit Markdown, HTML, or plain text content for the selected textbook page.</p></div> <label class="btn btn-sm btn-ghost">Import file <input class="sr-only" type="file" accept=".md,.markdown,.html,.htm,.txt,text/markdown,text/html,text/plain"/></label></div> <!> <div class="editor-grid svelte-1doqfep"><label class="form-control w-full"><span class="label-text">Existing page</span> <select class="select select-bordered select-sm"><option>Select page</option><!></select></label> <label class="form-control w-full"><span class="label-text">Create page</span> <div class="join w-full"><input class="input input-bordered input-sm join-item flex-1" type="text" placeholder="New page title"/> <button type="button" class="btn btn-sm btn-primary join-item"><!> Add</button></div></label></div> <div class="editor-grid mt-3 svelte-1doqfep"><label class="form-control w-full"><span class="label-text">Page title</span> <input class="input input-bordered input-sm w-full" type="text"/></label> <label class="form-control w-full"><span class="label-text">Format</span> <select class="select select-bordered select-sm w-full"><option>Markdown</option><option>HTML</option><option>Plain text</option></select></label></div> <div class="editor-tabs mt-3 svelte-1doqfep"><button type="button">Edit</button> <button type="button">Preview</button></div> <!> <div class="editor-actions svelte-1doqfep"><span class="muted svelte-1doqfep"> </span> <button type="button" class="btn btn-sm btn-primary"><!> Save page</button></div></div>`);
+var root_123 = from_html(`<div class="ranges svelte-1doqfep"><!></div>`);
+var root_133 = from_html(`<li class="material svelte-1doqfep"><div class="material-head svelte-1doqfep"><span class="pos svelte-1doqfep"> </span> <span class="name svelte-1doqfep"> </span> <span class="material-actions svelte-1doqfep"><button type="button" class="btn btn-xs btn-ghost" aria-label="Move up">\u2191</button> <button type="button" class="btn btn-xs btn-ghost" aria-label="Move down">\u2193</button> <button type="button" class="btn btn-xs btn-ghost"> </button> <button type="button" class="btn btn-xs btn-ghost text-error">Remove</button></span></div> <!></li>`);
+var root_142 = from_html(`<ol class="material-list svelte-1doqfep"></ol>`);
+var root_152 = from_html(`<div class="card bg-base-100 shadow-sm"><div class="card-body"><h2 class="card-title">Course content</h2> <p class="muted svelte-1doqfep">Attach textbooks to this course and edit their pages and content.</p> <!> <!> <div class="material-tools svelte-1doqfep"><section class="material-create svelte-1doqfep" aria-labelledby="create-material-title"><div class="section-head svelte-1doqfep"><h3 id="create-material-title" class="svelte-1doqfep">Create material</h3></div> <div class="material-form-grid svelte-1doqfep"><label class="form-control w-full"><span class="label-text">Material name</span> <input class="input input-bordered w-full" type="text" placeholder="e.g. Chapter 1"/></label> <label class="form-control w-full"><span class="label-text">Slug</span> <input class="input input-bordered w-full" type="text"/></label> <label class="form-control w-full"><span class="label-text">Format</span> <select class="select select-bordered w-full"><option>Markdown</option><option>HTML</option><option>Plain text</option></select></label> <label class="form-control w-full material-description svelte-1doqfep"><span class="label-text">Description</span> <textarea class="textarea textarea-bordered w-full" rows="3"></textarea></label></div> <div class="tool-actions svelte-1doqfep"><button type="button" class="btn btn-primary"><!> Create material</button></div></section> <section class="material-attach svelte-1doqfep" aria-labelledby="attach-material-title"><div class="section-head svelte-1doqfep"><h3 id="attach-material-title" class="svelte-1doqfep">Attach existing textbook</h3></div> <div class="add-row svelte-1doqfep"><select class="select select-bordered svelte-1doqfep"></select> <button type="button" class="btn btn-ghost"><!> Attach</button></div></section></div> <!></div></div>`);
 var $$css5 = {
   hash: "svelte-1doqfep",
-  code: '.material-tools.svelte-1doqfep {display:grid;grid-template-columns:minmax(0, 2fr) minmax(16rem, 1fr);gap:1rem;margin:0.75rem 0 1rem;}.material-create.svelte-1doqfep,\n    .material-attach.svelte-1doqfep {min-width:0;padding:1rem;border:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);border-radius:0.5rem;}.section-head.svelte-1doqfep {display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:0.75rem;}.section-head.svelte-1doqfep h3:where(.svelte-1doqfep) {font-weight:700;}.material-form-grid.svelte-1doqfep {display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:0.75rem;}.material-description.svelte-1doqfep {grid-column:1 / -1;}.tool-actions.svelte-1doqfep {display:flex;justify-content:flex-end;margin-top:0.75rem;}.add-row.svelte-1doqfep {display:flex;gap:0.5rem;}.add-row.svelte-1doqfep select:where(.svelte-1doqfep) {min-width:0;flex:1 1 auto;}.material-list.svelte-1doqfep {list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0.5rem;}.material.svelte-1doqfep {border:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);border-radius:0.6rem;padding:0.6rem 0.8rem;}.material-head.svelte-1doqfep {display:flex;align-items:center;gap:0.75rem;}.pos.svelte-1doqfep {display:grid;place-items:center;width:1.6rem;height:1.6rem;border-radius:999px;font-size:0.8rem;font-weight:700;background:color-mix(in oklab, var(--color-primary) 20%, transparent);color:var(--color-primary);}.name.svelte-1doqfep {font-weight:600;}.material-actions.svelte-1doqfep {margin-left:auto;display:flex;gap:0.25rem;}.ranges.svelte-1doqfep {margin-top:0.75rem;padding-top:0.75rem;border-top:1px dashed color-mix(in oklab, var(--color-base-content) 15%, transparent);}.range-list.svelte-1doqfep {list-style:none;margin:0 0 0.75rem;padding:0;display:flex;flex-direction:column;gap:0.3rem;}.range-list.svelte-1doqfep li:where(.svelte-1doqfep) {display:flex;align-items:center;justify-content:space-between;gap:0.5rem;font-size:0.9rem;}.range-add.svelte-1doqfep {display:flex;align-items:flex-end;gap:0.5rem;flex-wrap:wrap;}.range-add.svelte-1doqfep label:where(.svelte-1doqfep) {display:flex;flex-direction:column;gap:0.15rem;}.page-editor.svelte-1doqfep {margin-top:1rem;padding-top:1rem;border-top:1px dashed color-mix(in oklab, var(--color-base-content) 15%, transparent);display:flex;flex-direction:column;gap:0.75rem;}.editor-head.svelte-1doqfep {display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;}.editor-head.svelte-1doqfep h3:where(.svelte-1doqfep) {font-weight:700;}.editor-grid.svelte-1doqfep {display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:0.75rem;}.editor-tabs.svelte-1doqfep {display:flex;gap:0.5rem;}.editor-source.svelte-1doqfep,\n    .preview-frame.svelte-1doqfep,\n    .preview-prose.svelte-1doqfep {width:100%;min-height:18rem;}.editor-source.svelte-1doqfep {font-family:ui-monospace, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;line-height:1.5;resize:vertical;}.preview-frame.svelte-1doqfep,\n    .preview-prose.svelte-1doqfep {border:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);border-radius:0.5rem;background:var(--color-base-100);}.preview-frame.svelte-1doqfep {display:block;}.preview-prose.svelte-1doqfep {padding:1rem;overflow:auto;line-height:1.6;}.preview-prose.svelte-1doqfep h1,\n    .preview-prose.svelte-1doqfep h2,\n    .preview-prose.svelte-1doqfep h3 {margin-bottom:0.5rem;font-weight:700;}.preview-prose.svelte-1doqfep h1 {font-size:1.5rem;}.preview-prose.svelte-1doqfep h2 {font-size:1.25rem;}.editor-actions.svelte-1doqfep {display:flex;align-items:center;justify-content:space-between;gap:1rem;}.muted.svelte-1doqfep {color:color-mix(in oklab, var(--color-base-content) 60%, transparent);font-size:0.85rem;}\n\n    @media (max-width: 48rem) {.material-tools.svelte-1doqfep,\n        .material-form-grid.svelte-1doqfep {grid-template-columns:1fr;}.add-row.svelte-1doqfep,\n        .material-head.svelte-1doqfep,\n        .editor-head.svelte-1doqfep,\n        .editor-actions.svelte-1doqfep {align-items:stretch;flex-direction:column;}.material-actions.svelte-1doqfep {margin-left:0;flex-wrap:wrap;}.editor-grid.svelte-1doqfep {grid-template-columns:1fr;}\n    }'
+  code: '.material-tools.svelte-1doqfep {display:grid;grid-template-columns:minmax(0, 2fr) minmax(16rem, 1fr);gap:1rem;margin:0.75rem 0 1rem;}.material-create.svelte-1doqfep,\r\n    .material-attach.svelte-1doqfep {min-width:0;padding:1rem;border:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);border-radius:0.5rem;}.section-head.svelte-1doqfep {display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:0.75rem;}.section-head.svelte-1doqfep h3:where(.svelte-1doqfep) {font-weight:700;}.material-form-grid.svelte-1doqfep {display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:0.75rem;}.material-description.svelte-1doqfep {grid-column:1 / -1;}.tool-actions.svelte-1doqfep {display:flex;justify-content:flex-end;margin-top:0.75rem;}.add-row.svelte-1doqfep {display:flex;gap:0.5rem;}.add-row.svelte-1doqfep select:where(.svelte-1doqfep) {min-width:0;flex:1 1 auto;}.material-list.svelte-1doqfep {list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0.5rem;}.material.svelte-1doqfep {border:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);border-radius:0.6rem;padding:0.6rem 0.8rem;}.material-head.svelte-1doqfep {display:flex;align-items:center;gap:0.75rem;}.pos.svelte-1doqfep {display:grid;place-items:center;width:1.6rem;height:1.6rem;border-radius:999px;font-size:0.8rem;font-weight:700;background:color-mix(in oklab, var(--color-primary) 20%, transparent);color:var(--color-primary);}.name.svelte-1doqfep {font-weight:600;}.material-actions.svelte-1doqfep {margin-left:auto;display:flex;gap:0.25rem;}.ranges.svelte-1doqfep {margin-top:0.75rem;padding-top:0.75rem;border-top:1px dashed color-mix(in oklab, var(--color-base-content) 15%, transparent);}.page-editor.svelte-1doqfep {margin-top:1rem;padding-top:1rem;border-top:1px dashed color-mix(in oklab, var(--color-base-content) 15%, transparent);display:flex;flex-direction:column;gap:0.75rem;}.editor-head.svelte-1doqfep {display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;}.editor-head.svelte-1doqfep h3:where(.svelte-1doqfep) {font-weight:700;}.editor-grid.svelte-1doqfep {display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:0.75rem;}.editor-tabs.svelte-1doqfep {display:flex;gap:0.5rem;}.editor-source.svelte-1doqfep,\r\n    .preview-frame.svelte-1doqfep,\r\n    .preview-prose.svelte-1doqfep {width:100%;min-height:18rem;}.editor-source.svelte-1doqfep {font-family:ui-monospace, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;line-height:1.5;resize:vertical;}.preview-frame.svelte-1doqfep,\r\n    .preview-prose.svelte-1doqfep {border:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);border-radius:0.5rem;background:var(--color-base-100);}.preview-frame.svelte-1doqfep {display:block;}.preview-prose.svelte-1doqfep {padding:1rem;overflow:auto;line-height:1.6;}.preview-prose.svelte-1doqfep h1,\r\n    .preview-prose.svelte-1doqfep h2,\r\n    .preview-prose.svelte-1doqfep h3 {margin-bottom:0.5rem;font-weight:700;}.preview-prose.svelte-1doqfep h1 {font-size:1.5rem;}.preview-prose.svelte-1doqfep h2 {font-size:1.25rem;}.editor-actions.svelte-1doqfep {display:flex;align-items:center;justify-content:space-between;gap:1rem;}.muted.svelte-1doqfep {color:color-mix(in oklab, var(--color-base-content) 60%, transparent);font-size:0.85rem;}\r\n\r\n    @media (max-width: 48rem) {.material-tools.svelte-1doqfep,\r\n        .material-form-grid.svelte-1doqfep {grid-template-columns:1fr;}.add-row.svelte-1doqfep,\r\n        .material-head.svelte-1doqfep,\r\n        .editor-head.svelte-1doqfep,\r\n        .editor-actions.svelte-1doqfep {align-items:stretch;flex-direction:column;}.material-actions.svelte-1doqfep {margin-left:0;flex-wrap:wrap;}.editor-grid.svelte-1doqfep {grid-template-columns:1fr;}\r\n    }'
 };
 function ContentPanel($$anchor, $$props) {
   push($$props, true);
@@ -13992,14 +13956,10 @@ function ContentPanel($$anchor, $$props) {
   let creatingMaterial = state(false);
   let materialMessage = state("");
   let expandedId = state(null);
-  let ranges = state(proxy([]));
-  let rangesLoading = state(false);
+  let pagesLoading = state(false);
   let pages = state(proxy([]));
-  let startPageId = state("");
-  let endPageId = state("");
-  let addingRange = state(false);
   let selectedPageId = state("");
-  let pageName2 = state("");
+  let pageName = state("");
   let pageTextFormat = state("MD");
   let editorSource = state("");
   let editorFilename = state("");
@@ -14130,33 +14090,22 @@ function ContentPanel($$anchor, $$props) {
       return;
     }
     set(expandedId, material.id, true);
-    set(rangesLoading, true);
-    set(startPageId, "");
-    set(endPageId, "");
+    set(pagesLoading, true);
     resetEditor();
     try {
-      await (async ($$value) => {
-        var $$array_1 = to_array($$value, 2);
-        set(ranges, $$array_1[0], true);
-        set(pages, $$array_1[1], true);
-      })(await Promise.all([
-        loadPageRanges(material.id),
-        fetchTextbookPages(material.textbookId)
-      ]));
+      set(pages, await fetchTextbookPages(material.textbookId), true);
       if (get2(pages).length > 0 && get2(pages)[0]) {
-        set(startPageId, get2(pages)[0].id, true);
-        set(endPageId, get2(pages)[get2(pages).length - 1]?.id ?? get2(pages)[0].id, true);
         selectPage(get2(pages)[0].id);
       }
     } catch (e) {
       set(error2, e instanceof Error ? e.message : String(e), true);
     } finally {
-      set(rangesLoading, false);
+      set(pagesLoading, false);
     }
   }
   function resetEditor() {
     set(selectedPageId, "");
-    set(pageName2, "");
+    set(pageName, "");
     set(pageTextFormat, "MD");
     set(editorSource, "");
     set(editorFilename, "");
@@ -14183,7 +14132,7 @@ function ContentPanel($$anchor, $$props) {
       return;
     }
     set(selectedPageId, page.id, true);
-    set(pageName2, page.name, true);
+    set(pageName, page.name, true);
     set(pageTextFormat, page.text_format ?? "MD", true);
     set(editorSource, readPageSource(page), true);
     set(editorFilename, isSourceContent(page.content) ? page.content.filename ?? "" : "", true);
@@ -14232,7 +14181,7 @@ function ContentPanel($$anchor, $$props) {
       set(error2, "Please select a page.");
       return;
     }
-    if (!get2(pageName2).trim()) {
+    if (!get2(pageName).trim()) {
       set(error2, "Page name is required.");
       return;
     }
@@ -14241,7 +14190,7 @@ function ContentPanel($$anchor, $$props) {
     set(editorMessage, "");
     try {
       const updated = await updateTextbookPage(get2(selectedPageId), {
-        name: get2(pageName2).trim(),
+        name: get2(pageName).trim(),
         text_format: get2(pageTextFormat),
         content: makeContent()
       });
@@ -14272,8 +14221,8 @@ function ContentPanel($$anchor, $$props) {
     }
     set(editorFilename, file.name, true);
     set(pageTextFormat, formatFromFilename(file.name), true);
-    if (!get2(pageName2).trim()) {
-      set(pageName2, file.name.replace(/\.[^.]+$/, ""), true);
+    if (!get2(pageName).trim()) {
+      set(pageName, file.name.replace(/\.[^.]+$/, ""), true);
     }
     set(editorSource, await file.text(), true);
     set(editorMessage, `Imported ${file.name}.`);
@@ -14283,31 +14232,6 @@ function ContentPanel($$anchor, $$props) {
     return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
   }
   const previewHtml = user_derived(() => get2(pageTextFormat) === "HTML" ? get2(editorSource) : get2(pageTextFormat) === "TEXT" ? `<pre>${escapeHtml2(get2(editorSource))}</pre>` : markdownRenderer.render(get2(editorSource)));
-  async function onAddRange(materialId) {
-    if (!get2(startPageId) || !get2(endPageId)) {
-      return;
-    }
-    set(addingRange, true);
-    set(error2, "");
-    try {
-      const position = get2(ranges).reduce((max, r) => Math.max(max, r.position), 0) + 1;
-      await addPageRange(materialId, get2(startPageId), get2(endPageId), position);
-      set(ranges, await loadPageRanges(materialId), true);
-    } catch (e) {
-      set(error2, e instanceof Error ? e.message : String(e), true);
-    } finally {
-      set(addingRange, false);
-    }
-  }
-  async function onDeleteRange(materialId, rangeId) {
-    set(error2, "");
-    try {
-      await deletePageRange(rangeId);
-      set(ranges, await loadPageRanges(materialId), true);
-    } catch (e) {
-      set(error2, e instanceof Error ? e.message : String(e), true);
-    }
-  }
   var $$exports = {
     get courseId() {
       return courseId();
@@ -14324,7 +14248,7 @@ function ContentPanel($$anchor, $$props) {
       flushSync();
     }
   };
-  var div = root_182();
+  var div = root_152();
   var div_1 = child(div);
   var node = sibling(child(div_1), 4);
   {
@@ -14441,10 +14365,10 @@ function ContentPanel($$anchor, $$props) {
       var p = root_53();
       append($$anchor2, p);
     };
-    var alternate_3 = ($$anchor2) => {
-      var ol = root_172();
+    var alternate_2 = ($$anchor2) => {
+      var ol = root_142();
       each(ol, 23, () => get2(materials), (material) => material.id, ($$anchor3, material, index2) => {
-        var li = root_162();
+        var li = root_133();
         var div_8 = child(li);
         var span_5 = child(div_8);
         var text_3 = child(span_5, true);
@@ -14453,269 +14377,196 @@ function ContentPanel($$anchor, $$props) {
         var text_4 = child(span_6, true);
         reset(span_6);
         var span_7 = sibling(span_6, 2);
-        var text_5 = child(span_7);
-        reset(span_7);
-        var span_8 = sibling(span_7, 2);
-        var button_2 = child(span_8);
+        var button_2 = child(span_7);
         var button_3 = sibling(button_2, 2);
         var button_4 = sibling(button_3, 2);
-        var text_6 = child(button_4, true);
+        var text_5 = child(button_4, true);
         reset(button_4);
         var button_5 = sibling(button_4, 2);
-        reset(span_8);
+        reset(span_7);
         reset(div_8);
         var node_5 = sibling(div_8, 2);
         {
-          var consequent_13 = ($$anchor4) => {
-            var div_9 = root_152();
+          var consequent_12 = ($$anchor4) => {
+            var div_9 = root_123();
             var node_6 = child(div_9);
             {
               var consequent_6 = ($$anchor5) => {
-                var span_9 = root_26();
-                append($$anchor5, span_9);
+                var span_8 = root_26();
+                append($$anchor5, span_8);
               };
-              var alternate_2 = ($$anchor5) => {
-                var fragment = root_142();
-                var node_7 = first_child(fragment);
+              var alternate_1 = ($$anchor5) => {
+                var div_10 = root_112();
+                var div_11 = child(div_10);
+                var label_4 = sibling(child(div_11), 2);
+                var input_3 = sibling(child(label_4));
+                reset(label_4);
+                reset(div_11);
+                var node_7 = sibling(div_11, 2);
                 {
                   var consequent_7 = ($$anchor6) => {
-                    var ul = root_73();
-                    each(ul, 21, () => get2(ranges), (range) => range.id, ($$anchor7, range) => {
-                      var li_1 = root_63();
-                      var span_10 = child(li_1);
-                      var text_7 = child(span_10);
-                      reset(span_10);
-                      var button_6 = sibling(span_10, 2);
-                      reset(li_1);
-                      template_effect(() => set_text(text_7, `${get2(range).startPageName ?? ""} \u2192 ${get2(range).endPageName ?? ""}`));
-                      delegated("click", button_6, () => onDeleteRange(get2(material).id, get2(range).id));
-                      append($$anchor7, li_1);
-                    });
-                    reset(ul);
-                    append($$anchor6, ul);
-                  };
-                  var alternate = ($$anchor6) => {
-                    var p_1 = root_83();
-                    append($$anchor6, p_1);
+                    var div_12 = root_63();
+                    var span_9 = child(div_12);
+                    var text_6 = child(span_9, true);
+                    reset(span_9);
+                    reset(div_12);
+                    template_effect(() => set_text(text_6, get2(editorMessage)));
+                    append($$anchor6, div_12);
                   };
                   if_block(node_7, ($$render) => {
-                    if (get2(ranges).length > 0) $$render(consequent_7);
-                    else $$render(alternate, -1);
+                    if (get2(editorMessage)) $$render(consequent_7);
                   });
                 }
-                var div_10 = sibling(node_7, 2);
-                var label_4 = child(div_10);
-                var select_2 = sibling(child(label_4), 2);
-                each(select_2, 21, () => get2(pages), (page) => page.id, ($$anchor6, page) => {
-                  var option_4 = root_34();
-                  var text_8 = child(option_4, true);
-                  reset(option_4);
-                  var option_4_value = {};
-                  template_effect(() => {
-                    set_text(text_8, get2(page).name);
-                    if (option_4_value !== (option_4_value = get2(page).id)) {
-                      option_4.value = (option_4.__value = get2(page).id) ?? "";
-                    }
-                  });
-                  append($$anchor6, option_4);
-                });
-                reset(select_2);
-                reset(label_4);
-                var label_5 = sibling(label_4, 2);
-                var select_3 = sibling(child(label_5), 2);
-                each(select_3, 21, () => get2(pages), (page) => page.id, ($$anchor6, page) => {
+                var div_13 = sibling(node_7, 2);
+                var label_5 = child(div_13);
+                var select_2 = sibling(child(label_5), 2);
+                var option_4 = child(select_2);
+                option_4.value = option_4.__value = "";
+                var node_8 = sibling(option_4);
+                each(node_8, 17, () => get2(pages), (page) => page.id, ($$anchor6, page) => {
                   var option_5 = root_34();
-                  var text_9 = child(option_5, true);
+                  var text_7 = child(option_5, true);
                   reset(option_5);
                   var option_5_value = {};
                   template_effect(() => {
-                    set_text(text_9, get2(page).name);
+                    set_text(text_7, get2(page).name);
                     if (option_5_value !== (option_5_value = get2(page).id)) {
                       option_5.value = (option_5.__value = get2(page).id) ?? "";
                     }
                   });
                   append($$anchor6, option_5);
                 });
-                reset(select_3);
+                reset(select_2);
                 reset(label_5);
-                var button_7 = sibling(label_5, 2);
-                reset(div_10);
-                var div_11 = sibling(div_10, 2);
-                var div_12 = child(div_11);
-                var label_6 = sibling(child(div_12), 2);
-                var input_3 = sibling(child(label_6));
-                reset(label_6);
-                reset(div_12);
-                var node_8 = sibling(div_12, 2);
+                var label_6 = sibling(label_5, 2);
+                var div_14 = sibling(child(label_6), 2);
+                var input_4 = child(div_14);
+                remove_input_defaults(input_4);
+                var button_6 = sibling(input_4, 2);
+                var node_9 = child(button_6);
                 {
                   var consequent_8 = ($$anchor6) => {
-                    var div_13 = root_93();
-                    var span_11 = child(div_13);
-                    var text_10 = child(span_11, true);
-                    reset(span_11);
-                    reset(div_13);
-                    template_effect(() => set_text(text_10, get2(editorMessage)));
-                    append($$anchor6, div_13);
+                    var span_10 = root_73();
+                    append($$anchor6, span_10);
                   };
-                  if_block(node_8, ($$render) => {
-                    if (get2(editorMessage)) $$render(consequent_8);
-                  });
-                }
-                var div_14 = sibling(node_8, 2);
-                var label_7 = child(div_14);
-                var select_4 = sibling(child(label_7), 2);
-                var option_6 = child(select_4);
-                option_6.value = option_6.__value = "";
-                var node_9 = sibling(option_6);
-                each(node_9, 17, () => get2(pages), (page) => page.id, ($$anchor6, page) => {
-                  var option_7 = root_34();
-                  var text_11 = child(option_7, true);
-                  reset(option_7);
-                  var option_7_value = {};
-                  template_effect(() => {
-                    set_text(text_11, get2(page).name);
-                    if (option_7_value !== (option_7_value = get2(page).id)) {
-                      option_7.value = (option_7.__value = get2(page).id) ?? "";
-                    }
-                  });
-                  append($$anchor6, option_7);
-                });
-                reset(select_4);
-                reset(label_7);
-                var label_8 = sibling(label_7, 2);
-                var div_15 = sibling(child(label_8), 2);
-                var input_4 = child(div_15);
-                remove_input_defaults(input_4);
-                var button_8 = sibling(input_4, 2);
-                var node_10 = child(button_8);
-                {
-                  var consequent_9 = ($$anchor6) => {
-                    var span_12 = root_103();
-                    append($$anchor6, span_12);
-                  };
-                  if_block(node_10, ($$render) => {
-                    if (get2(creatingPage)) $$render(consequent_9);
+                  if_block(node_9, ($$render) => {
+                    if (get2(creatingPage)) $$render(consequent_8);
                   });
                 }
                 next();
-                reset(button_8);
-                reset(div_15);
-                reset(label_8);
+                reset(button_6);
                 reset(div_14);
-                var div_16 = sibling(div_14, 2);
-                var label_9 = child(div_16);
-                var input_5 = sibling(child(label_9), 2);
+                reset(label_6);
+                reset(div_13);
+                var div_15 = sibling(div_13, 2);
+                var label_7 = child(div_15);
+                var input_5 = sibling(child(label_7), 2);
                 remove_input_defaults(input_5);
-                reset(label_9);
-                var label_10 = sibling(label_9, 2);
-                var select_5 = sibling(child(label_10), 2);
-                var option_8 = child(select_5);
-                option_8.value = option_8.__value = "MD";
-                var option_9 = sibling(option_8);
-                option_9.value = option_9.__value = "HTML";
-                var option_10 = sibling(option_9);
-                option_10.value = option_10.__value = "TEXT";
-                reset(select_5);
-                reset(label_10);
-                reset(div_16);
-                var div_17 = sibling(div_16, 2);
-                var button_9 = child(div_17);
+                reset(label_7);
+                var label_8 = sibling(label_7, 2);
+                var select_3 = sibling(child(label_8), 2);
+                var option_6 = child(select_3);
+                option_6.value = option_6.__value = "MD";
+                var option_7 = sibling(option_6);
+                option_7.value = option_7.__value = "HTML";
+                var option_8 = sibling(option_7);
+                option_8.value = option_8.__value = "TEXT";
+                reset(select_3);
+                reset(label_8);
+                reset(div_15);
+                var div_16 = sibling(div_15, 2);
+                var button_7 = child(div_16);
                 let classes;
-                var button_10 = sibling(button_9, 2);
+                var button_8 = sibling(button_7, 2);
                 let classes_1;
-                reset(div_17);
-                var node_11 = sibling(div_17, 2);
+                reset(div_16);
+                var node_10 = sibling(div_16, 2);
                 {
-                  var consequent_10 = ($$anchor6) => {
-                    var textarea_1 = root_112();
+                  var consequent_9 = ($$anchor6) => {
+                    var textarea_1 = root_83();
                     remove_textarea_child(textarea_1);
                     template_effect(() => textarea_1.disabled = !get2(selectedPage));
                     bind_value(textarea_1, () => get2(editorSource), ($$value) => set(editorSource, $$value));
                     append($$anchor6, textarea_1);
                   };
-                  var consequent_11 = ($$anchor6) => {
-                    var iframe = root_123();
+                  var consequent_10 = ($$anchor6) => {
+                    var iframe = root_93();
                     template_effect(() => set_attribute2(iframe, "srcdoc", get2(previewHtml)));
                     append($$anchor6, iframe);
                   };
-                  var alternate_1 = ($$anchor6) => {
-                    var div_18 = root_133();
-                    html(div_18, () => get2(previewHtml), true);
-                    reset(div_18);
-                    append($$anchor6, div_18);
+                  var alternate = ($$anchor6) => {
+                    var div_17 = root_103();
+                    html(div_17, () => get2(previewHtml), true);
+                    reset(div_17);
+                    append($$anchor6, div_17);
                   };
-                  if_block(node_11, ($$render) => {
-                    if (get2(editorMode) === "edit") $$render(consequent_10);
-                    else if (get2(pageTextFormat) === "HTML") $$render(consequent_11, 1);
-                    else $$render(alternate_1, -1);
+                  if_block(node_10, ($$render) => {
+                    if (get2(editorMode) === "edit") $$render(consequent_9);
+                    else if (get2(pageTextFormat) === "HTML") $$render(consequent_10, 1);
+                    else $$render(alternate, -1);
                   });
                 }
-                var div_19 = sibling(node_11, 2);
-                var span_13 = child(div_19);
-                var text_12 = child(span_13, true);
-                reset(span_13);
-                var button_11 = sibling(span_13, 2);
-                var node_12 = child(button_11);
+                var div_18 = sibling(node_10, 2);
+                var span_11 = child(div_18);
+                var text_8 = child(span_11, true);
+                reset(span_11);
+                var button_9 = sibling(span_11, 2);
+                var node_11 = child(button_9);
                 {
-                  var consequent_12 = ($$anchor6) => {
-                    var span_14 = root_103();
-                    append($$anchor6, span_14);
+                  var consequent_11 = ($$anchor6) => {
+                    var span_12 = root_73();
+                    append($$anchor6, span_12);
                   };
-                  if_block(node_12, ($$render) => {
-                    if (get2(editorSaving)) $$render(consequent_12);
+                  if_block(node_11, ($$render) => {
+                    if (get2(editorSaving)) $$render(consequent_11);
                   });
                 }
                 next();
-                reset(button_11);
-                reset(div_19);
-                reset(div_11);
+                reset(button_9);
+                reset(div_18);
+                reset(div_10);
                 template_effect(
                   ($0) => {
-                    button_7.disabled = get2(addingRange) || get2(pages).length === 0;
-                    button_8.disabled = $0;
+                    button_6.disabled = $0;
                     input_5.disabled = !get2(selectedPage);
-                    classes = set_class(button_9, 1, "btn btn-sm", null, classes, { "btn-primary": get2(editorMode) === "edit" });
-                    classes_1 = set_class(button_10, 1, "btn btn-sm", null, classes_1, { "btn-primary": get2(editorMode) === "preview" });
-                    set_text(text_12, get2(editorFilename) ? `Imported from ${get2(editorFilename)}` : "Content is stored on the selected textbook page.");
-                    button_11.disabled = get2(editorSaving) || !get2(selectedPage);
+                    classes = set_class(button_7, 1, "btn btn-sm", null, classes, { "btn-primary": get2(editorMode) === "edit" });
+                    classes_1 = set_class(button_8, 1, "btn btn-sm", null, classes_1, { "btn-primary": get2(editorMode) === "preview" });
+                    set_text(text_8, get2(editorFilename) ? `Imported from ${get2(editorFilename)}` : "Content is stored on the selected textbook page.");
+                    button_9.disabled = get2(editorSaving) || !get2(selectedPage);
                   },
                   [() => get2(creatingPage) || !get2(newPageName).trim()]
                 );
-                bind_select_value(select_2, () => get2(startPageId), ($$value) => set(startPageId, $$value));
-                bind_select_value(select_3, () => get2(endPageId), ($$value) => set(endPageId, $$value));
-                delegated("click", button_7, () => onAddRange(get2(material).id));
                 delegated("change", input_3, onFileSelected);
-                delegated("change", select_4, (event2) => selectPage(event2.currentTarget.value));
-                bind_select_value(select_4, () => get2(selectedPageId), ($$value) => set(selectedPageId, $$value));
+                delegated("change", select_2, (event2) => selectPage(event2.currentTarget.value));
+                bind_select_value(select_2, () => get2(selectedPageId), ($$value) => set(selectedPageId, $$value));
                 bind_value(input_4, () => get2(newPageName), ($$value) => set(newPageName, $$value));
-                delegated("click", button_8, () => onCreatePage(get2(material)));
-                bind_value(input_5, () => get2(pageName2), ($$value) => set(pageName2, $$value));
-                bind_select_value(select_5, () => get2(pageTextFormat), ($$value) => set(pageTextFormat, $$value));
-                delegated("click", button_9, () => set(editorMode, "edit"));
-                delegated("click", button_10, () => set(editorMode, "preview"));
-                delegated("click", button_11, onSavePage);
-                append($$anchor5, fragment);
+                delegated("click", button_6, () => onCreatePage(get2(material)));
+                bind_value(input_5, () => get2(pageName), ($$value) => set(pageName, $$value));
+                bind_select_value(select_3, () => get2(pageTextFormat), ($$value) => set(pageTextFormat, $$value));
+                delegated("click", button_7, () => set(editorMode, "edit"));
+                delegated("click", button_8, () => set(editorMode, "preview"));
+                delegated("click", button_9, onSavePage);
+                append($$anchor5, div_10);
               };
               if_block(node_6, ($$render) => {
-                if (get2(rangesLoading)) $$render(consequent_6);
-                else $$render(alternate_2, -1);
+                if (get2(pagesLoading)) $$render(consequent_6);
+                else $$render(alternate_1, -1);
               });
             }
             reset(div_9);
             append($$anchor4, div_9);
           };
           if_block(node_5, ($$render) => {
-            if (get2(expandedId) === get2(material).id) $$render(consequent_13);
+            if (get2(expandedId) === get2(material).id) $$render(consequent_12);
           });
         }
         reset(li);
         template_effect(() => {
           set_text(text_3, get2(index2) + 1);
           set_text(text_4, get2(material).textbookName);
-          set_text(text_5, `${get2(material).pageRangeCount ?? ""} range(s)`);
           button_2.disabled = get2(index2) === 0;
           button_3.disabled = get2(index2) === get2(materials).length - 1;
-          set_text(text_6, get2(expandedId) === get2(material).id ? "Hide pages" : "Edit pages");
+          set_text(text_5, get2(expandedId) === get2(material).id ? "Hide pages" : "Edit pages");
         });
         delegated("click", button_2, () => move2(get2(index2), -1));
         delegated("click", button_3, () => move2(get2(index2), 1));
@@ -14729,7 +14580,7 @@ function ContentPanel($$anchor, $$props) {
     if_block(node_4, ($$render) => {
       if (get2(isLoading)) $$render(consequent_4);
       else if (get2(materials).length === 0) $$render(consequent_5, 1);
-      else $$render(alternate_3, -1);
+      else $$render(alternate_2, -1);
     });
   }
   reset(div_1);

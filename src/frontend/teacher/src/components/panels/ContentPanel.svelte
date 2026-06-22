@@ -11,22 +11,20 @@ License, or (at your option) any later version.
 <!--
 @component
 Content tab: manage the ordered course materials (each linking a textbook) and,
-per material, the page ranges selected within that textbook. Materials can be
-added, reordered (by swapping positions) and removed; page ranges can be added
-and removed.
+per material, the textbook pages and their content. Materials can be added,
+reordered (by swapping positions) and removed. The whole linked textbook is used
+in the course.
 -->
 <script lang="ts">
     import MarkdownIt from "markdown-it";
 
-    import {loadMaterials, loadPageRanges} from "../../data/teacher.js";
-    import type {CourseMaterialView, PageRangeView} from "../../data/teacher.js";
+    import {loadMaterials} from "../../data/teacher.js";
+    import type {CourseMaterialView} from "../../data/teacher.js";
     import {
         addMaterial,
-        addPageRange,
         createTextbook,
         createTextbookPage,
         deleteMaterial,
-        deletePageRange,
         fetchTextbookPages,
         fetchTextbooks,
         updateMaterialPosition,
@@ -53,14 +51,10 @@ and removed.
     let creatingMaterial = $state(false);
     let materialMessage = $state("");
 
-    // Per-material page-range editing (one expanded at a time).
+    // Per-material page editing (one material expanded at a time).
     let expandedId = $state<string | null>(null);
-    let ranges = $state<PageRangeView[]>([]);
-    let rangesLoading = $state(false);
+    let pagesLoading = $state(false);
     let pages = $state<TextbookPageDto[]>([]);
-    let startPageId = $state("");
-    let endPageId = $state("");
-    let addingRange = $state(false);
 
     // Page source editing.
     let selectedPageId = $state("");
@@ -215,25 +209,18 @@ and removed.
         }
 
         expandedId = material.id;
-        rangesLoading = true;
-        startPageId = "";
-        endPageId = "";
+        pagesLoading = true;
         resetEditor();
 
         try {
-            [ranges, pages] = await Promise.all([
-                loadPageRanges(material.id),
-                fetchTextbookPages(material.textbookId),
-            ]);
+            pages = await fetchTextbookPages(material.textbookId);
             if (pages.length > 0 && pages[0]) {
-                startPageId = pages[0].id;
-                endPageId = pages[pages.length - 1]?.id ?? pages[0].id;
                 selectPage(pages[0].id);
             }
         } catch (e) {
             error = e instanceof Error ? e.message : String(e);
         } finally {
-            rangesLoading = false;
+            pagesLoading = false;
         }
     }
 
@@ -401,41 +388,12 @@ and removed.
               ? `<pre>${escapeHtml(editorSource)}</pre>`
               : markdownRenderer.render(editorSource),
     );
-
-    async function onAddRange(materialId: string): Promise<void> {
-        if (!startPageId || !endPageId) {
-            return;
-        }
-
-        addingRange = true;
-        error = "";
-
-        try {
-            const position = ranges.reduce((max, r) => Math.max(max, r.position), 0) + 1;
-            await addPageRange(materialId, startPageId, endPageId, position);
-            ranges = await loadPageRanges(materialId);
-        } catch (e) {
-            error = e instanceof Error ? e.message : String(e);
-        } finally {
-            addingRange = false;
-        }
-    }
-
-    async function onDeleteRange(materialId: string, rangeId: string): Promise<void> {
-        error = "";
-        try {
-            await deletePageRange(rangeId);
-            ranges = await loadPageRanges(materialId);
-        } catch (e) {
-            error = e instanceof Error ? e.message : String(e);
-        }
-    }
 </script>
 
 <div class="card bg-base-100 shadow-sm">
     <div class="card-body">
         <h2 class="card-title">Course content</h2>
-        <p class="muted">Attach textbooks and define which page ranges belong to this course.</p>
+        <p class="muted">Attach textbooks to this course and edit their pages and content.</p>
 
         {#if error}
             <div class="alert alert-error"><span>{error}</span></div>
@@ -520,7 +478,6 @@ and removed.
                         <div class="material-head">
                             <span class="pos">{index + 1}</span>
                             <span class="name">{material.textbookName}</span>
-                            <span class="muted">{material.pageRangeCount} range(s)</span>
 
                             <span class="material-actions">
                                 <button type="button" class="btn btn-xs btn-ghost" disabled={index === 0} onclick={() => move(index, -1)} aria-label="Move up">↑</button>
@@ -534,44 +491,9 @@ and removed.
 
                         {#if expandedId === material.id}
                             <div class="ranges">
-                                {#if rangesLoading}
+                                {#if pagesLoading}
                                     <span class="loading loading-spinner loading-sm"></span>
                                 {:else}
-                                    {#if ranges.length > 0}
-                                        <ul class="range-list">
-                                            {#each ranges as range (range.id)}
-                                                <li>
-                                                    <span>{range.startPageName} &rarr; {range.endPageName}</span>
-                                                    <button type="button" class="btn btn-xs btn-ghost text-error" onclick={() => onDeleteRange(material.id, range.id)}>×</button>
-                                                </li>
-                                            {/each}
-                                        </ul>
-                                    {:else}
-                                        <p class="muted">No page ranges yet — the whole textbook is used.</p>
-                                    {/if}
-
-                                    <div class="range-add">
-                                        <label>
-                                            <span class="label-text">From</span>
-                                            <select class="select select-bordered select-sm" bind:value={startPageId}>
-                                                {#each pages as page (page.id)}
-                                                    <option value={page.id}>{page.name}</option>
-                                                {/each}
-                                            </select>
-                                        </label>
-                                        <label>
-                                            <span class="label-text">To</span>
-                                            <select class="select select-bordered select-sm" bind:value={endPageId}>
-                                                {#each pages as page (page.id)}
-                                                    <option value={page.id}>{page.name}</option>
-                                                {/each}
-                                            </select>
-                                        </label>
-                                        <button type="button" class="btn btn-sm btn-primary" onclick={() => onAddRange(material.id)} disabled={addingRange || pages.length === 0}>
-                                            Add range
-                                        </button>
-                                    </div>
-
                                     <div class="page-editor">
                                         <div class="editor-head">
                                             <div>
@@ -764,36 +686,6 @@ and removed.
         margin-top: 0.75rem;
         padding-top: 0.75rem;
         border-top: 1px dashed color-mix(in oklab, var(--color-base-content) 15%, transparent);
-    }
-
-    .range-list {
-        list-style: none;
-        margin: 0 0 0.75rem;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 0.3rem;
-    }
-
-    .range-list li {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.5rem;
-        font-size: 0.9rem;
-    }
-
-    .range-add {
-        display: flex;
-        align-items: flex-end;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-    }
-
-    .range-add label {
-        display: flex;
-        flex-direction: column;
-        gap: 0.15rem;
     }
 
     .page-editor {
