@@ -154,9 +154,15 @@ function courseName(course: string | CourseDto): string {
     return typeof course === "string" ? course : course.name;
 }
 
+/** Course-scoped routes (chat, quiz, content) key off the real course id, so map it
+ *  from the expanded course rather than the progress record's own id. */
+function courseId(course: string | CourseDto): string {
+    return typeof course === "string" ? course : course.id;
+}
+
 function mapCourses(records: CourseProgressDto[]): DashboardCourse[] {
     return records.map((record) => ({
-        id: record.id,
+        id: courseId(record.course),
         name: courseName(record.course),
         level: toNumber(record.course_level, 1),
         points: toNumber(record.course_points),

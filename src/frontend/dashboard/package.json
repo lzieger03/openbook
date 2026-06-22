@@ -22,5 +22,8 @@
     "daisyui": "^5.5.19",
     "svelte-spa-router": "^5.0.1",
     "tailwindcss": "^4.2.4"
+  },
+  "dependencies": {
+    "markdown-it": "^14.2.0"
   }
 }

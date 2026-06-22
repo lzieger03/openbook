@@ -10,18 +10,19 @@ License, or (at your option) any later version.
 
 <!--
 @component
-Wiki-style course content page: a table of contents on the left and a readable
-article on the right.
-
-Note: the demo courses have no authored content yet (description is empty,
-text_format = Markdown), so the sections below are sample placeholders. TODO:
-load and render the real course material (Markdown) from the content API.
+Wiki-style course content page: a table of contents on the left and the readable
+course material on the right. The material is the content authored by teachers in
+the /teacher area (course materials → page ranges → textbook pages); it is loaded
+and rendered via the content data layer. When a course has no authored content yet,
+a friendly placeholder is shown instead.
 -->
 <script lang="ts">
     import {onMount} from "svelte";
     import {push} from "svelte-spa-router";
     import {dashboardStore} from "../../stores/dashboard.store.js";
     import type {DashboardState} from "../../stores/dashboard.store.js";
+    import {loadCourseContent} from "../../data/course-content.js";
+    import type {ContentMaterialView} from "../../data/course-content.js";
 
     let {params}: {params?: {id?: string}} = $props();
 
@@ -33,6 +34,10 @@ load and render the real course material (Markdown) from the content API.
         skills: [],
         courses: [],
     });
+
+    let materials = $state<ContentMaterialView[]>([]);
+    let contentLoading = $state(true);
+    let contentError = $state("");
 
     onMount(() => {
         const unsubscribe = dashboardStore.subscribe((value) => {
@@ -46,17 +51,41 @@ load and render the real course material (Markdown) from the content API.
         return unsubscribe;
     });
 
+    // Reload the authored content whenever the course in the route changes.
+    $effect(() => {
+        const courseId = params?.id;
+
+        if (!courseId) {
+            materials = [];
+            contentLoading = false;
+            return;
+        }
+
+        contentLoading = true;
+        contentError = "";
+
+        loadCourseContent(courseId)
+            .then((result) => {
+                materials = result;
+            })
+            .catch((error: unknown) => {
+                contentError = error instanceof Error ? error.message : String(error);
+            })
+            .finally(() => {
+                contentLoading = false;
+            });
+    });
+
     const courseTitle = $derived(
         state.courses.find((course) => course.id === params?.id)?.name ?? "Course",
     );
 
-    const sections = [
-        {id: "overview", title: "Overview"},
-        {id: "getting-started", title: "Getting started"},
-        {id: "key-concepts", title: "Key concepts"},
-        {id: "example", title: "Example"},
-        {id: "summary", title: "Summary"},
-    ];
+    const hasContent = $derived(materials.some((material) => material.pages.length > 0));
+
+    /** A stable DOM/anchor id for a page section. */
+    function anchor(pageId: string): string {
+        return `page-${pageId}`;
+    }
 
     function scrollTo(id: string): void {
         document.getElementById(id)?.scrollIntoView({behavior: "smooth", block: "start"});
@@ -69,11 +98,20 @@ load and render the real course material (Markdown) from the content API.
 
         <p class="toc-label">On this page</p>
         <nav class="toc-nav" aria-label="Table of contents">
-            {#each sections as section (section.id)}
-                <button type="button" class="toc-link" onclick={() => scrollTo(section.id)}>
-                    {section.title}
-                </button>
-            {/each}
+            {#if hasContent}
+                {#each materials as material (material.id)}
+                    {#if material.pages.length > 0}
+                        <p class="toc-group">{material.title}</p>
+                        {#each material.pages as page (page.id)}
+                            <button type="button" class="toc-link" onclick={() => scrollTo(anchor(page.id))}>
+                                {page.title}
+                            </button>
+                        {/each}
+                    {/if}
+                {/each}
+            {:else}
+                <p class="muted">No sections yet.</p>
+            {/if}
         </nav>
     </aside>
 
@@ -81,59 +119,39 @@ load and render the real course material (Markdown) from the content API.
         <header class="article-head">
             <p class="eyebrow">Course content</p>
             <h1 class="article-title">{courseTitle}</h1>
-            <p class="placeholder-note">📝 Sample content — the authored course material will appear here.</p>
         </header>
 
-        <section id="overview" class="block">
-            <h2>Overview</h2>
-            <p>
-                Welcome to <strong>{courseTitle}</strong>. This page collects the course material in a
-                readable, wiki-style format so you can browse concepts, examples and summaries at your own pace.
-            </p>
-        </section>
-
-        <section id="getting-started" class="block">
-            <h2>Getting started</h2>
-            <p>Work through the sections in order. Each concept builds on the previous one.</p>
-            <div class="callout">
-                💡 Tip: open the AI tutor (the chat icon) any time you want a concept explained differently.
-            </div>
-        </section>
-
-        <section id="key-concepts" class="block">
-            <h2>Key concepts</h2>
-            <ul>
-                <li>The fundamentals and core vocabulary of {courseTitle}.</li>
-                <li>How the pieces fit together in practice.</li>
-                <li>Common mistakes and how to avoid them.</li>
-            </ul>
-        </section>
-
-        <section id="example" class="block">
-            <h2>Example</h2>
-            <p>A minimal example you can adapt:</p>
-            <pre class="code"><code>&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-  &lt;head&gt;&lt;title&gt;{courseTitle}&lt;/title&gt;&lt;/head&gt;
-  &lt;body&gt;Hello, learner!&lt;/body&gt;
-&lt;/html&gt;</code></pre>
-        </section>
-
-        <section id="summary" class="block">
-            <h2>Summary</h2>
-            <p>
-                You now have a map of {courseTitle}. Test yourself with the quiz, or ask the tutor to go deeper
-                on any section.
-            </p>
-            <div class="actions">
-                <button type="button" class="btn btn-primary" onclick={() => push(`/quiz/${params?.id ?? ""}`)}>
-                    Take the quiz
-                </button>
-                <button type="button" class="btn btn-ghost" onclick={() => push(`/chat/${params?.id ?? ""}`)}>
-                    Ask the tutor
-                </button>
-            </div>
-        </section>
+        {#if contentLoading}
+            <p class="muted">Loading course content…</p>
+        {:else if contentError}
+            <p class="error">{contentError}</p>
+        {:else if hasContent}
+            {#each materials as material (material.id)}
+                {#each material.pages as page (page.id)}
+                    <section id={anchor(page.id)} class="block">
+                        <h2>{page.title}</h2>
+                        {#if page.format === "HTML"}
+                            <iframe class="html-frame" title={page.title} sandbox="" srcdoc={page.html}></iframe>
+                        {:else}
+                            <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+                            <div class="prose">{@html page.html}</div>
+                        {/if}
+                    </section>
+                {/each}
+            {/each}
+        {:else}
+            <section class="block">
+                <p class="placeholder-note">
+                    📝 No content has been added to this course yet. Once your teacher publishes course
+                    material in the teacher area, it will appear here.
+                </p>
+                <div class="actions">
+                    <button type="button" class="btn btn-ghost" onclick={() => push(`/chat/${params?.id ?? ""}`)}>
+                        Ask the tutor
+                    </button>
+                </div>
+            </section>
+        {/if}
     </main>
 </div>
 
@@ -185,6 +203,17 @@ load and render the real course material (Markdown) from the content API.
         display: flex;
         flex-direction: column;
         gap: 0.15rem;
+        min-height: 0;
+        overflow-y: auto;
+    }
+
+    .toc-group {
+        margin-top: 0.6rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: color-mix(in oklab, var(--color-base-content) 70%, transparent);
     }
 
     .toc-link {
@@ -254,31 +283,81 @@ load and render the real course material (Markdown) from the content API.
         color: var(--color-base-content);
     }
 
-    .block ul {
-        margin: 0.5rem 0 0 1.25rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.35rem;
+    .error {
+        color: var(--color-error, crimson);
     }
 
-    .callout {
-        margin-top: 0.75rem;
-        padding: 0.9rem 1.1rem;
-        border-radius: 0.75rem;
-        background: color-mix(in oklab, var(--color-primary) 12%, transparent);
-        border-left: 3px solid var(--color-primary);
+    .muted {
+        color: color-mix(in oklab, var(--color-base-content) 60%, transparent);
+        font-size: 0.9rem;
     }
 
-    .code {
+    /* Rendered Markdown / plain-text content. Styling targets the injected HTML. */
+    .prose :global(h1),
+    .prose :global(h2),
+    .prose :global(h3) {
+        font-weight: 700;
+        margin: 1rem 0 0.5rem;
+    }
+
+    .prose :global(h1) {
+        font-size: 1.6rem;
+    }
+
+    .prose :global(h2) {
+        font-size: 1.3rem;
+    }
+
+    .prose :global(h3) {
+        font-size: 1.1rem;
+    }
+
+    .prose :global(p) {
+        margin: 0.5rem 0;
+    }
+
+    .prose :global(ul),
+    .prose :global(ol) {
+        margin: 0.5rem 0 0.5rem 1.5rem;
+    }
+
+    .prose :global(li) {
+        margin: 0.2rem 0;
+    }
+
+    .prose :global(a) {
+        color: var(--color-primary);
+        text-decoration: underline;
+    }
+
+    .prose :global(pre),
+    .prose :global(code) {
+        font-family: ui-monospace, "SF Mono", Menlo, monospace;
+        font-size: 0.9rem;
+    }
+
+    .prose :global(pre) {
         margin-top: 0.75rem;
         padding: 1rem 1.25rem;
         border-radius: 0.75rem;
         overflow-x: auto;
-        font-family: ui-monospace, "SF Mono", Menlo, monospace;
-        font-size: 0.9rem;
-        color: var(--color-base-content);
         background: color-mix(in oklab, var(--color-base-content) 8%, transparent);
         border: 1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);
+    }
+
+    .prose :global(blockquote) {
+        margin: 0.75rem 0;
+        padding: 0.5rem 1rem;
+        border-left: 3px solid var(--color-primary);
+        background: color-mix(in oklab, var(--color-primary) 8%, transparent);
+    }
+
+    .html-frame {
+        width: 100%;
+        min-height: 24rem;
+        border: 1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);
+        border-radius: 0.5rem;
+        background: var(--color-base-100);
     }
 
     .actions {
