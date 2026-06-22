@@ -30,6 +30,12 @@ from ..messages.chat          import (
     LearningPageCompleted,
     LearningPageOpened,
     LearningQuizResult,
+    QuizAnswerOptionPayload,
+    QuizGenerated,
+    QuizGeneratedPayload,
+    QuizQuestionPayload,
+    QuizSourcePayload,
+    QuizStart,
 )
 
 # =============================================================================
@@ -229,6 +235,58 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             ),
         )
 
+    @ws_handler(
+        summary     = "Generate Quiz",
+        description = "Generate a course quiz from RAG documents or course content",
+    )
+    async def handle_quiz_start(
+        self,
+        message: QuizStart,
+    ) -> QuizGenerated | LearningEventStatus:
+        """
+        Generate quiz questions for the current course.
+        """
+        try:
+            quiz = await sync_to_async(self._generate_quiz)(
+                question_count=message.payload.question_count,
+            )
+            return QuizGenerated(
+                payload=QuizGeneratedPayload(
+                    course_id=self._get_required_course_id(),
+                    context_source=quiz.context_source,
+                    questions=[
+                        QuizQuestionPayload(
+                            prompt=question.prompt,
+                            options=[
+                                QuizAnswerOptionPayload(
+                                    text=option.text,
+                                    correct=option.correct,
+                                )
+                                for option in question.options
+                            ],
+                        )
+                        for question in quiz.questions
+                    ],
+                    sources=[
+                        QuizSourcePayload(
+                            chunk_id=source.chunk_id,
+                            document_id=source.document_id,
+                            document_title=source.document_title,
+                            position=source.position,
+                        )
+                        for source in quiz.sources
+                    ],
+                ),
+            )
+        except Exception as error:
+            return LearningEventStatus(
+                payload=LearningEventStatusPayload(
+                    event="quiz_start",
+                    success=False,
+                    message=str(error),
+                ),
+            )
+
     async def _run_learning_event(self, event: str, callback) -> LearningEventStatus:
         """Run a blocking learning event and convert the result into an acknowledgement."""
         try:
@@ -255,6 +313,14 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             course=course_id,
         )
         return str(answer or "")
+
+    def _generate_quiz(self, question_count: int):
+        """Run the blocking quiz generation stack outside the async event loop."""
+        return AssistantOrchestrator().generate_quiz(
+            user=self.scope.get("user"),
+            course=self._get_required_course_id(),
+            question_count=question_count,
+        )
 
     def _record_page_opened(self, page_id: UUID) -> None:
         """Store that the current user opened a course page."""

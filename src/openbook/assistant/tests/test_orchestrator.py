@@ -13,6 +13,8 @@ from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 
 from openbook.assistant.services.orchestrator import AssistantOrchestrator
+from openbook.assistant.services.rag_client import RagContext
+from openbook.assistant.services.rag_client import RagSource
 from openbook.auth.middleware.current_user import reset_current_user
 from openbook.auth.models.user import User
 from openbook.content.models.course import Course
@@ -67,6 +69,24 @@ class AssistantOrchestrator_Tests(TestCase):
             llm_client=self.llm_client,
             learning_context_service=self.learning_context_service,
         )
+
+    def _quiz_response(self):
+        """Return a minimal valid generated quiz response."""
+        return """
+        {
+            "questions": [
+                {
+                    "prompt": "What is HTML?",
+                    "options": [
+                        {"text": "Markup language", "correct": true},
+                        {"text": "Database", "correct": false},
+                        {"text": "Server", "correct": false},
+                        {"text": "Image format", "correct": false}
+                    ]
+                }
+            ]
+        }
+        """
 
     def test_answer_global_query(self):
         """Global chat should not require a course permission check."""
@@ -205,6 +225,61 @@ class AssistantOrchestrator_Tests(TestCase):
             score=0.75,
             attempts=3,
         )
+
+    def test_generate_quiz_uses_rag_documents_first(self):
+        """Quiz generation should prefer indexed assistant document context."""
+        source = RagSource(
+            chunk_id="chunk-1",
+            document_id="document-1",
+            document_title="Guide",
+            position=0,
+        )
+        self.llm_client.retrieve_rag_context.return_value = RagContext(
+            context="Indexed HTML context",
+            sources=(source,),
+        )
+        self.llm_client.get_user_message.return_value = self._quiz_response()
+
+        quiz = self.orchestrator.generate_quiz(
+            user=self.owner,
+            course=self.course,
+            question_count=1,
+        )
+
+        self.assertEqual(quiz.context_source, "rag_documents")
+        self.assertEqual(quiz.sources, (source,))
+        self.assertEqual(len(quiz.questions), 1)
+        self.llm_client.retrieve_rag_context.assert_called_once()
+        prompt = self.llm_client.get_user_message.call_args.args[0]
+        self.assertIn("Indexed HTML context", prompt)
+        self.assertNotIn("Kurskontext:", prompt)
+
+    def test_generate_quiz_falls_back_to_course_context(self):
+        """Quiz generation should use course content when no RAG documents exist."""
+        self.page.content = {
+            "type": "source",
+            "format": "MD",
+            "source": "# HTML Basics\nHTML structures web pages.",
+        }
+        self.page.save(update_fields=["content"])
+        self.llm_client.retrieve_rag_context.return_value = RagContext(
+            context="",
+            sources=(),
+        )
+        self.llm_client.get_user_message.return_value = self._quiz_response()
+
+        quiz = self.orchestrator.generate_quiz(
+            user=self.owner,
+            course=self.course,
+            question_count=1,
+        )
+
+        self.assertEqual(quiz.context_source, "course_context")
+        self.assertEqual(len(quiz.questions), 1)
+        prompt = self.llm_client.get_user_message.call_args.args[0]
+        self.assertIn("Kurskontext:", prompt)
+        self.assertIn("Course", prompt)
+        self.assertIn("HTML structures web pages.", prompt)
 
     def test_record_page_opened_denied(self):
         """Learning-state writes should require course access."""

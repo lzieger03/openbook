@@ -65,27 +65,18 @@ Beispiel Kontext-String fuer das LLM:
    Letztes Quiz: Score 0.3 (schlecht) auf Seite 'Division'."
 
 
-QUIZ-CONSUMER (noch nicht gebaut - wartet auf KI-Team):
----------------------------------------------------------
-Der Quiz-Consumer in openbook/ai/consumers/quiz.py soll NICHT auf dem
-aktuellen QuizQuestion-Modell des KI-Pair-Teams (ki-pair_dev/quizzing)
-aufbauen. Dieses Modell wird sich noch aendern.
+QUIZ-GENERIERUNG:
+-----------------
+Quiz-Fragen werden dynamisch ueber den bestehenden kursbezogenen Chat-WebSocket
+generiert. Das statische KI-Pair-Quiz mit JSON-Datei/QuizQuestion-Modell wurde
+entfernt.
 
-GEPLANTES Verhalten:
-  - Die KI generiert Quiz-Fragen dynamisch aus dem Kursmaterial (TextbookPage)
-  - Kein statisches JSON / keine vordefinierten Fragen in der DB
-  - Ablauf: Frontend verbindet sich, schickt Kurs/Seite mit, KI generiert
-    passende Fragen on-the-fly per LLM-Call und schickt sie per WebSocket
-
-Was dann gebaut werden muss:
-  1. messages/quiz.py  - Nachrichtenprotokoll (quiz_start, quiz_question,
-                         quiz_answer, quiz_result, quiz_finished)
-  2. consumers/quiz.py - Consumer der LLM-Aufruf macht und Fragen streamt
-  3. Route in asgi.py eintragen: path("ws/ai/quiz", QuizConsumer.as_asgi())
-  4. QuizResult (s.o.) nach jedem Versuch in der DB speichern
-
-WARTEN BIS: KI-Team und Quiz-Team sich auf das endgueltige Datenformat
-geeinigt haben.
+Aktuelles Verhalten:
+  - Frontend sendet quiz_start ueber /ws/ai/courses/<course_id>/chat
+  - AssistantOrchestrator generiert Fragen zuerst aus RAG-Dokumenten
+  - Ohne RAG-Dokumente wird Kurskontext aus Kursdaten, Skills und TextbookPages
+    verwendet
+  - Backend liefert quiz_generated mit Multiple-Choice-Fragen zurueck
 
 
 MODELLE ALS IMPORTS FREISCHALTEN:

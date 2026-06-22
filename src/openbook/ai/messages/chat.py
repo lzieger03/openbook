@@ -150,6 +150,45 @@ class LearningEventStatusPayload(BaseModel):
     success: bool
     message: str = ""
 
+class QuizStartPayload(BaseModel):
+    """
+    Payload for requesting a generated quiz for the current course channel.
+    """
+    question_count: int = Field(default=5, ge=1, le=10)
+
+class QuizAnswerOptionPayload(BaseModel):
+    """
+    A selectable answer option in a generated quiz question.
+    """
+    text:    str
+    correct: bool
+
+class QuizQuestionPayload(BaseModel):
+    """
+    One generated multiple-choice quiz question.
+    """
+    id:      str = Field(default_factory=lambda: str(uuid4()))
+    prompt:  str
+    options: list[QuizAnswerOptionPayload]
+
+class QuizSourcePayload(BaseModel):
+    """
+    Source metadata for a RAG chunk used to generate a quiz.
+    """
+    chunk_id:       str
+    document_id:    str
+    document_title: str
+    position:       int
+
+class QuizGeneratedPayload(BaseModel):
+    """
+    Generated quiz questions for the current course.
+    """
+    course_id:      UUID
+    context_source: Literal["rag_documents", "course_context"]
+    questions:      list[QuizQuestionPayload]
+    sources:        list[QuizSourcePayload] = Field(default_factory=list)
+
 class ChatInput(BaseMessage):
     """
     Chat input sent by the user to the assistant.
@@ -207,3 +246,17 @@ class LearningEventStatus(BaseMessage):
     """
     action:  Literal["learning_event_status"] = "learning_event_status"
     payload: LearningEventStatusPayload
+
+class QuizStart(BaseMessage):
+    """
+    Message sent by the client to generate a course quiz.
+    """
+    action:  Literal["quiz_start"] = "quiz_start"
+    payload: QuizStartPayload
+
+class QuizGenerated(BaseMessage):
+    """
+    Message sent by the server after generating a course quiz.
+    """
+    action:  Literal["quiz_generated"] = "quiz_generated"
+    payload: QuizGeneratedPayload
