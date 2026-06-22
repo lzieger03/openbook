@@ -11,6 +11,7 @@ from __future__ import annotations
 from django.core.exceptions                import ValidationError
 from django.db.utils                       import IntegrityError
 from django.test                           import TestCase
+from django.urls                           import reverse
 
 from openbook.core.utils.content_type      import model_string_for_content_type
 from openbook.content.models.course        import Course
@@ -101,6 +102,25 @@ class RoleAssignment_ViewSet_Tests(ModelViewSetTestMixin, RoleAssignment_Test_Mi
                 "start_date": "",
                 "end_date":   "",
             }
+
+    def test_list_filters_by_scope_type_string(self):
+        """List should accept serialized scope type strings as filters."""
+        self.create_user_and_login(["openbook_auth.view_roleassignment"])
+
+        response = self.client.get(
+            reverse("role_assignment-list"),
+            {
+                "scope_type": model_string_for_content_type(self.ra_student.scope_type),
+                "scope_uuid": str(self.ra_student.scope_uuid),
+                "role": "student",
+                "_expand": "user",
+                "_page_size": "200",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"][0]["id"], str(self.ra_student.id))
 
     operations = {
         "create": {

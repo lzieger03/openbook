@@ -11,7 +11,6 @@
 import type { BreadcrumbsCallback } from "../stores/breadcrumbs.js";
 import { breadcrumbs }              from "../stores/breadcrumbs.js";
 import { wrap }                     from "svelte-spa-router/wrap";
-import GamificationManualTestPage from "./pages/gamification/GamificationManualTestPage.svelte";
 
 /**
  * Set breadcrumbs callback for a matched route and prefix it with a fixed
@@ -36,7 +35,8 @@ export default {
     }),
 
     "/gamification-test": wrap({
-        component: GamificationManualTestPage,
+        asyncComponent: () => import("./pages/gamification/GamificationManualTestPage.svelte"),
+        conditions: [_breadcrumbs(() => [{ href: "#/gamification-test", label: "Gamification Test" }])],
     }),
 
     "*": wrap({

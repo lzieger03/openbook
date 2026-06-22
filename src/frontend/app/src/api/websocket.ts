@@ -142,7 +142,7 @@ export class WebSocketClient<SentMessages extends WebSocketMessage, ReceivedMess
                         // is therefore still waiting for the promise to resolve or reject.
                         if (this.#status === "connecting") {
                             reject(new Error(i18n.value.Error.WebSocket.Failed));
-                        };
+                        }
 
                         // Case 2: External caller deliberately wanted to disconnect.
                         if (this.#status === "disconnected") return;
@@ -299,7 +299,7 @@ export type WebSocketMessageAction = string;
  * received WebSocket message is an object with an `action` property to distinguish
  * the message type. Messages will be serialized as JSON over the wire.
  */
-export interface WebSocketMessage { action: WebSocketMessageAction };
+export interface WebSocketMessage { action: WebSocketMessageAction }
 
 /**
  * Handler function to handle received messages of a given type.

@@ -21,6 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 #
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECURITY WARNING: don"t run with debug turned on in production!
+MISTRAL_API_KEY = ""
 SECRET_KEY = "django-insecure-jeo+.}_}9(Q.t_IU$WJ!%eL=b:MDbAL.~NY_=a:>D@:W[XPh4["
 DEBUG = True
 ALLOWED_HOSTS = ["*"]
@@ -38,6 +39,8 @@ INSTALLED_APPS = [
     "openbook.ai",
     "openbook.content",
     "openbook.learning",
+    "openbook.quiz",
+    "openbook.assistant",
     "openbook.gamification",
 
     # 3rd-party reusable apps
@@ -144,8 +147,6 @@ DATABASES = {
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-MISTRAL_API_KEY = ""
 
 
 # Django REST framework
@@ -326,8 +327,13 @@ HEADLESS_FRONTEND_URLS = {
 # See: https://django-allauth.readthedocs.io/en/latest/socialaccount/providers/saml.html#guidelines
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+
+# Secure cookies require HTTPS. In local development (DEBUG=True) the app is served
+# over plain HTTP, where browsers refuse to send "Secure" cookies — which silently
+# breaks session/CSRF auth (you appear logged in to the SPA but API calls are
+# anonymous). Only enforce Secure cookies in production, where traffic is HTTPS.
+CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
 
 # Django Unfold Admin
 CRISPY_TEMPLATE_PACK = "unfold_crispy"
@@ -340,7 +346,7 @@ UNFOLD = {
         lambda request: static("openbook/admin/bundle.css"),
     ],
     "SCRIPTS": [
-        lambda request: static("openbook/admin/bundle.js"),
+        lambda request: static("openbook/admin/loader.js"),
     ],
 
     "SITE_FAVICONS": [
@@ -382,7 +388,7 @@ UNFOLD = {
         {
             "icon": "api",
             "title": _("WebSocket API Explorer"),
-            "link": reverse_lazy("asyncapi-docs"),
+            "link": reverse_lazy("asyncapi_docs"),
         },
         {
             "icon": "menu_book",
@@ -648,6 +654,8 @@ STATIC_ROOT = BASE_DIR / "_static"
 STATICFILES_DIRS = [
     BASE_DIR / "frontend" / "admin" / "dist",
     BASE_DIR / "frontend" / "app" / "dist",
+    BASE_DIR / "frontend" / "dashboard" / "dist",
+    BASE_DIR / "frontend" / "teacher" / "dist",
 ]
 
 # Uploaded media files

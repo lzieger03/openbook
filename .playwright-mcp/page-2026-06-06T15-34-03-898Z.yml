@@ -1,0 +1,53 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - img "ElisaAI logo" [ref=e5]
+      - generic [ref=e6]: ElisaAI
+    - generic [ref=e7]:
+      - button "Switch to dark mode" [ref=e8] [cursor=pointer]: 🌙
+      - generic [ref=e10]: Dashboard
+      - generic [ref=e11]: System online // v2.0.2.5
+  - main [ref=e13]:
+    - generic [ref=e14]:
+      - complementary [ref=e15]:
+        - button "← Back to chat" [ref=e16] [cursor=pointer]
+        - paragraph [ref=e17]: On this page
+        - navigation "Table of contents" [ref=e18]:
+          - button "Overview" [ref=e19] [cursor=pointer]
+          - button "Getting started" [ref=e20] [cursor=pointer]
+          - button "Key concepts" [ref=e21] [cursor=pointer]
+          - button "Example" [ref=e22] [cursor=pointer]
+          - button "Summary" [ref=e23] [cursor=pointer]
+      - main [ref=e24]:
+        - generic [ref=e25]:
+          - paragraph [ref=e26]: Course content
+          - heading "Course" [level=1] [ref=e27]
+          - paragraph [ref=e28]: 📝 Sample content — the authored course material will appear here.
+        - generic [ref=e29]:
+          - heading "Overview" [level=2] [ref=e30]
+          - paragraph [ref=e31]:
+            - text: Welcome to
+            - strong [ref=e32]: Course
+            - text: . This page collects the course material in a readable, wiki-style format so you can browse concepts, examples and summaries at your own pace.
+        - generic [ref=e33]:
+          - heading "Getting started" [level=2] [ref=e34]
+          - paragraph [ref=e35]: Work through the sections in order. Each concept builds on the previous one.
+          - generic [ref=e36]: "💡 Tip: open the AI tutor (the chat icon) any time you want a concept explained differently."
+        - generic [ref=e37]:
+          - heading "Key concepts" [level=2] [ref=e38]
+          - list [ref=e39]:
+            - listitem [ref=e40]: The fundamentals and core vocabulary of Course.
+            - listitem [ref=e41]: How the pieces fit together in practice.
+            - listitem [ref=e42]: Common mistakes and how to avoid them.
+        - generic [ref=e43]:
+          - heading "Example" [level=2] [ref=e44]
+          - paragraph [ref=e45]: "A minimal example you can adapt:"
+          - code [ref=e47]: <!DOCTYPE html> <html> <head><title>Course</title></head> <body>Hello, learner!</body> </html>
+        - generic [ref=e48]:
+          - heading "Summary" [level=2] [ref=e49]
+          - paragraph [ref=e50]: You now have a map of Course. Test yourself with the quiz, or ask the tutor to go deeper on any section.
+          - generic [ref=e51]:
+            - button "Take the quiz" [ref=e52] [cursor=pointer]
+            - button "Ask the tutor" [ref=e53] [cursor=pointer]
+  - contentinfo [ref=e54]: Copyright 2026 | OpenBook
+  - button "Open Quick Chat"

@@ -30,6 +30,14 @@ class Course(UUIDMixin, NonUniqueSlugMixin, NameDescriptionMixin, ScopedRolesMix
         related_name = "courses",
     )
 
+    skills = models.ManyToManyField(
+        "openbook_gamification.Skill",
+        verbose_name = _("Skills"),
+        related_name = "courses",
+        blank        = True,
+        help_text    = _("Skills that learners train and level up by working in this course."),
+    )
+
     # License (via new model in core)
     # Image
     # AI Notes (new mixin)

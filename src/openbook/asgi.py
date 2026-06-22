@@ -42,6 +42,7 @@ application = ProtocolTypeRouter({
                 path("ws/ai/chat", ChatConsumer.as_asgi()),
                 # NEUE ROUTEN HIER EINTRAGEN, z.B.:
                 # path("ws/ai/quiz", QuizConsumer.as_asgi()),
+                path("ws/ai/courses/<uuid:course_id>/chat", ChatConsumer.as_asgi()),
             ]),
         ),
     ),

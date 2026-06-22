@@ -20,6 +20,32 @@ import { WebSocketClient }             from "./websocket.js";
 
 let _baseUrl = "";
 
+function isLoopbackHost(hostname: string): boolean {
+    return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
+}
+
+function normalizeBaseUrl(value: string): string {
+    let configuredUrl = new URL(value || window.location.origin, window.location.origin);
+    const currentUrl = new URL(window.location.origin);
+
+    if (
+        isLoopbackHost(configuredUrl.hostname)
+        && isLoopbackHost(currentUrl.hostname)
+        && configuredUrl.protocol === currentUrl.protocol
+        && configuredUrl.port === currentUrl.port
+    ) {
+        configuredUrl = currentUrl;
+    }
+
+    let url = configuredUrl.toString();
+
+    while (url.endsWith("/")) {
+        url = url.slice(0, url.length - 1);
+    }
+
+    return url;
+}
+
 /**
  * Call the well-known endpoint `server.url` to get the full API backend
  * base URL. The result will be cached. Note, that this is encapsulated
@@ -32,11 +58,7 @@ async function getBaseUrl(): Promise<string> {
     if (_baseUrl) return _baseUrl;
 
     let response = await fetch("server.url");
-    _baseUrl = await response.text();
-
-    while (_baseUrl.endsWith("/")) {
-        _baseUrl = _baseUrl.slice(0, _baseUrl.length - 1);
-    }
+    _baseUrl = normalizeBaseUrl((await response.text()).trim());
 
     return _baseUrl;
 }

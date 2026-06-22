@@ -1,0 +1,26 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - img "OpenBook logo" [ref=e5]
+      - generic [ref=e6]: OpenBook
+      - generic [ref=e7]: Teacher
+    - generic [ref=e8]:
+      - button "Switch to dark mode" [ref=e9] [cursor=pointer]: 🌙
+      - generic [ref=e18]: Lars Zieger
+  - main [ref=e10]:
+    - generic [ref=e77]:
+      - navigation [ref=e78]:
+        - button "← My Courses" [ref=e79] [cursor=pointer]
+      - heading "WebProgramming" [level=1] [ref=e81]
+      - tablist [ref=e82]:
+        - tab "Overview" [ref=e83] [cursor=pointer]
+        - tab "Students" [ref=e84] [cursor=pointer]
+        - tab "Content" [active] [ref=e85] [cursor=pointer]
+      - generic [ref=e123]:
+        - heading "Course content" [level=2] [ref=e124]
+        - paragraph [ref=e125]: Attach textbooks and define which page ranges belong to this course.
+        - generic [ref=e126]:
+          - combobox [ref=e127]
+          - button "Add textbook" [disabled]
+        - paragraph [ref=e128]: No materials yet. Add a textbook to start building this course.
+  - contentinfo [ref=e17]: Copyright 2026 | OpenBook

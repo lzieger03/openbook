@@ -1,10 +1,17 @@
 # OpenBook: Interactive Online Textbooks - Server
 # © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
 
-from django.contrib.auth import get_user_model
-from django.test         import TestCase
+from django.contrib.auth                   import get_user_model
+from django.test                           import TestCase
+
+from openbook.auth.middleware.current_user import reset_current_user
+from openbook.auth.models.role             import Role
+from openbook.auth.models.role_assignment  import RoleAssignment
+from openbook.content.models.course        import Course
+from openbook.content.models.library_group import LibraryGroup
 
 from ..models            import AccountProgress
+from ..models            import CourseProgress
 from ..models            import Reward
 from ..models            import RewardEventLog
 
@@ -74,3 +81,72 @@ class Gamification_Signal_Tests(TestCase):
 
         account_points = AccountProgress.objects.get(account=user)
         self.assertEqual(account_points.point_total, 50)
+
+
+class Gamification_Enrollment_Signal_Tests(TestCase):
+    """Tests for the CourseProgress signals tied to course enrollment."""
+
+    def setUp(self):
+        super().setUp()
+        reset_current_user()
+
+        self.user          = User.objects.create_user(
+            username = "enroll-user",
+            email    = "enroll-user@test.com",
+            password = "password",
+        )
+        self.library_group = LibraryGroup.objects.create(name="Test", slug="test")
+        self.course        = Course.objects.create(name="Test Course", slug="test-course", group=self.library_group)
+
+        self.role_student  = Role.from_obj(self.course, name="Student", slug="student", priority=0)
+        self.role_teacher  = Role.from_obj(self.course, name="Teacher", slug="teacher", priority=2)
+        self.role_student.save()
+        self.role_teacher.save()
+
+    def _enroll(self, role):
+        assignment = RoleAssignment.from_obj(self.course, role=role, user=self.user)
+        assignment.save()
+        return assignment
+
+    def test_enrolling_student_creates_course_progress(self):
+        """Enrolling a user as a student creates a zeroed CourseProgress row."""
+        self._enroll(self.role_student)
+
+        progress = CourseProgress.objects.get(account=self.user, course=self.course)
+        self.assertEqual(progress.course_points, 0)
+        self.assertEqual(progress.course_level, 1)
+
+    def test_enrolling_non_student_role_does_not_create_progress(self):
+        """A teacher assignment must not create a learner CourseProgress row."""
+        self._enroll(self.role_teacher)
+
+        self.assertFalse(CourseProgress.objects.filter(account=self.user, course=self.course).exists())
+
+    def test_enrolling_twice_is_idempotent(self):
+        """Re-saving a student assignment must not raise or duplicate progress rows."""
+        assignment = self._enroll(self.role_student)
+        assignment.save()
+
+        self.assertEqual(
+            CourseProgress.objects.filter(account=self.user, course=self.course).count(),
+            1,
+        )
+
+    def test_unenrolling_removes_empty_progress(self):
+        """Withdrawing a student who earned no points removes the placeholder row."""
+        assignment = self._enroll(self.role_student)
+        assignment.delete()
+
+        self.assertFalse(CourseProgress.objects.filter(account=self.user, course=self.course).exists())
+
+    def test_unenrolling_keeps_progress_with_points(self):
+        """Withdrawing a student who earned points keeps their progress and history."""
+        assignment = self._enroll(self.role_student)
+
+        progress = CourseProgress.objects.get(account=self.user, course=self.course)
+        progress.course_points = 25
+        progress.save(update_fields=["course_points"])
+
+        assignment.delete()
+
+        self.assertTrue(CourseProgress.objects.filter(account=self.user, course=self.course).exists())

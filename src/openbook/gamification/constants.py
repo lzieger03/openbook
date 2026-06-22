@@ -23,6 +23,15 @@ class LearningActivityType(models.TextChoices):
     GAME_PLAYED       = "GAME_PLAYED",       _("Game Played")
 
 
+class CourseEventType(models.TextChoices):
+    """
+    Event types written to the reward event log when a learner earns points inside
+    a course. These carry a non-zero point delta so the global account progress and
+    streak are updated alongside the per-course progress.
+    """
+    COURSE_POINTS_AWARDED = "COURSE_POINTS_AWARDED", _("Course Points Awarded")
+
+
 class StreakEventType(models.TextChoices):
     """
     Event types written to the reward event log when a learning activity is
