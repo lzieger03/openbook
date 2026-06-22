@@ -18,7 +18,7 @@ DEBUG = False
 ALLOWED_HOSTS = ["*"]
 
 # MistralAI API access
-MISTRAL_API_KEY = "dZM4jr9K7YElmXBhhJwnHsfIQVGrrNRE"
+MISTRAL_API_KEY =
 
 # Where to redirect, when the root URL of the server is accessed
 OB_ROOT_REDIRECT = "/api/"
