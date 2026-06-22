@@ -316,25 +316,28 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     def _generate_quiz(self, question_count: int):
         """Run the blocking quiz generation stack outside the async event loop."""
+        course_id = self._get_required_course_id()
         return AssistantOrchestrator().generate_quiz(
             user=self.scope.get("user"),
-            course=self._get_required_course_id(),
+            course=course_id,
             question_count=question_count,
         )
 
     def _record_page_opened(self, page_id: UUID) -> None:
         """Store that the current user opened a course page."""
+        course_id = self._get_required_course_id()
         AssistantOrchestrator().record_page_opened(
             user=self.scope.get("user"),
-            course=self._get_required_course_id(),
+            course=course_id,
             page=page_id,
         )
 
     def _mark_page_completed(self, page_id: UUID) -> None:
         """Store that the current user completed a course page."""
+        course_id = self._get_required_course_id()
         AssistantOrchestrator().mark_page_completed(
             user=self.scope.get("user"),
-            course=self._get_required_course_id(),
+            course=course_id,
             page=page_id,
         )
 
@@ -345,9 +348,10 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         attempts: int | None,
     ) -> None:
         """Store the current user's quiz result for a course page."""
+        course_id = self._get_required_course_id()
         AssistantOrchestrator().record_quiz_result(
             user=self.scope.get("user"),
-            course=self._get_required_course_id(),
+            course=course_id,
             page=page_id,
             score=score,
             attempts=attempts,
