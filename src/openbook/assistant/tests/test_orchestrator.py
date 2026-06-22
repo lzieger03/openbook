@@ -16,7 +16,10 @@ from openbook.assistant.services.orchestrator import AssistantOrchestrator
 from openbook.auth.middleware.current_user import reset_current_user
 from openbook.auth.models.user import User
 from openbook.content.models.course import Course
+from openbook.content.models.course_material import CourseMaterial
 from openbook.content.models.library_group import LibraryGroup
+from openbook.content.models.textbook import Textbook
+from openbook.content.models.textbook_page import TextbookPage
 
 
 class AssistantOrchestrator_Tests(TestCase):
@@ -41,9 +44,29 @@ class AssistantOrchestrator_Tests(TestCase):
             group=self.library_group,
             owner=self.owner,
         )
+        self.textbook = Textbook.objects.create(
+            name="Textbook",
+            slug="textbook",
+            group=self.library_group,
+        )
+        CourseMaterial.objects.create(
+            course=self.course,
+            textbook=self.textbook,
+            position=0,
+        )
+        self.page = TextbookPage.objects.create(
+            textbook=self.textbook,
+            name="Page",
+            position=0,
+        )
         self.llm_client = Mock()
         self.llm_client.perform_rag_query.return_value = "answer"
-        self.orchestrator = AssistantOrchestrator(llm_client=self.llm_client)
+        self.learning_context_service = Mock()
+        self.learning_context_service.get_prompt_context.return_value = "learning context"
+        self.orchestrator = AssistantOrchestrator(
+            llm_client=self.llm_client,
+            learning_context_service=self.learning_context_service,
+        )
 
     def test_answer_global_query(self):
         """Global chat should not require a course permission check."""
@@ -53,7 +76,26 @@ class AssistantOrchestrator_Tests(TestCase):
         self.llm_client.perform_rag_query.assert_called_once_with(
             "Question?",
             course=None,
+            learning_context="",
         )
+        self.learning_context_service.get_prompt_context.assert_not_called()
+
+    def test_answer_global_query_falls_back_without_global_documents(self):
+        """Global chat should still answer when no global RAG documents exist."""
+        self.llm_client.perform_rag_query.side_effect = RuntimeError(
+            "No global assistant documents have been indexed yet."
+        )
+        self.llm_client.get_user_message.return_value = "direct answer"
+
+        answer = self.orchestrator.answer("Question?", user=self.student)
+
+        self.assertEqual(answer, "direct answer")
+        self.llm_client.perform_rag_query.assert_called_once_with(
+            "Question?",
+            course=None,
+            learning_context="",
+        )
+        self.llm_client.get_user_message.assert_called_once_with("Question?")
 
     def test_answer_global_query_denied_for_anonymous_user(self):
         """Global chat should require authentication."""
@@ -72,6 +114,11 @@ class AssistantOrchestrator_Tests(TestCase):
         self.llm_client.perform_rag_query.assert_called_once_with(
             "Question?",
             course=self.course,
+            learning_context="learning context",
+        )
+        self.learning_context_service.get_prompt_context.assert_called_once_with(
+            user=self.owner,
+            course=self.course,
         )
 
     def test_answer_course_query_denied(self):
@@ -81,4 +128,89 @@ class AssistantOrchestrator_Tests(TestCase):
                 "Question?",
                 user=self.student,
                 course=self.course,
+            )
+
+    def test_answer_course_query_falls_back_without_course_documents(self):
+        """Course chat should answer directly when no course RAG documents exist."""
+        self.llm_client.perform_rag_query.side_effect = RuntimeError(
+            "No assistant documents have been indexed for this course yet."
+        )
+        self.llm_client.get_user_message.return_value = "direct course answer"
+
+        answer = self.orchestrator.answer(
+            "Question?",
+            user=self.owner,
+            course=self.course,
+        )
+
+        self.assertEqual(answer, "direct course answer")
+        self.llm_client.perform_rag_query.assert_called_once_with(
+            "Question?",
+            course=self.course,
+            learning_context="learning context",
+        )
+        self.llm_client.get_user_message.assert_called_once_with("Question?")
+
+    def test_record_page_opened(self):
+        """Page-open events should be delegated to the learning context service."""
+        self.learning_context_service.record_page_opened.return_value = "learning state"
+
+        learning_state = self.orchestrator.record_page_opened(
+            user=self.owner,
+            course=self.course,
+            page=self.page,
+        )
+
+        self.assertEqual(learning_state, "learning state")
+        self.learning_context_service.record_page_opened.assert_called_once_with(
+            user=self.owner,
+            course=self.course,
+            page=self.page,
+        )
+
+    def test_mark_page_completed(self):
+        """Page-completion events should be delegated to the learning context service."""
+        self.learning_context_service.mark_page_completed.return_value = "learning state"
+
+        learning_state = self.orchestrator.mark_page_completed(
+            user=self.owner,
+            course=self.course,
+            page=self.page,
+        )
+
+        self.assertEqual(learning_state, "learning state")
+        self.learning_context_service.mark_page_completed.assert_called_once_with(
+            user=self.owner,
+            course=self.course,
+            page=self.page,
+        )
+
+    def test_record_quiz_result(self):
+        """Quiz-result events should be delegated to the learning context service."""
+        self.learning_context_service.record_quiz_result.return_value = "quiz result"
+
+        quiz_result = self.orchestrator.record_quiz_result(
+            user=self.owner,
+            course=self.course,
+            page=self.page,
+            score=0.75,
+            attempts=3,
+        )
+
+        self.assertEqual(quiz_result, "quiz result")
+        self.learning_context_service.record_quiz_result.assert_called_once_with(
+            user=self.owner,
+            course=self.course,
+            page=self.page,
+            score=0.75,
+            attempts=3,
+        )
+
+    def test_record_page_opened_denied(self):
+        """Learning-state writes should require course access."""
+        with self.assertRaises(PermissionDenied):
+            self.orchestrator.record_page_opened(
+                user=self.student,
+                course=self.course,
+                page=self.page,
             )

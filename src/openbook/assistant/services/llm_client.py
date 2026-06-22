@@ -71,9 +71,13 @@ class LLM_Client:
         """Delegiert das Laden der RAG-Daten an den RagClient."""
         self._get_rag_client().load_data(file_path, course=course)
 
-    def perform_rag_query(self, query: str, course=None) -> str:
+    def perform_rag_query(self, query: str, course=None, learning_context: str = "") -> str:
         """Delegiert die RAG-Abfrage an den RagClient."""
-        return self._get_rag_client().perform_rag_query(query, course=course)
+        return self._get_rag_client().perform_rag_query(
+            query,
+            course=course,
+            learning_context=learning_context,
+        )
 
     def _get_rag_client(self):
         """Create the RAG client lazily to avoid circular service initialization."""

@@ -23,7 +23,7 @@ sidebar, minimised icon) can be layered on later.
     import {dashboardStore} from "../../stores/dashboard.store.js";
     import type {DashboardState} from "../../stores/dashboard.store.js";
     import {createAiChatStore} from "../../stores/ai-chat.store.js";
-    import type {AiChatState, AiChatStore} from "../../stores/ai-chat.store.js";
+    import type {AiChatState} from "../../stores/ai-chat.store.js";
 
     let {params}: {params?: {id?: string}} = $props();
 
@@ -36,7 +36,8 @@ sidebar, minimised icon) can be layered on later.
         courses: [],
     });
 
-    let chat: AiChatStore | undefined;
+    // AI chat over the course-scoped WebSocket channel.
+    const chat = createAiChatStore(() => params?.id);
     let chatState = $state<AiChatState>({connection: "disconnected", errorMessage: "", messages: []});
     let draft = $state("");
 
@@ -49,7 +50,6 @@ sidebar, minimised icon) can be layered on later.
             dashboardStore.refresh();
         }
 
-        chat = createAiChatStore(params?.id);
         const unsubscribeChat = chat.subscribe((value) => {
             chatState = value;
         });
@@ -58,7 +58,7 @@ sidebar, minimised icon) can be layered on later.
         return () => {
             unsubscribeDashboard();
             unsubscribeChat();
-            void chat?.disconnect();
+            void chat.disconnect();
         };
     });
 
@@ -92,7 +92,7 @@ sidebar, minimised icon) can be layered on later.
         }
 
         draft = "";
-        await chat?.sendChatInput("markdown", text);
+        await chat.sendChatInput("markdown", text);
     }
 </script>
 
@@ -171,7 +171,7 @@ sidebar, minimised icon) can be layered on later.
                     <span class="error-icon" aria-hidden="true">🔌</span>
                     <h2 class="error-title">Assistant unavailable</h2>
                     <p class="error-text">{chatState.errorMessage}</p>
-                    <button type="button" class="btn btn-primary" onclick={() => chat?.retry()}>Retry</button>
+                    <button type="button" class="btn btn-primary" onclick={() => chat.retry()}>Retry</button>
                 </div>
             </div>
         {/if}

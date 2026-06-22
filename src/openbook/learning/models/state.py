@@ -55,3 +55,9 @@ class LearningState(UUIDMixin):
                 name="openbook_learning_unique_user_course_state",
             )
         ]
+
+    def __str__(self):
+        return _("{user} in {course}").format(
+            user=self.user,
+            course=self.course,
+        )

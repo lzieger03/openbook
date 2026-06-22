@@ -70,7 +70,7 @@ from chanx.messages.base import BaseMessage
 from datetime            import datetime
 from pydantic            import BaseModel, Field
 from typing              import Literal
-from uuid                import uuid4
+from uuid                import UUID, uuid4
 
 ChatMessageSender = Literal["user", "assistant"]
 """Who sent the message, the user or the AI assistant"""
@@ -128,6 +128,28 @@ class ChatHistoryPayload(BaseModel):
     """
     messages: list[ChatMessagePayload]
 
+class LearningPagePayload(BaseModel):
+    """
+    Payload for page-related learning progress events.
+    """
+    page_id: UUID
+
+class LearningQuizResultPayload(BaseModel):
+    """
+    Payload for storing a quiz result in the learning model.
+    """
+    page_id:  UUID
+    score:    float
+    attempts: int | None = None
+
+class LearningEventStatusPayload(BaseModel):
+    """
+    Payload acknowledging a learning progress event.
+    """
+    event:   str
+    success: bool
+    message: str = ""
+
 class ChatInput(BaseMessage):
     """
     Chat input sent by the user to the assistant.
@@ -157,3 +179,31 @@ class ChatHistory(BaseMessage):
     """
     action:  Literal["chat_history"] = "chat_history"
     payload: ChatHistoryPayload
+
+class LearningPageOpened(BaseMessage):
+    """
+    Message sent by the client when the current course page was opened.
+    """
+    action:  Literal["learning_page_opened"] = "learning_page_opened"
+    payload: LearningPagePayload
+
+class LearningPageCompleted(BaseMessage):
+    """
+    Message sent by the client when the current course page was completed.
+    """
+    action:  Literal["learning_page_completed"] = "learning_page_completed"
+    payload: LearningPagePayload
+
+class LearningQuizResult(BaseMessage):
+    """
+    Message sent by the client when a course quiz result should be stored.
+    """
+    action:  Literal["learning_quiz_result"] = "learning_quiz_result"
+    payload: LearningQuizResultPayload
+
+class LearningEventStatus(BaseMessage):
+    """
+    Acknowledgement for a learning progress event.
+    """
+    action:  Literal["learning_event_status"] = "learning_event_status"
+    payload: LearningEventStatusPayload

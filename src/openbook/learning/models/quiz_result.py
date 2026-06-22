@@ -49,3 +49,10 @@ class QuizResult(UUIDMixin):
                 name="openbook_learning_unique_user_page_quiz",
             )
         ]
+
+    def __str__(self):
+        return _("{user} on {page}: {score}").format(
+            user=self.user,
+            page=self.page,
+            score=self.score,
+        )
