@@ -30,6 +30,10 @@ develop-eggs/
 ## Needed for typescript output
 #dist/
 
+# Generated frontend build output
+src/frontend/*/dist/
+src/frontend/*/src/tailwind.css
+
 downloads/
 eggs/
 .eggs/
