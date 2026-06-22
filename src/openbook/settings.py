@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     "openbook.auth",
     "openbook.ai",
     "openbook.content",
+    "openbook.learning",
+    "openbook.gamification",
 
     # 3rd-party reusable apps
     "daphne",
@@ -142,6 +144,9 @@ DATABASES = {
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+MISTRAL_API_KEY = ""
+
 
 # Django REST framework
 REST_FRAMEWORK = {

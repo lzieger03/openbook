@@ -1,0 +1,21 @@
+{
+	"folders": [
+		{
+			"path": "../../../../.."
+		}
+	],
+	"settings": {
+		"python-envs.defaultEnvManager": "ms-python.python:venv",
+		"python-envs.defaultPackageManager": "ms-python.python:pip",
+		"files.associations": {
+			"renovate.json": "jsonc",
+			"renovate.json5": "jsonc",
+			".renovaterc": "jsonc",
+			".renovaterc.json": "jsonc",
+			".renovaterc.json5": "jsonc"
+		},
+		"chat.agentFilesLocations": {
+			".agents/agents": true
+		}
+	}
+}

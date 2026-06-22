@@ -15,8 +15,11 @@ from channels.routing            import ChannelNameRouter, ProtocolTypeRouter, U
 from channels.security.websocket import AllowedHostsOriginValidator
 from django.core.asgi            import get_asgi_application
 from django.urls                 import path
-
 from openbook.ai.consumers.chat  import ChatConsumer
+
+# NEUE WEBSOCKET-ROUTE HIER EINTRAGEN:
+# Wenn ihr einen neuen Consumer baut (z.B. Quiz, Tutor), importiert ihn hier
+# und fügt ihn in den URLRouter unten ein – nach dem gleichen Muster wie ChatConsumer.
 
 # Initialize Django ASGI application early to ensure the AppRegistry
 # is populated before importing code that may import ORM models.
@@ -36,7 +39,9 @@ application = ProtocolTypeRouter({
             # if inner routers are wrapped by additional middleware. See Issue #1428."
             # Therefore, we define all routes of all Django apps here (and not in the apps).
             URLRouter([
-                path("ws/ai/chat", ChatConsumer.as_asgi())
+                path("ws/ai/chat", ChatConsumer.as_asgi()),
+                # NEUE ROUTEN HIER EINTRAGEN, z.B.:
+                # path("ws/ai/quiz", QuizConsumer.as_asgi()),
             ]),
         ),
     ),

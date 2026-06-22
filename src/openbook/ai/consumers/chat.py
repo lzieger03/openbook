@@ -26,6 +26,47 @@ from ..messages.chat          import (
     GetChatHistory,
 )
 
+# =============================================================================
+# FÜR DAS KI-TEAM:
+# =============================================================================
+# Diese Datei ist euer Einstiegspunkt. Hier passiert die gesamte
+# WebSocket-Kommunikation zwischen Frontend und KI-Backend.
+#
+# WEBSOCKET-ENDPUNKT:
+#   ws://localhost:8000/ws/ai/chat
+#
+# WAS IHR ANPASSEN MÜSST:
+#   1. handle_chat_input() — ersetzt den Fake-LLM-Block (Zeile ~90) durch
+#      einen echten Mistral-API-Call. Der API-Key steht in settings.py
+#      unter MISTRAL_API_KEY. Streamt die Tokens direkt durch, das Protokoll
+#      bleibt identisch.
+#
+#      WICHTIG - ASYNC: Dieser Consumer ist vollständig async. Euer LLM_Client
+#      ist synchron. Ihr habt zwei Optionen:
+#        a) Sync-Aufruf wrappen:
+#           from asgiref.sync import sync_to_async
+#           response = await sync_to_async(llm.get_user_message)(message)
+#        b) Euren LLM_Client mit async/await umschreiben (empfohlen für Streaming)
+#
+#      WICHTIG - STREAMING: Der Consumer schickt die Antwort Token für Token.
+#      Euer LLM-Aufruf muss also ebenfalls Token für Token liefern (stream=True
+#      bei Mistral), nicht die komplette Antwort auf einmal.
+#
+#   2. __init__() — ersetzt self.chat_history (In-Memory-Liste) durch
+#      Datenbankzugriff, damit der Verlauf über Sessions hinweg erhalten bleibt.
+#
+#   3. handle_chat_input() Zeile ~80 — guardRails ist immer "none". Hier
+#      könnte eine echte Inhaltsprüfung rein, bevor die Nachricht ans LLM geht.
+#
+# NEUEN CONSUMER (z.B. Quiz) ANLEGEN:
+#   1. Neue Datei consumers/quiz.py nach dem gleichen Muster erstellen
+#   2. Import + Route in asgi.py eintragen (dort steht ein Kommentar wo genau)
+#   3. Nachrichtentypen in messages/ definieren (siehe messages/chat.py als Vorlage)
+#
+# DAS NACHRICHTENPROTOKOLL (was Frontend schickt/empfängt) steht in:
+#   openbook/ai/messages/chat.py
+# =============================================================================
+
 @channel(
     name        = "chat",
     description = "Chat with AI Assistant",
