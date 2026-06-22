@@ -52,11 +52,20 @@ class AssistantOrchestrator:
                 course=course_obj,
             )
 
-        return self.llm_client.perform_rag_query(
-            query,
-            course=course_obj,
-            learning_context=learning_context,
-        )
+        try:
+            return self.llm_client.perform_rag_query(
+                query,
+                course=course_obj,
+                learning_context=learning_context,
+            )
+        except RuntimeError as error:
+            if str(error) in {
+                "No global assistant documents have been indexed yet.",
+                "No assistant documents have been indexed for this course yet.",
+            }:
+                return self.llm_client.get_user_message(query)
+
+            raise
 
     def record_page_opened(
         self,
