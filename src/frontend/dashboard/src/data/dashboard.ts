@@ -17,6 +17,7 @@ import {
     fetchAccountProgress,
     fetchCourseProgress,
     fetchCurrentUser,
+    fetchLeaderboard,
     fetchSkillProgress,
     fetchStreak,
 } from "../api/gamification.js";
@@ -25,6 +26,7 @@ import type {
     CourseDto,
     CourseProgressDto,
     CurrentUserDto,
+    LeaderboardEntryDto,
     SkillDto,
     SkillProgressDto,
     StreakDto,
@@ -66,11 +68,21 @@ export interface DashboardCourse {
     progress: number;
 }
 
+export interface DashboardLeaderboardEntry {
+    rank: number;
+    username: string;
+    fullName: string;
+    level: number;
+    points: number;
+    isCurrentUser: boolean;
+}
+
 export interface DashboardData {
     user: DashboardUser | null;
     stats: DashboardStats | null;
     skills: DashboardSkill[];
     courses: DashboardCourse[];
+    leaderboard: DashboardLeaderboardEntry[];
 }
 
 function toNumber(value: number | string | undefined | null, fallback = 0): number {
@@ -170,17 +182,29 @@ function mapCourses(records: CourseProgressDto[]): DashboardCourse[] {
     }));
 }
 
+function mapLeaderboard(records: LeaderboardEntryDto[]): DashboardLeaderboardEntry[] {
+    return records.map((record) => ({
+        rank: toNumber(record.rank, 1),
+        username: record.username,
+        fullName: record.full_name || record.username,
+        level: toNumber(record.level, 1),
+        points: toNumber(record.point_total),
+        isCurrentUser: Boolean(record.is_current_user),
+    }));
+}
+
 /** Load and map every piece of data the dashboard needs. */
 export async function loadDashboardData(): Promise<DashboardData> {
     // Resolve the current user first so skill/course progress can be scoped to them.
     const user = await fetchCurrentUser();
     const username = user?.username ?? null;
 
-    const [progress, streak, skills, courses] = await Promise.all([
+    const [progress, streak, skills, courses, leaderboard] = await Promise.all([
         fetchAccountProgress(),
         fetchStreak(),
         fetchSkillProgress(username),
         fetchCourseProgress(username),
+        fetchLeaderboard(),
     ]);
 
     // Defence in depth: even if the server returns other accounts' rows (e.g. for
@@ -193,5 +217,6 @@ export async function loadDashboardData(): Promise<DashboardData> {
         stats: mapStats(progress, streak),
         skills: mapSkills(ownSkills),
         courses: mapCourses(ownCourses),
+        leaderboard: mapLeaderboard(leaderboard),
     };
 }

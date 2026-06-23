@@ -166,6 +166,13 @@ placeholders derived from the available skill names until that data exists.
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
+        /* Firefox: keep the track transparent so the bar only shows on hover. */
+        scrollbar-width: thin;
+        scrollbar-color: transparent transparent;
+    }
+
+    .panel-body:hover {
+        scrollbar-color: color-mix(in oklab, var(--color-base-content) 20%, transparent) transparent;
     }
 
     .panel-body::-webkit-scrollbar {
@@ -174,6 +181,10 @@ placeholders derived from the available skill names until that data exists.
 
     .panel-body::-webkit-scrollbar-thumb {
         border-radius: 999px;
+        background: transparent;
+    }
+
+    .panel-body:hover::-webkit-scrollbar-thumb {
         background: color-mix(in oklab, var(--color-base-content) 20%, transparent);
     }
 

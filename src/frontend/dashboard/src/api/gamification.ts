@@ -61,6 +61,15 @@ export interface CourseProgressDto {
     course_progress?: number | string;
 }
 
+export interface LeaderboardEntryDto {
+    rank: number;
+    username: string;
+    full_name: string;
+    level: number;
+    point_total: number;
+    is_current_user: boolean;
+}
+
 export interface CurrentUserDto {
     username: string;
     full_name: string | null;
@@ -126,6 +135,13 @@ export async function fetchCourseProgress(username?: string | null): Promise<Cou
     const data = await apiGet<CourseProgressDto[] | Paginated<CourseProgressDto>>(
         "/api/gamification/course_progress/",
         query,
+    );
+    return toList(data);
+}
+
+export async function fetchLeaderboard(): Promise<LeaderboardEntryDto[]> {
+    const data = await apiGet<LeaderboardEntryDto[] | Paginated<LeaderboardEntryDto>>(
+        "/api/gamification/account_progress/leaderboard/",
     );
     return toList(data);
 }

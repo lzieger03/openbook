@@ -6,6 +6,8 @@ from django_filters.filterset       import FilterSet
 from drf_spectacular.utils          import extend_schema
 from rest_framework.decorators      import action
 from rest_framework.response        import Response
+from rest_framework.serializers     import BooleanField
+from rest_framework.serializers     import CharField
 from rest_framework.serializers     import IntegerField
 from rest_framework.serializers     import Serializer
 from rest_framework.viewsets        import ReadOnlyModelViewSet
@@ -34,6 +36,14 @@ class AccountProgressMeSerializer(Serializer):
     level                    = IntegerField()
     current_level_min_points = IntegerField()
     next_level_min_points    = IntegerField(allow_null=True)
+
+class LeaderboardEntrySerializer(Serializer):
+    rank            = IntegerField()
+    username        = CharField()
+    full_name       = CharField()
+    level           = IntegerField()
+    point_total     = IntegerField()
+    is_current_user = BooleanField()
 
 class AccountProgressFilter(FilterSet):
     account = CharFilter(method="account_filter")
@@ -113,3 +123,33 @@ class AccountProgressViewSet(ReadOnlyModelViewSet):
             "current_level_min_points": current_threshold.min_points if current_threshold else 0,
             "next_level_min_points":    next_threshold.min_points if next_threshold else None,
         })
+
+    @extend_schema(
+        operation_id = "gamification_account_progress_leaderboard",
+        summary      = "Leaderboard",
+        responses    = LeaderboardEntrySerializer(many=True),
+    )
+    @action(detail=False, methods=["get"], url_path="leaderboard")
+    def leaderboard(self, request):
+        # The leaderboard is global: every authenticated user sees the same
+        # ranking, so query all accounts directly rather than the (per-user
+        # scoped) default queryset.
+        top = (
+            AccountProgress.objects
+            .select_related("account")
+            .order_by("-point_total", "account__username")[:10]
+        )
+
+        entries = [
+            {
+                "rank":            index,
+                "username":        progress.account.username,
+                "full_name":       progress.account.get_full_name() or progress.account.username,
+                "level":           progress.level,
+                "point_total":     progress.point_total,
+                "is_current_user": progress.account_id == request.user.id,
+            }
+            for index, progress in enumerate(top, start=1)
+        ]
+
+        return Response(entries)

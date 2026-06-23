@@ -17,6 +17,7 @@ import {writable} from "svelte/store";
 import {loadDashboardData} from "../data/dashboard.js";
 import type {
     DashboardCourse,
+    DashboardLeaderboardEntry,
     DashboardSkill,
     DashboardStats,
     DashboardUser,
@@ -29,6 +30,7 @@ export interface DashboardState {
     stats: DashboardStats | null;
     skills: DashboardSkill[];
     courses: DashboardCourse[];
+    leaderboard: DashboardLeaderboardEntry[];
 }
 
 const initialState: DashboardState = {
@@ -38,6 +40,7 @@ const initialState: DashboardState = {
     stats: null,
     skills: [],
     courses: [],
+    leaderboard: [],
 };
 
 const state = writable<DashboardState>(initialState);
