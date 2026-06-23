@@ -12,7 +12,13 @@ License, or (at your option) any later version.
 @component
 "My Learning" panel: each course is a clickable card showing its progress and
 the skills it teaches (as read-only tags). Clicking a course opens its AI tutor
-page. Only the "Current" tab is wired; "Path"/"Repeat" are placeholders.
+page. "Current" and "Next Steps" are wired off real data; "Repeat" is still a
+placeholder.
+
+The "Next Steps" tab is a "what next?" guide rather than another list: it
+synthesises courses, skills and stats into a short, prioritised set of
+recommended next steps (finish a course, level up a skill, reach the next level,
+keep the streak).
 
 Note: the backend has no course -> skill relation yet, so the skill tags are
 placeholders derived from the available skill names until that data exists.
@@ -20,30 +26,116 @@ placeholders derived from the available skill names until that data exists.
 <script lang="ts">
     import ProgressBar from "../basic/ProgressBar.svelte";
     import SegmentedTabs from "../basic/SegmentedTabs.svelte";
-    import type {DashboardCourse, DashboardSkill} from "../../data/dashboard.js";
+    import type {DashboardCourse, DashboardSkill, DashboardStats} from "../../data/dashboard.js";
 
     let {
         courses,
         skills,
+        stats,
         onCourseOpen,
     }: {
         courses: DashboardCourse[];
         skills: DashboardSkill[];
+        stats: DashboardStats | null;
         onCourseOpen?: (course: DashboardCourse) => void;
     } = $props();
 
-    const tabs = ["Current", "Path", "Repeat"] as const;
+    const tabs = ["Current", "Next Steps", "Repeat"] as const;
     let activeTab = $state<string>("Current");
 
     const isEmpty = $derived(courses.length === 0);
 
-    // Mock data for the not-yet-built tabs (shown blurred behind a "Coming soon" notice).
-    const pathSteps = [
-        {step: 1, title: "Foundations", status: "Completed"},
-        {step: 2, title: "Core concepts", status: "In progress"},
-        {step: 3, title: "Hands-on practice", status: "Locked"},
-        {step: 4, title: "Mastery project", status: "Locked"},
-    ];
+    // A single recommended next step on the "Path" tab. `progress` adds a bar;
+    // `course` makes the card clickable (opens that course's tutor page).
+    interface Recommendation {
+        icon: string;
+        title: string;
+        detail: string;
+        progress?: number;
+        course?: DashboardCourse;
+    }
+
+    /** Pick the most "finish-able" item: the one with the highest progress below 100. */
+    function closestToDone<T extends {progress: number}>(items: T[]): T | undefined {
+        return items
+            .filter((item) => item.progress > 0 && item.progress < 100)
+            .sort((a, b) => b.progress - a.progress)[0];
+    }
+
+    // The "Path" guide: a short, prioritised list of next steps synthesised from
+    // the loaded data. Only steps that actually apply to this user are shown.
+    const recommendations = $derived.by<Recommendation[]>(() => {
+        const list: Recommendation[] = [];
+
+        // 1. Finish a course that is already underway, otherwise start a new one.
+        const courseInProgress = closestToDone(courses);
+        const notStarted = courses.find((course) => course.progress === 0);
+        if (courseInProgress) {
+            list.push({
+                icon: "▶️",
+                title: "Finish a course",
+                detail: `${courseInProgress.name} — ${Math.round(courseInProgress.progress)}% done, almost there!`,
+                course: courseInProgress,
+            });
+        } else if (notStarted) {
+            list.push({
+                icon: "▶️",
+                title: "Start a new course",
+                detail: `Begin ${notStarted.name} and make your first progress.`,
+                course: notStarted,
+            });
+        }
+
+        // 2. Level up the skill closest to its next level.
+        const skillToLevel = closestToDone(skills);
+        if (skillToLevel) {
+            list.push({
+                icon: "⬆️",
+                title: "Level up a skill",
+                detail: `${skillToLevel.name} to Level ${skillToLevel.level + 1} — ${100 - Math.round(skillToLevel.progress)}% to go.`,
+            });
+        }
+
+        // 3. Reach the next account level (or celebrate the top level).
+        if (stats) {
+            if (stats.nextLevelPoints === null) {
+                list.push({
+                    icon: "🏅",
+                    title: "Top level reached",
+                    detail: `You're at Level ${stats.level} — the highest there is. 🎉`,
+                });
+            } else {
+                const remaining = Math.max(0, stats.nextLevelPoints - stats.points);
+                list.push({
+                    icon: "⭐",
+                    title: "Reach the next level",
+                    detail: `${remaining} points to Level ${stats.level + 1}.`,
+                    progress: stats.levelProgress,
+                });
+            }
+        }
+
+        // 4. Keep (or start) the daily streak.
+        if (stats) {
+            if (stats.currentStreak > 0) {
+                list.push({
+                    icon: "🔥",
+                    title: "Keep your streak",
+                    detail: `${stats.currentStreak}-day streak — study today to reach ${stats.currentStreak + 1}.`,
+                });
+            } else {
+                list.push({
+                    icon: "🔥",
+                    title: "Start a streak",
+                    detail: "Study today to begin a new daily streak.",
+                });
+            }
+        }
+
+        return list;
+    });
+
+    // Mock data for the not-yet-built Repeat tab (shown blurred behind a "Coming soon" notice).
     const repeatItems = [
         {title: "HTML structure", due: "Due today"},
         {title: "CSS selectors", due: "Due in 2 days"},
@@ -65,6 +157,23 @@ placeholders derived from the available skill names until that data exists.
         return Array.from({length: count}, (_, offset) => pool[(index + offset) % pool.length]);
     }
 </script>
+
+<!-- Shared inner markup for a recommendation, rendered inside either a button or a div. -->
+{#snippet recInner(rec: Recommendation)}
+    <span class="rec-icon" aria-hidden="true">{rec.icon}</span>
+    <span class="rec-body">
+        <span class="rec-title">{rec.title}</span>
+        <span class="rec-detail">{rec.detail}</span>
+        {#if rec.progress !== undefined}
+            <span class="rec-bar">
+                <ProgressBar value={rec.progress} label={rec.title} />
+            </span>
+        {/if}
+    </span>
+    {#if rec.course}
+        <span class="rec-go" aria-hidden="true">›</span>
+    {/if}
+{/snippet}
 
 <section class="card panel">
     <header class="panel-head">
@@ -96,26 +205,36 @@ placeholders derived from the available skill names until that data exists.
                     </button>
                 {/each}
             {/if}
+        {:else if activeTab === "Next Steps"}
+            {#if recommendations.length === 0}
+                <p class="empty">No next steps yet. Enrol in a course to start your learning path.</p>
+            {:else}
+                {#each recommendations as rec (rec.title)}
+                    {#if rec.course}
+                        <button
+                            type="button"
+                            class="rec-card clickable"
+                            onclick={() => onCourseOpen?.(rec.course!)}
+                        >
+                            {@render recInner(rec)}
+                        </button>
+                    {:else}
+                        <div class="rec-card">
+                            {@render recInner(rec)}
+                        </div>
+                    {/if}
+                {/each}
+            {/if}
         {:else}
-            <!-- Frontend-only: mock content for the unfinished tabs, blurred behind a notice. -->
+            <!-- Frontend-only: mock content for the Repeat tab, blurred behind a notice. -->
             <div class="locked">
                 <div class="locked-content" aria-hidden="true">
-                    {#if activeTab === "Path"}
-                        {#each pathSteps as item (item.step)}
-                            <div class="path-step">
-                                <span class="step-num">{item.step}</span>
-                                <span class="step-title">{item.title}</span>
-                                <span class="step-status">{item.status}</span>
-                            </div>
-                        {/each}
-                    {:else}
-                        {#each repeatItems as item (item.title)}
-                            <div class="repeat-item">
-                                <span class="repeat-title">{item.title}</span>
-                                <span class="repeat-due">{item.due}</span>
-                            </div>
-                        {/each}
-                    {/if}
+                    {#each repeatItems as item (item.title)}
+                        <div class="repeat-item">
+                            <span class="repeat-title">{item.title}</span>
+                            <span class="repeat-due">{item.due}</span>
+                        </div>
+                    {/each}
                 </div>
                 <div class="locked-overlay" role="status">
                     <span class="overlay-badge">🚧 Coming soon</span>
@@ -315,10 +434,88 @@ placeholders derived from the available skill names until that data exists.
         color: color-mix(in oklab, var(--color-base-content) 70%, transparent);
     }
 
-    .path-step,
+    /* A recommendation card may render as a <button> (clickable course) or a <div>;
+       reset the button chrome so both look identical. */
+    .rec-card {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        width: 100%;
+        text-align: left;
+        font: inherit;
+        padding: 0.9rem 1.1rem;
+        border-radius: 1rem;
+        background: color-mix(in oklab, var(--color-base-200) 50%, transparent);
+        border: 1px solid color-mix(in oklab, var(--color-base-content) 8%, transparent);
+    }
+
+    .rec-card.clickable {
+        cursor: pointer;
+        transition: border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .rec-card.clickable:hover {
+        background: color-mix(in oklab, var(--color-primary) 12%, transparent);
+        border-color: color-mix(in oklab, var(--color-primary) 45%, transparent);
+    }
+
+    .rec-card.clickable:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+    }
+
+    .rec-icon {
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 999px;
+        font-size: 1.2rem;
+        background: color-mix(in oklab, var(--color-primary) 14%, transparent);
+    }
+
+    /* Title, detail and optional progress bar stacked, taking the row's free space. */
+    .rec-body {
+        flex: 1 1 auto;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .rec-title {
+        font-weight: 700;
+        color: var(--color-base-content);
+    }
+
+    .rec-detail {
+        font-size: 0.85rem;
+        color: color-mix(in oklab, var(--color-base-content) 70%, transparent);
+    }
+
+    .rec-bar {
+        margin-top: 0.35rem;
+    }
+
+    .rec-go {
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 999px;
+        font-size: 1.2rem;
+        line-height: 1;
+        color: var(--color-primary-content);
+        background: var(--color-primary);
+        box-shadow: 0 0 12px color-mix(in oklab, var(--color-primary) 45%, transparent);
+    }
+
     .repeat-item {
         display: flex;
         align-items: center;
+        justify-content: space-between;
         gap: 1rem;
         padding: 0.9rem 1.1rem;
         border-radius: 1rem;
@@ -326,32 +523,10 @@ placeholders derived from the available skill names until that data exists.
         border: 1px solid color-mix(in oklab, var(--color-base-content) 8%, transparent);
     }
 
-    .repeat-item {
-        justify-content: space-between;
-    }
-
-    .step-num {
-        display: grid;
-        place-items: center;
-        width: 2rem;
-        height: 2rem;
-        flex: 0 0 auto;
-        border-radius: 999px;
-        font-weight: 700;
-        color: var(--color-primary-content);
-        background: var(--color-primary);
-    }
-
-    .step-title,
     .repeat-title {
         flex: 1 1 auto;
         font-weight: 600;
         color: var(--color-base-content);
-    }
-
-    .step-status {
-        font-size: 0.8rem;
-        color: color-mix(in oklab, var(--color-base-content) 65%, transparent);
     }
 
     .repeat-due {

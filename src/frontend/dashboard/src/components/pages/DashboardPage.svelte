@@ -69,6 +69,7 @@ with loading / error / content states.
                 <MyLearningPanel
                     courses={state.courses}
                     skills={state.skills}
+                    stats={state.stats}
                     onCourseOpen={(course) => push(`/chat/${course.id}`)}
                 />
             </div>
