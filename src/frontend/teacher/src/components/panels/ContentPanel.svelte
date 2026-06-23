@@ -27,7 +27,7 @@ in the course.
         deleteMaterial,
         fetchTextbookPages,
         fetchTextbooks,
-        updateMaterialPosition,
+        moveMaterial,
         updateTextbookPage,
     } from "../../api/content.js";
     import type {SourceContent, TextbookDto, TextbookPageDto} from "../../api/content.js";
@@ -183,19 +183,18 @@ in the course.
         }
     }
 
-    /** Swap the position of a material with its neighbour to reorder the list. */
+    /** Move a material one step up or down to reorder the list. */
     async function move(index: number, direction: -1 | 1): Promise<void> {
-        const target = index + direction;
-        const a = materials[index];
-        const b = materials[target];
+        const material = materials[index];
+        const target = materials[index + direction];
 
-        if (!a || !b) {
+        if (!material || !target) {
             return;
         }
 
         error = "";
         try {
-            await Promise.all([updateMaterialPosition(a.id, b.position), updateMaterialPosition(b.id, a.position)]);
+            await moveMaterial(material.id, direction === -1 ? "up" : "down");
             await load();
         } catch (e) {
             error = e instanceof Error ? e.message : String(e);

@@ -160,6 +160,13 @@ export async function updateMaterialPosition(id: string, position: number): Prom
     });
 }
 
+/** Move a material one step up or down in the syllabus (atomic swap on the server). */
+export async function moveMaterial(id: string, direction: "up" | "down"): Promise<CourseMaterialDto> {
+    return apiSend<CourseMaterialDto>("POST", `/api/content/course_materials/${encodeURIComponent(id)}/move/`, {
+        direction,
+    });
+}
+
 export async function deleteMaterial(id: string): Promise<void> {
     await apiSend<void>("DELETE", `/api/content/course_materials/${encodeURIComponent(id)}/`);
 }

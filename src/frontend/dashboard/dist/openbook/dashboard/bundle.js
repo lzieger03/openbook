@@ -1,131 +1,15252 @@
-var d0=Object.defineProperty;var gn=(e,t)=>{for(var r in t)d0(e,r,{get:t[r],enumerable:!0})};var Qs=globalThis.process?.env?.NODE_ENV,x=Qs&&!Qs.toLowerCase().startsWith("prod");var fr=Array.isArray,eu=Array.prototype.indexOf,$r=Array.prototype.includes,lo=Array.from,Ho=Object.keys,Ie=Object.defineProperty,Qe=Object.getOwnPropertyDescriptor,Ui=Object.getOwnPropertyDescriptors,Vi=Object.prototype,tu=Array.prototype,co=Object.getPrototypeOf,Yi=Object.isExtensible;function qr(e){return typeof e=="function"}var ut=()=>{};function _n(e){for(var t=0;t<e.length;t++)e[t]()}function xn(){var e,t,r=new Promise((o,n)=>{e=o,t=n});return{promise:r,resolve:e,reject:t}}var et=Symbol("$state"),fo=Symbol("legacy props"),ru=Symbol(""),yn=Symbol("proxy path"),wn=Symbol("attributes"),Uo=Symbol("class"),Vo=Symbol("style"),Yo=Symbol("text"),Er=Symbol("form reset"),Gi=Symbol("hmr anchor"),Cr=new class extends Error{name="StaleReactionError";message="The reaction that called `getAbortSignal()` was re-run or destroyed"},kn=!!globalThis.document?.contentType&&globalThis.document.contentType.includes("xml");var po=3,$t=8;function ou(e){if(x){let t=new Error(`invariant_violation
-An invariant violation occurred, meaning Svelte's internal assumptions were flawed. This is a bug in Svelte, not your app \u2014 please open an issue at https://github.com/sveltejs/svelte, citing the following message: "${e}"
-https://svelte.dev/e/invariant_violation`);throw t.name="Svelte error",t}else throw new Error("https://svelte.dev/e/invariant_violation")}function Go(e){if(x){let t=new Error(`lifecycle_outside_component
-\`${e}(...)\` can only be used during component initialisation
-https://svelte.dev/e/lifecycle_outside_component`);throw t.name="Svelte error",t}else throw new Error("https://svelte.dev/e/lifecycle_outside_component")}function iu(){if(x){let e=new Error("async_derived_orphan\nCannot create a `$derived(...)` with an `await` expression outside of an effect tree\nhttps://svelte.dev/e/async_derived_orphan");throw e.name="Svelte error",e}else throw new Error("https://svelte.dev/e/async_derived_orphan")}function Wi(){if(x){let e=new Error("bind_invalid_checkbox_value\nUsing `bind:value` together with a checkbox input is not allowed. Use `bind:checked` instead\nhttps://svelte.dev/e/bind_invalid_checkbox_value");throw e.name="Svelte error",e}else throw new Error("https://svelte.dev/e/bind_invalid_checkbox_value")}function au(){if(x){let e=new Error(`derived_references_self
+var __defProp = Object.defineProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+
+// ../../../node_modules/esm-env/dev-fallback.js
+var node_env = globalThis.process?.env?.NODE_ENV;
+var dev_fallback_default = node_env && !node_env.toLowerCase().startsWith("prod");
+
+// ../../../node_modules/svelte/src/internal/shared/utils.js
+var is_array = Array.isArray;
+var index_of = Array.prototype.indexOf;
+var includes = Array.prototype.includes;
+var array_from = Array.from;
+var object_keys = Object.keys;
+var define_property = Object.defineProperty;
+var get_descriptor = Object.getOwnPropertyDescriptor;
+var get_descriptors = Object.getOwnPropertyDescriptors;
+var object_prototype = Object.prototype;
+var array_prototype = Array.prototype;
+var get_prototype_of = Object.getPrototypeOf;
+var is_extensible = Object.isExtensible;
+function is_function(thing) {
+  return typeof thing === "function";
+}
+var noop = () => {
+};
+function run_all(arr) {
+  for (var i = 0; i < arr.length; i++) {
+    arr[i]();
+  }
+}
+function deferred() {
+  var resolve;
+  var reject;
+  var promise = new Promise((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  return { promise, resolve, reject };
+}
+
+// ../../../node_modules/svelte/src/internal/client/constants.js
+var DERIVED = 1 << 1;
+var EFFECT = 1 << 2;
+var RENDER_EFFECT = 1 << 3;
+var MANAGED_EFFECT = 1 << 24;
+var BLOCK_EFFECT = 1 << 4;
+var BRANCH_EFFECT = 1 << 5;
+var ROOT_EFFECT = 1 << 6;
+var BOUNDARY_EFFECT = 1 << 7;
+var CONNECTED = 1 << 9;
+var CLEAN = 1 << 10;
+var DIRTY = 1 << 11;
+var MAYBE_DIRTY = 1 << 12;
+var INERT = 1 << 13;
+var DESTROYED = 1 << 14;
+var REACTION_RAN = 1 << 15;
+var DESTROYING = 1 << 25;
+var EFFECT_TRANSPARENT = 1 << 16;
+var EAGER_EFFECT = 1 << 17;
+var HEAD_EFFECT = 1 << 18;
+var EFFECT_PRESERVED = 1 << 19;
+var USER_EFFECT = 1 << 20;
+var EFFECT_OFFSCREEN = 1 << 25;
+var WAS_MARKED = 1 << 16;
+var REACTION_IS_UPDATING = 1 << 21;
+var ASYNC = 1 << 22;
+var ERROR_VALUE = 1 << 23;
+var STATE_SYMBOL = /* @__PURE__ */ Symbol("$state");
+var LEGACY_PROPS = /* @__PURE__ */ Symbol("legacy props");
+var LOADING_ATTR_SYMBOL = /* @__PURE__ */ Symbol("");
+var PROXY_PATH_SYMBOL = /* @__PURE__ */ Symbol("proxy path");
+var ATTRIBUTES_CACHE = /* @__PURE__ */ Symbol("attributes");
+var CLASS_CACHE = /* @__PURE__ */ Symbol("class");
+var STYLE_CACHE = /* @__PURE__ */ Symbol("style");
+var TEXT_CACHE = /* @__PURE__ */ Symbol("text");
+var FORM_RESET_HANDLER = /* @__PURE__ */ Symbol("form reset");
+var HMR_ANCHOR = /* @__PURE__ */ Symbol("hmr anchor");
+var STALE_REACTION = new class StaleReactionError extends Error {
+  name = "StaleReactionError";
+  message = "The reaction that called `getAbortSignal()` was re-run or destroyed";
+}();
+var IS_XHTML = (
+  // We gotta write it like this because after downleveling the pure comment may end up in the wrong location
+  !!globalThis.document?.contentType && /* @__PURE__ */ globalThis.document.contentType.includes("xml")
+);
+var TEXT_NODE = 3;
+var COMMENT_NODE = 8;
+
+// ../../../node_modules/svelte/src/internal/shared/errors.js
+function invariant_violation(message) {
+  if (dev_fallback_default) {
+    const error2 = new Error(`invariant_violation
+An invariant violation occurred, meaning Svelte's internal assumptions were flawed. This is a bug in Svelte, not your app \u2014 please open an issue at https://github.com/sveltejs/svelte, citing the following message: "${message}"
+https://svelte.dev/e/invariant_violation`);
+    error2.name = "Svelte error";
+    throw error2;
+  } else {
+    throw new Error(`https://svelte.dev/e/invariant_violation`);
+  }
+}
+function lifecycle_outside_component(name) {
+  if (dev_fallback_default) {
+    const error2 = new Error(`lifecycle_outside_component
+\`${name}(...)\` can only be used during component initialisation
+https://svelte.dev/e/lifecycle_outside_component`);
+    error2.name = "Svelte error";
+    throw error2;
+  } else {
+    throw new Error(`https://svelte.dev/e/lifecycle_outside_component`);
+  }
+}
+
+// ../../../node_modules/svelte/src/internal/client/errors.js
+function async_derived_orphan() {
+  if (dev_fallback_default) {
+    const error2 = new Error(`async_derived_orphan
+Cannot create a \`$derived(...)\` with an \`await\` expression outside of an effect tree
+https://svelte.dev/e/async_derived_orphan`);
+    error2.name = "Svelte error";
+    throw error2;
+  } else {
+    throw new Error(`https://svelte.dev/e/async_derived_orphan`);
+  }
+}
+function bind_invalid_checkbox_value() {
+  if (dev_fallback_default) {
+    const error2 = new Error(`bind_invalid_checkbox_value
+Using \`bind:value\` together with a checkbox input is not allowed. Use \`bind:checked\` instead
+https://svelte.dev/e/bind_invalid_checkbox_value`);
+    error2.name = "Svelte error";
+    throw error2;
+  } else {
+    throw new Error(`https://svelte.dev/e/bind_invalid_checkbox_value`);
+  }
+}
+function derived_references_self() {
+  if (dev_fallback_default) {
+    const error2 = new Error(`derived_references_self
 A derived value cannot reference itself recursively
-https://svelte.dev/e/derived_references_self`);throw e.name="Svelte error",e}else throw new Error("https://svelte.dev/e/derived_references_self")}function Zi(e,t,r){if(x){let o=new Error(`each_key_duplicate
-${r?`Keyed each block has duplicate key \`${r}\` at indexes ${e} and ${t}`:`Keyed each block has duplicate key at indexes ${e} and ${t}`}
-https://svelte.dev/e/each_key_duplicate`);throw o.name="Svelte error",o}else throw new Error("https://svelte.dev/e/each_key_duplicate")}function su(e,t,r){if(x){let o=new Error(`each_key_volatile
-Keyed each block has key that is not idempotent \u2014 the key for item at index ${e} was \`${t}\` but is now \`${r}\`. Keys must be the same each time for a given item
-https://svelte.dev/e/each_key_volatile`);throw o.name="Svelte error",o}else throw new Error("https://svelte.dev/e/each_key_volatile")}function uu(e){if(x){let t=new Error(`effect_in_teardown
-\`${e}\` cannot be used inside an effect cleanup function
-https://svelte.dev/e/effect_in_teardown`);throw t.name="Svelte error",t}else throw new Error("https://svelte.dev/e/effect_in_teardown")}function lu(){if(x){let e=new Error("effect_in_unowned_derived\nEffect cannot be created inside a `$derived` value that was not itself created inside an effect\nhttps://svelte.dev/e/effect_in_unowned_derived");throw e.name="Svelte error",e}else throw new Error("https://svelte.dev/e/effect_in_unowned_derived")}function cu(e){if(x){let t=new Error(`effect_orphan
-\`${e}\` can only be used inside an effect (e.g. during component initialisation)
-https://svelte.dev/e/effect_orphan`);throw t.name="Svelte error",t}else throw new Error("https://svelte.dev/e/effect_orphan")}function du(){if(x){let e=new Error(`effect_update_depth_exceeded
+https://svelte.dev/e/derived_references_self`);
+    error2.name = "Svelte error";
+    throw error2;
+  } else {
+    throw new Error(`https://svelte.dev/e/derived_references_self`);
+  }
+}
+function each_key_duplicate(a, b, value) {
+  if (dev_fallback_default) {
+    const error2 = new Error(`each_key_duplicate
+${value ? `Keyed each block has duplicate key \`${value}\` at indexes ${a} and ${b}` : `Keyed each block has duplicate key at indexes ${a} and ${b}`}
+https://svelte.dev/e/each_key_duplicate`);
+    error2.name = "Svelte error";
+    throw error2;
+  } else {
+    throw new Error(`https://svelte.dev/e/each_key_duplicate`);
+  }
+}
+function each_key_volatile(index2, a, b) {
+  if (dev_fallback_default) {
+    const error2 = new Error(`each_key_volatile
+Keyed each block has key that is not idempotent \u2014 the key for item at index ${index2} was \`${a}\` but is now \`${b}\`. Keys must be the same each time for a given item
+https://svelte.dev/e/each_key_volatile`);
+    error2.name = "Svelte error";
+    throw error2;
+  } else {
+    throw new Error(`https://svelte.dev/e/each_key_volatile`);
+  }
+}
+function effect_in_teardown(rune) {
+  if (dev_fallback_default) {
+    const error2 = new Error(`effect_in_teardown
+\`${rune}\` cannot be used inside an effect cleanup function
+https://svelte.dev/e/effect_in_teardown`);
+    error2.name = "Svelte error";
+    throw error2;
+  } else {
+    throw new Error(`https://svelte.dev/e/effect_in_teardown`);
+  }
+}
+function effect_in_unowned_derived() {
+  if (dev_fallback_default) {
+    const error2 = new Error(`effect_in_unowned_derived
+Effect cannot be created inside a \`$derived\` value that was not itself created inside an effect
+https://svelte.dev/e/effect_in_unowned_derived`);
+    error2.name = "Svelte error";
+    throw error2;
+  } else {
+    throw new Error(`https://svelte.dev/e/effect_in_unowned_derived`);
+  }
+}
+function effect_orphan(rune) {
+  if (dev_fallback_default) {
+    const error2 = new Error(`effect_orphan
+\`${rune}\` can only be used inside an effect (e.g. during component initialisation)
+https://svelte.dev/e/effect_orphan`);
+    error2.name = "Svelte error";
+    throw error2;
+  } else {
+    throw new Error(`https://svelte.dev/e/effect_orphan`);
+  }
+}
+function effect_update_depth_exceeded() {
+  if (dev_fallback_default) {
+    const error2 = new Error(`effect_update_depth_exceeded
 Maximum update depth exceeded. This typically indicates that an effect reads and writes the same piece of state
-https://svelte.dev/e/effect_update_depth_exceeded`);throw e.name="Svelte error",e}else throw new Error("https://svelte.dev/e/effect_update_depth_exceeded")}function fu(){if(x){let e=new Error(`hydration_failed
+https://svelte.dev/e/effect_update_depth_exceeded`);
+    error2.name = "Svelte error";
+    throw error2;
+  } else {
+    throw new Error(`https://svelte.dev/e/effect_update_depth_exceeded`);
+  }
+}
+function hydration_failed() {
+  if (dev_fallback_default) {
+    const error2 = new Error(`hydration_failed
 Failed to hydrate the application
-https://svelte.dev/e/hydration_failed`);throw e.name="Svelte error",e}else throw new Error("https://svelte.dev/e/hydration_failed")}function pu(e){if(x){let t=new Error(`props_invalid_value
-Cannot do \`bind:${e}={undefined}\` when \`${e}\` has a fallback value
-https://svelte.dev/e/props_invalid_value`);throw t.name="Svelte error",t}else throw new Error("https://svelte.dev/e/props_invalid_value")}function mu(e){if(x){let t=new Error(`rune_outside_svelte
-The \`${e}\` rune is only available inside \`.svelte\` and \`.svelte.js/ts\` files
-https://svelte.dev/e/rune_outside_svelte`);throw t.name="Svelte error",t}else throw new Error("https://svelte.dev/e/rune_outside_svelte")}function hu(){if(x){let e=new Error("state_descriptors_fixed\nProperty descriptors defined on `$state` objects must contain `value` and always be `enumerable`, `configurable` and `writable`.\nhttps://svelte.dev/e/state_descriptors_fixed");throw e.name="Svelte error",e}else throw new Error("https://svelte.dev/e/state_descriptors_fixed")}function bu(){if(x){let e=new Error("state_prototype_fixed\nCannot set prototype of `$state` object\nhttps://svelte.dev/e/state_prototype_fixed");throw e.name="Svelte error",e}else throw new Error("https://svelte.dev/e/state_prototype_fixed")}function vu(){if(x){let e=new Error("state_unsafe_mutation\nUpdating state inside `$derived(...)`, `$inspect(...)` or a template expression is forbidden. If the value should not be reactive, declare it without `$state`\nhttps://svelte.dev/e/state_unsafe_mutation");throw e.name="Svelte error",e}else throw new Error("https://svelte.dev/e/state_unsafe_mutation")}function gu(){if(x){let e=new Error("svelte_boundary_reset_onerror\nA `<svelte:boundary>` `reset` function cannot be called while an error is still being handled\nhttps://svelte.dev/e/svelte_boundary_reset_onerror");throw e.name="Svelte error",e}else throw new Error("https://svelte.dev/e/svelte_boundary_reset_onerror")}var Xt={};var xe=Symbol("uninitialized"),vt=Symbol("filename");var $n="http://www.w3.org/1999/xhtml",Wo="http://www.w3.org/2000/svg",Xi="http://www.w3.org/1998/Math/MathML";var Kt="font-weight: bold",Jt="font-weight: normal";function _u(e){x?console.warn(`%c[svelte] await_reactivity_loss
-%cDetected reactivity loss when reading \`${e}\`. This happens when state is read in an async function after an earlier \`await\`
-https://svelte.dev/e/await_reactivity_loss`,Kt,Jt):console.warn("https://svelte.dev/e/await_reactivity_loss")}function xu(e,t){x?console.warn(`%c[svelte] await_waterfall
-%cAn async derived, \`${e}\` (${t}) was not read immediately after it resolved. This often indicates an unnecessary waterfall, which can slow down your app
-https://svelte.dev/e/await_waterfall`,Kt,Jt):console.warn("https://svelte.dev/e/await_waterfall")}function yu(){x?console.warn(`%c[svelte] derived_inert
+https://svelte.dev/e/hydration_failed`);
+    error2.name = "Svelte error";
+    throw error2;
+  } else {
+    throw new Error(`https://svelte.dev/e/hydration_failed`);
+  }
+}
+function props_invalid_value(key2) {
+  if (dev_fallback_default) {
+    const error2 = new Error(`props_invalid_value
+Cannot do \`bind:${key2}={undefined}\` when \`${key2}\` has a fallback value
+https://svelte.dev/e/props_invalid_value`);
+    error2.name = "Svelte error";
+    throw error2;
+  } else {
+    throw new Error(`https://svelte.dev/e/props_invalid_value`);
+  }
+}
+function rune_outside_svelte(rune) {
+  if (dev_fallback_default) {
+    const error2 = new Error(`rune_outside_svelte
+The \`${rune}\` rune is only available inside \`.svelte\` and \`.svelte.js/ts\` files
+https://svelte.dev/e/rune_outside_svelte`);
+    error2.name = "Svelte error";
+    throw error2;
+  } else {
+    throw new Error(`https://svelte.dev/e/rune_outside_svelte`);
+  }
+}
+function state_descriptors_fixed() {
+  if (dev_fallback_default) {
+    const error2 = new Error(`state_descriptors_fixed
+Property descriptors defined on \`$state\` objects must contain \`value\` and always be \`enumerable\`, \`configurable\` and \`writable\`.
+https://svelte.dev/e/state_descriptors_fixed`);
+    error2.name = "Svelte error";
+    throw error2;
+  } else {
+    throw new Error(`https://svelte.dev/e/state_descriptors_fixed`);
+  }
+}
+function state_prototype_fixed() {
+  if (dev_fallback_default) {
+    const error2 = new Error(`state_prototype_fixed
+Cannot set prototype of \`$state\` object
+https://svelte.dev/e/state_prototype_fixed`);
+    error2.name = "Svelte error";
+    throw error2;
+  } else {
+    throw new Error(`https://svelte.dev/e/state_prototype_fixed`);
+  }
+}
+function state_unsafe_mutation() {
+  if (dev_fallback_default) {
+    const error2 = new Error(`state_unsafe_mutation
+Updating state inside \`$derived(...)\`, \`$inspect(...)\` or a template expression is forbidden. If the value should not be reactive, declare it without \`$state\`
+https://svelte.dev/e/state_unsafe_mutation`);
+    error2.name = "Svelte error";
+    throw error2;
+  } else {
+    throw new Error(`https://svelte.dev/e/state_unsafe_mutation`);
+  }
+}
+function svelte_boundary_reset_onerror() {
+  if (dev_fallback_default) {
+    const error2 = new Error(`svelte_boundary_reset_onerror
+A \`<svelte:boundary>\` \`reset\` function cannot be called while an error is still being handled
+https://svelte.dev/e/svelte_boundary_reset_onerror`);
+    error2.name = "Svelte error";
+    throw error2;
+  } else {
+    throw new Error(`https://svelte.dev/e/svelte_boundary_reset_onerror`);
+  }
+}
+
+// ../../../node_modules/svelte/src/constants.js
+var EACH_ITEM_REACTIVE = 1;
+var EACH_INDEX_REACTIVE = 1 << 1;
+var EACH_IS_CONTROLLED = 1 << 2;
+var EACH_IS_ANIMATED = 1 << 3;
+var EACH_ITEM_IMMUTABLE = 1 << 4;
+var PROPS_IS_IMMUTABLE = 1;
+var PROPS_IS_RUNES = 1 << 1;
+var PROPS_IS_UPDATED = 1 << 2;
+var PROPS_IS_BINDABLE = 1 << 3;
+var PROPS_IS_LAZY_INITIAL = 1 << 4;
+var TRANSITION_OUT = 1 << 1;
+var TRANSITION_GLOBAL = 1 << 2;
+var TEMPLATE_FRAGMENT = 1;
+var TEMPLATE_USE_IMPORT_NODE = 1 << 1;
+var TEMPLATE_USE_SVG = 1 << 2;
+var TEMPLATE_USE_MATHML = 1 << 3;
+var HYDRATION_START = "[";
+var HYDRATION_START_ELSE = "[!";
+var HYDRATION_START_FAILED = "[?";
+var HYDRATION_END = "]";
+var HYDRATION_ERROR = {};
+var ELEMENT_PRESERVE_ATTRIBUTE_CASE = 1 << 1;
+var ELEMENT_IS_INPUT = 1 << 2;
+var UNINITIALIZED = /* @__PURE__ */ Symbol("uninitialized");
+var FILENAME = /* @__PURE__ */ Symbol("filename");
+var NAMESPACE_HTML = "http://www.w3.org/1999/xhtml";
+var NAMESPACE_SVG = "http://www.w3.org/2000/svg";
+var NAMESPACE_MATHML = "http://www.w3.org/1998/Math/MathML";
+
+// ../../../node_modules/svelte/src/internal/client/warnings.js
+var bold = "font-weight: bold";
+var normal = "font-weight: normal";
+function await_reactivity_loss(name) {
+  if (dev_fallback_default) {
+    console.warn(`%c[svelte] await_reactivity_loss
+%cDetected reactivity loss when reading \`${name}\`. This happens when state is read in an async function after an earlier \`await\`
+https://svelte.dev/e/await_reactivity_loss`, bold, normal);
+  } else {
+    console.warn(`https://svelte.dev/e/await_reactivity_loss`);
+  }
+}
+function await_waterfall(name, location) {
+  if (dev_fallback_default) {
+    console.warn(`%c[svelte] await_waterfall
+%cAn async derived, \`${name}\` (${location}) was not read immediately after it resolved. This often indicates an unnecessary waterfall, which can slow down your app
+https://svelte.dev/e/await_waterfall`, bold, normal);
+  } else {
+    console.warn(`https://svelte.dev/e/await_waterfall`);
+  }
+}
+function derived_inert() {
+  if (dev_fallback_default) {
+    console.warn(`%c[svelte] derived_inert
 %cReading a derived belonging to a now-destroyed effect may result in stale values
-https://svelte.dev/e/derived_inert`,Kt,Jt):console.warn("https://svelte.dev/e/derived_inert")}function wu(e,t,r){x?console.warn(`%c[svelte] hydration_attribute_changed
-%cThe \`${e}\` attribute on \`${t}\` changed its value between server and client renders. The client value, \`${r}\`, will be ignored in favour of the server value
-https://svelte.dev/e/hydration_attribute_changed`,Kt,Jt):console.warn("https://svelte.dev/e/hydration_attribute_changed")}function ku(e){x?console.warn(`%c[svelte] hydration_html_changed
-%c${e?`The value of an \`{@html ...}\` block ${e} changed between server and client renders. The client value will be ignored in favour of the server value`:"The value of an `{@html ...}` block changed between server and client renders. The client value will be ignored in favour of the server value"}
-https://svelte.dev/e/hydration_html_changed`,Kt,Jt):console.warn("https://svelte.dev/e/hydration_html_changed")}function Ar(e){x?console.warn(`%c[svelte] hydration_mismatch
-%c${e?`Hydration failed because the initial UI does not match what was rendered on the server. The error occurred near ${e}`:"Hydration failed because the initial UI does not match what was rendered on the server"}
-https://svelte.dev/e/hydration_mismatch`,Kt,Jt):console.warn("https://svelte.dev/e/hydration_mismatch")}function $u(){x?console.warn(`%c[svelte] lifecycle_double_unmount
+https://svelte.dev/e/derived_inert`, bold, normal);
+  } else {
+    console.warn(`https://svelte.dev/e/derived_inert`);
+  }
+}
+function hydration_attribute_changed(attribute2, html2, value) {
+  if (dev_fallback_default) {
+    console.warn(`%c[svelte] hydration_attribute_changed
+%cThe \`${attribute2}\` attribute on \`${html2}\` changed its value between server and client renders. The client value, \`${value}\`, will be ignored in favour of the server value
+https://svelte.dev/e/hydration_attribute_changed`, bold, normal);
+  } else {
+    console.warn(`https://svelte.dev/e/hydration_attribute_changed`);
+  }
+}
+function hydration_html_changed(location) {
+  if (dev_fallback_default) {
+    console.warn(
+      `%c[svelte] hydration_html_changed
+%c${location ? `The value of an \`{@html ...}\` block ${location} changed between server and client renders. The client value will be ignored in favour of the server value` : "The value of an `{@html ...}` block changed between server and client renders. The client value will be ignored in favour of the server value"}
+https://svelte.dev/e/hydration_html_changed`,
+      bold,
+      normal
+    );
+  } else {
+    console.warn(`https://svelte.dev/e/hydration_html_changed`);
+  }
+}
+function hydration_mismatch(location) {
+  if (dev_fallback_default) {
+    console.warn(
+      `%c[svelte] hydration_mismatch
+%c${location ? `Hydration failed because the initial UI does not match what was rendered on the server. The error occurred near ${location}` : "Hydration failed because the initial UI does not match what was rendered on the server"}
+https://svelte.dev/e/hydration_mismatch`,
+      bold,
+      normal
+    );
+  } else {
+    console.warn(`https://svelte.dev/e/hydration_mismatch`);
+  }
+}
+function lifecycle_double_unmount() {
+  if (dev_fallback_default) {
+    console.warn(`%c[svelte] lifecycle_double_unmount
 %cTried to unmount a component that was not mounted
-https://svelte.dev/e/lifecycle_double_unmount`,Kt,Jt):console.warn("https://svelte.dev/e/lifecycle_double_unmount")}function En(e){x?console.warn(`%c[svelte] state_proxy_equality_mismatch
-%cReactive \`$state(...)\` proxies and the values they proxy have different identities. Because of this, comparisons with \`${e}\` will produce unexpected results
-https://svelte.dev/e/state_proxy_equality_mismatch`,Kt,Jt):console.warn("https://svelte.dev/e/state_proxy_equality_mismatch")}function Eu(){x?console.warn(`%c[svelte] state_proxy_unmount
+https://svelte.dev/e/lifecycle_double_unmount`, bold, normal);
+  } else {
+    console.warn(`https://svelte.dev/e/lifecycle_double_unmount`);
+  }
+}
+function state_proxy_equality_mismatch(operator) {
+  if (dev_fallback_default) {
+    console.warn(`%c[svelte] state_proxy_equality_mismatch
+%cReactive \`$state(...)\` proxies and the values they proxy have different identities. Because of this, comparisons with \`${operator}\` will produce unexpected results
+https://svelte.dev/e/state_proxy_equality_mismatch`, bold, normal);
+  } else {
+    console.warn(`https://svelte.dev/e/state_proxy_equality_mismatch`);
+  }
+}
+function state_proxy_unmount() {
+  if (dev_fallback_default) {
+    console.warn(`%c[svelte] state_proxy_unmount
 %cTried to unmount a state proxy, rather than a component
-https://svelte.dev/e/state_proxy_unmount`,Kt,Jt):console.warn("https://svelte.dev/e/state_proxy_unmount")}function Cu(){x?console.warn("%c[svelte] svelte_boundary_reset_noop\n%cA `<svelte:boundary>` `reset` function only resets the boundary the first time it is called\nhttps://svelte.dev/e/svelte_boundary_reset_noop",Kt,Jt):console.warn("https://svelte.dev/e/svelte_boundary_reset_noop")}var P=!1;function Fe(e){P=e}var K;function de(e){if(e===null)throw Ar(),Xt;return K=e}function qe(){return de(Ve(K))}function v(e){if(P){if(Ve(K)!==null)throw Ar(),Xt;K=e}}function gt(e=1){if(P){for(var t=e,r=K;t--;)r=Ve(r);K=r}}function Ot(e=!0){for(var t=0,r=K;;){if(r.nodeType===$t){var o=r.data;if(o==="]"){if(t===0)return r;t-=1}else(o==="["||o==="[!"||o[0]==="["&&!isNaN(Number(o.slice(1))))&&(t+=1)}var n=Ve(r);e&&r.remove(),r=n}}function vo(e){if(!e||e.nodeType!==$t)throw Ar(),Xt;return e.data}function Cn(e){return e===this.v}function An(e,t){return e!=e?t==t:e!==t||e!==null&&typeof e=="object"||typeof e=="function"}function Dn(e){return!An(e,this.v)}var Me=!1,pr=!1,Bt=!1;function Au(){Me=!0}var Zo=null;function lt(e,t){return e.label=t,Tn(e.v,t),e}function Tn(e,t){return e?.[yn]?.(t),e}function jt(e){let t=new Error,r=p0();return r.length===0?null:(r.unshift(`
-`),Ie(t,"stack",{value:r.join(`
-`)}),Ie(t,"name",{value:e}),t)}function p0(){let e=Error.stackTraceLimit;Error.stackTraceLimit=1/0;let t=new Error().stack;if(Error.stackTraceLimit=e,!t)return[];let r=t.split(`
-`),o=[];for(let n=0;n<r.length;n++){let i=r[n],a=i.replaceAll("\\","/");if(i.trim()!=="Error"){if(i.includes("validate_each_keys"))return[];a.includes("svelte/src/internal")||a.includes("node_modules/.vite")||o.push(i)}}return o}function Su(e,t){if(!x)throw new Error("invariant(...) was not guarded by if (DEV)");e||ou(t)}var re=null;function hr(e){re=e}var Qt=null;function go(e){Qt=e}var Et=null;function Fn(e){Et=e}function le(e,t=!1,r){re={p:re,i:!1,c:null,e:null,s:e,x:null,r:I,l:pr&&!t?{s:null,u:null,$:[]}:null},x&&(re.function=r,Et=r)}function ce(e){var t=re,r=t.e;if(r!==null){t.e=null;for(var o of r)Ki(o)}return e!==void 0&&(t.x=e),t.i=!0,re=t.p,x&&(Et=re?.function??null),e??{}}function er(){return!pr||re!==null&&re.l===null}var Or=[];function Tu(){var e=Or;Or=[],_n(e)}function Oe(e){if(Or.length===0&&!Br){var t=Or;queueMicrotask(()=>{t===Or&&Tu()})}Or.push(e)}function Fu(){for(;Or.length>0;)Tu()}var Ji=new WeakMap;function Mn(e){var t=I;if(t===null)return G.f|=8388608,e;if(x&&e instanceof Error&&!Ji.has(e)&&Ji.set(e,m0(e,t)),(t.f&32768)===0&&(t.f&4)===0)throw x&&!t.parent&&e instanceof Error&&Mu(e),e;Rt(e,t)}function Rt(e,t){for(;t!==null;){if((t.f&128)!==0){if((t.f&32768)===0)throw e;try{t.b.error(e);return}catch(r){e=r}}t=t.parent}throw x&&e instanceof Error&&Mu(e),e}function m0(e,t){let r=Qe(e,"message");if(!(r&&!r.configurable)){for(var o=Ko?"  ":"	",n=`
-${o}in ${t.fn?.name||"<unknown>"}`,i=t.ctx;i!==null;)n+=`
-${o}in ${i.function?.[vt].split("/").pop()}`,i=i.p;return{message:e.message+`
-${n}
-`,stack:e.stack?.split(`
-`).filter(a=>!a.includes("svelte/src/internal")).join(`
-`)}}}function Mu(e){let t=Ji.get(e);t&&(Ie(e,"message",{value:t.message}),Ie(e,"stack",{value:t.stack}))}var h0=-7169;function _e(e,t){e.f=e.f&h0|t}function _o(e){(e.f&512)!==0||e.deps===null?_e(e,1024):_e(e,4096)}function Ru(e){if(e!==null)for(let t of e)(t.f&2)===0||(t.f&65536)===0||(t.f^=65536,Ru(t.deps))}function Rn(e,t,r){(e.f&2048)!==0?t.add(e):(e.f&4096)!==0&&r.add(e),Ru(e.deps),_e(e,1024)}function zn(e,t,r){if(e==null)return t(void 0),r&&r(void 0),ut;let o=be(()=>e.subscribe(t,r));return o.unsubscribe?()=>o.unsubscribe():o}var xo=[];function Dr(e,t=ut){let r=null,o=new Set;function n(s){if(An(e,s)&&(e=s,r)){let u=!xo.length;for(let l of o)l[1](),xo.push(l,e);if(u){for(let l=0;l<xo.length;l+=2)xo[l][0](xo[l+1]);xo.length=0}}}function i(s){n(s(e))}function a(s,u=ut){let l=[s,u];return o.add(l),o.size===1&&(r=t(n,i)||ut),s(e),()=>{o.delete(l),o.size===0&&r&&(r(),r=null)}}return{set:n,update:i,subscribe:a}}function jr(e){let t;return zn(e,r=>t=r)(),t}var zu=!1,Ln=!1,Qi=Symbol("unmounted");function ea(e,t,r){let o=r[t]??={store:null,source:Sr(void 0),unsubscribe:ut};if(x&&(o.source.label=t),o.store!==e&&!(Qi in r))if(o.unsubscribe(),o.store=e??null,e==null)o.source.v=void 0,o.unsubscribe=ut;else{var n=!0;o.unsubscribe=zn(e,i=>{n?o.source.v=i:F(o.source,i)}),n=!1}return e&&Qi in r?jr(e):m(o.source)}function ta(){let e={};function t(){Ge(()=>{for(var r in e)e[r].unsubscribe();Ie(e,Qi,{enumerable:!1,value:!0})})}return[e,t]}function ra(e){var t=Ln;try{return Ln=!1,[e(),Ln]}finally{Ln=t}}var Nn=null,wo=null,W=null,Vr=null,We=null,ia=null,Br=!1,oa=!1,Ur=null,Jo=null,Lu=0,na=new Set,v0=1,At=class e{id=v0++;#t=!1;linked=!0;#e=null;#r=null;async_deriveds=new Map;current=new Map;previous=new Map;#a=new Set;#o=new Set;#s=0;#n=new Map;#u=null;#i=[];#c=[];#l=new Set;#f=new Set;#p=new Map;#b=new Set;is_fork=!1;#d=!1;constructor(){wo===null?Nn=wo=this:(wo.#r=this,this.#e=wo),wo=this}#_(){if(this.is_fork)return!0;for(let o of this.#n.keys()){for(var t=o,r=!1;t.parent!==null;){if(this.#p.has(t)){r=!0;break}t=t.parent}if(!r)return!0}return!1}skip_effect(t){this.#p.has(t)||this.#p.set(t,{d:[],m:[]}),this.#b.delete(t)}unskip_effect(t,r=o=>this.schedule(o)){var o=this.#p.get(t);if(o){this.#p.delete(t);for(var n of o.d)_e(n,2048),r(n);for(n of o.m)_e(n,4096),r(n)}this.#b.add(t)}#v(){if(this.#t=!0,Lu++>1e3&&(this.#h(),g0()),x)for(let u of this.current.keys())na.add(u);for(let u of this.#l)this.#f.delete(u),_e(u,2048),this.schedule(u);for(let u of this.#f)_e(u,4096),this.schedule(u);let t=this.#i;this.#i=[],this.apply();var r=Ur=[],o=[],n=Jo=[];for(let u of t)try{this.#x(u,r,o)}catch(l){throw qu(u),this.#_()||this.discard(),l}if(W=null,n.length>0){var i=e.ensure();for(let u of n)i.schedule(u)}if(Ur=null,Jo=null,this.#_()){this.#m(o),this.#m(r);for(let[u,l]of this.#p)Iu(u,l);n.length>0&&W.#v();return}let a=this.#w();if(a){this.#m(o),this.#m(r),a.#y(this);return}this.#l.clear(),this.#f.clear();for(let u of this.#a)u(this);this.#a.clear(),Vr=this,Nu(o),Nu(r),Vr=null,this.#u?.resolve();var s=W;if(this.#s===0&&(this.#i.length===0||s!==null)&&(this.#h(),Me&&(this.#g(),W=s)),this.#i.length>0)if(s!==null){let u=s;u.#i.push(...this.#i.filter(l=>!u.#i.includes(l)))}else s=this;s!==null&&s.#v()}#x(t,r,o){t.f^=1024;for(var n=t.first;n!==null;){var i=n.f,a=(i&96)!==0,s=a&&(i&1024)!==0,u=s||(i&8192)!==0||this.#p.has(n);if(!u&&n.fn!==null){a?n.f^=1024:(i&4)!==0?r.push(n):Me&&(i&16777224)!==0?o.push(n):Tr(n)&&((i&16)!==0&&this.#f.add(n),tr(n));var l=n.first;if(l!==null){n=l;continue}}for(;n!==null;){var c=n.next;if(c!==null){n=c;break}n=n.parent}}}#w(){for(var t=this.#e;t!==null;){if(!t.is_fork){for(let[r,[,o]]of this.current)if(t.current.has(r)&&!o)return t}t=t.#e}return null}#y(t){for(let[o,n]of t.current)!this.previous.has(o)&&t.previous.has(o)&&this.previous.set(o,t.previous.get(o)),this.current.set(o,n);for(let[o,n]of t.async_deriveds){let i=this.async_deriveds.get(o);i&&n.promise.then(i.resolve).catch(i.reject)}this.transfer_effects(t.#l,t.#f);let r=o=>{var n=o.reactions;if(n!==null)for(let s of n){var i=s.f;if((i&2)!==0)r(s);else{var a=s;i&4194320&&!this.async_deriveds.has(a)&&(this.#f.delete(a),_e(a,2048),this.schedule(a))}}};for(let o of this.current.keys())r(o);this.oncommit(()=>t.discard()),t.#h(),W=this,this.#v()}#m(t){for(var r=0;r<t.length;r+=1)Rn(t[r],this.#l,this.#f)}capture(t,r,o=!1){t.v!==xe&&!this.previous.has(t)&&this.previous.set(t,t.v),(t.f&8388608)===0&&(this.current.set(t,[r,o]),We?.set(t,r)),this.is_fork||(t.v=r)}activate(){W=this}deactivate(){W=null,We=null}flush(){try{x&&na.clear(),oa=!0,W=this,this.#v()}finally{if(Lu=0,ia=null,Ur=null,Jo=null,oa=!1,W=null,We=null,vr.clear(),x)for(let t of na)t.updated=null}}discard(){for(let t of this.#o)t(this);this.#o.clear(),this.#h(),this.#u?.resolve()}register_created_effect(t){this.#c.push(t)}#g(){for(let c=Nn;c!==null;c=c.#r){var t=c.id<this.id,r=[];for(let[f,[p,d]]of this.current){if(c.current.has(f)){var o=c.current.get(f)[0];if(t&&p!==o)c.current.set(f,[p,d]);else continue}r.push(f)}if(t)for(let[f,p]of this.async_deriveds){let d=c.async_deriveds.get(f);d&&p.promise.then(d.resolve).catch(d.reject)}if(c.#t){var n=[...c.current.keys()].filter(f=>!c.current.get(f)[1]&&!this.current.has(f));if(n.length===0)t&&c.discard();else if(r.length>0){if(x&&!c.#d&&Su(c.#i.length===0,"Batch has scheduled roots"),t)for(let f of this.#b)c.unskip_effect(f,p=>{(p.f&4194320)!==0?c.schedule(p):c.#m([p])});c.activate();var i=new Set,a=new Map;for(var s of r)Pu(s,n,i,a);a=new Map;var u=[...c.current].filter(([f,p])=>{let d=this.current.get(f);return d?d[0]!==p[0]||d[1]!==p[1]:!0}).map(([f])=>f);if(u.length>0)for(let f of this.#c)(f.f&155648)===0&&aa(f,u,a)&&((f.f&4194320)!==0?(_e(f,2048),c.schedule(f)):c.#l.add(f));if(c.#i.length>0&&!c.#d){c.apply();for(var l of c.#i)c.#x(l,[],[]);c.#i=[]}c.deactivate()}}}}increment(t,r){if(this.#s+=1,t){let o=this.#n.get(r)??0;this.#n.set(r,o+1)}}decrement(t,r){if(this.#s-=1,t){let o=this.#n.get(r)??0;o===1?this.#n.delete(r):this.#n.set(r,o-1)}this.#d||(this.#d=!0,Oe(()=>{this.#d=!1,this.linked&&this.flush()}))}transfer_effects(t,r){for(let o of t)this.#l.add(o);for(let o of r)this.#f.add(o);t.clear(),r.clear()}oncommit(t){this.#a.add(t)}ondiscard(t){this.#o.add(t)}settled(){return(this.#u??=xn()).promise}static ensure(){if(W===null){let t=W=new e;!oa&&!Br&&Oe(()=>{t.#t||t.flush()})}return W}apply(){if(!Me||!this.is_fork&&this.#e===null&&this.#r===null){We=null;return}We=new Map;for(let[r,[o]]of this.current)We.set(r,o);for(let r=Nn;r!==null;r=r.#r)if(!(r===this||r.is_fork)){var t=!1;if(r.id<this.id){for(let[o,[,n]]of r.current)if(!n&&this.current.has(o)){t=!0;break}}if(!t)for(let[o,n]of r.previous)We.has(o)||We.set(o,n)}}schedule(t){if(ia=t,t.b?.is_pending&&(t.f&16777228)!==0&&(t.f&32768)===0){t.b.defer_effect(t);return}for(var r=t;r.parent!==null;){r=r.parent;var o=r.f;if(Ur!==null&&r===I&&(Me||(G===null||(G.f&2)===0)&&!zu))return;if((o&96)!==0){if((o&1024)===0)return;r.f^=1024}}this.#i.push(r)}#h(){if(this.linked){var t=this.#e,r=this.#r;t===null?Nn=r:t.#r=r,r===null?wo=t:r.#e=t,this.linked=!1}}};function X(e){var t=Br;Br=!0;try{var r;for(e&&(W!==null&&!W.is_fork&&W.flush(),r=e());;){if(Fu(),W===null)return r;W.flush()}}finally{Br=t}}function g0(){if(x){var e=new Map;for(let r of W.current.keys())for(let[o,n]of r.updated??[]){var t=e.get(o);t||(t={error:n.error,count:0},e.set(o,t)),t.count+=n.count}for(let r of e.values())r.error&&console.error(r.error)}try{du()}catch(r){x&&Ie(r,"stack",{value:""}),Rt(r,ia)}}var Lt=null;function Nu(e){var t=e.length;if(t!==0){for(var r=0;r<t;){var o=e[r++];if((o.f&24576)===0&&Tr(o)&&(Lt=new Set,tr(o),o.deps===null&&o.first===null&&o.nodes===null&&o.teardown===null&&o.ac===null&&sa(o),Lt?.size>0)){vr.clear();for(let n of Lt){if((n.f&24576)!==0)continue;let i=[n],a=n.parent;for(;a!==null;)Lt.has(a)&&(Lt.delete(a),i.push(a)),a=a.parent;for(let s=i.length-1;s>=0;s--){let u=i[s];(u.f&24576)===0&&tr(u)}}Lt.clear()}}Lt=null}}function Pu(e,t,r,o){if(!r.has(e)&&(r.add(e),e.reactions!==null))for(let n of e.reactions){let i=n.f;(i&2)!==0?Pu(n,t,r,o):(i&4194320)!==0&&(i&2048)===0&&aa(n,t,o)&&(_e(n,2048),Qo(n))}}function aa(e,t,r){let o=r.get(e);if(o!==void 0)return o;if(e.deps!==null)for(let n of e.deps){if($r.call(t,n))return!0;if((n.f&2)!==0&&aa(n,t,r))return r.set(n,!0),!0}return r.set(e,!1),!1}function Qo(e){W.schedule(e)}function Iu(e,t){if(!((e.f&32)!==0&&(e.f&1024)!==0)){(e.f&2048)!==0?t.d.push(e):(e.f&4096)!==0&&t.m.push(e),_e(e,1024);for(var r=e.first;r!==null;)Iu(r,t),r=r.next}}function qu(e){_e(e,1024);for(var t=e.first;t!==null;)qu(t),t=t.next}function ua(e){let t=0,r=ft(0),o;return x&&lt(r,"createSubscriber version"),()=>{mr()&&(m(r),nt(()=>(t===0&&(o=be(()=>e(()=>Gr(r)))),t+=1,()=>{Oe(()=>{t-=1,t===0&&(o?.(),o=void 0,Gr(r))})})))}}var x0=589824;function ca(e,t,r,o){new la(e,t,r,o)}var la=class{parent;is_pending=!1;transform_error;#t;#e=P?K:null;#r;#a;#o;#s=null;#n=null;#u=null;#i=null;#c=0;#l=0;#f=!1;#p=new Set;#b=new Set;#d=null;#_=ua(()=>(this.#d=ft(this.#c),x&&lt(this.#d,"$effect.pending()"),()=>{this.#d=null}));constructor(t,r,o,n){this.#t=t,this.#r=r,this.#a=i=>{var a=I;a.b=this,a.f|=128,o(i)},this.parent=I.b,this.transform_error=n??this.parent?.transform_error??(i=>i),this.#o=yt(()=>{if(P){let i=this.#e;qe();let a=i.data==="[!";if(i.data.startsWith("[?")){let u=JSON.parse(i.data.slice("[?".length));this.#x(u)}else a?this.#w():this.#v()}else this.#y()},x0),P&&(this.#t=K)}#v(){try{this.#s=je(()=>this.#a(this.#t))}catch(t){this.error(t)}}#x(t){let r=this.#r.failed;r&&(this.#u=je(()=>{r(this.#t,()=>t,()=>()=>{})}))}#w(){let t=this.#r.pending;t&&(this.is_pending=!0,this.#n=je(()=>t(this.#t)),Oe(()=>{var r=this.#i=document.createDocumentFragment(),o=He();r.append(o),this.#s=this.#g(()=>je(()=>this.#a(o))),this.#l===0&&(this.#t.before(r),this.#i=null,rr(this.#n,()=>{this.#n=null}),this.#m(W))}))}#y(){try{if(this.is_pending=this.has_pending_snippet(),this.#l=0,this.#c=0,this.#s=je(()=>{this.#a(this.#t)}),this.#l>0){var t=this.#i=document.createDocumentFragment();$o(this.#s,t);let r=this.#r.pending;this.#n=je(()=>r(this.#t))}else this.#m(W)}catch(r){this.error(r)}}#m(t){this.is_pending=!1,t.transfer_effects(this.#p,this.#b)}defer_effect(t){Rn(t,this.#p,this.#b)}is_rendered(){return!this.is_pending&&(!this.parent||this.parent.is_rendered())}has_pending_snippet(){return!!this.#r.pending}#g(t){var r=I,o=G,n=re;Pe(this.#o),Ne(this.#o),hr(this.#o.ctx);try{return At.ensure(),t()}catch(i){return Mn(i),null}finally{Pe(r),Ne(o),hr(n)}}#h(t,r){if(!this.has_pending_snippet()){this.parent&&this.parent.#h(t,r);return}this.#l+=t,this.#l===0&&(this.#m(r),this.#n&&rr(this.#n,()=>{this.#n=null}),this.#i&&(this.#t.before(this.#i),this.#i=null))}update_pending_count(t,r){this.#h(t,r),this.#c+=t,!(!this.#d||this.#f)&&(this.#f=!0,Oe(()=>{this.#f=!1,this.#d&&Ut(this.#d,this.#c)}))}get_effect_pending(){return this.#_(),m(this.#d)}error(t){if(!this.#r.onerror&&!this.#r.failed)throw t;W?.is_fork?(this.#s&&W.skip_effect(this.#s),this.#n&&W.skip_effect(this.#n),this.#u&&W.skip_effect(this.#u),W.oncommit(()=>{this.#k(t)})):this.#k(t)}#k(t){this.#s&&(De(this.#s),this.#s=null),this.#n&&(De(this.#n),this.#n=null),this.#u&&(De(this.#u),this.#u=null),P&&(de(this.#e),gt(),de(Ot()));var r=this.#r.onerror;let o=this.#r.failed;var n=!1,i=!1;let a=()=>{if(n){Cu();return}n=!0,i&&gu(),this.#u!==null&&rr(this.#u,()=>{this.#u=null}),this.#g(()=>{this.#y()})},s=u=>{try{i=!0,r?.(u,a),i=!1}catch(l){Rt(l,this.#o&&this.#o.parent)}o&&(this.#u=this.#g(()=>{try{return je(()=>{var l=I;l.b=this,l.f|=128,o(this.#t,()=>u,()=>a)})}catch(l){return Rt(l,this.#o.parent),null}}))};Oe(()=>{var u;try{u=this.transform_error(t)}catch(l){Rt(l,this.#o&&this.#o.parent);return}u!==null&&typeof u=="object"&&typeof u.then=="function"?u.then(s,l=>Rt(l,this.#o&&this.#o.parent)):s(u)})}};function On(e,t,r,o){let n=er()?Fr:Wr;var i=e.filter(d=>!d.settled),a=t.map(n);if(x&&a.forEach((d,h)=>{d.label=t[h].toString().replace("() => ","").replaceAll("$.eager(() => ","$state.eager(").replace(/\$\.get\((.+?)\)/g,(b,g)=>g)}),r.length===0&&i.length===0){o(a);return}var s=I,u=ju(),l=i.length===1?i[0].promise:i.length>1?Promise.all(i.map(d=>d.promise)):null;function c(d){if((s.f&16384)===0){u();try{o([...a,...d])}catch(h){Rt(h,s)}Eo()}}var f=da();if(r.length===0){l.then(()=>c([])).finally(f);return}function p(){Promise.all(r.map(d=>pa(d))).then(c).catch(d=>Rt(d,s)).finally(f)}l?l.then(()=>{u(),p(),Eo()}):p()}function ju(){var e=I,t=G,r=re,o=W;if(x)var n=Qt;return function(a=!0){Pe(e),Ne(t),hr(r),a&&(e.f&16384)===0&&(o?.activate(),o?.apply()),x&&(fa(null),go(n))}}function Eo(e=!0){Pe(null),Ne(null),hr(null),e&&W?.deactivate(),x&&(fa(null),go(null))}function da(){var e=I,t=e.b,r=W,o=!!t?.is_rendered();return t?.update_pending_count(1,r),r.increment(o,e),()=>{t?.update_pending_count(-1,r),r.decrement(o,e)}}var wt=null;function fa(e){wt=e}var en=new Set;function Fr(e){var t=2050;I!==null&&(I.f|=524288);let r={ctx:re,deps:null,effects:null,equals:Cn,f:t,fn:e,reactions:null,rv:0,v:xe,wv:0,parent:I,ac:null};return x&&Bt&&(r.created=jt("created at")),r}var Bn=Symbol("obsolete");function pa(e,t,r){let o=I;o===null&&iu();var n=void 0,i=ft(xe);x&&(i.label=t??e.toString());var a=!G,s=new Set;return Vu(()=>{var u=I;x&&(wt={effect:u,effect_deps:new Set,warned:!1});var l=xn();n=l.promise;try{Promise.resolve(e()).then(l.resolve,d=>{d!==Cr&&l.reject(d)}).finally(Eo)}catch(d){l.reject(d),Eo()}if(x){if(wt){if(u.deps!==null)for(let d=0;d<pt;d+=1)wt.effect_deps.add(u.deps[d]);if(Ze!==null)for(let d=0;d<Ze.length;d+=1)wt.effect_deps.add(Ze[d])}wt=null}var c=W;if(a){if((u.f&32768)!==0)var f=da();if(o.b?.is_rendered())c.async_deriveds.get(u)?.reject(Bn);else for(let d of s.values())d.reject(Bn);s.add(l),c.async_deriveds.set(u,l)}let p=(d,h=void 0)=>{x&&(wt=null),f?.(),s.delete(l),h!==Bn&&(c.activate(),h?(i.f|=8388608,Ut(i,h)):((i.f&8388608)!==0&&(i.f^=8388608),x&&r!==void 0&&!i.equals(d)&&(en.add(i),setTimeout(()=>{en.has(i)&&(u.f&16384)===0&&(xu(i.label,r),en.delete(i))})),Ut(i,d)),c.deactivate())};l.promise.then(p,d=>p(null,d||"unknown"))}),Ge(()=>{for(let u of s)u.reject(Bn)}),x&&(i.f|=4194304),new Promise(u=>{function l(c){function f(){c===n?u(i):l(n)}c.then(f,f)}l(n)})}function J(e){let t=Fr(e);return Me||Hn(t),t}function Wr(e){let t=Fr(e);return t.equals=Dn,t}function Hu(e){var t=e.effects;if(t!==null){e.effects=null;for(var r=0;r<t.length;r+=1)De(t[r])}}var ma=[];function tn(e){var t,r=I,o=e.parent;if(!Dt&&o!==null&&e.v!==xe&&(o.f&24576)!==0)return yu(),e.v;if(Pe(o),x){let n=Zr;In(new Set);try{$r.call(ma,e)&&au(),ma.push(e),e.f&=-65537,Hu(e),t=jn(e)}finally{Pe(r),In(n),ma.pop()}}else try{e.f&=-65537,Hu(e),t=jn(e)}finally{Pe(r)}return t}function ha(e){var t=tn(e);if(!e.equals(t)&&(e.wv=ko(),(!W?.is_fork||e.deps===null)&&(W!==null?(W.capture(e,t,!0),Vr?.capture(e,t,!0)):e.v=t,e.deps===null))){_e(e,1024);return}Dt||(We!==null?(mr()||W?.is_fork)&&We.set(e,t):_o(e))}function Uu(e){if(e.effects!==null)for(let t of e.effects)(t.teardown||t.ac)&&(t.teardown?.(),t.ac?.abort(Cr),t.fn!==null&&(t.teardown=ut),t.ac=null,Xr(t,0),rn(t))}function ba(e){if(e.effects!==null)for(let t of e.effects)t.teardown&&t.fn!==null&&tr(t)}var Zr=new Set,vr=new Map;function In(e){Zr=e}var va=!1;function Yu(){va=!0}function ft(e,t){var r={f:0,v:e,reactions:null,equals:Cn,rv:0,wv:0};return x&&Bt&&(r.created=t??jt("created at"),r.updated=null,r.set_during_effect=!1,r.trace=null),r}function H(e,t){let r=ft(e,t);return Hn(r),r}function Sr(e,t=!1,r=!0){let o=ft(e);return t||(o.equals=Dn),pr&&r&&re!==null&&re.l!==null&&(re.l.s??=[]).push(o),o}function F(e,t,r=!1){G!==null&&(!mt||(G.f&131072)!==0)&&er()&&(G.f&4325394)!==0&&(Vt===null||!Vt.has(e))&&vu();let o=r?$e(t):t;return x&&Tn(o,e.label),Ut(e,o,Jo)}function Ut(e,t,r=null){if(!e.equals(t)){vr.set(e,Dt?t:e.v);var o=At.ensure();if(o.capture(e,t),x){if(Bt||I!==null){e.updated??=new Map;let n=(e.updated.get("")?.count??0)+1;if(e.updated.set("",{error:null,count:n}),Bt||n>5){let i=jt("updated at");if(i!==null){let a=e.updated.get(i.stack);a||(a={error:i,count:0},e.updated.set(i.stack,a)),a.count++}}}I!==null&&(e.set_during_effect=!0)}if((e.f&2)!==0){let n=e;(e.f&2048)!==0&&tn(n),We===null&&_o(n)}e.wv=ko(),Gu(e,2048,r),er()&&I!==null&&(I.f&1024)!==0&&(I.f&96)===0&&(St===null?Wu([e]):St.push(e)),!o.is_fork&&Zr.size>0&&!va&&qn()}return t}function qn(){va=!1;for(let e of Zr){(e.f&1024)!==0&&_e(e,4096);let t;try{t=Tr(e)}catch{t=!0}t&&tr(e)}Zr.clear()}function Gr(e){F(e,e.v+1)}function Gu(e,t,r){var o=e.reactions;if(o!==null)for(var n=er(),i=o.length,a=0;a<i;a++){var s=o[a],u=s.f;if(!(!n&&s===I)){var l=(u&2048)===0;if(l&&_e(s,t),(u&131072)!==0)Zr.add(s);else if((u&2)!==0){var c=s;We?.delete(c),(u&65536)===0&&(u&512&&(I===null||(I.f&2097152)===0)&&(s.f|=65536),Gu(c,4096,r))}else if(l){var f=s;(u&16)!==0&&Lt!==null&&Lt.add(f),r!==null?r.push(f):Qo(f)}}}}var w0=/^[a-zA-Z_$][a-zA-Z_$0-9]*$/;function $e(e){if(typeof e!="object"||e===null||et in e)return e;let t=co(e);if(t!==Vi&&t!==tu)return e;var r=new Map,o=fr(e),n=H(0),i=x&&Bt?jt("created at"):null,a=Mr,s=f=>{if(Mr===a)return f();var p=G,d=Mr;Ne(null),ga(a);var h=f();return Ne(p),ga(d),h};o&&(r.set("length",H(e.length,i)),x&&(e=$0(e)));var u="";let l=!1;function c(f){if(!l){l=!0,u=f,lt(n,`${u} version`);for(let[p,d]of r)lt(d,Kr(u,p));l=!1}}return new Proxy(e,{defineProperty(f,p,d){(!("value"in d)||d.configurable===!1||d.enumerable===!1||d.writable===!1)&&hu();var h=r.get(p);return h===void 0?s(()=>{var b=H(d.value,i);return r.set(p,b),x&&typeof p=="string"&&lt(b,Kr(u,p)),b}):F(h,d.value,!0),!0},deleteProperty(f,p){var d=r.get(p);if(d===void 0){if(p in f){let h=s(()=>H(xe,i));r.set(p,h),Gr(n),x&&lt(h,Kr(u,p))}}else F(d,xe),Gr(n);return!0},get(f,p,d){if(p===et)return e;if(x&&p===yn)return c;var h=r.get(p),b=p in f;if(h===void 0&&(!b||Qe(f,p)?.writable)&&(h=s(()=>{var D=$e(b?f[p]:xe),E=H(D,i);return x&&lt(E,Kr(u,p)),E}),r.set(p,h)),h!==void 0){var g=m(h);return g===xe?void 0:g}return Reflect.get(f,p,d)},getOwnPropertyDescriptor(f,p){var d=Reflect.getOwnPropertyDescriptor(f,p);if(d&&"value"in d){var h=r.get(p);h&&(d.value=m(h))}else if(d===void 0){var b=r.get(p),g=b?.v;if(b!==void 0&&g!==xe)return{enumerable:!0,configurable:!0,value:g,writable:!0}}return d},has(f,p){if(p===et)return!0;var d=r.get(p),h=d!==void 0&&d.v!==xe||Reflect.has(f,p);if(d!==void 0||I!==null&&(!h||Qe(f,p)?.writable)){d===void 0&&(d=s(()=>{var g=h?$e(f[p]):xe,D=H(g,i);return x&&lt(D,Kr(u,p)),D}),r.set(p,d));var b=m(d);if(b===xe)return!1}return h},set(f,p,d,h){var b=r.get(p),g=p in f;if(o&&p==="length")for(var D=d;D<b.v;D+=1){var E=r.get(D+"");E!==void 0?F(E,xe):D in f&&(E=s(()=>H(xe,i)),r.set(D+"",E),x&&lt(E,Kr(u,D)))}if(b===void 0)(!g||Qe(f,p)?.writable)&&(b=s(()=>H(void 0,i)),x&&lt(b,Kr(u,p)),F(b,$e(d)),r.set(p,b));else{g=b.v!==xe;var C=s(()=>$e(d));F(b,C)}var A=Reflect.getOwnPropertyDescriptor(f,p);if(A?.set&&A.set.call(h,d),!g){if(o&&typeof p=="string"){var T=r.get("length"),k=Number(p);Number.isInteger(k)&&k>=T.v&&F(T,k+1)}Gr(n)}return!0},ownKeys(f){m(n);var p=Reflect.ownKeys(f).filter(b=>{var g=r.get(b);return g===void 0||g.v!==xe});for(var[d,h]of r)h.v!==xe&&!(d in f)&&p.push(d);return p},setPrototypeOf(){bu()}})}function Kr(e,t){return typeof t=="symbol"?`${e}[Symbol(${t.description??""})]`:w0.test(t)?`${e}.${t}`:/^\d+$/.test(t)?`${e}[${t}]`:`${e}['${t}']`}function Un(e){try{if(e!==null&&typeof e=="object"&&et in e)return e[et]}catch{}return e}var k0=new Set(["copyWithin","fill","pop","push","reverse","shift","sort","splice","unshift"]);function $0(e){return new Proxy(e,{get(t,r,o){var n=Reflect.get(t,r,o);return k0.has(r)?function(...i){Yu();var a=n.apply(this,i);return qn(),a}:n}})}function Zu(){let e=Array.prototype,t=Array.__svelte_cleanup;t&&t();let{indexOf:r,lastIndexOf:o,includes:n}=e;e.indexOf=function(i,a){let s=r.call(this,i,a);if(s===-1){for(let u=a??0;u<this.length;u+=1)if(Un(this[u])===i){En("array.indexOf(...)");break}}return s},e.lastIndexOf=function(i,a){let s=o.call(this,i,a??this.length-1);if(s===-1){for(let u=0;u<=(a??this.length-1);u+=1)if(Un(this[u])===i){En("array.lastIndexOf(...)");break}}return s},e.includes=function(i,a){let s=n.call(this,i,a);if(!s){for(let u=0;u<this.length;u+=1)if(Un(this[u])===i){En("array.includes(...)");break}}return s},Array.__svelte_cleanup=()=>{e.indexOf=r,e.lastIndexOf=o,e.includes=n}}var _a,Xu,Ko,Ku,Ju;function Vn(){if(_a===void 0){_a=window,Xu=document,Ko=/Firefox/.test(navigator.userAgent);var e=Element.prototype,t=Node.prototype,r=Text.prototype;Ku=Qe(t,"firstChild").get,Ju=Qe(t,"nextSibling").get,Yi(e)&&(e[Uo]=void 0,e[wn]=null,e[Vo]=void 0,e.__e=void 0),Yi(r)&&(r[Yo]=void 0),x&&(e.__svelte_meta=null,Zu())}}function He(e=""){return document.createTextNode(e)}function Se(e){return Ku.call(e)}function Ve(e){return Ju.call(e)}function _(e,t){if(!P)return Se(e);var r=Se(K);if(r===null)r=K.appendChild(He());else if(t&&r.nodeType!==po){var o=He();return r?.before(o),de(o),o}return t&&Gn(r),de(r),r}function Re(e,t=!1){if(!P){var r=Se(e);return r instanceof Comment&&r.data===""?Ve(r):r}if(t){if(K?.nodeType!==po){var o=He();return K?.before(o),de(o),o}Gn(K)}return K}function $(e,t=1,r=!1){let o=P?K:e;for(var n;t--;)n=o,o=Ve(o);if(!P)return o;if(r){if(o?.nodeType!==po){var i=He();return o===null?n?.after(i):o.before(i),de(i),i}Gn(o)}return de(o),o}function Ao(e){e.textContent=""}function Yn(){if(!Me||Lt!==null)return!1;var e=I.f;return(e&32768)!==0}function Yt(e,t,r){return t==null||t===$n?r?document.createElement(e,{is:r}):document.createElement(e):r?document.createElementNS(t,e,{is:r}):document.createElementNS(t,e)}function Gn(e){if(e.nodeValue.length<65536)return;let t=e.nextSibling;for(;t!==null&&t.nodeType===po;)t.remove(),e.nodeValue+=t.nodeValue,t=e.nextSibling}function xa(e){P&&Se(e)!==null&&Ao(e)}var Qu=!1;function Wn(){Qu||(Qu=!0,document.addEventListener("reset",e=>{Promise.resolve().then(()=>{if(!e.defaultPrevented)for(let t of e.target.elements)t[Er]?.()})},{capture:!0}))}function _r(e){var t=G,r=I;Ne(null),Pe(null);try{return e()}finally{Ne(t),Pe(r)}}function ya(e,t,r,o=r){e.addEventListener(t,()=>_r(r));let n=e[Er];n?e[Er]=()=>{n(),o(!0)}:e[Er]=()=>o(!0),Wn()}function tl(e){I===null&&(G===null&&cu(e),lu()),Dt&&uu(e)}function C0(e,t){var r=t.last;r===null?t.last=t.first=e:(r.next=e,e.prev=r,t.last=e)}function or(e,t){var r=I;if(x)for(;r!==null&&(r.f&131072)!==0;)r=r.parent;r!==null&&(r.f&8192)!==0&&(e|=8192);var o={ctx:re,deps:null,nodes:null,f:e|2048|512,first:null,fn:t,last:null,next:null,parent:r,b:r&&r.b,prev:null,teardown:null,wv:0,ac:null};x&&(o.component_function=Et),W?.register_created_effect(o);var n=o;if((e&4)!==0)Ur!==null?Ur.push(o):At.ensure().schedule(o);else if(t!==null){try{tr(o)}catch(a){throw De(o),a}n.deps===null&&n.teardown===null&&n.nodes===null&&n.first===n.last&&(n.f&524288)===0&&(n=n.first,(e&16)!==0&&(e&65536)!==0&&n!==null&&(n.f|=65536))}if(n!==null&&(n.parent=r,r!==null&&C0(n,r),G!==null&&(G.f&2)!==0&&(e&64)===0)){var i=G;(i.effects??=[]).push(n)}return o}function mr(){return G!==null&&!mt}function Ge(e){let t=or(8,null);return _e(t,1024),t.teardown=e,t}function nr(e){tl("$effect"),x&&Ie(e,"name",{value:"$effect"});var t=I.f,r=!G&&(t&32)!==0&&re!==null&&!re.i;if(r){var o=re;(o.e??=[]).push(e)}else return Ki(e)}function Ki(e){return or(1048580,e)}function Zn(e){At.ensure();let t=or(524352,e);return()=>{De(t)}}function rl(e){At.ensure();let t=or(524352,e);return(r={})=>new Promise(o=>{r.outro?rr(t,()=>{De(t),o(void 0)}):(De(t),o(void 0))})}function Nt(e){return or(4,e)}function Vu(e){return or(4718592,e)}function nt(e,t=0){return or(8|t,e)}function U(e,t=[],r=[],o=[]){On(o,t,r,n=>{or(8,()=>{e(...n.map(m))})})}function yt(e,t=0){var r=or(16|t,e);return x&&(r.dev_stack=Qt),r}function je(e){return or(524320,e)}function ka(e){var t=e.teardown;if(t!==null){let r=Dt,o=G;wa(!0),Ne(null);try{t.call(null)}finally{wa(r),Ne(o)}}}function rn(e,t=!1){var r=e.first;for(e.first=e.last=null;r!==null;){let n=r.ac;n!==null&&_r(()=>{n.abort(Cr)});var o=r.next;(r.f&64)!==0?r.parent=null:De(r,t),r=o}}function ol(e){for(var t=e.first;t!==null;){var r=t.next;(t.f&32)===0&&De(t),t=r}}function De(e,t=!0){var r=!1;(t||(e.f&262144)!==0)&&e.nodes!==null&&e.nodes.end!==null&&($a(e.nodes.start,e.nodes.end),r=!0),e.f|=33554432,rn(e,t&&!r),Xr(e,0);var o=e.nodes&&e.nodes.t;if(o!==null)for(let i of o)i.stop();ka(e),e.f^=33554432,e.f|=16384;var n=e.parent;n!==null&&n.first!==null&&sa(e),x&&(e.component_function=null),e.next=e.prev=e.teardown=e.ctx=e.deps=e.fn=e.nodes=e.ac=e.b=null}function $a(e,t){for(;e!==null;){var r=e===t?null:Ve(e);e.remove(),e=r}}function sa(e){var t=e.parent,r=e.prev,o=e.next;r!==null&&(r.next=o),o!==null&&(o.prev=r),t!==null&&(t.first===e&&(t.first=o),t.last===e&&(t.last=r))}function rr(e,t,r=!0){var o=[];nl(e,o,!0);var n=()=>{r&&De(e),t&&t()},i=o.length;if(i>0){var a=()=>--i||n();for(var s of o)s.out(a)}else n()}function nl(e,t,r){if((e.f&8192)===0){e.f^=8192;var o=e.nodes&&e.nodes.t;if(o!==null)for(let s of o)(s.is_global||r)&&t.push(s);for(var n=e.first;n!==null;){var i=n.next;if((n.f&64)===0){var a=(n.f&65536)!==0||(n.f&32)!==0&&(e.f&16)!==0;nl(n,t,a?r:!1)}n=i}}}function Do(e){il(e,!0)}function il(e,t){if((e.f&8192)!==0){e.f^=8192,(e.f&1024)===0&&(_e(e,2048),At.ensure().schedule(e));for(var r=e.first;r!==null;){var o=r.next,n=(r.f&65536)!==0||(r.f&32)!==0;il(r,n?t:!1),r=o}var i=e.nodes&&e.nodes.t;if(i!==null)for(let a of i)(a.is_global||t)&&a.in()}}function $o(e,t){if(e.nodes)for(var r=e.nodes.start,o=e.nodes.end;r!==null;){var n=r===o?null:Ve(r);t.append(r),r=n}}var al=null;var Xn=!1,Dt=!1;function wa(e){Dt=e}var G=null,mt=!1;function Ne(e){G=e}var I=null;function Pe(e){I=e}var Vt=null;function Hn(e){G!==null&&(!Me||(G.f&2)!==0)&&(Vt??=new Set).add(e)}var Ze=null,pt=0,St=null;function Wu(e){St=e}var sl=1,Jr=0,Mr=Jr;function ga(e){Mr=e}function ko(){return++sl}function Tr(e){var t=e.f;if((t&2048)!==0)return!0;if(t&2&&(e.f&=-65537),(t&4096)!==0){for(var r=e.deps,o=r.length,n=0;n<o;n++){var i=r[n];if(Tr(i)&&ha(i),i.wv>e.wv)return!0}(t&512)!==0&&We===null&&_e(e,1024)}return!1}function ul(e,t,r=!0){var o=e.reactions;if(o!==null&&!(!Me&&Vt!==null&&Vt.has(e)))for(var n=0;n<o.length;n++){var i=o[n];(i.f&2)!==0?ul(i,t,!1):t===i&&(r?_e(i,2048):(i.f&1024)!==0&&_e(i,4096),Qo(i))}}function jn(e){var t=Ze,r=pt,o=St,n=G,i=Vt,a=re,s=mt,u=Mr,l=e.f;Ze=null,pt=0,St=null,G=(l&96)===0?e:null,Vt=null,hr(e.ctx),mt=!1,Mr=++Jr,e.ac!==null&&(_r(()=>{e.ac.abort(Cr)}),e.ac=null);try{e.f|=2097152;var c=e.fn,f=c();e.f|=32768;var p=e.deps,d=W?.is_fork;if(Ze!==null){var h;if(d||Xr(e,pt),p!==null&&pt>0)for(p.length=pt+Ze.length,h=0;h<Ze.length;h++)p[pt+h]=Ze[h];else e.deps=p=Ze;if(mr()&&(e.f&512)!==0)for(h=pt;h<p.length;h++)(p[h].reactions??=[]).push(e)}else!d&&p!==null&&pt<p.length&&(Xr(e,pt),p.length=pt);if(er()&&St!==null&&!mt&&p!==null&&(e.f&6146)===0)for(h=0;h<St.length;h++)ul(St[h],e);if(n!==null&&n!==e){if(Jr++,n.deps!==null)for(let b=0;b<r;b+=1)n.deps[b].rv=Jr;if(t!==null)for(let b of t)b.rv=Jr;St!==null&&(o===null?o=St:o.push(...St))}return(e.f&8388608)!==0&&(e.f^=8388608),f}catch(b){return Mn(b)}finally{e.f^=2097152,Ze=t,pt=r,St=o,G=n,Vt=i,hr(a),mt=s,Mr=u}}function A0(e,t){let r=t.reactions;if(r!==null){var o=eu.call(r,e);if(o!==-1){var n=r.length-1;n===0?r=t.reactions=null:(r[o]=r[n],r.pop())}}if(r===null&&(t.f&2)!==0&&(Ze===null||!$r.call(Ze,t))){var i=t;(i.f&512)!==0&&(i.f^=512,i.f&=-65537),i.v!==xe&&_o(i),Uu(i),Xr(i,0)}}function Xr(e,t){var r=e.deps;if(r!==null)for(var o=t;o<r.length;o++)A0(e,r[o])}function tr(e){var t=e.f;if((t&16384)===0){_e(e,1024);var r=I,o=Xn;if(I=e,Xn=!0,x){var n=Et;Fn(e.component_function);var i=Qt;go(e.dev_stack??Qt)}try{(t&16777232)!==0?ol(e):rn(e),ka(e);var a=jn(e);if(e.teardown=typeof a=="function"?a:null,e.wv=sl,x&&Bt&&(e.f&2048)!==0&&e.deps!==null)for(var s of e.deps)s.set_during_effect&&(s.wv=ko(),s.set_during_effect=!1)}finally{Xn=o,I=r,x&&(Fn(n),go(i))}}}async function Qr(){if(Me)return new Promise(e=>{requestAnimationFrame(()=>e()),setTimeout(()=>e())});await Promise.resolve(),X()}function m(e){var t=e.f,r=(t&2)!==0;if(al?.add(e),G!==null&&!mt){var o=I!==null&&(I.f&16384)!==0;if(!o&&(Vt===null||!Vt.has(e))){var n=G.deps;if((G.f&2097152)!==0)e.rv<Jr&&(e.rv=Jr,Ze===null&&n!==null&&n[pt]===e?pt++:Ze===null?Ze=[e]:Ze.push(e));else{G.deps??=[],$r.call(G.deps,e)||G.deps.push(e);var i=e.reactions;i===null?e.reactions=[G]:$r.call(i,G)||i.push(G)}}}if(x){if(!mt&&wt&&!wt.warned&&(wt.effect.f&2097152)===0&&!wt.effect_deps.has(e)){wt.warned=!0,_u(e.label);var a=jt("traced at");a&&console.warn(a)}if(en.delete(e),Bt&&!mt&&Zo!==null&&G!==null&&Zo.reaction===G){if(e.trace)e.trace();else if(a=jt("traced at"),a){var s=Zo.entries.get(e);s===void 0&&(s={traces:[]},Zo.entries.set(e,s));var u=s.traces[s.traces.length-1];a.stack!==u?.stack&&s.traces.push(a)}}}if(Dt&&vr.has(e))return vr.get(e);if(r){var l=e;if(Dt){var c=l.v;return((l.f&1024)===0&&l.reactions!==null||cl(l))&&(c=tn(l)),vr.set(l,c),c}var f=(l.f&512)===0&&!mt&&G!==null&&(Xn||(G.f&512)!==0),p=(l.f&32768)===0;Tr(l)&&(f&&(l.f|=512),ha(l)),f&&!p&&(ba(l),ll(l))}if(We?.has(e))return We.get(e);if((e.f&8388608)!==0)throw e.v;return e.v}function ll(e){if(e.f|=512,e.deps!==null)for(let t of e.deps)(t.reactions??=[]).push(e),(t.f&2)!==0&&(t.f&512)===0&&(ba(t),ll(t))}function cl(e){if(e.v===xe)return!0;if(e.deps===null)return!1;for(let t of e.deps)if(vr.has(t)||(t.f&2)!==0&&cl(t))return!0;return!1}function be(e){var t=mt;try{return mt=!0,e()}finally{mt=t}}var S0=/\r/g;function dl(e){e=e.replace(S0,"");let t=5381,r=e.length;for(;r--;)t=(t<<5)-t^e.charCodeAt(r);return(t>>>0).toString(36)}var T0=["allowfullscreen","async","autofocus","autoplay","checked","controls","default","disabled","formnovalidate","indeterminate","inert","ismap","loop","multiple","muted","nomodule","novalidate","open","playsinline","readonly","required","reversed","seamless","selected","webkitdirectory","defer","disablepictureinpicture","disableremoteplayback"];var Lg=[...T0,"formNoValidate","isMap","noModule","playsInline","readOnly","value","volume","defaultValue","defaultChecked","srcObject","noValidate","allowFullscreen","disablePictureInPicture","disableRemotePlayback"];var F0=["touchstart","touchmove"];function fl(e){return F0.includes(e)}var M0=["$state","$state.raw","$derived","$derived.by"],Ng=[...M0,"$state.eager","$state.snapshot","$props","$props.id","$bindable","$effect","$effect.pre","$effect.tracking","$effect.root","$effect.pending","$inspect","$inspect().with","$inspect.trace","$host"];function Kn(e){return e?.replace(/\//g,"/\u200B")}var pl=new Map;function ml(e,t){var r=pl.get(e);r||(r=new Set,pl.set(e,r)),r.add(t)}var on=Symbol("events"),Ea=new Set,Jn=new Set;function vl(e,t,r,o={}){function n(i){if(o.capture||Qn.call(t,i),!i.cancelBubble)return _r(()=>r?.call(this,i))}return e.startsWith("pointer")||e.startsWith("touch")||e==="wheel"?Oe(()=>{t.addEventListener(e,n,o)}):t.addEventListener(e,n,o),n}function eo(e,t,r,o,n){var i={capture:o,passive:n},a=vl(e,t,r,i);(t===document.body||t===window||t===document||t instanceof HTMLMediaElement)&&Ge(()=>{t.removeEventListener(e,a,i)})}function se(e,t,r){(t[on]??={})[e]=r}function Te(e){for(var t=0;t<e.length;t++)Ea.add(e[t]);for(var r of Jn)r(e)}var bl=null;function Qn(e){var t=this,r=t.ownerDocument,o=e.type,n=e.composedPath?.()||[],i=n[0]||e.target;bl=e;var a=0,s=bl===e&&e[on];if(s){var u=n.indexOf(s);if(u!==-1&&(t===document||t===window)){e[on]=t;return}var l=n.indexOf(t);if(l===-1)return;u<=l&&(a=u)}if(i=n[a]||e.target,i!==t){Ie(e,"currentTarget",{configurable:!0,get(){return i||r}});var c=G,f=I;Ne(null),Pe(null);try{for(var p,d=[];i!==null&&i!==t;){try{var h=i[on]?.[o];h!=null&&(!i.disabled||e.target===i)&&h.call(i,e)}catch(b){p?d.push(b):p=b}if(e.cancelBubble)break;a++,i=a<n.length?n[a]:null}if(p){for(let b of d)queueMicrotask(()=>{throw b});throw p}}finally{e[on]=t,delete e.currentTarget,Ne(c),Pe(f)}}}var z0=globalThis?.window?.trustedTypes&&globalThis.window.trustedTypes.createPolicy("svelte-trusted-html",{createHTML:e=>e});function gl(e){return z0?.createHTML(e)??e}function Ca(e){var t=Yt("template");return t.innerHTML=gl(e.replaceAll("<!>","<!---->")),t.content}function Tt(e,t){var r=I;r.nodes===null&&(r.nodes={start:e,end:t,a:null,t:null})}function z(e,t){var r=(t&1)!==0,o=(t&2)!==0,n,i=!e.startsWith("<!>");return()=>{if(P)return Tt(K,null),K;n===void 0&&(n=Ca(i?e:"<!>"+e),r||(n=Se(n)));var a=o||Ko?document.importNode(n,!0):n.cloneNode(!0);if(r){var s=Se(a),u=a.lastChild;Tt(s,u)}else Tt(a,a);return a}}function Xe(){if(P)return Tt(K,null),K;var e=document.createDocumentFragment(),t=document.createComment(""),r=He();return e.append(t,r),Tt(t,r),e}function R(e,t){if(P){var r=I;((r.f&32768)===0||r.nodes.end===null)&&(r.nodes.end=K),qe();return}e!==null&&e.before(t)}var Aa=!0;function q(e,t){var r=t==null?"":typeof t=="object"?`${t}`:t;r!==(e[Yo]??=e.nodeValue)&&(e[Yo]=r,e.nodeValue=`${r}`)}function So(e,t){return _l(e,t)}function Sa(e,t){Vn(),t.intro=t.intro??!1;let r=t.target,o=P,n=K;try{for(var i=Se(r);i&&(i.nodeType!==$t||i.data!=="[");)i=Ve(i);if(!i)throw Xt;Fe(!0),de(i);let a=_l(e,{...t,anchor:i});return Fe(!1),a}catch(a){if(a instanceof Error&&a.message.split(`
-`).some(s=>s.startsWith("https://svelte.dev/e/")))throw a;return a!==Xt&&console.warn("Failed to hydrate: ",a),t.recover===!1&&fu(),Vn(),Ao(r),Fe(!1),So(e,t)}finally{Fe(o),de(n)}}var ei=new Map;function _l(e,{target:t,anchor:r,props:o={},events:n,context:i,intro:a=!0,transformError:s}){Vn();var u=void 0,l=rl(()=>{var c=r??t.appendChild(He());ca(c,{pending:()=>{}},d=>{le({});var h=re;if(i&&(h.c=i),n&&(o.$$events=n),P&&Tt(d,null),Aa=a,u=e(d,o)||{},Aa=!0,P&&(I.nodes.end=K,K===null||K.nodeType!==$t||K.data!=="]"))throw Ar(),Xt;ce()},s);var f=new Set,p=d=>{for(var h=0;h<d.length;h++){var b=d[h];if(!f.has(b)){f.add(b);var g=fl(b);for(let C of[t,document]){var D=ei.get(C);D===void 0&&(D=new Map,ei.set(C,D));var E=D.get(b);E===void 0?(C.addEventListener(b,Qn,{passive:g}),D.set(b,1)):D.set(b,E+1)}}}};return p(lo(Ea)),Jn.add(p),()=>{for(var d of f)for(let g of[t,document]){var h=ei.get(g),b=h.get(d);--b==0?(g.removeEventListener(d,Qn),h.delete(d),h.size===0&&ei.delete(g)):h.set(d,b)}Jn.delete(p),c!==r&&c.parentNode?.removeChild(c)}});return Da.set(u,l),u}var Da=new WeakMap;function Ta(e,t){let r=Da.get(e);return r?(Da.delete(e),r(t)):(x&&(et in e?Eu():$u()),Promise.resolve())}var ir=class{anchor;#t=new Map;#e=new Map;#r=new Map;#a=new Set;#o=!0;constructor(t,r=!0){this.anchor=t,this.#o=r}#s=t=>{if(this.#t.has(t)){var r=this.#t.get(t),o=this.#e.get(r);if(o)Do(o),this.#a.delete(r);else{var n=this.#r.get(r);n&&(Do(n.effect),this.#e.set(r,n.effect),this.#r.delete(r),x&&(n.fragment.lastChild[Gi]=this.anchor),n.fragment.lastChild.remove(),this.anchor.before(n.fragment),o=n.effect)}for(let[i,a]of this.#t){if(this.#t.delete(i),i===t)break;let s=this.#r.get(a);s&&(De(s.effect),this.#r.delete(a))}for(let[i,a]of this.#e){if(i===r||this.#a.has(i))continue;let s=()=>{if(Array.from(this.#t.values()).includes(i)){var l=document.createDocumentFragment();$o(a,l),l.append(He()),this.#r.set(i,{effect:a,fragment:l})}else De(a);this.#a.delete(i),this.#e.delete(i)};this.#o||!o?(this.#a.add(i),rr(a,s,!1)):s()}}};#n=t=>{this.#t.delete(t);let r=Array.from(this.#t.values());for(let[o,n]of this.#r)r.includes(o)||(De(n.effect),this.#r.delete(o))};ensure(t,r){var o=W,n=Yn();if(r&&!this.#e.has(t)&&!this.#r.has(t))if(n){var i=document.createDocumentFragment(),a=He();i.append(a),this.#r.set(t,{effect:je(()=>r(a)),fragment:i})}else this.#e.set(t,je(()=>r(this.anchor)));if(this.#t.set(o,t),n){for(let[s,u]of this.#e)s===t?o.unskip_effect(u):o.skip_effect(u);for(let[s,u]of this.#r)s===t?o.unskip_effect(u.effect):o.skip_effect(u.effect);o.oncommit(this.#s),o.ondiscard(this.#n)}else P&&(this.anchor=K),this.#s(o)}};function ee(e,t,r=!1){var o;P&&(o=K,qe());var n=new ir(e),i=r?65536:0;function a(s,u){if(P){var l=vo(o);if(s!==parseInt(l.substring(1))){var c=Ot();de(c),n.anchor=c,Fe(!1),n.ensure(s,u),Fe(!0);return}}n.ensure(s,u)}yt(()=>{var s=!1;t((u,l=0)=>{s=!0,a(l,u)}),s||a(-1,null)},i)}function U0(e,t,r){for(var o=[],n=t.length,i,a=t.length,s=0;s<n;s++){let f=t[s];rr(f,()=>{if(i){if(i.pending.delete(f),i.done.add(f),i.pending.size===0){var p=e.outrogroups;Fa(e,lo(i.done)),p.delete(i),p.size===0&&(e.outrogroups=null)}}else a-=1},!1)}if(a===0){var u=o.length===0&&r!==null;if(u){var l=r,c=l.parentNode;Ao(c),c.append(l),e.items.clear()}Fa(e,t,!u)}else i={pending:new Set(t),done:new Set},(e.outrogroups??=new Set).add(i)}function Fa(e,t,r=!0){var o;if(e.pending.size>0){o=new Set;for(let a of e.pending.values())for(let s of a)o.add(e.items.get(s).e)}for(var n=0;n<t.length;n++){var i=t[n];if(o?.has(i)){i.f|=33554432;let a=document.createDocumentFragment();$o(i,a)}else De(t[n],r)}}var xl;function Ce(e,t,r,o,n,i=null){var a=e,s=new Map,u=(t&4)!==0;if(u){var l=e;a=P?de(Se(l)):l.appendChild(He())}P&&qe();var c=null,f=Wr(()=>{var C=r();return fr(C)?C:C==null?[]:lo(C)});x&&lt(f,"{#each ...}");var p,d=new Map,h=!0;function b(C){(E.effect.f&16384)===0&&(E.pending.delete(C),E.fallback=c,V0(E,p,a,t,o),c!==null&&(p.length===0?(c.f&33554432)===0?Do(c):(c.f^=33554432,an(c,null,a)):rr(c,()=>{c=null})))}function g(C){E.pending.delete(C)}var D=yt(()=>{p=m(f);var C=p.length;let A=!1;if(P){var T=vo(a)==="[!";T!==(C===0)&&(a=Ot(),de(a),Fe(!1),A=!0)}for(var k=new Set,S=W,N=Yn(),j=0;j<C;j+=1){P&&K.nodeType===$t&&K.data==="]"&&(a=K,A=!0,Fe(!1));var O=p[j],w=o(O,j);if(x){var y=o(O,j);w!==y&&su(String(j),String(w),String(y))}var M=h?null:s.get(w);M?(M.v&&Ut(M.v,O),M.i&&Ut(M.i,j),N&&S.unskip_effect(M.e)):(M=Y0(s,h?a:xl??=He(),O,w,j,n,t,r),h||(M.e.f|=33554432),s.set(w,M)),k.add(w)}if(C===0&&i&&!c&&(h?c=je(()=>i(a)):(c=je(()=>i(xl??=He())),c.f|=33554432)),C>k.size&&(x?G0(p,o):Zi("","","")),P&&C>0&&de(Ot()),!h)if(d.set(S,k),N){for(let[B,Z]of s)k.has(B)||S.skip_effect(Z.e);S.oncommit(b),S.ondiscard(g)}else b(S);A&&Fe(!0),m(f)}),E={effect:D,flags:t,items:s,pending:d,outrogroups:null,fallback:c};h=!1,P&&(a=K)}function nn(e){for(;e!==null&&(e.f&32)===0;)e=e.next;return e}function V0(e,t,r,o,n){var i=(o&8)!==0,a=t.length,s=e.items,u=nn(e.effect.first),l,c=null,f,p=[],d=[],h,b,g,D;if(i)for(D=0;D<a;D+=1)h=t[D],b=n(h,D),g=s.get(b).e,(g.f&33554432)===0&&(g.nodes?.a?.measure(),(f??=new Set).add(g));for(D=0;D<a;D+=1){if(h=t[D],b=n(h,D),g=s.get(b).e,e.outrogroups!==null)for(let O of e.outrogroups)O.pending.delete(g),O.done.delete(g);if((g.f&8192)!==0&&(Do(g),i&&(g.nodes?.a?.unfix(),(f??=new Set).delete(g))),(g.f&33554432)!==0)if(g.f^=33554432,g===u)an(g,null,r);else{var E=c?c.next:u;g===e.effect.last&&(e.effect.last=g.prev),g.prev&&(g.prev.next=g.next),g.next&&(g.next.prev=g.prev),Rr(e,c,g),Rr(e,g,E),an(g,E,r),c=g,p=[],d=[],u=nn(c.next);continue}if(g!==u){if(l!==void 0&&l.has(g)){if(p.length<d.length){var C=d[0],A;c=C.prev;var T=p[0],k=p[p.length-1];for(A=0;A<p.length;A+=1)an(p[A],C,r);for(A=0;A<d.length;A+=1)l.delete(d[A]);Rr(e,T.prev,k.next),Rr(e,c,T),Rr(e,k,C),u=C,c=k,D-=1,p=[],d=[]}else l.delete(g),an(g,u,r),Rr(e,g.prev,g.next),Rr(e,g,c===null?e.effect.first:c.next),Rr(e,c,g),c=g;continue}for(p=[],d=[];u!==null&&u!==g;)(l??=new Set).add(u),d.push(u),u=nn(u.next);if(u===null)continue}(g.f&33554432)===0&&p.push(g),c=g,u=nn(g.next)}if(e.outrogroups!==null){for(let O of e.outrogroups)O.pending.size===0&&(Fa(e,lo(O.done)),e.outrogroups?.delete(O));e.outrogroups.size===0&&(e.outrogroups=null)}if(u!==null||l!==void 0){var S=[];if(l!==void 0)for(g of l)(g.f&8192)===0&&S.push(g);for(;u!==null;)(u.f&8192)===0&&u!==e.fallback&&S.push(u),u=nn(u.next);var N=S.length;if(N>0){var j=(o&4)!==0&&a===0?r:null;if(i){for(D=0;D<N;D+=1)S[D].nodes?.a?.measure();for(D=0;D<N;D+=1)S[D].nodes?.a?.fix()}U0(e,S,j)}}i&&Oe(()=>{if(f!==void 0)for(g of f)g.nodes?.a?.apply()})}function Y0(e,t,r,o,n,i,a,s){var u=(a&1)!==0?(a&16)===0?Sr(r,!1,!1):ft(r):null,l=(a&2)!==0?ft(n):null;return x&&u&&(u.trace=()=>{s()[l?.v??n]}),{v:u,i:l,e:je(()=>(i(t,u??r,l??n,s),()=>{e.delete(o)}))}}function an(e,t,r){if(e.nodes)for(var o=e.nodes.start,n=e.nodes.end,i=t&&(t.f&33554432)===0?t.nodes.start:r;o!==null;){var a=Ve(o);if(i.before(o),o===n)return;o=a}}function Rr(e,t,r){t===null?e.effect.first=r:t.next=r,r===null?e.effect.last=t:r.prev=t}function G0(e,t){let r=new Map,o=e.length;for(let n=0;n<o;n++){let i=t(e[n],n);if(r.has(i)){let a=String(r.get(i)),s=String(n),u=String(i);u.startsWith("[object ")&&(u=null),Zi(a,s,u)}r.set(i,n)}}function W0(e,t,r){if(!t||t===dl(String(r??"")))return;let o,n=e.__svelte_meta?.loc;n?o=`near ${n.file}:${n.line}:${n.column}`:Et?.[vt]&&(o=`in ${Et[vt]}`),ku(Kn(o))}function Ma(e,t,r=!1,o=!1,n=!1,i=!1){var a=e,s="";if(r){var u=e;P&&(a=de(Se(u)))}U(()=>{var l=I;if(s===(s=t()??"")){P&&qe();return}if(r&&!P){l.nodes=null,u.innerHTML=s,s!==""&&Tt(Se(u),u.lastChild);return}if(l.nodes!==null&&($a(l.nodes.start,l.nodes.end),l.nodes=null),s!==""){if(P){for(var c=K.data,f=qe(),p=f;f!==null&&(f.nodeType!==$t||f.data!=="");)p=f,f=Ve(f);if(f===null)throw Ar(),Xt;x&&!i&&W0(f.parentNode,c,s),Tt(K,p),a=de(f);return}var d=o?Wo:n?Xi:void 0,h=Yt(o?"svg":n?"math":"template",d);h.innerHTML=s;var b=o||n?h:h.content;if(Tt(Se(b),b.lastChild),o||n)for(;Se(b);)a.before(Se(b));else a.before(b)}})}function ti(e,t,r){var o;P&&(o=K,qe());var n=new ir(e);yt(()=>{var i=t()??null;if(P){var a=vo(o),s=a==="[",u=i!==null;if(s!==u){var l=Ot();de(l),n.anchor=l,Fe(!1),n.ensure(i,i&&(c=>r(c,i))),Fe(!0);return}}n.ensure(i,i&&(c=>r(c,i)))},65536)}function ve(e,t){Nt(()=>{var r=e.getRootNode(),o=r.host?r:r.head??r.ownerDocument.head;if(!o.querySelector("#"+t.hash)){let n=Yt("style");n.id=t.hash,n.textContent=t.code,o.appendChild(n),x&&ml(t.hash,n)}})}var kl=[...` 	
-\r\f\xA0\v\uFEFF`];function El(e,t,r){var o=e==null?"":""+e;if(t&&(o=o?o+" "+t:t),r){for(var n of Object.keys(r))if(r[n])o=o?o+" "+n:n;else if(o.length)for(var i=n.length,a=0;(a=o.indexOf(n,a))>=0;){var s=a+i;(a===0||kl.includes(o[a-1]))&&(s===o.length||kl.includes(o[s]))?o=(a===0?"":o.substring(0,a))+o.substring(s+1):a=s}}return o===""?null:o}function $l(e,t=!1){var r=t?" !important;":";",o="";for(var n of Object.keys(e)){var i=e[n];i!=null&&i!==""&&(o+=" "+n+": "+i+r)}return o}function Ra(e){return e[0]!=="-"||e[1]!=="-"?e.toLowerCase():e}function Cl(e,t){if(t){var r="",o,n;if(Array.isArray(t)?(o=t[0],n=t[1]):o=t,e){e=String(e).replaceAll(/\s*\/\*.*?\*\/\s*/g,"").trim();var i=!1,a=0,s=!1,u=[];o&&u.push(...Object.keys(o).map(Ra)),n&&u.push(...Object.keys(n).map(Ra));var l=0,c=-1;let b=e.length;for(var f=0;f<b;f++){var p=e[f];if(s?p==="/"&&e[f-1]==="*"&&(s=!1):i?i===p&&(i=!1):p==="/"&&e[f+1]==="*"?s=!0:p==='"'||p==="'"?i=p:p==="("?a++:p===")"&&a--,!s&&i===!1&&a===0){if(p===":"&&c===-1)c=f;else if(p===";"||f===b-1){if(c!==-1){var d=Ra(e.substring(l,c).trim());if(!u.includes(d)){p!==";"&&f++;var h=e.substring(l,f).trim();r+=" "+h+";"}}l=f+1,c=-1}}}}return o&&(r+=$l(o)),n&&(r+=$l(n,!0)),r=r.trim(),r===""?null:r}return e==null?null:String(e)}function Ue(e,t,r,o,n,i){var a=e[Uo];if(P||a!==r||a===void 0){var s=El(r,o,i);(!P||s!==e.getAttribute("class"))&&(s==null?e.removeAttribute("class"):t?e.className=s:e.setAttribute("class",s)),e[Uo]=r}else if(i&&n!==i)for(var u in i){var l=!!i[u];(n==null||l!==!!n[u])&&e.classList.toggle(u,l)}return i}function za(e,t={},r,o){for(var n in r){var i=r[n];t[n]!==i&&(r[n]==null?e.style.removeProperty(n):e.style.setProperty(n,i,o))}}function zr(e,t,r,o){var n=e[Vo];if(P||n!==t){var i=Cl(t,o);(!P||i!==e.getAttribute("style"))&&(i==null?e.removeAttribute("style"):e.style.cssText=i),e[Vo]=t}else o&&(Array.isArray(o)?(za(e,r?.[0],o[0]),za(e,r?.[1],o[1],"important")):za(e,r,o));return o}var nd=Symbol("is custom element"),id=Symbol("is html"),ad=kn?"link":"LINK";var sd=kn?"progress":"PROGRESS";function sr(e){if(P){var t=!1,r=()=>{if(!t){if(t=!0,e.hasAttribute("value")){var o=e.value;ge(e,"value",null),e.value=o}if(e.hasAttribute("checked")){var n=e.checked;ge(e,"checked",null),e.checked=n}}};e[Er]=r,Oe(r),Wn()}}function Na(e,t){var r=Tl(e);r.value===(r.value=t??void 0)||e.value===t&&(t!==0||e.nodeName!==sd)||(e.value=t??"")}function ge(e,t,r,o){var n=Tl(e);if(P&&(n[t]=e.getAttribute(t),t==="src"||t==="srcset"||t==="href"&&e.nodeName===ad)){o||ld(e,t,r??"");return}n[t]!==(n[t]=r)&&(t==="loading"&&(e[ru]=r),r==null?e.removeAttribute(t):typeof r!="string"&&ud(e).includes(t)?e[t]=r:e.setAttribute(t,r))}function Tl(e){return e[wn]??={[nd]:e.nodeName.includes("-"),[id]:e.namespaceURI===$n}}var Al=new Map;function ud(e){var t=e.getAttribute("is")||e.nodeName,r=Al.get(t);if(r)return r;Al.set(t,r=[]);for(var o,n=e,i=Element.prototype;i!==n;){o=Ui(n);for(var a in o)o[a].set&&a!=="innerHTML"&&a!=="textContent"&&a!=="innerText"&&r.push(a);n=co(n)}return r}function ld(e,t,r){x&&(t==="srcset"&&cd(e,r)||La(e.getAttribute(t)??"",r)||wu(t,e.outerHTML.replace(e.innerHTML,e.innerHTML&&"..."),String(r)))}function La(e,t){return e===t?!0:new URL(e,document.baseURI).href===new URL(t,document.baseURI).href}function Dl(e){return e.split(",").map(t=>t.trim().split(" ").filter(Boolean))}function cd(e,t){var r=Dl(e.srcset),o=Dl(t);return o.length===r.length&&o.every(([n,i],a)=>i===r[a][1]&&(La(r[a][0],n)||La(n,r[a][0])))}function ur(e,t,r=t){var o=new WeakSet;ya(e,"input",async n=>{x&&e.type==="checkbox"&&Wi();var i=n?e.defaultValue:e.value;if(i=Pa(e)?Ia(i):i,r(i),W!==null&&o.add(W),await Qr(),i!==(i=t())){var a=e.selectionStart,s=e.selectionEnd,u=e.value.length;if(e.value=i??"",s!==null){var l=e.value.length;a===s&&s===u&&l>u?(e.selectionStart=l,e.selectionEnd=l):(e.selectionStart=a,e.selectionEnd=Math.min(s,l))}}}),(P&&e.defaultValue!==e.value||be(t)==null&&e.value)&&(r(Pa(e)?Ia(e.value):e.value),W!==null&&o.add(W)),nt(()=>{x&&e.type==="checkbox"&&Wi();var n=t();if(e===document.activeElement){var i=Me?Vr:W;if(o.has(i))return}Pa(e)&&n===Ia(e.value)||e.type==="date"&&!n&&!e.value||n!==e.value&&(e.value=n??"")})}function Pa(e){var t=e.type;return t==="number"||t==="range"}function Ia(e){return e===""?null:+e}var bd={get(e,t){let r=e.props.length;for(;r--;){let o=e.props[r];if(qr(o)&&(o=o()),typeof o=="object"&&o!==null&&t in o)return o[t]}},set(e,t,r){let o=e.props.length;for(;o--;){let n=e.props[o];qr(n)&&(n=n());let i=Qe(n,t);if(i&&i.set)return i.set(r),!0}return!1},getOwnPropertyDescriptor(e,t){let r=e.props.length;for(;r--;){let o=e.props[r];if(qr(o)&&(o=o()),typeof o=="object"&&o!==null&&t in o){let n=Qe(o,t);return n&&!n.configurable&&(n.configurable=!0),n}}},has(e,t){if(t===et||t===fo)return!1;for(let r of e.props)if(qr(r)&&(r=r()),r!=null&&t in r)return!0;return!1},ownKeys(e){let t=[];for(let r of e.props)if(qr(r)&&(r=r()),!!r){for(let o in r)t.includes(o)||t.push(o);for(let o of Object.getOwnPropertySymbols(r))t.includes(o)||t.push(o)}return t}};function oi(...e){return new Proxy({props:e},bd)}function Q(e,t,r,o){var n=!pr||(r&2)!==0,i=(r&8)!==0,a=(r&16)!==0,s=o,u=!0,l=void 0,c=()=>a&&n?(l??=Fr(o),m(l)):(u&&(u=!1,s=a?be(o):o),s);let f;if(i){var p=et in e||fo in e;f=Qe(e,t)?.set??(p&&t in e?A=>e[t]=A:void 0)}var d,h=!1;i?[d,h]=ra(()=>e[t]):d=e[t],d===void 0&&o!==void 0&&(d=c(),f&&(n&&pu(t),f(d)));var b;if(n?b=()=>{var A=e[t];return A===void 0?c():(u=!0,A)}:b=()=>{var A=e[t];return A!==void 0&&(s=void 0),A===void 0?s:A},n&&(r&4)===0)return b;if(f){var g=e.$$legacy;return(function(A,T){return arguments.length>0?((!n||!T||g||h)&&f(T?b():A),A):b()})}var D=!1,E=((r&1)!==0?Fr:Wr)(()=>(D=!1,b()));x&&(E.label=t),i&&m(E);var C=I;return(function(A,T){if(arguments.length>0){let k=T?m(E):n&&i?$e(A):A;return F(E,k),D=!0,s!==void 0&&(s=k),A}return Dt&&D||(C.f&16384)!==0?E.v:m(E)})}function Fl(e){return new Oa(e)}var Oa=class{#t;#e;constructor(t){var r=new Map,o=(i,a)=>{var s=Sr(a,!1,!1);return r.set(i,s),s};let n=new Proxy({...t.props||{},$$events:{}},{get(i,a){return m(r.get(a)??o(a,Reflect.get(i,a)))},has(i,a){return a===fo?!0:(m(r.get(a)??o(a,Reflect.get(i,a))),Reflect.has(i,a))},set(i,a,s){return F(r.get(a)??o(a,s),s),Reflect.set(i,a,s)}});this.#e=(t.hydrate?Sa:So)(t.component,{target:t.target,anchor:t.anchor,props:n,context:t.context,intro:t.intro??!1,recover:t.recover,transformError:t.transformError}),!Me&&(!t?.props?.$$host||t.sync===!1)&&X(),this.#t=n.$$events;for(let i of Object.keys(this.#e))i==="$set"||i==="$destroy"||i==="$on"||Ie(this,i,{get(){return this.#e[i]},set(a){this.#e[i]=a},enumerable:!0});this.#e.$set=i=>{Object.assign(n,i)},this.#e.$destroy=()=>{Ta(this.#e)}}$set(t){this.#e.$set(t)}$on(t,r){this.#t[t]=this.#t[t]||[];let o=(...n)=>r.call(this,...n);return this.#t[t].push(o),()=>{this.#t[t]=this.#t[t].filter(n=>n!==o)}}$destroy(){this.#e.$destroy()}};var Ml;typeof HTMLElement=="function"&&(Ml=class extends HTMLElement{$$ctor;$$s;$$c;$$cn=!1;$$d={};$$r=!1;$$p_d={};$$l={};$$l_u=new Map;$$me;$$shadowRoot=null;constructor(e,t,r){super(),this.$$ctor=e,this.$$s=t,r&&(this.$$shadowRoot=this.attachShadow(r))}addEventListener(e,t,r){if(this.$$l[e]=this.$$l[e]||[],this.$$l[e].push(t),this.$$c){let o=this.$$c.$on(e,t);this.$$l_u.set(t,o)}super.addEventListener(e,t,r)}removeEventListener(e,t,r){if(super.removeEventListener(e,t,r),this.$$c){let o=this.$$l_u.get(t);o&&(o(),this.$$l_u.delete(t))}}async connectedCallback(){if(this.$$cn=!0,!this.$$c){let e=function(o){return n=>{let i=Yt("slot");o!=="default"&&(i.name=o),R(n,i)}};if(await Promise.resolve(),!this.$$cn||this.$$c)return;let t={},r=$d(this);for(let o of this.$$s)o in r&&(o==="default"&&!this.$$d.children?(this.$$d.children=e(o),t.default=!0):t[o]=e(o));for(let o of this.attributes){let n=this.$$g_p(o.name);n in this.$$d||(this.$$d[n]=ni(n,o.value,this.$$p_d,"toProp"))}for(let o in this.$$p_d)!(o in this.$$d)&&this[o]!==void 0&&(this.$$d[o]=this[o],delete this[o]);this.$$c=Fl({component:this.$$ctor,target:this.$$shadowRoot||this,props:{...this.$$d,$$slots:t,$$host:this}}),this.$$me=Zn(()=>{nt(()=>{this.$$r=!0;for(let o of Ho(this.$$c)){if(!this.$$p_d[o]?.reflect)continue;this.$$d[o]=this.$$c[o];let n=ni(o,this.$$d[o],this.$$p_d,"toAttribute");n==null?this.removeAttribute(this.$$p_d[o].attribute||o):this.setAttribute(this.$$p_d[o].attribute||o,n)}this.$$r=!1})});for(let o in this.$$l)for(let n of this.$$l[o]){let i=this.$$c.$on(o,n);this.$$l_u.set(n,i)}this.$$l={}}}attributeChangedCallback(e,t,r){this.$$r||(e=this.$$g_p(e),this.$$d[e]=ni(e,r,this.$$p_d,"toProp"),this.$$c?.$set({[e]:this.$$d[e]}))}disconnectedCallback(){this.$$cn=!1,Promise.resolve().then(()=>{!this.$$cn&&this.$$c&&(this.$$c.$destroy(),this.$$me(),this.$$c=void 0)})}$$g_p(e){return Ho(this.$$p_d).find(t=>this.$$p_d[t].attribute===e||!this.$$p_d[t].attribute&&t.toLowerCase()===e)||e}});function ni(e,t,r,o){let n=r[e]?.type;if(t=n==="Boolean"&&typeof t!="boolean"?t!=null:t,!o||!r[e])return t;if(o==="toAttribute")switch(n){case"Object":case"Array":return t==null?null:JSON.stringify(t);case"Boolean":return t?"":null;case"Number":return t??null;default:return t}else switch(n){case"Object":case"Array":return t&&JSON.parse(t);case"Boolean":return t;case"Number":return t!=null?+t:t;default:return t}}function $d(e){let t={};return e.childNodes.forEach(r=>{t[r.slot||"default"]=!0}),t}function fe(e,t,r,o,n,i){let a=class extends Ml{constructor(){super(e,r,n),this.$$p_d=t}static get observedAttributes(){return Ho(t).map(s=>(t[s].attribute||s).toLowerCase())}};return Ho(t).forEach(s=>{Ie(a.prototype,s,{get(){return this.$$c&&s in this.$$c?this.$$c[s]:this.$$d[s]},set(u){u=ni(s,u,t),this.$$d[s]=u;var l=this.$$c;if(l){var c=Qe(l,s)?.get;c?l[s]=u:l.$set({[s]:u})}}})}),o.forEach(s=>{Ie(a.prototype,s,{get(){return this.$$c?.[s]}})}),i&&(a=i(a)),e.element=a,a}if(x){let e=function(t){if(!(t in globalThis)){let r;Object.defineProperty(globalThis,t,{configurable:!0,get:()=>{if(r!==void 0)return r;mu(t)},set:o=>{r=o}})}};e("$state"),e("$effect"),e("$derived"),e("$inspect"),e("$props"),e("$bindable")}function bt(e){re===null&&Go("onMount"),pr&&re.l!==null?Ed(re).m.push(e):nr(()=>{let t=be(e);if(typeof t=="function")return t})}function ii(e){re===null&&Go("onDestroy"),bt(()=>()=>be(e))}function Ed(e){var t=e.l;return t.u??={a:[],b:[],m:[]}}var Rl="openbook-dashboard-theme",zl="(prefers-color-scheme: dark)";function Cd(){return window.matchMedia(zl).matches?"dark":"light"}function Ll(){let e=localStorage.getItem(Rl);return e==="light"||e==="dark"?e:null}function Ba(e){document.documentElement.setAttribute("data-theme",e)}var To=Dr(Ll()??Cd());function Ad(e){localStorage.setItem(Rl,e),Ba(e),To.set(e)}function Nl(){Ad(jr(To)==="dark"?"light":"dark")}function Pl(){Ba(jr(To)),window.matchMedia(zl).addEventListener("change",e=>{if(!Ll()){let t=e.matches?"dark":"light";Ba(t),To.set(t)}})}typeof window<"u"&&((window.__svelte??={}).v??=new Set).add("5");Au();function ja(e,t){if(e instanceof RegExp)return{keys:!1,pattern:e};var r,o,n,i,a=[],s="",u=e.split("/");for(u[0]||u.shift();n=u.shift();)r=n[0],r==="*"?(a.push("wild"),s+="/(.*)"):r===":"?(o=n.indexOf("?",1),i=n.indexOf(".",1),a.push(n.substring(1,~o?o:~i?i:n.length)),s+=~o&&!~i?"(?:/([^/]+?))?":"/([^/]+?)",~i&&(s+=(~o?"?":"")+"\\"+n.substring(i))):s+="/"+n;return{keys:a,pattern:new RegExp("^"+s+(t?"(?=$|/)":"/?$"),"i")}}var Ha=class{#t=H(Il());get _loc(){return m(this.#t)}set _loc(t){F(this.#t,t)}#e=J(()=>this._loc.location);get _location(){return m(this.#e)}set _location(t){F(this.#e,t)}#r=J(()=>this._loc.querystring);get _querystring(){return m(this.#r)}set _querystring(t){F(this.#r,t)}#a=H(void 0);get _params(){return m(this.#a)}set _params(t){F(this.#a,t)}get loc(){return this._loc}get location(){return this._location}get querystring(){return this._querystring}get params(){return this._params}constructor(){window.addEventListener("hashchange",()=>{this._loc=Il()})}},sn=new Ha;function Il(){let e=window.location.href.indexOf("#/"),t=e>-1?window.location.href.substr(e+1):"/",r=t.indexOf("?"),o="";return r>-1&&(o=t.substr(r+1),t=t.substr(0,r)),{location:t,querystring:o}}async function kt(e){if(!e||e.length<1||e.charAt(0)!="/"&&e.indexOf("#/")!==0)throw Error("Invalid parameter location");await Qr(),history.replaceState({...history.state,__svelte_spa_router_scrollX:window.scrollX,__svelte_spa_router_scrollY:window.scrollY},""),window.location.hash=(e.charAt(0)=="#"?"":"#")+e}function ql(e){e?window.scrollTo(e.__svelte_spa_router_scrollX||0,e.__svelte_spa_router_scrollY||0):window.scrollTo(0,0)}function ai(e,t){le(t,!0);let r=Q(t,"routes",23,()=>({})),o=Q(t,"prefix",7,""),n=Q(t,"restoreScrollState",7,!1),i=Q(t,"onConditionsFailed",7,()=>{}),a=Q(t,"onRouteLoaded",7,()=>{}),s=Q(t,"onRouteLoading",7,()=>{}),u=Q(t,"onRouteEvent",7,()=>{});class l{path;component;conditions;userData;props;_pattern;_keys;constructor(S,N){let j=w=>typeof w=="object"&&w!==null&&w._sveltesparouter===!0;if(!N||typeof N!="function"&&!j(N))throw Error("Invalid component object");if(!S||typeof S=="string"&&(S.length<1||S.charAt(0)!="/"&&S.charAt(0)!="*")||typeof S=="object"&&!(S instanceof RegExp))throw Error('Invalid value for "path" argument - strings must start with / or *');let O=typeof S=="string"?ja(S):ja(S);if(this.path=S,j(N)){let w=N;this.component=w.component,this.conditions=w.conditions||[],this.userData=w.userData,this.props=w.props||{}}else{let w=N;this.component=()=>Promise.resolve(w),this.conditions=[],this.props={}}this._pattern=O.pattern,this._keys=O.keys}match(S){if(o()){if(typeof o()=="string")if(S.startsWith(o()))S=S.substr(o().length)||"/";else return null;else if(o()instanceof RegExp){let w=S.match(o());if(w&&w[0])S=S.substr(w[0].length)||"/";else return null}}let N=this._pattern.exec(S);if(N===null)return null;if(this._keys===!1)return N;let j={},O=0;for(;O<this._keys.length;){try{j[this._keys[O]]=decodeURIComponent(N[O+1]||"")||null}catch{j[this._keys[O]]=null}O++}return j}async checkConditions(S){for(let N=0;N<this.conditions.length;N++)if(!await this.conditions[N](S))return!1;return!0}}let c=[];r()instanceof Map?r().forEach((k,S)=>{c.push(new l(S,k))}):Object.keys(r()).forEach(k=>{let S=r();c.push(new l(k,S[k]))});let f=H(null),p=H(null),d=H({}),h=null,b=null;nr(()=>{history.scrollRestoration=n()?"manual":"auto"}),nr(()=>{if(!n())return;let k=S=>{S.state&&(S.state.__svelte_spa_router_scrollY||S.state.__svelte_spa_router_scrollX)?h=S.state:h=null};return window.addEventListener("popstate",k),()=>window.removeEventListener("popstate",k)});async function g(k,S){await Qr(),k(S)}nr(()=>{let k=sn.loc,S=!1;return be(async()=>{let N=0;for(;N<c.length;){let j=c[N].match(k.location);if(!j){N++;continue}let O=D(j),w={route:c[N].path,location:k.location,querystring:k.querystring||"",userData:c[N].userData,params:O};if(!await c[N].checkConditions(w)){if(S)return;F(f,null),b=null,g(i(),w);return}if(S)return;g(s(),{...w});let y=c[N].component;if(b!=y){if(y.loading){F(f,y.loading),b=y,F(p,y.loadingParams||null),F(d,{});let Z=y.loading;g(a(),{...w,component:Z,name:Z.name,params:y.loadingParams||null})}else F(f,null),b=null;let B=await y();if(S)return;F(f,B&&typeof B=="object"&&"default"in B?B.default:B),b=y}F(p,O),F(d,c[N].props);let M=m(f);M&&g(a(),{...w,component:M,name:M.name,params:O}),sn._params=O,n()&&(ql(h),h=null);return}F(f,null),b=null,sn._params=void 0,n()&&(ql(h),h=null)}),()=>{S=!0}});function D(k){return k&&typeof k=="object"&&Object.keys(k).length?k:null}var E={get routes(){return r()},set routes(k={}){r(k),X()},get prefix(){return o()},set prefix(k=""){o(k),X()},get restoreScrollState(){return n()},set restoreScrollState(k=!1){n(k),X()},get onConditionsFailed(){return i()},set onConditionsFailed(k=()=>{}){i(k),X()},get onRouteLoaded(){return a()},set onRouteLoaded(k=()=>{}){a(k),X()},get onRouteLoading(){return s()},set onRouteLoading(k=()=>{}){s(k),X()},get onRouteEvent(){return u()},set onRouteEvent(k=()=>{}){u(k),X()}},C=Xe(),A=Re(C);{var T=k=>{let S=J(()=>m(f));var N=Xe(),j=Re(N);{var O=y=>{var M=Xe(),B=Re(M);ti(B,()=>m(S),(Z,ue)=>{ue(Z,oi({get params(){return m(p)},get onRouteEvent(){return u()}},()=>m(d)))}),R(y,M)},w=y=>{var M=Xe(),B=Re(M);ti(B,()=>m(S),(Z,ue)=>{ue(Z,oi({get onRouteEvent(){return u()}},()=>m(d)))}),R(y,M)};ee(j,y=>{m(p)?y(O):y(w,-1)})}R(k,N)};ee(A,k=>{m(f)&&k(T)})}return R(e,C),ce(E)}fe(ai,{routes:{},prefix:{},restoreScrollState:{},onConditionsFailed:{},onRouteLoaded:{},onRouteLoading:{},onRouteEvent:{}},[],[],{mode:"open"});var Ua=class extends Error{payload;constructor(t,r=[],o){super(t,{cause:o}),this.name="WebSocketServerError",this.payload=r}};function Sd(e){return typeof e=="object"&&e!==null&&"action"in e&&e.action==="error"}function Td(e){return!Array.isArray(e)||e.length===0?"Unknown WebSocket error.":e.map(({type:t,msg:r,loc:o})=>{let n=r||"Unknown WebSocket error.",i=Array.isArray(o)&&o.length?` (${o.map(String).join(".")})`:"";return t?`${n} [${t}]${i}`:`${n}${i}`}).join(`
-`)}var si=class{#t;#e;#r="disconnected";#a;#o;#s=new Map;#n=[];#u=0;#i=0;constructor(t){this.#t=t}setConnectionStatusListener(t){this.#a=t}setErrorHandler(t){this.#o=t}setMessageHandler(t,r){this.#s.set(t,r)}async#c(t,r=0){this.#r=t,this.#a&&await this.#a(t,r)}async connect(){if(this.#r!=="disconnected")return;let t=null,r=250;for(let o=1;o<=5;o++){t=null;try{await this.#c("connecting"),await new Promise((n,i)=>{this.#e=new WebSocket(this.#t),this.#e.addEventListener("open",async()=>{this.#u=Date.now(),await this.#c("connected");for(let a of this.#n)await this.#l(a);this.#n=[],n(void 0)}),this.#e.addEventListener("close",()=>{if(this.#e=void 0,this.#r==="connecting"){i(new Error("WebSocket connection failed."));return}if(this.#r==="disconnected")return;let a=Date.now()-this.#u;window.setTimeout(async()=>{if(await this.#c("disconnected"),a<4e3){if(this.#i++,this.#i>4){this.#o&&await this.#o(new Error("The assistant keeps dropping the connection. Please try again later."));return}await new Promise(s=>setTimeout(s,250*2**this.#i))}else this.#i=0;try{await this.connect()}catch(s){console.error(s),this.#o&&await this.#o(s)}},0)}),this.#e.addEventListener("error",async a=>{console.error(a),this.#o&&await this.#o(a)}),this.#e.addEventListener("message",async a=>{try{let s=JSON.parse(a.data);if(!s.action)throw new Error("Received a WebSocket message without an `action`.");if(Sd(s)){let l=new Ua(Td(s.payload),s.payload??[],s);console.error(l),this.#o&&await this.#o(l);return}let u=this.#s.get(s.action);if(!u){console.warn('No handler for WebSocket action "%s".',s.action,s);return}await u(s)}catch(s){console.error(s),this.#o&&await this.#o(s)}})})}catch(n){t=n}if(this.#r==="connected")return;await this.#c("wait_before_retry",r/1e3),await new Promise(n=>setTimeout(n,r)),r*=2,console.warn(`WebSocket retry ${o}/5 for ${this.#t}.`)}throw await this.#c("disconnected"),t instanceof Error?t:new Error("WebSocket connection failed.")}async disconnect(){this.#e&&(await this.#c("disconnected"),this.#e.close())}async retry(){this.#i=0,await this.connect()}async send(t){this.#r==="connected"&&this.#e?await this.#l(t):this.#n.push(t)}async#l(t){this.#e&&this.#e.send(JSON.stringify(t))}};var Va=null;function Ol(e){return e==="localhost"||e==="127.0.0.1"||e==="::1"}function Fd(e){let t=new URL(e||window.location.origin,window.location.origin),r=new URL(window.location.origin);Ol(t.hostname)&&Ol(r.hostname)&&t.protocol===r.protocol&&t.port===r.port&&(t=r);let o=t.toString();for(;o.endsWith("/");)o=o.slice(0,o.length-1);return o}async function Md(){let e=await fetch("server.url");if(!e.ok)throw new Error(`Could not load backend URL (HTTP ${e.status}).`);return Fd((await e.text()).trim())}function Ya(){return Va||(Va=Md()),Va}async function Bl(e){let t=e.startsWith("/")?e:`/${e}`,r=new URL(`/ws${t}`,`${await Ya()}/`);return r.protocol==="http:"?r.protocol="ws:":r.protocol==="https:"&&(r.protocol="wss:"),new si(r.toString())}async function Pt(e,t={}){let r=await Ya(),o=new URL(`${r}${e}`);for(let[i,a]of Object.entries(t))o.searchParams.set(i,a);let n=await fetch(o.toString(),{credentials:"include",headers:{Accept:"application/json"}});if(n.status===401||n.status===403)throw new Error("You are not signed in. Please log in to view your dashboard.");if(!n.ok)throw new Error(`Request to ${e} failed (HTTP ${n.status}).`);return await n.json()}function Rd(e){let r=document.cookie.match(new RegExp(`(?:^|; )${e}=([^;]*)`))?.[1];return r?decodeURIComponent(r):""}function zd(e){if(typeof e=="string")return e;if(e&&typeof e=="object"){let t=e;if(typeof t.detail=="string")return t.detail;if(Array.isArray(t.errors)){let o=t.errors.map(n=>n&&typeof n=="object"?String(n.message??""):"").filter(Boolean);if(o.length>0)return o.join(" ")}let r=Object.values(t).flatMap(o=>Array.isArray(o)?o:[o]).filter(o=>typeof o=="string");if(r.length>0)return r.join(" ")}return""}async function ui(e,t,r,o={}){let n=await Ya(),i={Accept:"application/json","X-CSRFToken":Rd("csrftoken")},a;o.formData&&r instanceof FormData?a=r:r!==void 0&&(i["Content-Type"]="application/json",a=JSON.stringify(r));let s=await fetch(`${n}${t}`,{method:e,credentials:"include",headers:i,body:a});if(!s.ok){let u=await s.json().catch(()=>null);throw new Error(zd(u)||`Request to ${t} failed (HTTP ${s.status}).`)}if(s.status!==204)return await s.json().catch(()=>{})}function jl(e){return Array.isArray(e)?e:e.results}function Hl(){return Pt("/api/gamification/account_progress/me/")}async function Ul(){let e=await Pt("/api/gamification/streak/");return Array.isArray(e)?e[0]??null:"results"in e?e.results[0]??null:e}async function Vl(e){let t={_expand:"skill",_page_size:"100",_sort:"skill__name"};e&&(t.account=e);let r=await Pt("/api/gamification/skill_progress/",t);return jl(r)}async function Yl(e){let t={_expand:"course",_page_size:"100",_sort:"course__name"};e&&(t.account=e);let r=await Pt("/api/gamification/course_progress/",t);return jl(r)}async function li(){let e=await Pt("/api/auth/current_user/");return Array.isArray(e)?e[0]??null:"results"in e?e.results[0]??null:e}function Gt(e,t=0){let r=typeof e=="number"?e:Number(e);return Number.isFinite(r)?r:t}function Ga(e){return Math.min(100,Math.max(0,e))}function Ld(e){return e?{username:e.username,fullName:e.full_name||e.username,avatarUrl:e.picture??null,isAuthenticated:!!e.is_authenticated}:null}function Nd(e,t){let r=Gt(t?.current_level_min_points),o=t?.next_level_min_points;if(o==null)return 100;let n=o-r;return n>0?Ga((e-r)/n*100):0}function Pd(e,t){if(!e&&!t)return null;let r=Gt(e?.point_total);return{points:r,level:Gt(e?.level,1),levelProgress:Nd(r,e),nextLevelPoints:e?.next_level_min_points??null,currentStreak:Gt(t?.current_streak),longestStreak:Gt(t?.longest_streak),streakFreezes:Gt(t?.streak_freezes),lastActiveDate:t?.last_active_date?new Date(t.last_active_date):null}}function Id(e){return typeof e=="string"?{name:e,iconPath:""}:{name:e.name,iconPath:e.icon_path??""}}function qd(e){return e.map(t=>{let{name:r,iconPath:o}=Id(t.skill);return{id:t.id,name:r,iconPath:o,level:Gt(t.level,1),progress:Ga(Gt(t.progress))}})}function Od(e){return typeof e=="string"?e:e.name}function Bd(e){return typeof e=="string"?e:e.id}function jd(e){return e.map(t=>({id:Bd(t.course),name:Od(t.course),level:Gt(t.course_level,1),points:Gt(t.course_points),progress:Ga(Gt(t.course_progress))}))}async function Gl(){let e=await li(),t=e?.username??null,[r,o,n,i]=await Promise.all([Hl(),Ul(),Vl(t),Yl(t)]),a=t?n.filter(u=>u.account===t):n,s=t?i.filter(u=>u.account===t):i;return{user:Ld(e),stats:Pd(r,o),skills:qd(a),courses:jd(s)}}var Hd={isLoading:!0,errorMessage:"",user:null,stats:null,skills:[],courses:[]},ci=Dr(Hd);function Ud(e){return e instanceof Error?e.message:String(e)}async function Vd(){ci.update(e=>({...e,isLoading:!0,errorMessage:""}));try{let e=await Gl();ci.set({isLoading:!1,errorMessage:"",...e})}catch(e){ci.update(t=>({...t,isLoading:!1,errorMessage:Ud(e)}))}}var it={subscribe:ci.subscribe,refresh:Vd};var Yd=z('<img alt="" class="svelte-1xhay2l"/>'),Gd=z('<header class="app-header svelte-1xhay2l"><div class="header-left svelte-1xhay2l"><img class="brand-logo svelte-1xhay2l"/> <span class="brand-text svelte-1xhay2l"> </span></div> <div class="header-right svelte-1xhay2l"><button type="button" class="theme-toggle svelte-1xhay2l"> </button> <span class="avatar-mark svelte-1xhay2l" aria-hidden="true"><!></span> <span class="page-label svelte-1xhay2l"> </span> <span class="status-pill svelte-1xhay2l"><span class="status-dot svelte-1xhay2l" aria-hidden="true"></span> </span></div></header>'),Wd={hash:"svelte-1xhay2l",code:`.app-header.svelte-1xhay2l {position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0.75rem 1.5rem;background:var(--color-base-100);border-bottom:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);}.header-left.svelte-1xhay2l {display:flex;align-items:center;gap:0.75rem;font-weight:700;letter-spacing:0.05em;}.brand-logo.svelte-1xhay2l {width:2.4rem;height:2.4rem;border-radius:0.6rem;object-fit:contain;}.brand-text.svelte-1xhay2l {font-size:1.05rem;text-transform:uppercase;color:var(--color-base-content);}.header-right.svelte-1xhay2l {display:flex;align-items:center;gap:0.85rem;}.theme-toggle.svelte-1xhay2l {display:grid;place-items:center;width:2rem;height:2rem;border-radius:999px;font-size:1rem;cursor:pointer;background:color-mix(in oklab, var(--color-base-200) 70%, transparent);border:1px solid color-mix(in oklab, var(--color-base-content) 18%, transparent);}.theme-toggle.svelte-1xhay2l:hover {border-color:color-mix(in oklab, var(--color-primary) 50%, transparent);}.theme-toggle.svelte-1xhay2l:focus-visible {outline:2px solid var(--color-primary);outline-offset:2px;}.avatar-mark.svelte-1xhay2l {width:1.9rem;height:1.9rem;border-radius:999px;overflow:hidden;background:color-mix(in oklab, var(--color-base-content) 18%, transparent);}.avatar-mark.svelte-1xhay2l img:where(.svelte-1xhay2l) {width:100%;height:100%;object-fit:cover;}.page-label.svelte-1xhay2l {font-size:0.9rem;color:var(--color-primary);}.status-pill.svelte-1xhay2l {display:inline-flex;align-items:center;gap:0.5rem;padding:0.35rem 0.75rem;border-radius:999px;border:1px solid color-mix(in oklab, var(--color-base-content) 18%, transparent);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;background:color-mix(in oklab, var(--color-base-200) 70%, transparent);color:color-mix(in oklab, var(--color-base-content) 80%, transparent);}.status-dot.svelte-1xhay2l {width:0.5rem;height:0.5rem;border-radius:999px;background:var(--color-success);box-shadow:0 0 12px color-mix(in oklab, var(--color-success) 70%, transparent);}
+https://svelte.dev/e/state_proxy_unmount`, bold, normal);
+  } else {
+    console.warn(`https://svelte.dev/e/state_proxy_unmount`);
+  }
+}
+function svelte_boundary_reset_noop() {
+  if (dev_fallback_default) {
+    console.warn(`%c[svelte] svelte_boundary_reset_noop
+%cA \`<svelte:boundary>\` \`reset\` function only resets the boundary the first time it is called
+https://svelte.dev/e/svelte_boundary_reset_noop`, bold, normal);
+  } else {
+    console.warn(`https://svelte.dev/e/svelte_boundary_reset_noop`);
+  }
+}
 
-    @media (max-width: 40rem) {.app-header.svelte-1xhay2l {flex-direction:column;gap:0.75rem;text-align:center;}
-    }`};function di(e,t){le(t,!0),ve(e,Wd);let r=()=>ea(To,"$theme",o),[o,n]=ta(),i=Q(t,"user",7,null),a=Q(t,"brand",7,"ElisaAI"),s=Q(t,"logoSrc",7,"logo.png"),u=Q(t,"pageLabel",7,"Dashboard"),l=Q(t,"statusLabel",7,"System online"),c=Q(t,"statusDetail",7,"v2.0.2.5");var f={get user(){return i()},set user(y=null){i(y),X()},get brand(){return a()},set brand(y="ElisaAI"){a(y),X()},get logoSrc(){return s()},set logoSrc(y="logo.png"){s(y),X()},get pageLabel(){return u()},set pageLabel(y="Dashboard"){u(y),X()},get statusLabel(){return l()},set statusLabel(y="System online"){l(y),X()},get statusDetail(){return c()},set statusDetail(y="v2.0.2.5"){c(y),X()}},p=Gd(),d=_(p),h=_(d),b=$(h,2),g=_(b,!0);v(b),v(d);var D=$(d,2),E=_(D),C=_(E,!0);v(E);var A=$(E,2),T=_(A);{var k=y=>{var M=Yd();U(()=>ge(M,"src",i().avatarUrl)),R(y,M)};ee(T,y=>{i()?.avatarUrl&&y(k)})}v(A);var S=$(A,2),N=_(S,!0);v(S);var j=$(S,2),O=$(_(j));v(j),v(D),v(p),U(()=>{ge(h,"src",s()),ge(h,"alt",`${a()} logo`),q(g,a()),ge(E,"aria-label",r()==="dark"?"Switch to light mode":"Switch to dark mode"),q(C,r()==="dark"?"\u2600\uFE0F":"\u{1F319}"),q(N,u()),q(O,` ${l()??""} // ${c()??""}`)}),se("click",E,function(...y){Nl?.apply(this,y)}),R(e,p);var w=ce(f);return n(),w}Te(["click"]);fe(di,{user:{},brand:{},logoSrc:{},pageLabel:{},statusLabel:{},statusDetail:{}},[],[],{mode:"open"});function fi(e){let{subscribe:t,update:r}=Dr({connection:"disconnected",errorMessage:"",messages:[]}),o;async function n(){await o?.send({action:"get_chat_history",payload:null})}async function i(){if(!o){let p=typeof e=="function"?e():e,d=p?`/ai/courses/${encodeURIComponent(p)}/chat`:"/ai/chat";o=await Bl(d),o.setConnectionStatusListener(h=>{r(b=>({...b,connection:h,errorMessage:h==="connected"?"":b.errorMessage})),h==="connected"&&n()}),o.setErrorHandler(h=>{let b=h instanceof Error?h.message:"WebSocket error.";r(g=>({...g,errorMessage:b}))}),o.setMessageHandler("chat_history",h=>{r(b=>({...b,messages:h.payload.messages}))}),o.setMessageHandler("chat_message",h=>{r(b=>{let g=b.messages.findIndex(E=>E.id===h.payload.id),D=g===-1?[...b.messages,h.payload]:b.messages.map((E,C)=>C===g?h.payload:E);return{...b,messages:D}})}),o.setMessageHandler("learning_event_status",h=>{r(b=>({...b,errorMessage:h.payload.success?b.errorMessage:h.payload.message}))})}await o.connect()}async function a(){await o?.disconnect()}async function s(){r(p=>({...p,errorMessage:""})),o?await o.retry():await i()}async function u(p,d){await o?.send({action:"chat_input",payload:{format:p,content:d}})}async function l(p){await o?.send({action:"learning_page_opened",payload:{page_id:p}})}async function c(p){await o?.send({action:"learning_page_completed",payload:{page_id:p}})}async function f(p,d,h){await o?.send({action:"learning_quiz_result",payload:{page_id:p,score:d,attempts:h??null}})}return{subscribe:t,connect:i,disconnect:a,retry:s,getChatHistory:n,sendChatInput:u,recordPageOpened:l,markPageCompleted:c,recordQuizResult:f}}var Zd=z('<img class="avatar svelte-13e87sq" src="logo.png" alt="ElisaAI"/>'),Xd=z("<div><!> <div> </div></div>"),Kd=z('<span class="coming-soon svelte-13e87sq"> </span>'),Jd=z(`<section><header class="panel-header svelte-13e87sq" role="toolbar" tabindex="-1" aria-label="Chat window controls"><span class="panel-title svelte-13e87sq"> </span> <div class="panel-actions svelte-13e87sq"><button type="button" class="icon-btn svelte-13e87sq"> </button> <button type="button" class="icon-btn svelte-13e87sq" aria-label="Close chat">\u2715</button></div></header> <div class="panel-body svelte-13e87sq"><div class="message svelte-13e87sq"><img class="avatar svelte-13e87sq" src="logo.png" alt="ElisaAI"/> <div class="bubble svelte-13e87sq">System online. I am <strong>ElisaAI</strong>. Ready to process your queries.
-                    What topic shall we analyse today?</div></div> <!></div> <div class="composer svelte-13e87sq"><!> <form class="composer-row svelte-13e87sq"><button type="button" class="composer-add svelte-13e87sq" aria-label="Add" disabled="">+</button> <input class="composer-input svelte-13e87sq" type="text" placeholder="Message"/> <button type="submit" class="composer-send svelte-13e87sq" aria-label="Send">\u2192</button></form> <p class="disclaimer svelte-13e87sq">ElisaAI may generate misinformation. Please verify all information.</p></div></section>`),Qd=z('<!> <button type="button" aria-label="Open Quick Chat"><img src="logo.png" alt="" class="svelte-13e87sq"/></button>',1),ef={hash:"svelte-13e87sq",code:`.fab.svelte-13e87sq {position:fixed;right:1.5rem;bottom:1.5rem;z-index:60;width:3.75rem;height:3.75rem;border-radius:999px;padding:0;border:2px solid color-mix(in oklab, var(--color-primary) 60%, transparent);background:var(--color-base-100);cursor:pointer;overflow:hidden;box-shadow:0 0 22px color-mix(in oklab, var(--color-primary) 45%, transparent);transition:transform 0.15s ease;}.fab.svelte-13e87sq:hover {transform:scale(1.06);}.fab.hidden.svelte-13e87sq {display:none;}.fab.svelte-13e87sq img:where(.svelte-13e87sq) {width:100%;height:100%;object-fit:cover;}.panel.svelte-13e87sq {position:fixed;z-index:61;display:flex;flex-direction:column;background:var(--color-base-100);border:1px solid color-mix(in oklab, var(--color-primary) 30%, transparent);box-shadow:0 0 32px color-mix(in oklab, var(--color-primary) 30%, transparent);overflow:hidden;}.panel.floating.svelte-13e87sq {right:1.5rem;bottom:1.5rem;width:22.5rem;height:32rem;max-width:calc(100vw - 2rem);max-height:calc(100vh - 2rem);border-radius:1.25rem;}
+// ../../../node_modules/svelte/src/internal/client/dom/hydration.js
+var hydrating = false;
+function set_hydrating(value) {
+  hydrating = value;
+}
+var hydrate_node;
+function set_hydrate_node(node) {
+  if (node === null) {
+    hydration_mismatch();
+    throw HYDRATION_ERROR;
+  }
+  return hydrate_node = node;
+}
+function hydrate_next() {
+  return set_hydrate_node(get_next_sibling(hydrate_node));
+}
+function reset(node) {
+  if (!hydrating) return;
+  if (get_next_sibling(hydrate_node) !== null) {
+    hydration_mismatch();
+    throw HYDRATION_ERROR;
+  }
+  hydrate_node = node;
+}
+function next(count = 1) {
+  if (hydrating) {
+    var i = count;
+    var node = hydrate_node;
+    while (i--) {
+      node = /** @type {TemplateNode} */
+      get_next_sibling(node);
+    }
+    hydrate_node = node;
+  }
+}
+function skip_nodes(remove = true) {
+  var depth = 0;
+  var node = hydrate_node;
+  while (true) {
+    if (node.nodeType === COMMENT_NODE) {
+      var data = (
+        /** @type {Comment} */
+        node.data
+      );
+      if (data === HYDRATION_END) {
+        if (depth === 0) return node;
+        depth -= 1;
+      } else if (data === HYDRATION_START || data === HYDRATION_START_ELSE || // "[1", "[2", etc. for if blocks
+      data[0] === "[" && !isNaN(Number(data.slice(1)))) {
+        depth += 1;
+      }
+    }
+    var next2 = (
+      /** @type {TemplateNode} */
+      get_next_sibling(node)
+    );
+    if (remove) node.remove();
+    node = next2;
+  }
+}
+function read_hydration_instruction(node) {
+  if (!node || node.nodeType !== COMMENT_NODE) {
+    hydration_mismatch();
+    throw HYDRATION_ERROR;
+  }
+  return (
+    /** @type {Comment} */
+    node.data
+  );
+}
 
-    /* Docked, full-height sidebar (expand). */.panel.sidebar.svelte-13e87sq {top:0;right:0;bottom:0;width:min(28rem, 100vw);height:100vh;border-radius:0;border:none;border-left:1px solid color-mix(in oklab, var(--color-primary) 30%, transparent);}.panel-header.svelte-13e87sq {flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0.75rem 1rem;border-bottom:1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);}.panel.floating.svelte-13e87sq .panel-header:where(.svelte-13e87sq) {cursor:grab;}.panel.floating.svelte-13e87sq .panel-header:where(.svelte-13e87sq):active {cursor:grabbing;}.panel-title.svelte-13e87sq {font-weight:700;letter-spacing:0.03em;color:var(--color-base-content);}.panel-actions.svelte-13e87sq {display:flex;gap:0.35rem;}.icon-btn.svelte-13e87sq {display:grid;place-items:center;width:1.75rem;height:1.75rem;border-radius:0.5rem;border:none;background:transparent;color:color-mix(in oklab, var(--color-base-content) 70%, transparent);cursor:pointer;}.icon-btn.svelte-13e87sq:hover {background:color-mix(in oklab, var(--color-base-content) 10%, transparent);color:var(--color-base-content);}.panel-body.svelte-13e87sq {flex:1;min-height:0;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.75rem;}.message.svelte-13e87sq {display:flex;align-items:flex-start;gap:0.6rem;}.message.user.svelte-13e87sq {justify-content:flex-end;}.avatar.svelte-13e87sq {width:2.25rem;height:2.25rem;flex:0 0 auto;border-radius:999px;object-fit:cover;}.bubble.svelte-13e87sq {padding:0.75rem 0.9rem;border-radius:0.9rem;border-top-left-radius:0.25rem;line-height:1.5;color:var(--color-base-content);background:color-mix(in oklab, var(--color-primary) 12%, transparent);border:1px solid color-mix(in oklab, var(--color-primary) 28%, transparent);}.composer.svelte-13e87sq {flex:0 0 auto;display:flex;flex-direction:column;gap:0.4rem;padding:0.75rem;border-top:1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);}.coming-soon.svelte-13e87sq {align-self:center;font-size:0.7rem;color:var(--color-warning);}.composer-row.svelte-13e87sq {display:flex;align-items:center;gap:0.5rem;padding:0.35rem 0.5rem;border-radius:999px;background:color-mix(in oklab, var(--color-base-200) 80%, transparent);border:1px solid color-mix(in oklab, var(--color-primary) 30%, transparent);}.composer-add.svelte-13e87sq,
-    .composer-send.svelte-13e87sq {display:grid;place-items:center;width:1.9rem;height:1.9rem;flex:0 0 auto;border-radius:999px;border:none;cursor:not-allowed;color:var(--color-primary-content);background:color-mix(in oklab, var(--color-primary) 70%, transparent);}.composer-input.svelte-13e87sq {flex:1 1 auto;background:transparent;border:none;color:var(--color-base-content);padding:0.25rem;}.composer-input.svelte-13e87sq:focus {outline:none;}.disclaimer.svelte-13e87sq {text-align:center;font-size:0.65rem;color:color-mix(in oklab, var(--color-base-content) 55%, transparent);}`};function pi(e,t){le(t,!0),ve(e,ef);let r=Q(t,"onSidebarChange",7),o=H(!1),n=H("floating"),i=H(null),a=null,s=fi(),u=H($e({connection:"disconnected",errorMessage:"",messages:[]})),l=H(""),c=!1,f=J(()=>m(u).connection==="connected");function p(){c||(c=!0,s.connect())}async function d(){let w=m(l).trim();!w||!m(f)||(F(l,""),await s.sendChatInput("markdown",w))}function h(){r()?.(m(o)&&m(n)==="sidebar")}bt(()=>{h();let w=s.subscribe(y=>{F(u,y,!0)});return()=>{w(),s.disconnect()}});function b(){F(o,!m(o)),m(o)&&p(),h()}function g(){F(o,!1),h()}function D(){F(n,m(n)==="floating"?"sidebar":"floating",!0),F(i,null),h()}function E(w){if(!a)return;let y=Math.max(0,window.innerWidth-360),M=Math.max(0,window.innerHeight-120);F(i,{x:Math.min(Math.max(0,w.clientX-a.x),y),y:Math.min(Math.max(0,w.clientY-a.y),M)},!0)}function C(){a=null,window.removeEventListener("pointermove",E),window.removeEventListener("pointerup",C)}function A(w){if(m(n)!=="floating")return;let y=w.currentTarget.parentElement;if(!y)return;let M=y.getBoundingClientRect();a={x:w.clientX-M.left,y:w.clientY-M.top},F(i,{x:M.left,y:M.top},!0),window.addEventListener("pointermove",E),window.addEventListener("pointerup",C)}var T={get onSidebarChange(){return r()},set onSidebarChange(w){r(w),X()}},k=Qd(),S=Re(k);{var N=w=>{var y=Jd();let M;var B=_(y),Z=_(B),ue=_(Z,!0);v(Z);var ne=$(Z,2),V=_(ne),L=_(V,!0);v(V);var Y=$(V,2);v(ne),v(B);var te=$(B,2),ie=$(_(te),2);Ce(ie,17,()=>m(u).messages,at=>at.id,(at,qt)=>{var kr=Xd();let Io;var mn=_(kr);{var hn=jo=>{var Bi=Zd();R(jo,Bi)};ee(mn,jo=>{m(qt).sender==="assistant"&&jo(hn)})}var qo=$(mn,2);let Oo;var Bo=_(qo,!0);v(qo),v(kr),U(()=>{Io=Ue(kr,1,"message svelte-13e87sq",null,Io,{user:m(qt).sender==="user"}),Oo=Ue(qo,1,"bubble svelte-13e87sq",null,Oo,{user:m(qt).sender==="user"}),q(Bo,m(qt).content)}),R(at,kr)}),v(te);var pe=$(te,2),Ee=_(pe);{var me=at=>{var qt=Kd(),kr=_(qt,!0);v(qt),U(()=>q(kr,m(u).connection==="connecting"?"Connecting\u2026":"Offline \u2014 reconnecting\u2026")),R(at,qt)};ee(Ee,at=>{m(f)||at(me)})}var ze=$(Ee,2),ae=$(_(ze),2);sr(ae);var Ae=$(ae,2);v(ze),gt(2),v(pe),v(y),U(at=>{M=Ue(y,1,"panel svelte-13e87sq",null,M,{floating:m(n)==="floating",sidebar:m(n)==="sidebar"}),zr(y,m(n)==="floating"&&m(i)?`left:${m(i).x}px; top:${m(i).y}px; right:auto; bottom:auto;`:""),q(ue,m(n)==="sidebar"?"Quiz Chat":"Quick Chat"),ge(V,"aria-label",m(n)==="sidebar"?"Float chat":"Dock chat to sidebar"),q(L,m(n)==="sidebar"?"\u2199":"\u2197"),ae.disabled=!m(f),Ae.disabled=at},[()=>!m(f)||m(l).trim().length===0]),se("pointerdown",B,A),se("click",V,D),se("click",Y,g),eo("submit",ze,at=>{at.preventDefault(),d()}),ur(ae,()=>m(l),at=>F(l,at)),R(w,y)};ee(S,w=>{m(o)&&w(N)})}var j=$(S,2);let O;return U(()=>O=Ue(j,1,"fab svelte-13e87sq",null,O,{hidden:m(o)})),se("click",j,b),R(e,k),ce(T)}Te(["pointerdown","click"]);fe(pi,{onSidebarChange:{}},[],[],{mode:"open"});var tf=z('<div class="progress-track svelte-sbeapt" role="progressbar"><div class="progress-fill svelte-sbeapt"></div></div>'),rf={hash:"svelte-sbeapt",code:".progress-track.svelte-sbeapt {height:0.9rem;border-radius:999px;overflow:hidden;background:color-mix(in oklab, var(--color-base-content) 12%, transparent);}.progress-fill.svelte-sbeapt {height:100%;border-radius:999px;background:linear-gradient(90deg, var(--color-warning), var(--color-success));box-shadow:0 0 12px color-mix(in oklab, var(--color-success) 45%, transparent);transition:width 0.3s ease;}"};function Lr(e,t){le(t,!0),ve(e,rf);let r=Q(t,"value",7),o=Q(t,"label",7,""),n=J(()=>Math.min(100,Math.max(0,r())));var i={get value(){return r()},set value(u){r(u),X()},get label(){return o()},set label(u=""){o(u),X()}},a=tf();ge(a,"aria-valuemin",0),ge(a,"aria-valuemax",100);var s=_(a);return v(a),U(u=>{ge(a,"aria-valuenow",u),ge(a,"aria-label",o()),zr(s,`width: ${m(n)??""}%`)},[()=>Math.round(m(n))]),R(e,a),ce(i)}fe(Lr,{value:{},label:{}},[],[],{mode:"open"});var of=z('<button type="button" role="tab"> </button>'),nf=z('<div role="tablist" class="seg-tabs svelte-1rwwumd" aria-label="Learning views"></div>'),af={hash:"svelte-1rwwumd",code:".seg-tabs.svelte-1rwwumd {display:inline-flex;gap:0.25rem;}.seg-tab.svelte-1rwwumd {padding:0.25rem 0.75rem;border-radius:0.5rem;font-size:0.85rem;font-weight:600;letter-spacing:0.04em;color:color-mix(in oklab, var(--color-base-content) 65%, transparent);background:transparent;cursor:pointer;}.seg-tab.svelte-1rwwumd:hover:not(:disabled) {color:var(--color-base-content);}.seg-tab.active.svelte-1rwwumd {color:var(--color-primary);background:color-mix(in oklab, var(--color-primary) 16%, transparent);}.seg-tab.svelte-1rwwumd:disabled {cursor:not-allowed;opacity:0.45;}.seg-tab.svelte-1rwwumd:focus-visible {outline:2px solid var(--color-primary);outline-offset:2px;}"};function mi(e,t){le(t,!0),ve(e,af);let r=Q(t,"tabs",7),o=Q(t,"active",7),n=Q(t,"disabledTabs",23,()=>[]),i=Q(t,"onSelect",7);var a={get tabs(){return r()},set tabs(u){r(u),X()},get active(){return o()},set active(u){o(u),X()},get disabledTabs(){return n()},set disabledTabs(u=[]){n(u),X()},get onSelect(){return i()},set onSelect(u){i(u),X()}},s=nf();return Ce(s,20,r,u=>u,(u,l)=>{var c=of();let f;var p=_(c,!0);v(c),U(d=>{f=Ue(c,1,"seg-tab svelte-1rwwumd",null,f,{active:l===o()}),ge(c,"aria-selected",l===o()),c.disabled=d,q(p,l)},[()=>n().includes(l)]),se("click",c,()=>i()?.(l)),R(u,c)}),v(s),R(e,s),ce(a)}Te(["click"]);fe(mi,{tabs:{},active:{},disabledTabs:{},onSelect:{}},[],[],{mode:"open"});var sf=z('<p class="empty svelte-q1lzti">No courses in progress yet. Enrol in a course to see it here.</p>'),uf=z('<span class="tag svelte-q1lzti"> </span>'),lf=z('<button type="button" class="course-card svelte-q1lzti"><div class="course-head svelte-q1lzti"><span class="course-name svelte-q1lzti"> </span> <span class="course-bar svelte-q1lzti"><!></span> <span class="course-percent svelte-q1lzti"> </span> <span class="course-go svelte-q1lzti" aria-hidden="true">\u203A</span></div> <div class="course-tags svelte-q1lzti"></div></button>'),cf=z('<div class="path-step svelte-q1lzti"><span class="step-num svelte-q1lzti"> </span> <span class="step-title svelte-q1lzti"> </span> <span class="step-status svelte-q1lzti"> </span></div>'),df=z('<div class="repeat-item svelte-q1lzti"><span class="repeat-title svelte-q1lzti"> </span> <span class="repeat-due svelte-q1lzti"> </span></div>'),ff=z('<div class="locked svelte-q1lzti"><div class="locked-content svelte-q1lzti" aria-hidden="true"><!></div> <div class="locked-overlay svelte-q1lzti" role="status"><span class="overlay-badge svelte-q1lzti">\u{1F6A7} Coming soon</span> <span class="overlay-note svelte-q1lzti"> </span></div></div>'),pf=z('<section class="card panel svelte-q1lzti"><header class="panel-head svelte-q1lzti"><h2 class="panel-title svelte-q1lzti">My Learning</h2> <!></header> <div class="panel-body svelte-q1lzti"><!></div></section>'),mf={hash:"svelte-q1lzti",code:`
-    /* Fill the grid cell at a fixed height; the body scrolls instead of growing. */.panel.svelte-q1lzti {flex:1;min-height:0;display:flex;flex-direction:column;background:var(--color-base-100);border-radius:1.25rem;padding:1.75rem;box-shadow:0 0 24px color-mix(in oklab, var(--color-primary) 10%, transparent);}.panel-head.svelte-q1lzti {flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding-bottom:1rem;margin-bottom:0.5rem;border-bottom:1px solid color-mix(in oklab, var(--color-base-content) 8%, transparent);}.panel-title.svelte-q1lzti {font-size:1.5rem;font-weight:700;letter-spacing:0.02em;color:var(--color-base-content);}
+// ../../../node_modules/svelte/src/internal/client/reactivity/equality.js
+function equals(value) {
+  return value === this.v;
+}
+function safe_not_equal(a, b) {
+  return a != a ? b == b : a !== b || a !== null && typeof a === "object" || typeof a === "function";
+}
+function safe_equals(value) {
+  return !safe_not_equal(value, this.v);
+}
 
-    /* Scroll area: keeps the card a fixed size regardless of how many courses. */.panel-body.svelte-q1lzti {flex:1;min-height:0;overflow-y:auto;padding-right:0.5rem;display:flex;flex-direction:column;gap:0.75rem;}.panel-body.svelte-q1lzti::-webkit-scrollbar {width:0.5rem;}.panel-body.svelte-q1lzti::-webkit-scrollbar-thumb {border-radius:999px;background:color-mix(in oklab, var(--color-base-content) 20%, transparent);}
+// ../../../node_modules/svelte/src/internal/flags/index.js
+var async_mode_flag = false;
+var legacy_mode_flag = false;
+var tracing_mode_flag = false;
+function enable_async_mode_flag() {
+  async_mode_flag = true;
+}
 
-    /* A whole course is one clickable card. */.course-card.svelte-q1lzti {display:block;width:100%;text-align:left;cursor:pointer;background:color-mix(in oklab, var(--color-base-200) 50%, transparent);border:1px solid color-mix(in oklab, var(--color-base-content) 8%, transparent);border-radius:1rem;padding:1rem 1.25rem;transition:border-color 0.2s ease, background 0.2s ease;}.course-card.svelte-q1lzti:hover {background:color-mix(in oklab, var(--color-primary) 12%, transparent);border-color:color-mix(in oklab, var(--color-primary) 45%, transparent);}.course-card.svelte-q1lzti:focus-visible {outline:2px solid var(--color-primary);outline-offset:2px;}
+// ../../../node_modules/svelte/src/internal/client/dev/tracing.js
+var tracing_expressions = null;
+function tag(source2, label) {
+  source2.label = label;
+  tag_proxy(source2.v, label);
+  return source2;
+}
+function tag_proxy(value, label) {
+  value?.[PROXY_PATH_SYMBOL]?.(label);
+  return value;
+}
 
-    /* Fixed name + percent columns => the 1fr bar column is identical on every row. */.course-head.svelte-q1lzti {display:grid;grid-template-columns:14rem 1fr 3.5rem auto;align-items:center;gap:1rem;}.course-name.svelte-q1lzti {font-size:1.6rem;font-weight:700;color:var(--color-base-content);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}.course-bar.svelte-q1lzti {min-width:0;}.course-percent.svelte-q1lzti {font-weight:700;text-align:right;color:var(--color-base-content);}.course-go.svelte-q1lzti {display:grid;place-items:center;width:2rem;height:2rem;border-radius:999px;font-size:1.2rem;line-height:1;color:var(--color-primary-content);background:var(--color-primary);box-shadow:0 0 12px color-mix(in oklab, var(--color-primary) 45%, transparent);}.course-tags.svelte-q1lzti {display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.75rem;}.tag.svelte-q1lzti {font-size:0.75rem;padding:0.15rem 0.6rem;border-radius:999px;color:color-mix(in oklab, var(--color-base-content) 75%, transparent);background:color-mix(in oklab, var(--color-base-content) 10%, transparent);border:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);}.empty.svelte-q1lzti {color:color-mix(in oklab, var(--color-base-content) 60%, transparent);padding:1.5rem 0;}
+// ../../../node_modules/svelte/src/internal/shared/dev.js
+function get_error(label) {
+  const error2 = new Error();
+  const stack2 = get_stack();
+  if (stack2.length === 0) {
+    return null;
+  }
+  stack2.unshift("\n");
+  define_property(error2, "stack", {
+    value: stack2.join("\n")
+  });
+  define_property(error2, "name", {
+    value: label
+  });
+  return (
+    /** @type {Error & { stack: string }} */
+    error2
+  );
+}
+function get_stack() {
+  const limit = Error.stackTraceLimit;
+  Error.stackTraceLimit = Infinity;
+  const stack2 = new Error().stack;
+  Error.stackTraceLimit = limit;
+  if (!stack2) return [];
+  const lines = stack2.split("\n");
+  const new_lines = [];
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const posixified = line.replaceAll("\\", "/");
+    if (line.trim() === "Error") {
+      continue;
+    }
+    if (line.includes("validate_each_keys")) {
+      return [];
+    }
+    if (posixified.includes("svelte/src/internal") || posixified.includes("node_modules/.vite")) {
+      continue;
+    }
+    new_lines.push(line);
+  }
+  return new_lines;
+}
+function invariant(condition, message) {
+  if (!dev_fallback_default) {
+    throw new Error("invariant(...) was not guarded by if (DEV)");
+  }
+  if (!condition) invariant_violation(message);
+}
 
-    /* Mock content for Path/Repeat, blurred behind a "Coming soon" overlay. */.locked.svelte-q1lzti {position:relative;flex:1;min-height:0;}.locked-content.svelte-q1lzti {display:flex;flex-direction:column;gap:0.75rem;filter:blur(5px);opacity:0.5;pointer-events:none;user-select:none;}.locked-overlay.svelte-q1lzti {position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;text-align:center;}.overlay-badge.svelte-q1lzti {padding:0.4rem 1rem;border-radius:999px;font-weight:700;letter-spacing:0.04em;color:var(--color-warning);background:color-mix(in oklab, var(--color-warning) 16%, transparent);border:1px solid color-mix(in oklab, var(--color-warning) 40%, transparent);}.overlay-note.svelte-q1lzti {font-size:0.85rem;color:color-mix(in oklab, var(--color-base-content) 70%, transparent);}.path-step.svelte-q1lzti,
-    .repeat-item.svelte-q1lzti {display:flex;align-items:center;gap:1rem;padding:0.9rem 1.1rem;border-radius:1rem;background:color-mix(in oklab, var(--color-base-200) 50%, transparent);border:1px solid color-mix(in oklab, var(--color-base-content) 8%, transparent);}.repeat-item.svelte-q1lzti {justify-content:space-between;}.step-num.svelte-q1lzti {display:grid;place-items:center;width:2rem;height:2rem;flex:0 0 auto;border-radius:999px;font-weight:700;color:var(--color-primary-content);background:var(--color-primary);}.step-title.svelte-q1lzti,
-    .repeat-title.svelte-q1lzti {flex:1 1 auto;font-weight:600;color:var(--color-base-content);}.step-status.svelte-q1lzti {font-size:0.8rem;color:color-mix(in oklab, var(--color-base-content) 65%, transparent);}.repeat-due.svelte-q1lzti {flex:0 0 auto;font-size:0.8rem;padding:0.15rem 0.6rem;border-radius:999px;color:var(--color-primary);background:color-mix(in oklab, var(--color-primary) 14%, transparent);}`};function hi(e,t){le(t,!0),ve(e,mf);let r=Q(t,"courses",7),o=Q(t,"skills",7),n=Q(t,"onCourseOpen",7),i=["Current","Path","Repeat"],a=H("Current"),s=J(()=>r().length===0),u=[{step:1,title:"Foundations",status:"Completed"},{step:2,title:"Core concepts",status:"In progress"},{step:3,title:"Hands-on practice",status:"Locked"},{step:4,title:"Mastery project",status:"Locked"}],l=[{title:"HTML structure",due:"Due today"},{title:"CSS selectors",due:"Due in 2 days"},{title:"JS functions",due:"New"}],c=["Grundlagen","HTML","CSS","JavaScript","SQL","Datenmodellierung"],f=J(()=>o().length>0?o().map(T=>T.name):c);function p(T){let k=m(f);if(k.length===0)return[];let S=Math.min(3,k.length);return Array.from({length:S},(N,j)=>k[(T+j)%k.length])}var d={get courses(){return r()},set courses(T){r(T),X()},get skills(){return o()},set skills(T){o(T),X()},get onCourseOpen(){return n()},set onCourseOpen(T){n(T),X()}},h=pf(),b=_(h),g=$(_(b),2);mi(g,{get tabs(){return i},get active(){return m(a)},onSelect:T=>F(a,T,!0)}),v(b);var D=$(b,2),E=_(D);{var C=T=>{var k=Xe(),S=Re(k);{var N=O=>{var w=sf();R(O,w)},j=O=>{var w=Xe(),y=Re(w);Ce(y,19,r,M=>M.id,(M,B,Z)=>{var ue=lf(),ne=_(ue),V=_(ne),L=_(V,!0);v(V);var Y=$(V,2),te=_(Y);{let me=J(()=>`${m(B).name} progress`);Lr(te,{get value(){return m(B).progress},get label(){return m(me)}})}v(Y);var ie=$(Y,2),pe=_(ie);v(ie),gt(2),v(ne);var Ee=$(ne,2);Ce(Ee,20,()=>p(m(Z)),me=>me,(me,ze)=>{var ae=uf(),Ae=_(ae,!0);v(ae),U(()=>q(Ae,ze)),R(me,ae)}),v(Ee),v(ue),U(me=>{q(L,m(B).name),q(pe,`${me??""}%`)},[()=>Math.round(m(B).progress)]),se("click",ue,()=>n()?.(m(B))),R(M,ue)}),R(O,w)};ee(S,O=>{m(s)?O(N):O(j,-1)})}R(T,k)},A=T=>{var k=ff(),S=_(k),N=_(S);{var j=B=>{var Z=Xe(),ue=Re(Z);Ce(ue,17,()=>u,ne=>ne.step,(ne,V)=>{var L=cf(),Y=_(L),te=_(Y,!0);v(Y);var ie=$(Y,2),pe=_(ie,!0);v(ie);var Ee=$(ie,2),me=_(Ee,!0);v(Ee),v(L),U(()=>{q(te,m(V).step),q(pe,m(V).title),q(me,m(V).status)}),R(ne,L)}),R(B,Z)},O=B=>{var Z=Xe(),ue=Re(Z);Ce(ue,17,()=>l,ne=>ne.title,(ne,V)=>{var L=df(),Y=_(L),te=_(Y,!0);v(Y);var ie=$(Y,2),pe=_(ie,!0);v(ie),v(L),U(()=>{q(te,m(V).title),q(pe,m(V).due)}),R(ne,L)}),R(B,Z)};ee(N,B=>{m(a)==="Path"?B(j):B(O,-1)})}v(S);var w=$(S,2),y=$(_(w),2),M=_(y);v(y),v(w),v(k),U(()=>q(M,`${m(a)??""} mode is in the works.`)),R(T,k)};ee(E,T=>{m(a)==="Current"?T(C):T(A,-1)})}return v(D),v(h),R(e,h),ce(d)}Te(["click"]);fe(hi,{courses:{},skills:{},onCourseOpen:{}},[],[],{mode:"open"});var hf=z('<div class="stat-tile svelte-de708j"><span class="stat-icon svelte-de708j" aria-hidden="true"> </span> <span class="stat-value svelte-de708j"> </span> <span class="sr-only svelte-de708j"> </span></div>'),bf={hash:"svelte-de708j",code:".stat-tile.svelte-de708j {display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.35rem;text-align:center;}.stat-icon.svelte-de708j {display:block;width:100%;text-align:center;font-size:1.5rem;line-height:1;}.stat-value.svelte-de708j {display:block;width:100%;text-align:center;font-weight:700;font-size:1.1rem;color:var(--color-base-content);}.sr-only.svelte-de708j {position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0, 0, 0, 0);white-space:nowrap;border:0;}"};function to(e,t){le(t,!0),ve(e,bf);let r=Q(t,"icon",7),o=Q(t,"value",7),n=Q(t,"label",7);var i={get icon(){return r()},set icon(d){r(d),X()},get value(){return o()},set value(d){o(d),X()},get label(){return n()},set label(d){n(d),X()}},a=hf(),s=_(a),u=_(s,!0);v(s);var l=$(s,2),c=_(l,!0);v(l);var f=$(l,2),p=_(f,!0);return v(f),v(a),U(()=>{ge(a,"title",n()),q(u,r()),q(c,o()),q(p,n())}),R(e,a),ce(i)}fe(to,{icon:{},value:{},label:{}},[],[],{mode:"open"});var vf=z('<img alt="" class="svelte-1tag4vz"/>'),gf=z('<section class="card panel svelte-1tag4vz"><header class="panel-head svelte-1tag4vz"><h2 class="panel-title svelte-1tag4vz">My Stats</h2> <button type="button" class="btn btn-outline btn-sm">Go to Profile</button></header> <div class="identity svelte-1tag4vz"><span class="avatar-mark svelte-1tag4vz" aria-hidden="true"><!></span> <div class="identity-text svelte-1tag4vz"><span class="username svelte-1tag4vz"> </span> <div class="level-row svelte-1tag4vz"><span class="level-label svelte-1tag4vz"> </span> <div class="level-bar svelte-1tag4vz"><!></div> <span class="level-points svelte-1tag4vz"> </span></div></div></div> <div class="stat-grid svelte-1tag4vz"><!> <!> <!> <!></div></section>'),_f={hash:"svelte-1tag4vz",code:".panel.svelte-1tag4vz {background:var(--color-base-100);border-radius:1rem;padding:1.5rem;box-shadow:0 0 24px color-mix(in oklab, var(--color-primary) 10%, transparent);}.panel-head.svelte-1tag4vz {display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.25rem;}.panel-title.svelte-1tag4vz {font-size:1.3rem;font-weight:700;color:var(--color-base-content);}.identity.svelte-1tag4vz {display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;}.avatar-mark.svelte-1tag4vz {width:3.5rem;height:3.5rem;flex:0 0 auto;border-radius:999px;overflow:hidden;background:color-mix(in oklab, var(--color-base-content) 18%, transparent);box-shadow:0 0 16px color-mix(in oklab, var(--color-primary) 35%, transparent);}.avatar-mark.svelte-1tag4vz img:where(.svelte-1tag4vz) {width:100%;height:100%;object-fit:cover;}.identity-text.svelte-1tag4vz {flex:1 1 auto;min-width:0;}.username.svelte-1tag4vz {display:block;font-size:1.1rem;font-weight:600;color:var(--color-base-content);}.level-row.svelte-1tag4vz {display:flex;align-items:center;gap:0.6rem;margin-top:0.35rem;}.level-label.svelte-1tag4vz {font-size:0.8rem;white-space:nowrap;color:color-mix(in oklab, var(--color-base-content) 70%, transparent);}.level-bar.svelte-1tag4vz {flex:1 1 auto;}.level-points.svelte-1tag4vz {font-weight:700;color:var(--color-base-content);}.stat-grid.svelte-1tag4vz {display:grid;grid-template-columns:repeat(4, 1fr);gap:0.75rem;}"};function bi(e,t){le(t,!0),ve(e,_f);let r=Q(t,"user",7),o=Q(t,"stats",7),n=Q(t,"onProfile",7),i=new Intl.NumberFormat,a=J(()=>r()?.username??"user"),s=J(()=>o()?.points??0),u=J(()=>o()?.level??1),l=J(()=>o()?.levelProgress??0),c=J(()=>o()?.nextLevelPoints??m(s));function f(L){return i.format(L)}var p={get user(){return r()},set user(L){r(L),X()},get stats(){return o()},set stats(L){o(L),X()},get onProfile(){return n()},set onProfile(L){n(L),X()}},d=gf(),h=_(d),b=$(_(h),2);v(h);var g=$(h,2),D=_(g),E=_(D);{var C=L=>{var Y=vf();U(()=>ge(Y,"src",r().avatarUrl)),R(L,Y)};ee(E,L=>{r()?.avatarUrl&&L(C)})}v(D);var A=$(D,2),T=_(A),k=_(T,!0);v(T);var S=$(T,2),N=_(S),j=_(N);v(N);var O=$(N,2),w=_(O);{let L=J(()=>`Level ${m(u)} progress`);Lr(w,{get value(){return m(l)},get label(){return m(L)}})}v(O);var y=$(O,2),M=_(y,!0);v(y),v(S),v(A),v(g);var B=$(g,2),Z=_(B);{let L=J(()=>f(o()?.currentStreak??0));to(Z,{icon:"\u{1F525}",get value(){return m(L)},label:"Current streak"})}var ue=$(Z,2);{let L=J(()=>f(o()?.longestStreak??0));to(ue,{icon:"\u{1F3C6}",get value(){return m(L)},label:"Longest streak"})}var ne=$(ue,2);{let L=J(()=>f(m(s)));to(ne,{icon:"\u{1F3AF}",get value(){return m(L)},label:"Total points"})}var V=$(ne,2);{let L=J(()=>f(m(u)));to(V,{icon:"\u{1F3C5}",get value(){return m(L)},label:"Level"})}return v(B),v(d),U(L=>{q(k,m(a)),q(j,`Level ${m(u)??""}`),q(M,L)},[()=>f(m(c))]),se("click",b,()=>n()?.()),R(e,d),ce(p)}Te(["click"]);fe(bi,{user:{},stats:{},onProfile:{}},[],[],{mode:"open"});var xf=z('<p class="empty svelte-168eojm">No skills yet. Complete tasks and quizzes in your courses to earn skills.</p>'),yf=z('<div class="skill-row svelte-168eojm"><div class="skill-head svelte-168eojm"><span class="skill-name svelte-168eojm"> </span> <span class="skill-level svelte-168eojm"> </span></div> <div class="skill-bar svelte-168eojm"><!> <span class="skill-percent svelte-168eojm"> </span></div></div>'),wf=z('<section class="card panel svelte-168eojm"><h2 class="panel-title svelte-168eojm">Skills</h2> <div class="panel-body svelte-168eojm"><!></div></section>'),kf={hash:"svelte-168eojm",code:`
-    /* Fill the remaining height of the right column; the body scrolls if needed. */.panel.svelte-168eojm {flex:1;min-height:0;display:flex;flex-direction:column;background:var(--color-base-100);border-radius:1.25rem;padding:1.75rem;box-shadow:0 0 24px color-mix(in oklab, var(--color-primary) 10%, transparent);}.panel-title.svelte-168eojm {flex:0 0 auto;font-size:1.5rem;font-weight:700;margin-bottom:1rem;color:var(--color-base-content);}.panel-body.svelte-168eojm {flex:1;min-height:0;overflow-y:auto;padding-right:0.5rem;display:flex;flex-direction:column;gap:0.75rem;}.panel-body.svelte-168eojm::-webkit-scrollbar {width:0.5rem;}.panel-body.svelte-168eojm::-webkit-scrollbar-thumb {border-radius:999px;background:color-mix(in oklab, var(--color-base-content) 20%, transparent);}
+// ../../../node_modules/svelte/src/internal/client/context.js
+var component_context = null;
+function set_component_context(context) {
+  component_context = context;
+}
+var dev_stack = null;
+function set_dev_stack(stack2) {
+  dev_stack = stack2;
+}
+var dev_current_component_function = null;
+function set_dev_current_component_function(fn) {
+  dev_current_component_function = fn;
+}
+function push(props, runes = false, fn) {
+  component_context = {
+    p: component_context,
+    i: false,
+    c: null,
+    e: null,
+    s: props,
+    x: null,
+    r: (
+      /** @type {Effect} */
+      active_effect
+    ),
+    l: legacy_mode_flag && !runes ? { s: null, u: null, $: [] } : null
+  };
+  if (dev_fallback_default) {
+    component_context.function = fn;
+    dev_current_component_function = fn;
+  }
+}
+function pop(component2) {
+  var context = (
+    /** @type {ComponentContext} */
+    component_context
+  );
+  var effects = context.e;
+  if (effects !== null) {
+    context.e = null;
+    for (var fn of effects) {
+      create_user_effect(fn);
+    }
+  }
+  if (component2 !== void 0) {
+    context.x = component2;
+  }
+  context.i = true;
+  component_context = context.p;
+  if (dev_fallback_default) {
+    dev_current_component_function = component_context?.function ?? null;
+  }
+  return component2 ?? /** @type {T} */
+  {};
+}
+function is_runes() {
+  return !legacy_mode_flag || component_context !== null && component_context.l === null;
+}
 
-    /* One skill per card, mirroring the course cards in "My Learning". */.skill-row.svelte-168eojm {background:color-mix(in oklab, var(--color-base-200) 50%, transparent);border:1px solid color-mix(in oklab, var(--color-base-content) 8%, transparent);border-radius:1rem;padding:0.9rem 1.1rem;}.skill-head.svelte-168eojm {display:flex;align-items:center;justify-content:space-between;gap:0.75rem;margin-bottom:0.6rem;}.skill-name.svelte-168eojm {font-size:1.05rem;font-weight:700;color:var(--color-base-content);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}.skill-level.svelte-168eojm {flex:0 0 auto;font-size:0.75rem;font-weight:700;letter-spacing:0.03em;padding:0.15rem 0.6rem;border-radius:999px;color:var(--color-primary-content);background:var(--color-primary);box-shadow:0 0 12px color-mix(in oklab, var(--color-primary) 40%, transparent);}.skill-bar.svelte-168eojm {display:grid;grid-template-columns:1fr 3rem;align-items:center;gap:0.75rem;}.skill-percent.svelte-168eojm {font-weight:700;text-align:right;color:var(--color-base-content);}.empty.svelte-168eojm {color:color-mix(in oklab, var(--color-base-content) 60%, transparent);padding:1.5rem 0;}`};function vi(e,t){le(t,!0),ve(e,kf);let r=Q(t,"skills",7),o=J(()=>r().length===0);var n={get skills(){return r()},set skills(c){r(c),X()}},i=wf(),a=$(_(i),2),s=_(a);{var u=c=>{var f=xf();R(c,f)},l=c=>{var f=Xe(),p=Re(f);Ce(p,17,r,d=>d.id,(d,h)=>{var b=yf(),g=_(b),D=_(g),E=_(D,!0);v(D);var C=$(D,2),A=_(C);v(C),v(g);var T=$(g,2),k=_(T);{let j=J(()=>`${m(h).name} progress`);Lr(k,{get value(){return m(h).progress},get label(){return m(j)}})}var S=$(k,2),N=_(S);v(S),v(T),v(b),U(j=>{q(E,m(h).name),q(A,`Lv ${m(h).level??""}`),q(N,`${j??""}%`)},[()=>Math.round(m(h).progress)]),R(d,b)}),R(c,f)};ee(s,c=>{m(o)?c(u):c(l,-1)})}return v(a),v(i),R(e,i),ce(n)}fe(vi,{skills:{}},[],[],{mode:"open"});var $f=z('<div class="status svelte-wafcro" role="status" aria-live="polite"><span class="loading loading-spinner loading-lg"></span> <p>Loading your dashboard\u2026</p></div>'),Ef=z('<div class="status svelte-wafcro" role="alert"><p class="error svelte-wafcro"> </p> <button type="button" class="btn btn-primary btn-sm">Retry</button></div>'),Cf=z('<div class="grid svelte-wafcro"><div class="grid-main svelte-wafcro"><!></div> <div class="grid-side svelte-wafcro"><!> <!></div></div>'),Af=z('<div class="dashboard svelte-wafcro"><header class="top svelte-wafcro"><h1 class="title svelte-wafcro"> </h1></header> <!></div>'),Df={hash:"svelte-wafcro",code:`
-    /* Fill ~90% of the viewport with little margin around the edges. */.dashboard.svelte-wafcro {flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:1.25rem;width:90%;max-width:110rem;margin:0 auto;padding:1.25rem 0 0.5rem;}.top.svelte-wafcro {flex:0 0 auto;text-align:center;}.title.svelte-wafcro {font-size:clamp(1.6rem, 3.5vw, 2.6rem);font-weight:800;letter-spacing:0.04em;color:var(--color-base-content);text-shadow:0 0 24px color-mix(in oklab, var(--color-primary) 45%, transparent);}
+// ../../../node_modules/svelte/src/internal/client/dom/task.js
+var micro_tasks = [];
+function run_micro_tasks() {
+  var tasks = micro_tasks;
+  micro_tasks = [];
+  run_all(tasks);
+}
+function queue_micro_task(fn) {
+  if (micro_tasks.length === 0 && !is_flushing_sync) {
+    var tasks = micro_tasks;
+    queueMicrotask(() => {
+      if (tasks === micro_tasks) run_micro_tasks();
+    });
+  }
+  micro_tasks.push(fn);
+}
+function flush_tasks() {
+  while (micro_tasks.length > 0) {
+    run_micro_tasks();
+  }
+}
 
-    /* Stretch so both columns share the available height. */.grid.svelte-wafcro {flex:1;min-height:0;display:grid;grid-template-columns:2fr 1fr;gap:1.25rem;align-items:stretch;}.grid-main.svelte-wafcro {display:flex;min-height:0;}.grid-side.svelte-wafcro {display:flex;flex-direction:column;gap:1.25rem;min-height:0;}.status.svelte-wafcro {display:flex;flex-direction:column;align-items:center;gap:1rem;padding:4rem 0;color:color-mix(in oklab, var(--color-base-content) 70%, transparent);}.error.svelte-wafcro {color:var(--color-error);font-weight:600;text-align:center;}
+// ../../../node_modules/svelte/src/internal/client/error-handling.js
+var adjustments = /* @__PURE__ */ new WeakMap();
+function handle_error(error2) {
+  var effect2 = active_effect;
+  if (effect2 === null) {
+    active_reaction.f |= ERROR_VALUE;
+    return error2;
+  }
+  if (dev_fallback_default && error2 instanceof Error && !adjustments.has(error2)) {
+    adjustments.set(error2, get_adjustments(error2, effect2));
+  }
+  if ((effect2.f & REACTION_RAN) === 0 && (effect2.f & EFFECT) === 0) {
+    if (dev_fallback_default && !effect2.parent && error2 instanceof Error) {
+      apply_adjustments(error2);
+    }
+    throw error2;
+  }
+  invoke_error_boundary(error2, effect2);
+}
+function invoke_error_boundary(error2, effect2) {
+  while (effect2 !== null) {
+    if ((effect2.f & BOUNDARY_EFFECT) !== 0) {
+      if ((effect2.f & REACTION_RAN) === 0) {
+        throw error2;
+      }
+      try {
+        effect2.b.error(error2);
+        return;
+      } catch (e) {
+        error2 = e;
+      }
+    }
+    effect2 = effect2.parent;
+  }
+  if (dev_fallback_default && error2 instanceof Error) {
+    apply_adjustments(error2);
+  }
+  throw error2;
+}
+function get_adjustments(error2, effect2) {
+  const message_descriptor = get_descriptor(error2, "message");
+  if (message_descriptor && !message_descriptor.configurable) return;
+  var indent = is_firefox ? "  " : "	";
+  var component_stack = `
+${indent}in ${effect2.fn?.name || "<unknown>"}`;
+  var context = effect2.ctx;
+  while (context !== null) {
+    component_stack += `
+${indent}in ${context.function?.[FILENAME].split("/").pop()}`;
+    context = context.p;
+  }
+  return {
+    message: error2.message + `
+${component_stack}
+`,
+    stack: error2.stack?.split("\n").filter((line) => !line.includes("svelte/src/internal")).join("\n")
+  };
+}
+function apply_adjustments(error2) {
+  const adjusted = adjustments.get(error2);
+  if (adjusted) {
+    define_property(error2, "message", {
+      value: adjusted.message
+    });
+    define_property(error2, "stack", {
+      value: adjusted.stack
+    });
+  }
+}
 
-    @media (max-width: 60rem) {.grid.svelte-wafcro {grid-template-columns:1fr;}
-    }`};function un(e,t){le(t,!0),ve(e,Df);let r=H($e({isLoading:!0,errorMessage:"",user:null,stats:null,skills:[],courses:[]}));bt(()=>{let p=it.subscribe(d=>{F(r,d,!0)});return it.refresh(),p});let o=J(()=>m(r).user?.username?`@${m(r).user.username}`:"@user");var n=Af(),i=_(n),a=_(i),s=_(a);v(a),v(i);var u=$(i,2);{var l=p=>{var d=$f();R(p,d)},c=p=>{var d=Ef(),h=_(d),b=_(h,!0);v(h);var g=$(h,2);v(d),U(()=>q(b,m(r).errorMessage)),se("click",g,()=>it.refresh()),R(p,d)},f=p=>{var d=Cf(),h=_(d),b=_(h);hi(b,{get courses(){return m(r).courses},get skills(){return m(r).skills},onCourseOpen:C=>kt(`/chat/${C.id}`)}),v(h);var g=$(h,2),D=_(g);bi(D,{get user(){return m(r).user},get stats(){return m(r).stats},onProfile:()=>kt("/profile")});var E=$(D,2);vi(E,{get skills(){return m(r).skills}}),v(g),v(d),R(p,d)};ee(u,p=>{m(r).isLoading?p(l):m(r).errorMessage?p(c,1):p(f,-1)})}v(n),U(()=>q(s,`${m(o)??""} Dashboard`)),R(e,n),ce()}Te(["click"]);fe(un,{},[],[],{mode:"open"});async function Wl(e,t,r){let o=`/api/auth/users/${encodeURIComponent(e)}/`;if(r){let n=new FormData;n.set("first_name",t.firstName),n.set("last_name",t.lastName),n.set("description",t.description),n.set("picture",r),await ui("PATCH",o,n,{formData:!0});return}await ui("PATCH",o,{first_name:t.firstName,last_name:t.lastName,description:t.description})}async function Zl(){return(await Pt("/auth-api/browser/v1/account/email")).data??[]}async function Xl(e){await ui("POST","/auth-api/browser/v1/account/email",{email:e})}var Sf=z('<div class="status svelte-1u1012d" role="status" aria-live="polite"><span class="loading loading-spinner loading-lg"></span> <p>Loading your profile\u2026</p></div>'),Tf=z('<div class="status svelte-1u1012d" role="alert"><p class="error svelte-1u1012d"> </p></div>'),Ff=z('<img alt="" class="svelte-1u1012d"/>'),Mf=z('<span class="badge badge-sm badge-primary">primary</span>'),Rf=z('<li class="svelte-1u1012d"> <span> </span> <!></li>'),zf=z('<ul class="email-list svelte-1u1012d"></ul>'),Lf=z('<p class="error svelte-1u1012d" role="alert"> </p>'),Nf=z('<p class="success svelte-1u1012d" role="status"> </p>'),Pf=z('<span class="loading loading-spinner loading-sm"></span>'),If=z('<form class="card form svelte-1u1012d"><div class="avatar-row svelte-1u1012d"><span class="avatar-mark svelte-1u1012d" aria-hidden="true"><!></span> <div class="avatar-actions svelte-1u1012d"><label class="field-label svelte-1u1012d" for="picture">Profile picture</label> <input id="picture" class="file-input file-input-bordered file-input-sm" type="file" accept="image/*"/></div></div> <label class="field svelte-1u1012d"><span class="field-label svelte-1u1012d">Username</span> <input class="input input-bordered" type="text" readonly=""/> <span class="hint svelte-1u1012d">Username cannot be changed.</span></label> <div class="two-col svelte-1u1012d"><label class="field svelte-1u1012d"><span class="field-label svelte-1u1012d">First name</span> <input class="input input-bordered" type="text" autocomplete="given-name"/></label> <label class="field svelte-1u1012d"><span class="field-label svelte-1u1012d">Last name</span> <input class="input input-bordered" type="text" autocomplete="family-name"/></label></div> <label class="field svelte-1u1012d"><span class="field-label svelte-1u1012d">Description</span> <textarea class="textarea textarea-bordered" rows="4"></textarea></label> <label class="field svelte-1u1012d"><span class="field-label svelte-1u1012d">E-mail</span> <input class="input input-bordered" type="email" autocomplete="email"/> <span class="hint svelte-1u1012d">Changing your e-mail sends a verification link; it activates after you confirm.</span></label> <!> <!> <!> <div class="actions svelte-1u1012d"><button type="submit" class="btn btn-primary"><!> Save changes</button></div></form>'),qf=z('<div class="profile svelte-1u1012d"><header class="head svelte-1u1012d"><h1 class="title svelte-1u1012d">Edit Profile</h1> <button type="button" class="btn btn-ghost btn-sm">\u2190 Back to Dashboard</button></header> <!></div>'),Of={hash:"svelte-1u1012d",code:`.profile.svelte-1u1012d {flex:1;min-height:0;overflow-y:auto;max-width:42rem;width:100%;margin:0 auto;padding:2rem 1.5rem 1rem;display:flex;flex-direction:column;gap:1.5rem;}.head.svelte-1u1012d {display:flex;align-items:center;justify-content:space-between;gap:1rem;}.title.svelte-1u1012d {font-size:1.6rem;font-weight:800;color:var(--color-base-content);}.form.svelte-1u1012d {background:var(--color-base-100);border-radius:1rem;padding:1.5rem;display:flex;flex-direction:column;gap:1.1rem;box-shadow:0 0 24px color-mix(in oklab, var(--color-primary) 10%, transparent);}.avatar-row.svelte-1u1012d {display:flex;align-items:center;gap:1rem;}.avatar-mark.svelte-1u1012d {width:4rem;height:4rem;flex:0 0 auto;border-radius:999px;overflow:hidden;background:color-mix(in oklab, var(--color-base-content) 18%, transparent);box-shadow:0 0 16px color-mix(in oklab, var(--color-primary) 30%, transparent);}.avatar-mark.svelte-1u1012d img:where(.svelte-1u1012d) {width:100%;height:100%;object-fit:cover;}.avatar-actions.svelte-1u1012d {display:flex;flex-direction:column;gap:0.35rem;}.field.svelte-1u1012d {display:flex;flex-direction:column;gap:0.35rem;}.field-label.svelte-1u1012d {font-size:0.85rem;font-weight:600;color:color-mix(in oklab, var(--color-base-content) 80%, transparent);}.two-col.svelte-1u1012d {display:grid;grid-template-columns:1fr 1fr;gap:1rem;}.hint.svelte-1u1012d {font-size:0.75rem;color:color-mix(in oklab, var(--color-base-content) 60%, transparent);}.email-list.svelte-1u1012d {list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0.35rem;font-size:0.85rem;color:var(--color-base-content);}.email-list.svelte-1u1012d li:where(.svelte-1u1012d) {display:flex;align-items:center;gap:0.5rem;}.error.svelte-1u1012d {color:var(--color-error);font-weight:600;}.success.svelte-1u1012d {color:var(--color-success);font-weight:600;}.status.svelte-1u1012d {display:flex;flex-direction:column;align-items:center;gap:1rem;padding:4rem 0;color:color-mix(in oklab, var(--color-base-content) 70%, transparent);}.actions.svelte-1u1012d {display:flex;justify-content:flex-end;}
+// ../../../node_modules/svelte/src/internal/client/reactivity/status.js
+var STATUS_MASK = ~(DIRTY | MAYBE_DIRTY | CLEAN);
+function set_signal_status(signal, status) {
+  signal.f = signal.f & STATUS_MASK | status;
+}
+function update_derived_status(derived3) {
+  if ((derived3.f & CONNECTED) !== 0 || derived3.deps === null) {
+    set_signal_status(derived3, CLEAN);
+  } else {
+    set_signal_status(derived3, MAYBE_DIRTY);
+  }
+}
 
-    @media (max-width: 40rem) {.two-col.svelte-1u1012d {grid-template-columns:1fr;}
-    }`};function gi(e,t){le(t,!0),ve(e,Of);let r=H(!0),o=H(!1),n=H(""),i=H(""),a=H(""),s=H(""),u=H(""),l=H(""),c=H(""),f=H(""),p=H(null),d=H(null),h=H(null),b=H($e([])),g=J(()=>m(d)??m(p));async function D(){let w=await li();if(!w||!w.is_authenticated)throw new Error("You are not signed in. Please log in to edit your profile.");F(a,w.username,!0),F(s,w.first_name??"",!0),F(u,w.last_name??"",!0),F(l,w.description??"",!0),F(c,w.email??"",!0),F(f,w.email??"",!0),F(p,w.picture??null,!0),F(b,await Zl().catch(()=>[]),!0)}bt(()=>{D().catch(w=>{F(n,w instanceof Error?w.message:String(w),!0)}).finally(()=>{F(r,!1)})}),ii(()=>{m(d)&&URL.revokeObjectURL(m(d))});function E(w){let M=w.currentTarget.files?.[0]??null;m(d)&&URL.revokeObjectURL(m(d)),F(h,M,!0),F(d,M?URL.createObjectURL(M):null,!0)}async function C(){if(!(!m(a)||m(o))){F(o,!0),F(n,""),F(i,"");try{await Wl(m(a),{firstName:m(s),lastName:m(u),description:m(l)},m(h));let w="Profile saved.";m(c)&&m(c)!==m(f)&&(await Xl(m(c)),w+=" A verification link was sent to the new e-mail address."),m(d)&&URL.revokeObjectURL(m(d)),F(h,null),F(d,null),await it.refresh(),await D(),F(i,w,!0)}catch(w){F(n,w instanceof Error?w.message:String(w),!0)}finally{F(o,!1)}}}var A=qf(),T=_(A),k=$(_(T),2);v(T);var S=$(T,2);{var N=w=>{var y=Sf();R(w,y)},j=w=>{var y=Tf(),M=_(y),B=_(M,!0);v(M),v(y),U(()=>q(B,m(n))),R(w,y)},O=w=>{var y=If(),M=_(y),B=_(M),Z=_(B);{var ue=he=>{var st=Ff();U(()=>ge(st,"src",m(g))),R(he,st)};ee(Z,he=>{m(g)&&he(ue)})}v(B);var ne=$(B,2),V=$(_(ne),2);v(ne),v(M);var L=$(M,2),Y=$(_(L),2);sr(Y),gt(2),v(L);var te=$(L,2),ie=_(te),pe=$(_(ie),2);sr(pe),v(ie);var Ee=$(ie,2),me=$(_(Ee),2);sr(me),v(Ee),v(te);var ze=$(te,2),ae=$(_(ze),2);xa(ae),v(ze);var Ae=$(ze,2),at=$(_(Ae),2);sr(at),gt(2),v(Ae);var qt=$(Ae,2);{var kr=he=>{var st=zf();Ce(st,21,()=>m(b),Ir=>Ir.email,(Ir,bn)=>{var ji=Rf(),Js=_(ji),vn=$(Js),s0=_(vn,!0);v(vn);var u0=$(vn,2);{var l0=Hi=>{var c0=Mf();R(Hi,c0)};ee(u0,Hi=>{m(bn).primary&&Hi(l0)})}v(ji),U(()=>{q(Js,`${m(bn).email??""} `),Ue(vn,1,`badge badge-sm ${m(bn).verified?"badge-success":"badge-warning"}`),q(s0,m(bn).verified?"verified":"unverified")}),R(Ir,ji)}),v(st),R(he,st)};ee(qt,he=>{m(b).length>0&&he(kr)})}var Io=$(qt,2);{var mn=he=>{var st=Lf(),Ir=_(st,!0);v(st),U(()=>q(Ir,m(n))),R(he,st)};ee(Io,he=>{m(n)&&he(mn)})}var hn=$(Io,2);{var qo=he=>{var st=Nf(),Ir=_(st,!0);v(st),U(()=>q(Ir,m(i))),R(he,st)};ee(hn,he=>{m(i)&&he(qo)})}var Oo=$(hn,2),Bo=_(Oo),jo=_(Bo);{var Bi=he=>{var st=Pf();R(he,st)};ee(jo,he=>{m(o)&&he(Bi)})}gt(),v(Bo),v(Oo),v(y),U(()=>{Na(Y,m(a)),Bo.disabled=m(o)}),eo("submit",y,he=>{he.preventDefault(),C()}),se("change",V,E),ur(pe,()=>m(s),he=>F(s,he)),ur(me,()=>m(u),he=>F(u,he)),ur(ae,()=>m(l),he=>F(l,he)),ur(at,()=>m(c),he=>F(c,he)),R(w,y)};ee(S,w=>{m(r)?w(N):m(n)&&!m(a)?w(j,1):w(O,-1)})}v(A),se("click",k,()=>kt("/")),R(e,A),ce()}Te(["click","change"]);fe(gi,{},[],[],{mode:"open"});var Bf=z('<span class="soon svelte-nqv0rv">soon</span>'),jf=z('<button type="button" class="nav-item svelte-nqv0rv"><span class="nav-icon svelte-nqv0rv" aria-hidden="true"> </span> <span class="nav-label svelte-nqv0rv"> </span> <!></button>'),Hf=z('<img class="avatar svelte-nqv0rv" src="logo.png" alt="ElisaAI assistant"/>'),Uf=z("<div><!> <div> </div></div>"),Vf=z('<div class="error-overlay svelte-nqv0rv" role="alert"><div class="error-card svelte-nqv0rv"><span class="error-icon svelte-nqv0rv" aria-hidden="true">\u{1F50C}</span> <h2 class="error-title svelte-nqv0rv">Assistant unavailable</h2> <p class="error-text svelte-nqv0rv"> </p> <button type="button" class="btn btn-primary">Retry</button></div></div>'),Yf=z('<div class="chat-screen svelte-nqv0rv"><aside class="sidebar svelte-nqv0rv"><button type="button" class="back svelte-nqv0rv">\u2190 Dashboard</button> <button type="button" class="content-cta svelte-nqv0rv"><span aria-hidden="true">\u{1F4D6}</span> <span>Content</span></button> <nav class="nav svelte-nqv0rv" aria-label="Sections"></nav></aside> <main class="conversation svelte-nqv0rv"><div class="messages svelte-nqv0rv"><div class="message svelte-nqv0rv"><img class="avatar svelte-nqv0rv" src="logo.png" alt="ElisaAI assistant"/> <div class="bubble svelte-nqv0rv">System online. I am <strong>ElisaAI</strong>. Ready to help you with <strong> </strong> \u2014 what topic shall we analyse today?</div></div> <!></div> <div class="composer svelte-nqv0rv"><span><span class="status-dot svelte-nqv0rv" aria-hidden="true"></span> </span> <form class="composer-row svelte-nqv0rv"><button type="button" class="composer-add svelte-nqv0rv" aria-label="Add attachment" disabled="">+</button> <input class="composer-input svelte-nqv0rv" type="text"/> <button type="submit" class="composer-send svelte-nqv0rv" aria-label="Send message">\u2192</button></form> <p class="disclaimer svelte-nqv0rv">ElisaAI 2026 // ElisaAI may generate misinformation. Please verify all information.</p></div> <!></main></div>'),Gf={hash:"svelte-nqv0rv",code:`.chat-screen.svelte-nqv0rv {flex:1;min-height:0;overflow:hidden;display:grid;grid-template-columns:16rem 1fr;grid-template-rows:minmax(0, 1fr);width:100%;}
+// ../../../node_modules/svelte/src/internal/client/reactivity/utils.js
+function clear_marked(deps) {
+  if (deps === null) return;
+  for (const dep of deps) {
+    if ((dep.f & DERIVED) === 0 || (dep.f & WAS_MARKED) === 0) {
+      continue;
+    }
+    dep.f ^= WAS_MARKED;
+    clear_marked(
+      /** @type {Derived} */
+      dep.deps
+    );
+  }
+}
+function defer_effect(effect2, dirty_effects, maybe_dirty_effects) {
+  if ((effect2.f & DIRTY) !== 0) {
+    dirty_effects.add(effect2);
+  } else if ((effect2.f & MAYBE_DIRTY) !== 0) {
+    maybe_dirty_effects.add(effect2);
+  }
+  clear_marked(effect2.deps);
+  set_signal_status(effect2, CLEAN);
+}
 
-    /* Sidebar stays put; only the conversation scrolls. */.sidebar.svelte-nqv0rv {min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:1.5rem;padding:1.5rem 1rem;border-right:1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);background:color-mix(in oklab, var(--color-base-100) 60%, transparent);}.back.svelte-nqv0rv {align-self:flex-start;background:none;border:none;cursor:pointer;font-weight:600;color:var(--color-primary);}.back.svelte-nqv0rv:focus-visible {outline:2px solid var(--color-primary);outline-offset:2px;}.content-cta.svelte-nqv0rv {display:flex;align-items:center;justify-content:center;gap:0.5rem;padding:0.85rem 1rem;border-radius:0.85rem;border:1px solid color-mix(in oklab, var(--color-primary) 55%, transparent);font-size:1.05rem;font-weight:700;cursor:pointer;color:var(--color-primary-content);background:var(--color-primary);box-shadow:0 0 18px color-mix(in oklab, var(--color-primary) 45%, transparent);transition:transform 0.12s ease;}.content-cta.svelte-nqv0rv:hover {transform:translateY(-2px);}.content-cta.svelte-nqv0rv:focus-visible {outline:2px solid var(--color-base-content);outline-offset:2px;}.nav.svelte-nqv0rv {display:flex;flex-direction:column;gap:0.35rem;}.nav-item.svelte-nqv0rv {display:flex;align-items:center;gap:0.75rem;padding:0.65rem 0.75rem;border-radius:0.75rem;background:transparent;border:none;color:var(--color-base-content);cursor:pointer;}.nav-item.svelte-nqv0rv:hover:not(:disabled) {background:color-mix(in oklab, var(--color-primary) 14%, transparent);}.nav-item.svelte-nqv0rv:focus-visible {outline:2px solid var(--color-primary);outline-offset:2px;}.nav-item.svelte-nqv0rv:disabled {cursor:not-allowed;opacity:0.6;}.nav-icon.svelte-nqv0rv {font-size:1.1rem;}.nav-label.svelte-nqv0rv {flex:1 1 auto;text-align:left;font-weight:600;}.soon.svelte-nqv0rv {font-size:0.65rem;text-transform:uppercase;letter-spacing:0.06em;color:color-mix(in oklab, var(--color-base-content) 50%, transparent);}.conversation.svelte-nqv0rv {position:relative;display:flex;flex-direction:column;min-height:0;background:var(--color-base-200);}.messages.svelte-nqv0rv {flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:1.25rem;padding:2rem clamp(1rem, 6vw, 6rem);}.message.svelte-nqv0rv {display:flex;align-items:flex-start;gap:0.85rem;max-width:56rem;}.message.user.svelte-nqv0rv {margin-left:auto;justify-content:flex-end;}.avatar.svelte-nqv0rv {width:2.75rem;height:2.75rem;flex:0 0 auto;border-radius:999px;object-fit:cover;}.bubble.svelte-nqv0rv {padding:1rem 1.25rem;border-radius:1rem;border-top-left-radius:0.25rem;line-height:1.55;color:var(--color-base-content);background:color-mix(in oklab, var(--color-base-100) 85%, transparent);border:1px solid color-mix(in oklab, var(--color-primary) 30%, transparent);box-shadow:0 0 18px color-mix(in oklab, var(--color-primary) 12%, transparent);white-space:pre-wrap;}.bubble.user.svelte-nqv0rv {color:var(--color-primary-content);background:var(--color-primary);border-color:transparent;border-top-left-radius:1rem;border-bottom-right-radius:0.25rem;}.composer.svelte-nqv0rv {flex:0 0 auto;display:flex;flex-direction:column;gap:0.5rem;padding:1rem clamp(1rem, 6vw, 6rem) 1.25rem;}.status.svelte-nqv0rv {align-self:center;display:inline-flex;align-items:center;gap:0.4rem;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.06em;color:color-mix(in oklab, var(--color-base-content) 60%, transparent);}.status-dot.svelte-nqv0rv {width:0.5rem;height:0.5rem;border-radius:999px;background:color-mix(in oklab, var(--color-base-content) 40%, transparent);}.status.online.svelte-nqv0rv {color:var(--color-success);}
+// ../../../node_modules/svelte/src/store/utils.js
+function subscribe_to_store(store, run3, invalidate) {
+  if (store == null) {
+    run3(void 0);
+    if (invalidate) invalidate(void 0);
+    return noop;
+  }
+  const unsub = untrack(
+    () => store.subscribe(
+      run3,
+      // @ts-expect-error
+      invalidate
+    )
+  );
+  return unsub.unsubscribe ? () => unsub.unsubscribe() : unsub;
+}
 
-    /* Centered overlay shown when the assistant connection gives up. */.error-overlay.svelte-nqv0rv {position:absolute;inset:0;z-index:5;display:grid;place-items:center;padding:1.5rem;background:color-mix(in oklab, var(--color-base-300) 55%, transparent);backdrop-filter:blur(4px);}.error-card.svelte-nqv0rv {display:flex;flex-direction:column;align-items:center;gap:0.85rem;max-width:26rem;width:100%;text-align:center;padding:2rem;border-radius:1.25rem;background:var(--color-base-100);border:1px solid color-mix(in oklab, var(--color-warning) 35%, transparent);box-shadow:0 0 40px color-mix(in oklab, var(--color-warning) 18%, transparent);}.error-icon.svelte-nqv0rv {font-size:2.5rem;line-height:1;}.error-title.svelte-nqv0rv {font-size:1.3rem;font-weight:700;color:var(--color-base-content);}.error-text.svelte-nqv0rv {line-height:1.5;color:color-mix(in oklab, var(--color-base-content) 75%, transparent);}.status.online.svelte-nqv0rv .status-dot:where(.svelte-nqv0rv) {background:var(--color-success);box-shadow:0 0 10px color-mix(in oklab, var(--color-success) 70%, transparent);}.composer-row.svelte-nqv0rv {display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0.75rem;border-radius:999px;background:color-mix(in oklab, var(--color-base-100) 80%, transparent);border:1px solid color-mix(in oklab, var(--color-primary) 35%, transparent);box-shadow:0 0 18px color-mix(in oklab, var(--color-primary) 12%, transparent);}.composer-add.svelte-nqv0rv,
-    .composer-send.svelte-nqv0rv {display:grid;place-items:center;width:2.25rem;height:2.25rem;flex:0 0 auto;border-radius:999px;border:none;font-size:1.2rem;cursor:pointer;color:var(--color-primary-content);background:color-mix(in oklab, var(--color-primary) 70%, transparent);}.composer-add.svelte-nqv0rv:disabled,
-    .composer-send.svelte-nqv0rv:disabled {cursor:not-allowed;opacity:0.6;}.composer-input.svelte-nqv0rv {flex:1 1 auto;background:transparent;border:none;color:var(--color-base-content);font-size:1rem;padding:0.5rem 0.25rem;}.composer-input.svelte-nqv0rv:focus {outline:none;}.disclaimer.svelte-nqv0rv {text-align:center;font-size:0.7rem;letter-spacing:0.04em;color:color-mix(in oklab, var(--color-base-content) 55%, transparent);}
+// ../../../node_modules/svelte/src/store/shared/index.js
+var subscriber_queue = [];
+function writable(value, start = noop) {
+  let stop = null;
+  const subscribers = /* @__PURE__ */ new Set();
+  function set3(new_value) {
+    if (safe_not_equal(value, new_value)) {
+      value = new_value;
+      if (stop) {
+        const run_queue = !subscriber_queue.length;
+        for (const subscriber of subscribers) {
+          subscriber[1]();
+          subscriber_queue.push(subscriber, value);
+        }
+        if (run_queue) {
+          for (let i = 0; i < subscriber_queue.length; i += 2) {
+            subscriber_queue[i][0](subscriber_queue[i + 1]);
+          }
+          subscriber_queue.length = 0;
+        }
+      }
+    }
+  }
+  function update2(fn) {
+    set3(fn(
+      /** @type {T} */
+      value
+    ));
+  }
+  function subscribe(run3, invalidate = noop) {
+    const subscriber = [run3, invalidate];
+    subscribers.add(subscriber);
+    if (subscribers.size === 1) {
+      stop = start(set3, update2) || noop;
+    }
+    run3(
+      /** @type {T} */
+      value
+    );
+    return () => {
+      subscribers.delete(subscriber);
+      if (subscribers.size === 0 && stop) {
+        stop();
+        stop = null;
+      }
+    };
+  }
+  return { set: set3, update: update2, subscribe };
+}
+function get(store) {
+  let value;
+  subscribe_to_store(store, (_) => value = _)();
+  return value;
+}
 
-    @media (max-width: 48rem) {.chat-screen.svelte-nqv0rv {grid-template-columns:1fr;}.sidebar.svelte-nqv0rv {display:none;}
-    }`};function _i(e,t){le(t,!0),ve(e,Gf);let r=Q(t,"params",7),o=H($e({isLoading:!0,errorMessage:"",user:null,stats:null,skills:[],courses:[]})),n=fi(()=>r()?.id),i=H($e({connection:"disconnected",errorMessage:"",messages:[]})),a=H("");bt(()=>{let V=it.subscribe(Y=>{F(o,Y,!0)});m(o).courses.length===0&&it.refresh();let L=n.subscribe(Y=>{F(i,Y,!0)});return n.connect(),()=>{V(),L(),n.disconnect()}});let s=J(()=>m(o).courses.find(V=>V.id===r()?.id)?.name??"this course"),u=J(()=>[{icon:"\u{1F3AE}",label:"Games"},{icon:"\u{1F9E0}",label:"Quizzes",to:`/quiz/${r()?.id??""}`},{icon:"\u{1F393}",label:"Exams"},{icon:"\u{1F4AC}",label:"Chats"}]),l=J(()=>m(i).connection==="connected"),c=J(()=>m(i).connection==="connected"?"Online":m(i).connection==="connecting"?"Connecting\u2026":m(i).connection==="wait_before_retry"?"Reconnecting\u2026":"Offline");async function f(){let V=m(a).trim();!V||!m(l)||(F(a,""),await n.sendChatInput("markdown",V))}var p={get params(){return r()},set params(V){r(V),X()}},d=Yf(),h=_(d),b=_(h),g=$(b,2),D=$(g,2);Ce(D,21,()=>m(u),V=>V.label,(V,L)=>{var Y=jf(),te=_(Y),ie=_(te,!0);v(te);var pe=$(te,2),Ee=_(pe,!0);v(pe);var me=$(pe,2);{var ze=ae=>{var Ae=Bf();R(ae,Ae)};ee(me,ae=>{m(L).to||ae(ze)})}v(Y),U(()=>{Y.disabled=!m(L).to,q(ie,m(L).icon),q(Ee,m(L).label)}),se("click",Y,()=>m(L).to&&kt(m(L).to)),R(V,Y)}),v(D),v(h);var E=$(h,2),C=_(E),A=_(C),T=$(_(A),2),k=$(_(T),3),S=_(k,!0);v(k),gt(),v(T),v(A);var N=$(A,2);Ce(N,17,()=>m(i).messages,V=>V.id,(V,L)=>{var Y=Uf();let te;var ie=_(Y);{var pe=ae=>{var Ae=Hf();R(ae,Ae)};ee(ie,ae=>{m(L).sender==="assistant"&&ae(pe)})}var Ee=$(ie,2);let me;var ze=_(Ee,!0);v(Ee),v(Y),U(()=>{te=Ue(Y,1,"message svelte-nqv0rv",null,te,{user:m(L).sender==="user"}),me=Ue(Ee,1,"bubble svelte-nqv0rv",null,me,{user:m(L).sender==="user"}),q(ze,m(L).content)}),R(V,Y)}),v(C);var j=$(C,2),O=_(j);let w;var y=$(_(O));v(O);var M=$(O,2),B=$(_(M),2);sr(B);var Z=$(B,2);v(M),gt(2),v(j);var ue=$(j,2);{var ne=V=>{var L=Vf(),Y=_(L),te=$(_(Y),4),ie=_(te,!0);v(te);var pe=$(te,2);v(Y),v(L),U(()=>q(ie,m(i).errorMessage)),se("click",pe,()=>n.retry()),R(V,L)};ee(ue,V=>{m(i).errorMessage&&V(ne)})}return v(E),v(d),U(V=>{q(S,m(s)),w=Ue(O,1,"status svelte-nqv0rv",null,w,{online:m(l)}),q(y,` ${m(c)??""}`),ge(B,"placeholder",m(l)?"Message":"Connecting\u2026"),B.disabled=!m(l),Z.disabled=V},[()=>!m(l)||m(a).trim().length===0]),se("click",b,()=>kt("/")),se("click",g,()=>kt(`/content/${r()?.id??""}`)),eo("submit",M,V=>{V.preventDefault(),f()}),ur(B,()=>m(a),V=>F(a,V)),R(e,d),ce(p)}Te(["click"]);fe(_i,{params:{}},[],[],{mode:"open"});var Wf=z('<div class="progress-track svelte-10mivl5" aria-hidden="true"><div class="progress-fill svelte-10mivl5"></div></div>'),Zf=z('<section class="stage result svelte-10mivl5"><h1 class="course svelte-10mivl5"> </h1> <div class="score-ring svelte-10mivl5"> </div> <p class="result-text svelte-10mivl5"> </p> <div class="result-actions svelte-10mivl5"><button type="button" class="btn btn-primary">Try again</button> <button type="button" class="btn btn-ghost">Back to Dashboard</button></div></section>'),Xf=z('<button type="button"><span class="letter svelte-10mivl5"> </span> <span class="text svelte-10mivl5"> </span></button>'),Kf=z('<section class="stage svelte-10mivl5"><h1 class="course svelte-10mivl5"> </h1> <span class="progress-pill svelte-10mivl5"> </span> <h2 class="prompt svelte-10mivl5"> </h2> <div class="answers svelte-10mivl5"></div></section>'),Jf=z('<div class="quiz svelte-10mivl5"><header class="quiz-top svelte-10mivl5"><button type="button" class="content-btn svelte-10mivl5">\u2190 Back</button> <!></header> <!></div>'),Qf={hash:"svelte-10mivl5",code:`.quiz.svelte-10mivl5 {flex:1;min-height:0;display:flex;flex-direction:column;width:100%;background:radial-gradient(120% 70% at 50% 0%, color-mix(in oklab, var(--color-primary) 8%, transparent), transparent 55%),
-            var(--color-base-200);}.quiz-top.svelte-10mivl5 {flex:0 0 auto;display:flex;align-items:center;gap:1.5rem;padding:1.25rem 1.5rem;}.content-btn.svelte-10mivl5 {flex:0 0 auto;padding:0.5rem 1.25rem;border-radius:0.75rem;font-weight:600;color:color-mix(in oklab, var(--color-base-content) 80%, transparent);background:color-mix(in oklab, var(--color-base-100) 70%, transparent);border:1px solid color-mix(in oklab, var(--color-base-content) 14%, transparent);cursor:pointer;}.content-btn.svelte-10mivl5:hover {border-color:color-mix(in oklab, var(--color-primary) 45%, transparent);}.progress-track.svelte-10mivl5 {flex:1 1 auto;height:0.5rem;border-radius:999px;overflow:hidden;background:color-mix(in oklab, var(--color-base-content) 12%, transparent);}.progress-fill.svelte-10mivl5 {height:100%;border-radius:999px;background:linear-gradient(90deg, var(--color-primary), var(--color-success));transition:width 0.3s ease;}.stage.svelte-10mivl5 {flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.25rem;width:90%;max-width:64rem;margin:0 auto;padding:1rem 0 2.5rem;}.course.svelte-10mivl5 {font-size:clamp(1.3rem, 2.4vw, 1.9rem);font-weight:700;text-align:center;color:var(--color-base-content);text-shadow:0 0 20px color-mix(in oklab, var(--color-primary) 40%, transparent);}.progress-pill.svelte-10mivl5 {padding:0.3rem 1rem;border-radius:999px;font-weight:700;color:var(--color-primary);background:color-mix(in oklab, var(--color-primary) 16%, transparent);border:1px solid color-mix(in oklab, var(--color-primary) 35%, transparent);}.prompt.svelte-10mivl5 {font-size:clamp(1.7rem, 3.6vw, 2.8rem);font-weight:800;text-align:center;color:var(--color-base-content);text-shadow:0 0 22px color-mix(in oklab, var(--color-primary) 35%, transparent);margin:0.5rem 0 1rem;}.answers.svelte-10mivl5 {width:100%;display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;}
+// ../../../node_modules/svelte/src/internal/client/reactivity/store.js
+var legacy_is_updating_store = false;
+var is_store_binding = false;
+var IS_UNMOUNTED = /* @__PURE__ */ Symbol("unmounted");
+function store_get(store, store_name, stores) {
+  const entry = stores[store_name] ??= {
+    store: null,
+    source: mutable_source(void 0),
+    unsubscribe: noop
+  };
+  if (dev_fallback_default) {
+    entry.source.label = store_name;
+  }
+  if (entry.store !== store && !(IS_UNMOUNTED in stores)) {
+    entry.unsubscribe();
+    entry.store = store ?? null;
+    if (store == null) {
+      entry.source.v = void 0;
+      entry.unsubscribe = noop;
+    } else {
+      var is_synchronous_callback = true;
+      entry.unsubscribe = subscribe_to_store(store, (v) => {
+        if (is_synchronous_callback) {
+          entry.source.v = v;
+        } else {
+          set(entry.source, v);
+        }
+      });
+      is_synchronous_callback = false;
+    }
+  }
+  if (store && IS_UNMOUNTED in stores) {
+    return get(store);
+  }
+  return get2(entry.source);
+}
+function setup_stores() {
+  const stores = {};
+  function cleanup() {
+    teardown(() => {
+      for (var store_name in stores) {
+        const ref = stores[store_name];
+        ref.unsubscribe();
+      }
+      define_property(stores, IS_UNMOUNTED, {
+        enumerable: false,
+        value: true
+      });
+    });
+  }
+  return [stores, cleanup];
+}
+function capture_store_binding(fn) {
+  var previous_is_store_binding = is_store_binding;
+  try {
+    is_store_binding = false;
+    return [fn(), is_store_binding];
+  } finally {
+    is_store_binding = previous_is_store_binding;
+  }
+}
 
-    /* Answer colours map to DaisyUI semantic tokens (no hardcoded hex). */.answer.svelte-10mivl5 {display:flex;align-items:center;gap:1rem;padding:1.4rem 1.5rem;border-radius:1rem;border:none;font-family:ui-monospace, "SF Mono", Menlo, monospace;font-size:1.2rem;font-weight:700;cursor:pointer;transition:transform 0.12s ease, opacity 0.2s ease, box-shadow 0.2s ease;box-shadow:0 6px 18px color-mix(in oklab, var(--color-base-content) 14%, transparent);}.answer.svelte-10mivl5:hover:not(:disabled) {transform:translateY(-3px);}.answer.svelte-10mivl5:focus-visible {outline:3px solid var(--color-base-content);outline-offset:3px;}.letter.svelte-10mivl5 {display:grid;place-items:center;width:2.1rem;height:2.1rem;flex:0 0 auto;border-radius:0.6rem;font-family:inherit;background:color-mix(in oklab, currentColor 18%, transparent);}.text.svelte-10mivl5 {flex:1 1 auto;text-align:center;}.answer.c0.svelte-10mivl5 {background:var(--color-error);color:var(--color-error-content);}.answer.c1.svelte-10mivl5 {background:var(--color-info);color:var(--color-info-content);}.answer.c2.svelte-10mivl5 {background:var(--color-warning);color:var(--color-warning-content);}.answer.c3.svelte-10mivl5 {background:var(--color-success);color:var(--color-success-content);}.answer.dim.svelte-10mivl5 {opacity:0.35;}.answer.correct.svelte-10mivl5 {outline:4px solid var(--color-base-content);outline-offset:3px;transform:translateY(-3px);}.answer.wrong.svelte-10mivl5 {opacity:0.65;text-decoration:line-through;}.result.svelte-10mivl5 {justify-content:center;}.score-ring.svelte-10mivl5 {display:grid;place-items:center;width:9rem;height:9rem;border-radius:999px;font-size:2rem;font-weight:800;color:var(--color-base-content);background:color-mix(in oklab, var(--color-primary) 14%, transparent);border:4px solid color-mix(in oklab, var(--color-primary) 55%, transparent);box-shadow:0 0 28px color-mix(in oklab, var(--color-primary) 35%, transparent);}.result-text.svelte-10mivl5 {font-size:1.2rem;font-weight:600;color:color-mix(in oklab, var(--color-base-content) 80%, transparent);}.result-actions.svelte-10mivl5 {display:flex;gap:1rem;}
+// ../../../node_modules/svelte/src/internal/client/reactivity/batch.js
+var first_batch = null;
+var last_batch = null;
+var current_batch = null;
+var previous_batch = null;
+var batch_values = null;
+var last_scheduled_effect = null;
+var is_flushing_sync = false;
+var is_processing = false;
+var collected_effects = null;
+var legacy_updates = null;
+var flush_count = 0;
+var source_stacks = /* @__PURE__ */ new Set();
+var uid = 1;
+var Batch = class _Batch {
+  id = uid++;
+  /** True as soon as `#process` was called */
+  #started = false;
+  linked = true;
+  /** @type {Batch | null} */
+  #prev = null;
+  /** @type {Batch | null} */
+  #next = null;
+  /** @type {Map<Effect, ReturnType<typeof deferred<any>>>} */
+  async_deriveds = /* @__PURE__ */ new Map();
+  /**
+   * The current values of any signals that are updated in this batch.
+   * Tuple format: [value, is_derived] (note: is_derived is false for deriveds, too, if they were overridden via assignment)
+   * They keys of this map are identical to `this.#previous`
+   * @type {Map<Value, [any, boolean]>}
+   */
+  current = /* @__PURE__ */ new Map();
+  /**
+   * The values of any signals (sources and deriveds) that are updated in this batch _before_ those updates took place.
+   * They keys of this map are identical to `this.#current`
+   * @type {Map<Value, any>}
+   */
+  previous = /* @__PURE__ */ new Map();
+  /**
+   * When the batch is committed (and the DOM is updated), we need to remove old branches
+   * and append new ones by calling the functions added inside (if/each/key/etc) blocks
+   * @type {Set<(batch: Batch) => void>}
+   */
+  #commit_callbacks = /* @__PURE__ */ new Set();
+  /**
+   * If a fork is discarded, we need to destroy any effects that are no longer needed
+   * @type {Set<(batch: Batch) => void>}
+   */
+  #discard_callbacks = /* @__PURE__ */ new Set();
+  /**
+   * The number of async effects that are currently in flight
+   */
+  #pending = 0;
+  /**
+   * Async effects that are currently in flight, _not_ inside a pending boundary
+   * @type {Map<Effect, number>}
+   */
+  #blocking_pending = /* @__PURE__ */ new Map();
+  /**
+   * A deferred that resolves when the batch is committed, used with `settled()`
+   * TODO replace with Promise.withResolvers once supported widely enough
+   * @type {{ promise: Promise<void>, resolve: (value?: any) => void, reject: (reason: unknown) => void } | null}
+   */
+  #deferred = null;
+  /**
+   * The root effects that need to be flushed
+   * @type {Effect[]}
+   */
+  #roots = [];
+  /**
+   * Effects created while this batch was active.
+   * @type {Effect[]}
+   */
+  #new_effects = [];
+  /**
+   * Deferred effects (which run after async work has completed) that are DIRTY
+   * @type {Set<Effect>}
+   */
+  #dirty_effects = /* @__PURE__ */ new Set();
+  /**
+   * Deferred effects that are MAYBE_DIRTY
+   * @type {Set<Effect>}
+   */
+  #maybe_dirty_effects = /* @__PURE__ */ new Set();
+  /**
+   * A map of branches that still exist, but will be destroyed when this batch
+   * is committed — we skip over these during `process`.
+   * The value contains child effects that were dirty/maybe_dirty before being reset,
+   * so they can be rescheduled if the branch survives.
+   * @type {Map<Effect, { d: Effect[], m: Effect[] }>}
+   */
+  #skipped_branches = /* @__PURE__ */ new Map();
+  /**
+   * Inverse of #skipped_branches which we need to tell prior batches to unskip them when committing
+   * @type {Set<Effect>}
+   */
+  #unskipped_branches = /* @__PURE__ */ new Set();
+  is_fork = false;
+  #decrement_queued = false;
+  constructor() {
+    if (last_batch === null) {
+      first_batch = last_batch = this;
+    } else {
+      last_batch.#next = this;
+      this.#prev = last_batch;
+    }
+    last_batch = this;
+  }
+  #is_deferred() {
+    if (this.is_fork) return true;
+    for (const effect2 of this.#blocking_pending.keys()) {
+      var e = effect2;
+      var skipped = false;
+      while (e.parent !== null) {
+        if (this.#skipped_branches.has(e)) {
+          skipped = true;
+          break;
+        }
+        e = e.parent;
+      }
+      if (!skipped) {
+        return true;
+      }
+    }
+    return false;
+  }
+  /**
+   * Add an effect to the #skipped_branches map and reset its children
+   * @param {Effect} effect
+   */
+  skip_effect(effect2) {
+    if (!this.#skipped_branches.has(effect2)) {
+      this.#skipped_branches.set(effect2, { d: [], m: [] });
+    }
+    this.#unskipped_branches.delete(effect2);
+  }
+  /**
+   * Remove an effect from the #skipped_branches map and reschedule
+   * any tracked dirty/maybe_dirty child effects
+   * @param {Effect} effect
+   * @param {(e: Effect) => void} callback
+   */
+  unskip_effect(effect2, callback = (e) => this.schedule(e)) {
+    var tracked = this.#skipped_branches.get(effect2);
+    if (tracked) {
+      this.#skipped_branches.delete(effect2);
+      for (var e of tracked.d) {
+        set_signal_status(e, DIRTY);
+        callback(e);
+      }
+      for (e of tracked.m) {
+        set_signal_status(e, MAYBE_DIRTY);
+        callback(e);
+      }
+    }
+    this.#unskipped_branches.add(effect2);
+  }
+  #process() {
+    this.#started = true;
+    if (flush_count++ > 1e3) {
+      this.#unlink();
+      infinite_loop_guard();
+    }
+    if (dev_fallback_default) {
+      for (const value of this.current.keys()) {
+        source_stacks.add(value);
+      }
+    }
+    for (const e of this.#dirty_effects) {
+      this.#maybe_dirty_effects.delete(e);
+      set_signal_status(e, DIRTY);
+      this.schedule(e);
+    }
+    for (const e of this.#maybe_dirty_effects) {
+      set_signal_status(e, MAYBE_DIRTY);
+      this.schedule(e);
+    }
+    const roots = this.#roots;
+    this.#roots = [];
+    this.apply();
+    var effects = collected_effects = [];
+    var render_effects = [];
+    var updates = legacy_updates = [];
+    for (const root15 of roots) {
+      try {
+        this.#traverse(root15, effects, render_effects);
+      } catch (e) {
+        reset_all(root15);
+        if (!this.#is_deferred()) this.discard();
+        throw e;
+      }
+    }
+    current_batch = null;
+    if (updates.length > 0) {
+      var batch = _Batch.ensure();
+      for (const e of updates) {
+        batch.schedule(e);
+      }
+    }
+    collected_effects = null;
+    legacy_updates = null;
+    if (this.#is_deferred()) {
+      this.#defer_effects(render_effects);
+      this.#defer_effects(effects);
+      for (const [e, t] of this.#skipped_branches) {
+        reset_branch(e, t);
+      }
+      if (updates.length > 0) {
+        /** @type {unknown} */
+        current_batch.#process();
+      }
+      return;
+    }
+    const earlier_batch = this.#find_earlier_batch();
+    if (earlier_batch) {
+      this.#defer_effects(render_effects);
+      this.#defer_effects(effects);
+      earlier_batch.#merge(this);
+      return;
+    }
+    this.#dirty_effects.clear();
+    this.#maybe_dirty_effects.clear();
+    for (const fn of this.#commit_callbacks) fn(this);
+    this.#commit_callbacks.clear();
+    previous_batch = this;
+    flush_queued_effects(render_effects);
+    flush_queued_effects(effects);
+    previous_batch = null;
+    this.#deferred?.resolve();
+    var next_batch = (
+      /** @type {Batch | null} */
+      /** @type {unknown} */
+      current_batch
+    );
+    if (this.#pending === 0 && (this.#roots.length === 0 || next_batch !== null)) {
+      this.#unlink();
+      if (async_mode_flag) {
+        this.#commit();
+        current_batch = next_batch;
+      }
+    }
+    if (this.#roots.length > 0) {
+      if (next_batch !== null) {
+        const batch2 = next_batch;
+        batch2.#roots.push(...this.#roots.filter((r) => !batch2.#roots.includes(r)));
+      } else {
+        next_batch = this;
+      }
+    }
+    if (next_batch !== null) {
+      next_batch.#process();
+    }
+  }
+  /**
+   * Traverse the effect tree, executing effects or stashing
+   * them for later execution as appropriate
+   * @param {Effect} root
+   * @param {Effect[]} effects
+   * @param {Effect[]} render_effects
+   */
+  #traverse(root15, effects, render_effects) {
+    root15.f ^= CLEAN;
+    var effect2 = root15.first;
+    while (effect2 !== null) {
+      var flags2 = effect2.f;
+      var is_branch = (flags2 & (BRANCH_EFFECT | ROOT_EFFECT)) !== 0;
+      var is_skippable_branch = is_branch && (flags2 & CLEAN) !== 0;
+      var skip = is_skippable_branch || (flags2 & INERT) !== 0 || this.#skipped_branches.has(effect2);
+      if (!skip && effect2.fn !== null) {
+        if (is_branch) {
+          effect2.f ^= CLEAN;
+        } else if ((flags2 & EFFECT) !== 0) {
+          effects.push(effect2);
+        } else if (async_mode_flag && (flags2 & (RENDER_EFFECT | MANAGED_EFFECT)) !== 0) {
+          render_effects.push(effect2);
+        } else if (is_dirty(effect2)) {
+          if ((flags2 & BLOCK_EFFECT) !== 0) this.#maybe_dirty_effects.add(effect2);
+          update_effect(effect2);
+        }
+        var child2 = effect2.first;
+        if (child2 !== null) {
+          effect2 = child2;
+          continue;
+        }
+      }
+      while (effect2 !== null) {
+        var next2 = effect2.next;
+        if (next2 !== null) {
+          effect2 = next2;
+          break;
+        }
+        effect2 = effect2.parent;
+      }
+    }
+  }
+  #find_earlier_batch() {
+    var batch = this.#prev;
+    while (batch !== null) {
+      if (!batch.is_fork) {
+        for (const [value, [, is_derived]] of this.current) {
+          if (batch.current.has(value) && !is_derived) {
+            return batch;
+          }
+        }
+      }
+      batch = batch.#prev;
+    }
+    return null;
+  }
+  /**
+   * @param {Batch} batch
+   */
+  #merge(batch) {
+    for (const [source2, value] of batch.current) {
+      if (!this.previous.has(source2) && batch.previous.has(source2)) {
+        this.previous.set(source2, batch.previous.get(source2));
+      }
+      this.current.set(source2, value);
+    }
+    for (const [effect2, deferred2] of batch.async_deriveds) {
+      const d = this.async_deriveds.get(effect2);
+      if (d) deferred2.promise.then(d.resolve).catch(d.reject);
+    }
+    this.transfer_effects(batch.#dirty_effects, batch.#maybe_dirty_effects);
+    const mark = (value) => {
+      var reactions = value.reactions;
+      if (reactions === null) return;
+      for (const reaction of reactions) {
+        var flags2 = reaction.f;
+        if ((flags2 & DERIVED) !== 0) {
+          mark(
+            /** @type {Derived} */
+            reaction
+          );
+        } else {
+          var effect2 = (
+            /** @type {Effect} */
+            reaction
+          );
+          if (flags2 & (ASYNC | BLOCK_EFFECT) && !this.async_deriveds.has(effect2)) {
+            this.#maybe_dirty_effects.delete(effect2);
+            set_signal_status(effect2, DIRTY);
+            this.schedule(effect2);
+          }
+        }
+      }
+    };
+    for (const source2 of this.current.keys()) {
+      mark(source2);
+    }
+    this.oncommit(() => batch.discard());
+    batch.#unlink();
+    current_batch = this;
+    this.#process();
+  }
+  /**
+   * @param {Effect[]} effects
+   */
+  #defer_effects(effects) {
+    for (var i = 0; i < effects.length; i += 1) {
+      defer_effect(effects[i], this.#dirty_effects, this.#maybe_dirty_effects);
+    }
+  }
+  /**
+   * Associate a change to a given source with the current
+   * batch, noting its previous and current values
+   * @param {Value} source
+   * @param {any} value
+   * @param {boolean} [is_derived]
+   */
+  capture(source2, value, is_derived = false) {
+    if (source2.v !== UNINITIALIZED && !this.previous.has(source2)) {
+      this.previous.set(source2, source2.v);
+    }
+    if ((source2.f & ERROR_VALUE) === 0) {
+      this.current.set(source2, [value, is_derived]);
+      batch_values?.set(source2, value);
+    }
+    if (!this.is_fork) {
+      source2.v = value;
+    }
+  }
+  activate() {
+    current_batch = this;
+  }
+  deactivate() {
+    current_batch = null;
+    batch_values = null;
+  }
+  flush() {
+    try {
+      if (dev_fallback_default) {
+        source_stacks.clear();
+      }
+      is_processing = true;
+      current_batch = this;
+      this.#process();
+    } finally {
+      flush_count = 0;
+      last_scheduled_effect = null;
+      collected_effects = null;
+      legacy_updates = null;
+      is_processing = false;
+      current_batch = null;
+      batch_values = null;
+      old_values.clear();
+      if (dev_fallback_default) {
+        for (const source2 of source_stacks) {
+          source2.updated = null;
+        }
+      }
+    }
+  }
+  discard() {
+    for (const fn of this.#discard_callbacks) fn(this);
+    this.#discard_callbacks.clear();
+    this.#unlink();
+    this.#deferred?.resolve();
+  }
+  /**
+   * @param {Effect} effect
+   */
+  register_created_effect(effect2) {
+    this.#new_effects.push(effect2);
+  }
+  #commit() {
+    for (let batch = first_batch; batch !== null; batch = batch.#next) {
+      var is_earlier = batch.id < this.id;
+      var sources = [];
+      for (const [source3, [value, is_derived]] of this.current) {
+        if (batch.current.has(source3)) {
+          var batch_value = (
+            /** @type {[any, boolean]} */
+            batch.current.get(source3)[0]
+          );
+          if (is_earlier && value !== batch_value) {
+            batch.current.set(source3, [value, is_derived]);
+          } else {
+            continue;
+          }
+        }
+        sources.push(source3);
+      }
+      if (is_earlier) {
+        for (const [effect2, deferred2] of this.async_deriveds) {
+          const d = batch.async_deriveds.get(effect2);
+          if (d) deferred2.promise.then(d.resolve).catch(d.reject);
+        }
+      }
+      if (!batch.#started) continue;
+      var others = [...batch.current.keys()].filter(
+        (s) => !/** @type {[any, boolean]} */
+        batch.current.get(s)[1] && !this.current.has(s)
+      );
+      if (others.length === 0) {
+        if (is_earlier) {
+          batch.discard();
+        }
+      } else if (sources.length > 0) {
+        if (dev_fallback_default && !batch.#decrement_queued) {
+          invariant(batch.#roots.length === 0, "Batch has scheduled roots");
+        }
+        if (is_earlier) {
+          for (const unskipped of this.#unskipped_branches) {
+            batch.unskip_effect(unskipped, (e) => {
+              if ((e.f & (BLOCK_EFFECT | ASYNC)) !== 0) {
+                batch.schedule(e);
+              } else {
+                batch.#defer_effects([e]);
+              }
+            });
+          }
+        }
+        batch.activate();
+        var marked = /* @__PURE__ */ new Set();
+        var checked = /* @__PURE__ */ new Map();
+        for (var source2 of sources) {
+          mark_effects(source2, others, marked, checked);
+        }
+        checked = /* @__PURE__ */ new Map();
+        var current_unequal = [...batch.current].filter(([c, v1]) => {
+          const v2 = this.current.get(c);
+          if (!v2) return true;
+          return v2[0] !== v1[0] || v2[1] !== v1[1];
+        }).map(([c]) => c);
+        if (current_unequal.length > 0) {
+          for (const effect2 of this.#new_effects) {
+            if ((effect2.f & (DESTROYED | INERT | EAGER_EFFECT)) === 0 && depends_on(effect2, current_unequal, checked)) {
+              if ((effect2.f & (ASYNC | BLOCK_EFFECT)) !== 0) {
+                set_signal_status(effect2, DIRTY);
+                batch.schedule(effect2);
+              } else {
+                batch.#dirty_effects.add(effect2);
+              }
+            }
+          }
+        }
+        if (batch.#roots.length > 0 && !batch.#decrement_queued) {
+          batch.apply();
+          for (var root15 of batch.#roots) {
+            batch.#traverse(root15, [], []);
+          }
+          batch.#roots = [];
+        }
+        batch.deactivate();
+      }
+    }
+  }
+  /**
+   * @param {boolean} blocking
+   * @param {Effect} effect
+   */
+  increment(blocking, effect2) {
+    this.#pending += 1;
+    if (blocking) {
+      let blocking_pending_count = this.#blocking_pending.get(effect2) ?? 0;
+      this.#blocking_pending.set(effect2, blocking_pending_count + 1);
+    }
+  }
+  /**
+   * @param {boolean} blocking
+   * @param {Effect} effect
+   */
+  decrement(blocking, effect2) {
+    this.#pending -= 1;
+    if (blocking) {
+      let blocking_pending_count = this.#blocking_pending.get(effect2) ?? 0;
+      if (blocking_pending_count === 1) {
+        this.#blocking_pending.delete(effect2);
+      } else {
+        this.#blocking_pending.set(effect2, blocking_pending_count - 1);
+      }
+    }
+    if (this.#decrement_queued) return;
+    this.#decrement_queued = true;
+    queue_micro_task(() => {
+      this.#decrement_queued = false;
+      if (this.linked) {
+        this.flush();
+      }
+    });
+  }
+  /**
+   * @param {Set<Effect>} dirty_effects
+   * @param {Set<Effect>} maybe_dirty_effects
+   */
+  transfer_effects(dirty_effects, maybe_dirty_effects) {
+    for (const e of dirty_effects) {
+      this.#dirty_effects.add(e);
+    }
+    for (const e of maybe_dirty_effects) {
+      this.#maybe_dirty_effects.add(e);
+    }
+    dirty_effects.clear();
+    maybe_dirty_effects.clear();
+  }
+  /** @param {(batch: Batch) => void} fn */
+  oncommit(fn) {
+    this.#commit_callbacks.add(fn);
+  }
+  /** @param {(batch: Batch) => void} fn */
+  ondiscard(fn) {
+    this.#discard_callbacks.add(fn);
+  }
+  settled() {
+    return (this.#deferred ??= deferred()).promise;
+  }
+  static ensure() {
+    if (current_batch === null) {
+      const batch = current_batch = new _Batch();
+      if (!is_processing && !is_flushing_sync) {
+        queue_micro_task(() => {
+          if (!batch.#started) {
+            batch.flush();
+          }
+        });
+      }
+    }
+    return current_batch;
+  }
+  apply() {
+    if (!async_mode_flag || !this.is_fork && this.#prev === null && this.#next === null) {
+      batch_values = null;
+      return;
+    }
+    batch_values = /* @__PURE__ */ new Map();
+    for (const [source2, [value]] of this.current) {
+      batch_values.set(source2, value);
+    }
+    for (let batch = first_batch; batch !== null; batch = batch.#next) {
+      if (batch === this || batch.is_fork) continue;
+      var intersects = false;
+      if (batch.id < this.id) {
+        for (const [source2, [, is_derived]] of batch.current) {
+          if (is_derived) continue;
+          if (this.current.has(source2)) {
+            intersects = true;
+            break;
+          }
+        }
+      }
+      if (!intersects) {
+        for (const [source2, previous] of batch.previous) {
+          if (!batch_values.has(source2)) {
+            batch_values.set(source2, previous);
+          }
+        }
+      }
+    }
+  }
+  /**
+   *
+   * @param {Effect} effect
+   */
+  schedule(effect2) {
+    last_scheduled_effect = effect2;
+    if (effect2.b?.is_pending && (effect2.f & (EFFECT | RENDER_EFFECT | MANAGED_EFFECT)) !== 0 && (effect2.f & REACTION_RAN) === 0) {
+      effect2.b.defer_effect(effect2);
+      return;
+    }
+    var e = effect2;
+    while (e.parent !== null) {
+      e = e.parent;
+      var flags2 = e.f;
+      if (collected_effects !== null && e === active_effect) {
+        if (async_mode_flag) return;
+        if ((active_reaction === null || (active_reaction.f & DERIVED) === 0) && !legacy_is_updating_store) {
+          return;
+        }
+      }
+      if ((flags2 & (ROOT_EFFECT | BRANCH_EFFECT)) !== 0) {
+        if ((flags2 & CLEAN) === 0) {
+          return;
+        }
+        e.f ^= CLEAN;
+      }
+    }
+    this.#roots.push(e);
+  }
+  #unlink() {
+    if (!this.linked) return;
+    var prev = this.#prev;
+    var next2 = this.#next;
+    if (prev === null) {
+      first_batch = next2;
+    } else {
+      prev.#next = next2;
+    }
+    if (next2 === null) {
+      last_batch = prev;
+    } else {
+      next2.#prev = prev;
+    }
+    this.linked = false;
+  }
+};
+function flushSync(fn) {
+  var was_flushing_sync = is_flushing_sync;
+  is_flushing_sync = true;
+  try {
+    var result;
+    if (fn) {
+      if (current_batch !== null && !current_batch.is_fork) {
+        current_batch.flush();
+      }
+      result = fn();
+    }
+    while (true) {
+      flush_tasks();
+      if (current_batch === null) {
+        return (
+          /** @type {T} */
+          result
+        );
+      }
+      current_batch.flush();
+    }
+  } finally {
+    is_flushing_sync = was_flushing_sync;
+  }
+}
+function infinite_loop_guard() {
+  if (dev_fallback_default) {
+    var updates = /* @__PURE__ */ new Map();
+    for (
+      const source2 of
+      /** @type {Batch} */
+      current_batch.current.keys()
+    ) {
+      for (const [stack2, update2] of source2.updated ?? []) {
+        var entry = updates.get(stack2);
+        if (!entry) {
+          entry = { error: update2.error, count: 0 };
+          updates.set(stack2, entry);
+        }
+        entry.count += update2.count;
+      }
+    }
+    for (const update2 of updates.values()) {
+      if (update2.error) {
+        console.error(update2.error);
+      }
+    }
+  }
+  try {
+    effect_update_depth_exceeded();
+  } catch (error2) {
+    if (dev_fallback_default) {
+      define_property(error2, "stack", { value: "" });
+    }
+    invoke_error_boundary(error2, last_scheduled_effect);
+  }
+}
+var eager_block_effects = null;
+function flush_queued_effects(effects) {
+  var length = effects.length;
+  if (length === 0) return;
+  var i = 0;
+  while (i < length) {
+    var effect2 = effects[i++];
+    if ((effect2.f & (DESTROYED | INERT)) === 0 && is_dirty(effect2)) {
+      eager_block_effects = /* @__PURE__ */ new Set();
+      update_effect(effect2);
+      if (effect2.deps === null && effect2.first === null && effect2.nodes === null && effect2.teardown === null && effect2.ac === null) {
+        unlink_effect(effect2);
+      }
+      if (eager_block_effects?.size > 0) {
+        old_values.clear();
+        for (const e of eager_block_effects) {
+          if ((e.f & (DESTROYED | INERT)) !== 0) continue;
+          const ordered_effects = [e];
+          let ancestor = e.parent;
+          while (ancestor !== null) {
+            if (eager_block_effects.has(ancestor)) {
+              eager_block_effects.delete(ancestor);
+              ordered_effects.push(ancestor);
+            }
+            ancestor = ancestor.parent;
+          }
+          for (let j = ordered_effects.length - 1; j >= 0; j--) {
+            const e2 = ordered_effects[j];
+            if ((e2.f & (DESTROYED | INERT)) !== 0) continue;
+            update_effect(e2);
+          }
+        }
+        eager_block_effects.clear();
+      }
+    }
+  }
+  eager_block_effects = null;
+}
+function mark_effects(value, sources, marked, checked) {
+  if (marked.has(value)) return;
+  marked.add(value);
+  if (value.reactions !== null) {
+    for (const reaction of value.reactions) {
+      const flags2 = reaction.f;
+      if ((flags2 & DERIVED) !== 0) {
+        mark_effects(
+          /** @type {Derived} */
+          reaction,
+          sources,
+          marked,
+          checked
+        );
+      } else if ((flags2 & (ASYNC | BLOCK_EFFECT)) !== 0 && (flags2 & DIRTY) === 0 && depends_on(reaction, sources, checked)) {
+        set_signal_status(reaction, DIRTY);
+        schedule_effect(
+          /** @type {Effect} */
+          reaction
+        );
+      }
+    }
+  }
+}
+function depends_on(reaction, sources, checked) {
+  const depends = checked.get(reaction);
+  if (depends !== void 0) return depends;
+  if (reaction.deps !== null) {
+    for (const dep of reaction.deps) {
+      if (includes.call(sources, dep)) {
+        return true;
+      }
+      if ((dep.f & DERIVED) !== 0 && depends_on(
+        /** @type {Derived} */
+        dep,
+        sources,
+        checked
+      )) {
+        checked.set(
+          /** @type {Derived} */
+          dep,
+          true
+        );
+        return true;
+      }
+    }
+  }
+  checked.set(reaction, false);
+  return false;
+}
+function schedule_effect(effect2) {
+  current_batch.schedule(effect2);
+}
+function reset_branch(effect2, tracked) {
+  if ((effect2.f & BRANCH_EFFECT) !== 0 && (effect2.f & CLEAN) !== 0) {
+    return;
+  }
+  if ((effect2.f & DIRTY) !== 0) {
+    tracked.d.push(effect2);
+  } else if ((effect2.f & MAYBE_DIRTY) !== 0) {
+    tracked.m.push(effect2);
+  }
+  set_signal_status(effect2, CLEAN);
+  var e = effect2.first;
+  while (e !== null) {
+    reset_branch(e, tracked);
+    e = e.next;
+  }
+}
+function reset_all(effect2) {
+  set_signal_status(effect2, CLEAN);
+  var e = effect2.first;
+  while (e !== null) {
+    reset_all(e);
+    e = e.next;
+  }
+}
 
-    @media (max-width: 40rem) {.answers.svelte-10mivl5 {grid-template-columns:1fr;}
-    }`};function xi(e,t){le(t,!0),ve(e,Qf);let r=Q(t,"params",7),o=H($e({isLoading:!0,errorMessage:"",user:null,stats:null,skills:[],courses:[]}));bt(()=>{let w=it.subscribe(y=>{F(o,y,!0)});return m(o).courses.length===0&&it.refresh(),w});let n=J(()=>m(o).courses.find(w=>w.id===r()?.id)?.name??"HTML, beginners"),i=[{prompt:"How do you start a HTML file?",options:[{text:"<html>",correct:!0},{text:"<htm>",correct:!1},{text:"<hml>",correct:!1},{text:"<hm>",correct:!1}]},{prompt:"Which tag holds the page title?",options:[{text:"<title>",correct:!0},{text:"<head>",correct:!1},{text:"<h1>",correct:!1},{text:"<meta>",correct:!1}]},{prompt:"Which tag creates a hyperlink?",options:[{text:"<a>",correct:!0},{text:"<link>",correct:!1},{text:"<href>",correct:!1},{text:"<nav>",correct:!1}]},{prompt:"Which tag inserts an image?",options:[{text:"<img>",correct:!0},{text:"<image>",correct:!1},{text:"<src>",correct:!1},{text:"<pic>",correct:!1}]},{prompt:"Which tag defines a list item?",options:[{text:"<li>",correct:!0},{text:"<ul>",correct:!1},{text:"<ol>",correct:!1},{text:"<item>",correct:!1}]}],a=["A","B","C","D"],s=H(0),u=H(null),l=H(0),c=H(!1),f=null,p=J(()=>i[m(s)]),d=J(()=>m(u)!==null),h=J(()=>(m(s)+(m(u)!==null?1:0))/i.length*100);function b(){f=null,m(s)===i.length-1?F(c,!0):(F(s,m(s)+1),F(u,null))}function g(w){m(u)===null&&(F(u,w,!0),m(p).options[w].correct&&F(l,m(l)+1),f=setTimeout(b,950))}function D(){F(s,0),F(u,null),F(l,0),F(c,!1)}ii(()=>{f&&clearTimeout(f)});var E={get params(){return r()},set params(w){r(w),X()}},C=Jf(),A=_(C),T=_(A),k=$(T,2);{var S=w=>{var y=Wf(),M=_(y);v(y),U(()=>zr(M,`width: ${m(h)??""}%`)),R(w,y)};ee(k,w=>{m(c)||w(S)})}v(A);var N=$(A,2);{var j=w=>{var y=Zf(),M=_(y),B=_(M,!0);v(M);var Z=$(M,2),ue=_(Z);v(Z);var ne=$(Z,2),V=_(ne,!0);v(ne);var L=$(ne,2),Y=_(L),te=$(Y,2);v(L),v(y),U(()=>{q(B,m(n)),q(ue,`${m(l)??""}/${i.length??""}`),q(V,m(l)===i.length?"Perfect! \u{1F389}":"Nice work \u2014 keep practising!")}),se("click",Y,D),se("click",te,()=>kt("/")),R(w,y)},O=w=>{var y=Kf(),M=_(y),B=_(M,!0);v(M);var Z=$(M,2),ue=_(Z);v(Z);var ne=$(Z,2),V=_(ne,!0);v(ne);var L=$(ne,2);Ce(L,23,()=>m(p).options,Y=>Y.text,(Y,te,ie)=>{var pe=Xf();let Ee;var me=_(pe),ze=_(me,!0);v(me);var ae=$(me,2),Ae=_(ae,!0);v(ae),v(pe),U(()=>{Ee=Ue(pe,1,`answer c${m(ie)??""}`,"svelte-10mivl5",Ee,{correct:m(d)&&m(te).correct,wrong:m(d)&&m(ie)===m(u)&&!m(te).correct,dim:m(d)&&!m(te).correct&&m(ie)!==m(u)}),pe.disabled=m(d),q(ze,a[m(ie)]),q(Ae,m(te).text)}),se("click",pe,()=>g(m(ie))),R(Y,pe)}),v(L),v(y),U(()=>{q(B,m(n)),q(ue,`Question ${m(s)+1} / ${i.length??""}`),q(V,m(p).prompt)}),R(w,y)};ee(N,w=>{m(c)?w(j):w(O,-1)})}return v(C),se("click",T,()=>window.history.back()),R(e,C),ce(E)}Te(["click"]);fe(xi,{params:{}},[],[],{mode:"open"});var rs={};gn(rs,{arrayReplaceAt:()=>ts,asciiTrim:()=>ao,assign:()=>zo,escapeHtml:()=>yr,escapeRE:()=>Lp,fromCodePoint:()=>Lo,has:()=>$p,isMdAsciiPunct:()=>no,isPunctChar:()=>vc,isPunctCharCode:()=>oo,isSpace:()=>oe,isString:()=>Mi,isValidEntityCode:()=>Ri,isWhiteSpace:()=>ro,lib:()=>Np,normalizeReference:()=>io,unescapeAll:()=>xr,unescapeMd:()=>Sp});var Ei={};gn(Ei,{decode:()=>ln,encode:()=>ki,format:()=>Fo,parse:()=>cn});var Kl={};function ep(e){let t=Kl[e];if(t)return t;t=Kl[e]=[];for(let r=0;r<128;r++){let o=String.fromCharCode(r);t.push(o)}for(let r=0;r<e.length;r++){let o=e.charCodeAt(r);t[o]="%"+("0"+o.toString(16).toUpperCase()).slice(-2)}return t}function yi(e,t){typeof t!="string"&&(t=yi.defaultChars);let r=ep(t);return e.replace(/(%[a-f0-9]{2})+/gi,function(o){let n="";for(let i=0,a=o.length;i<a;i+=3){let s=parseInt(o.slice(i+1,i+3),16);if(s<128){n+=r[s];continue}if((s&224)===192&&i+3<a){let u=parseInt(o.slice(i+4,i+6),16);if((u&192)===128){let l=s<<6&1984|u&63;l<128?n+="\uFFFD\uFFFD":n+=String.fromCharCode(l),i+=3;continue}}if((s&240)===224&&i+6<a){let u=parseInt(o.slice(i+4,i+6),16),l=parseInt(o.slice(i+7,i+9),16);if((u&192)===128&&(l&192)===128){let c=s<<12&61440|u<<6&4032|l&63;c<2048||c>=55296&&c<=57343?n+="\uFFFD\uFFFD\uFFFD":n+=String.fromCharCode(c),i+=6;continue}}if((s&248)===240&&i+9<a){let u=parseInt(o.slice(i+4,i+6),16),l=parseInt(o.slice(i+7,i+9),16),c=parseInt(o.slice(i+10,i+12),16);if((u&192)===128&&(l&192)===128&&(c&192)===128){let f=s<<18&1835008|u<<12&258048|l<<6&4032|c&63;f<65536||f>1114111?n+="\uFFFD\uFFFD\uFFFD\uFFFD":(f-=65536,n+=String.fromCharCode(55296+(f>>10),56320+(f&1023))),i+=9;continue}}n+="\uFFFD"}return n})}yi.defaultChars=";/?:@&=+$,#";yi.componentChars="";var ln=yi;var Jl={};function tp(e){let t=Jl[e];if(t)return t;t=Jl[e]=[];for(let r=0;r<128;r++){let o=String.fromCharCode(r);/^[0-9a-z]$/i.test(o)?t.push(o):t.push("%"+("0"+r.toString(16).toUpperCase()).slice(-2))}for(let r=0;r<e.length;r++)t[e.charCodeAt(r)]=e[r];return t}function wi(e,t,r){typeof t!="string"&&(r=t,t=wi.defaultChars),typeof r>"u"&&(r=!0);let o=tp(t),n="";for(let i=0,a=e.length;i<a;i++){let s=e.charCodeAt(i);if(r&&s===37&&i+2<a&&/^[0-9a-f]{2}$/i.test(e.slice(i+1,i+3))){n+=e.slice(i,i+3),i+=2;continue}if(s<128){n+=o[s];continue}if(s>=55296&&s<=57343){if(s>=55296&&s<=56319&&i+1<a){let u=e.charCodeAt(i+1);if(u>=56320&&u<=57343){n+=encodeURIComponent(e[i]+e[i+1]),i++;continue}}n+="%EF%BF%BD";continue}n+=encodeURIComponent(e[i])}return n}wi.defaultChars=";/?:@&=+$,-_.!~*'()#";wi.componentChars="-_.!~*'()";var ki=wi;function Fo(e){let t="";return t+=e.protocol||"",t+=e.slashes?"//":"",t+=e.auth?e.auth+"@":"",e.hostname&&e.hostname.indexOf(":")!==-1?t+="["+e.hostname+"]":t+=e.hostname||"",t+=e.port?":"+e.port:"",t+=e.pathname||"",t+=e.search||"",t+=e.hash||"",t}function $i(){this.protocol=null,this.slashes=null,this.auth=null,this.port=null,this.hostname=null,this.hash=null,this.search=null,this.pathname=null}var rp=/^([a-z0-9.+-]+:)/i,op=/:[0-9]*$/,np=/^(\/\/?(?!\/)[^\?\s]*)(\?[^\s]*)?$/,ip=["<",">",'"',"`"," ","\r",`
-`,"	"],ap=["{","}","|","\\","^","`"].concat(ip),sp=["'"].concat(ap),Ql=["%","/","?",";","#"].concat(sp),ec=["/","?","#"],up=255,tc=/^[+a-z0-9A-Z_-]{0,63}$/,lp=/^([+a-z0-9A-Z_-]{0,63})(.*)$/,rc={javascript:!0,"javascript:":!0},oc={http:!0,https:!0,ftp:!0,gopher:!0,file:!0,"http:":!0,"https:":!0,"ftp:":!0,"gopher:":!0,"file:":!0};function cp(e,t){if(e&&e instanceof $i)return e;let r=new $i;return r.parse(e,t),r}$i.prototype.parse=function(e,t){let r,o,n,i=e;if(i=i.trim(),!t&&e.split("#").length===1){let l=np.exec(i);if(l)return this.pathname=l[1],l[2]&&(this.search=l[2]),this}let a=rp.exec(i);if(a&&(a=a[0],r=a.toLowerCase(),this.protocol=a,i=i.substr(a.length)),(t||a||i.match(/^\/\/[^@\/]+@[^@\/]+/))&&(n=i.substr(0,2)==="//",n&&!(a&&rc[a])&&(i=i.substr(2),this.slashes=!0)),!rc[a]&&(n||a&&!oc[a])){let l=-1;for(let h=0;h<ec.length;h++)o=i.indexOf(ec[h]),o!==-1&&(l===-1||o<l)&&(l=o);let c,f;l===-1?f=i.lastIndexOf("@"):f=i.lastIndexOf("@",l),f!==-1&&(c=i.slice(0,f),i=i.slice(f+1),this.auth=c),l=-1;for(let h=0;h<Ql.length;h++)o=i.indexOf(Ql[h]),o!==-1&&(l===-1||o<l)&&(l=o);l===-1&&(l=i.length),i[l-1]===":"&&l--;let p=i.slice(0,l);i=i.slice(l),this.parseHost(p),this.hostname=this.hostname||"";let d=this.hostname[0]==="["&&this.hostname[this.hostname.length-1]==="]";if(!d){let h=this.hostname.split(/\./);for(let b=0,g=h.length;b<g;b++){let D=h[b];if(D&&!D.match(tc)){let E="";for(let C=0,A=D.length;C<A;C++)D.charCodeAt(C)>127?E+="x":E+=D[C];if(!E.match(tc)){let C=h.slice(0,b),A=h.slice(b+1),T=D.match(lp);T&&(C.push(T[1]),A.unshift(T[2])),A.length&&(i=A.join(".")+i),this.hostname=C.join(".");break}}}}this.hostname.length>up&&(this.hostname=""),d&&(this.hostname=this.hostname.substr(1,this.hostname.length-2))}let s=i.indexOf("#");s!==-1&&(this.hash=i.substr(s),i=i.slice(0,s));let u=i.indexOf("?");return u!==-1&&(this.search=i.substr(u),i=i.slice(0,u)),i&&(this.pathname=i),oc[r]&&this.hostname&&!this.pathname&&(this.pathname=""),this};$i.prototype.parseHost=function(e){let t=op.exec(e);t&&(t=t[0],t!==":"&&(this.port=t.substr(1)),e=e.substr(0,e.length-t.length)),e&&(this.hostname=e)};var cn=cp;var Wa={};gn(Wa,{Any:()=>Ci,Cc:()=>Ai,Cf:()=>nc,P:()=>Mo,S:()=>Di,Z:()=>Si});var Ci=/[\0-\uD7FF\uE000-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]/;var Ai=/[\0-\x1F\x7F-\x9F]/;var nc=/[\xAD\u0600-\u0605\u061C\u06DD\u070F\u0890\u0891\u08E2\u180E\u200B-\u200F\u202A-\u202E\u2060-\u2064\u2066-\u206F\uFEFF\uFFF9-\uFFFB]|\uD804[\uDCBD\uDCCD]|\uD80D[\uDC30-\uDC3F]|\uD82F[\uDCA0-\uDCA3]|\uD834[\uDD73-\uDD7A]|\uDB40[\uDC01\uDC20-\uDC7F]/;var Mo=/[!-#%-\*,-\/:;\?@\[-\]_\{\}\xA1\xA7\xAB\xB6\xB7\xBB\xBF\u037E\u0387\u055A-\u055F\u0589\u058A\u05BE\u05C0\u05C3\u05C6\u05F3\u05F4\u0609\u060A\u060C\u060D\u061B\u061D-\u061F\u066A-\u066D\u06D4\u0700-\u070D\u07F7-\u07F9\u0830-\u083E\u085E\u0964\u0965\u0970\u09FD\u0A76\u0AF0\u0C77\u0C84\u0DF4\u0E4F\u0E5A\u0E5B\u0F04-\u0F12\u0F14\u0F3A-\u0F3D\u0F85\u0FD0-\u0FD4\u0FD9\u0FDA\u104A-\u104F\u10FB\u1360-\u1368\u1400\u166E\u169B\u169C\u16EB-\u16ED\u1735\u1736\u17D4-\u17D6\u17D8-\u17DA\u1800-\u180A\u1944\u1945\u1A1E\u1A1F\u1AA0-\u1AA6\u1AA8-\u1AAD\u1B5A-\u1B60\u1B7D\u1B7E\u1BFC-\u1BFF\u1C3B-\u1C3F\u1C7E\u1C7F\u1CC0-\u1CC7\u1CD3\u2010-\u2027\u2030-\u2043\u2045-\u2051\u2053-\u205E\u207D\u207E\u208D\u208E\u2308-\u230B\u2329\u232A\u2768-\u2775\u27C5\u27C6\u27E6-\u27EF\u2983-\u2998\u29D8-\u29DB\u29FC\u29FD\u2CF9-\u2CFC\u2CFE\u2CFF\u2D70\u2E00-\u2E2E\u2E30-\u2E4F\u2E52-\u2E5D\u3001-\u3003\u3008-\u3011\u3014-\u301F\u3030\u303D\u30A0\u30FB\uA4FE\uA4FF\uA60D-\uA60F\uA673\uA67E\uA6F2-\uA6F7\uA874-\uA877\uA8CE\uA8CF\uA8F8-\uA8FA\uA8FC\uA92E\uA92F\uA95F\uA9C1-\uA9CD\uA9DE\uA9DF\uAA5C-\uAA5F\uAADE\uAADF\uAAF0\uAAF1\uABEB\uFD3E\uFD3F\uFE10-\uFE19\uFE30-\uFE52\uFE54-\uFE61\uFE63\uFE68\uFE6A\uFE6B\uFF01-\uFF03\uFF05-\uFF0A\uFF0C-\uFF0F\uFF1A\uFF1B\uFF1F\uFF20\uFF3B-\uFF3D\uFF3F\uFF5B\uFF5D\uFF5F-\uFF65]|\uD800[\uDD00-\uDD02\uDF9F\uDFD0]|\uD801\uDD6F|\uD802[\uDC57\uDD1F\uDD3F\uDE50-\uDE58\uDE7F\uDEF0-\uDEF6\uDF39-\uDF3F\uDF99-\uDF9C]|\uD803[\uDEAD\uDF55-\uDF59\uDF86-\uDF89]|\uD804[\uDC47-\uDC4D\uDCBB\uDCBC\uDCBE-\uDCC1\uDD40-\uDD43\uDD74\uDD75\uDDC5-\uDDC8\uDDCD\uDDDB\uDDDD-\uDDDF\uDE38-\uDE3D\uDEA9]|\uD805[\uDC4B-\uDC4F\uDC5A\uDC5B\uDC5D\uDCC6\uDDC1-\uDDD7\uDE41-\uDE43\uDE60-\uDE6C\uDEB9\uDF3C-\uDF3E]|\uD806[\uDC3B\uDD44-\uDD46\uDDE2\uDE3F-\uDE46\uDE9A-\uDE9C\uDE9E-\uDEA2\uDF00-\uDF09]|\uD807[\uDC41-\uDC45\uDC70\uDC71\uDEF7\uDEF8\uDF43-\uDF4F\uDFFF]|\uD809[\uDC70-\uDC74]|\uD80B[\uDFF1\uDFF2]|\uD81A[\uDE6E\uDE6F\uDEF5\uDF37-\uDF3B\uDF44]|\uD81B[\uDE97-\uDE9A\uDFE2]|\uD82F\uDC9F|\uD836[\uDE87-\uDE8B]|\uD83A[\uDD5E\uDD5F]/;var Di=/[\$\+<->\^`\|~\xA2-\xA6\xA8\xA9\xAC\xAE-\xB1\xB4\xB8\xD7\xF7\u02C2-\u02C5\u02D2-\u02DF\u02E5-\u02EB\u02ED\u02EF-\u02FF\u0375\u0384\u0385\u03F6\u0482\u058D-\u058F\u0606-\u0608\u060B\u060E\u060F\u06DE\u06E9\u06FD\u06FE\u07F6\u07FE\u07FF\u0888\u09F2\u09F3\u09FA\u09FB\u0AF1\u0B70\u0BF3-\u0BFA\u0C7F\u0D4F\u0D79\u0E3F\u0F01-\u0F03\u0F13\u0F15-\u0F17\u0F1A-\u0F1F\u0F34\u0F36\u0F38\u0FBE-\u0FC5\u0FC7-\u0FCC\u0FCE\u0FCF\u0FD5-\u0FD8\u109E\u109F\u1390-\u1399\u166D\u17DB\u1940\u19DE-\u19FF\u1B61-\u1B6A\u1B74-\u1B7C\u1FBD\u1FBF-\u1FC1\u1FCD-\u1FCF\u1FDD-\u1FDF\u1FED-\u1FEF\u1FFD\u1FFE\u2044\u2052\u207A-\u207C\u208A-\u208C\u20A0-\u20C0\u2100\u2101\u2103-\u2106\u2108\u2109\u2114\u2116-\u2118\u211E-\u2123\u2125\u2127\u2129\u212E\u213A\u213B\u2140-\u2144\u214A-\u214D\u214F\u218A\u218B\u2190-\u2307\u230C-\u2328\u232B-\u2426\u2440-\u244A\u249C-\u24E9\u2500-\u2767\u2794-\u27C4\u27C7-\u27E5\u27F0-\u2982\u2999-\u29D7\u29DC-\u29FB\u29FE-\u2B73\u2B76-\u2B95\u2B97-\u2BFF\u2CE5-\u2CEA\u2E50\u2E51\u2E80-\u2E99\u2E9B-\u2EF3\u2F00-\u2FD5\u2FF0-\u2FFF\u3004\u3012\u3013\u3020\u3036\u3037\u303E\u303F\u309B\u309C\u3190\u3191\u3196-\u319F\u31C0-\u31E3\u31EF\u3200-\u321E\u322A-\u3247\u3250\u3260-\u327F\u328A-\u32B0\u32C0-\u33FF\u4DC0-\u4DFF\uA490-\uA4C6\uA700-\uA716\uA720\uA721\uA789\uA78A\uA828-\uA82B\uA836-\uA839\uAA77-\uAA79\uAB5B\uAB6A\uAB6B\uFB29\uFBB2-\uFBC2\uFD40-\uFD4F\uFDCF\uFDFC-\uFDFF\uFE62\uFE64-\uFE66\uFE69\uFF04\uFF0B\uFF1C-\uFF1E\uFF3E\uFF40\uFF5C\uFF5E\uFFE0-\uFFE6\uFFE8-\uFFEE\uFFFC\uFFFD]|\uD800[\uDD37-\uDD3F\uDD79-\uDD89\uDD8C-\uDD8E\uDD90-\uDD9C\uDDA0\uDDD0-\uDDFC]|\uD802[\uDC77\uDC78\uDEC8]|\uD805\uDF3F|\uD807[\uDFD5-\uDFF1]|\uD81A[\uDF3C-\uDF3F\uDF45]|\uD82F\uDC9C|\uD833[\uDF50-\uDFC3]|\uD834[\uDC00-\uDCF5\uDD00-\uDD26\uDD29-\uDD64\uDD6A-\uDD6C\uDD83\uDD84\uDD8C-\uDDA9\uDDAE-\uDDEA\uDE00-\uDE41\uDE45\uDF00-\uDF56]|\uD835[\uDEC1\uDEDB\uDEFB\uDF15\uDF35\uDF4F\uDF6F\uDF89\uDFA9\uDFC3]|\uD836[\uDC00-\uDDFF\uDE37-\uDE3A\uDE6D-\uDE74\uDE76-\uDE83\uDE85\uDE86]|\uD838[\uDD4F\uDEFF]|\uD83B[\uDCAC\uDCB0\uDD2E\uDEF0\uDEF1]|\uD83C[\uDC00-\uDC2B\uDC30-\uDC93\uDCA0-\uDCAE\uDCB1-\uDCBF\uDCC1-\uDCCF\uDCD1-\uDCF5\uDD0D-\uDDAD\uDDE6-\uDE02\uDE10-\uDE3B\uDE40-\uDE48\uDE50\uDE51\uDE60-\uDE65\uDF00-\uDFFF]|\uD83D[\uDC00-\uDED7\uDEDC-\uDEEC\uDEF0-\uDEFC\uDF00-\uDF76\uDF7B-\uDFD9\uDFE0-\uDFEB\uDFF0]|\uD83E[\uDC00-\uDC0B\uDC10-\uDC47\uDC50-\uDC59\uDC60-\uDC87\uDC90-\uDCAD\uDCB0\uDCB1\uDD00-\uDE53\uDE60-\uDE6D\uDE70-\uDE7C\uDE80-\uDE88\uDE90-\uDEBD\uDEBF-\uDEC5\uDECE-\uDEDB\uDEE0-\uDEE8\uDEF0-\uDEF8\uDF00-\uDF92\uDF94-\uDFCA]/;var Si=/[ \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000]/;var ic=new Uint16Array('\u1D41<\xD5\u0131\u028A\u049D\u057B\u05D0\u0675\u06DE\u07A2\u07D6\u080F\u0A4A\u0A91\u0DA1\u0E6D\u0F09\u0F26\u10CA\u1228\u12E1\u1415\u149D\u14C3\u14DF\u1525\0\0\0\0\0\0\u156B\u16CD\u198D\u1C12\u1DDD\u1F7E\u2060\u21B0\u228D\u23C0\u23FB\u2442\u2824\u2912\u2D08\u2E48\u2FCE\u3016\u32BA\u3639\u37AC\u38FE\u3A28\u3A71\u3AE0\u3B2E\u0800EMabcfglmnoprstu\\bfms\x7F\x84\x8B\x90\x95\x98\xA6\xB3\xB9\xC8\xCFlig\u803B\xC6\u40C6P\u803B&\u4026cute\u803B\xC1\u40C1reve;\u4102\u0100iyx}rc\u803B\xC2\u40C2;\u4410r;\uC000\u{1D504}rave\u803B\xC0\u40C0pha;\u4391acr;\u4100d;\u6A53\u0100gp\x9D\xA1on;\u4104f;\uC000\u{1D538}plyFunction;\u6061ing\u803B\xC5\u40C5\u0100cs\xBE\xC3r;\uC000\u{1D49C}ign;\u6254ilde\u803B\xC3\u40C3ml\u803B\xC4\u40C4\u0400aceforsu\xE5\xFB\xFE\u0117\u011C\u0122\u0127\u012A\u0100cr\xEA\xF2kslash;\u6216\u0176\xF6\xF8;\u6AE7ed;\u6306y;\u4411\u0180crt\u0105\u010B\u0114ause;\u6235noullis;\u612Ca;\u4392r;\uC000\u{1D505}pf;\uC000\u{1D539}eve;\u42D8c\xF2\u0113mpeq;\u624E\u0700HOacdefhilorsu\u014D\u0151\u0156\u0180\u019E\u01A2\u01B5\u01B7\u01BA\u01DC\u0215\u0273\u0278\u027Ecy;\u4427PY\u803B\xA9\u40A9\u0180cpy\u015D\u0162\u017Aute;\u4106\u0100;i\u0167\u0168\u62D2talDifferentialD;\u6145leys;\u612D\u0200aeio\u0189\u018E\u0194\u0198ron;\u410Cdil\u803B\xC7\u40C7rc;\u4108nint;\u6230ot;\u410A\u0100dn\u01A7\u01ADilla;\u40B8terDot;\u40B7\xF2\u017Fi;\u43A7rcle\u0200DMPT\u01C7\u01CB\u01D1\u01D6ot;\u6299inus;\u6296lus;\u6295imes;\u6297o\u0100cs\u01E2\u01F8kwiseContourIntegral;\u6232eCurly\u0100DQ\u0203\u020FoubleQuote;\u601Duote;\u6019\u0200lnpu\u021E\u0228\u0247\u0255on\u0100;e\u0225\u0226\u6237;\u6A74\u0180git\u022F\u0236\u023Aruent;\u6261nt;\u622FourIntegral;\u622E\u0100fr\u024C\u024E;\u6102oduct;\u6210nterClockwiseContourIntegral;\u6233oss;\u6A2Fcr;\uC000\u{1D49E}p\u0100;C\u0284\u0285\u62D3ap;\u624D\u0580DJSZacefios\u02A0\u02AC\u02B0\u02B4\u02B8\u02CB\u02D7\u02E1\u02E6\u0333\u048D\u0100;o\u0179\u02A5trahd;\u6911cy;\u4402cy;\u4405cy;\u440F\u0180grs\u02BF\u02C4\u02C7ger;\u6021r;\u61A1hv;\u6AE4\u0100ay\u02D0\u02D5ron;\u410E;\u4414l\u0100;t\u02DD\u02DE\u6207a;\u4394r;\uC000\u{1D507}\u0100af\u02EB\u0327\u0100cm\u02F0\u0322ritical\u0200ADGT\u0300\u0306\u0316\u031Ccute;\u40B4o\u0174\u030B\u030D;\u42D9bleAcute;\u42DDrave;\u4060ilde;\u42DCond;\u62C4ferentialD;\u6146\u0470\u033D\0\0\0\u0342\u0354\0\u0405f;\uC000\u{1D53B}\u0180;DE\u0348\u0349\u034D\u40A8ot;\u60DCqual;\u6250ble\u0300CDLRUV\u0363\u0372\u0382\u03CF\u03E2\u03F8ontourIntegra\xEC\u0239o\u0274\u0379\0\0\u037B\xBB\u0349nArrow;\u61D3\u0100eo\u0387\u03A4ft\u0180ART\u0390\u0396\u03A1rrow;\u61D0ightArrow;\u61D4e\xE5\u02CAng\u0100LR\u03AB\u03C4eft\u0100AR\u03B3\u03B9rrow;\u67F8ightArrow;\u67FAightArrow;\u67F9ight\u0100AT\u03D8\u03DErrow;\u61D2ee;\u62A8p\u0241\u03E9\0\0\u03EFrrow;\u61D1ownArrow;\u61D5erticalBar;\u6225n\u0300ABLRTa\u0412\u042A\u0430\u045E\u047F\u037Crrow\u0180;BU\u041D\u041E\u0422\u6193ar;\u6913pArrow;\u61F5reve;\u4311eft\u02D2\u043A\0\u0446\0\u0450ightVector;\u6950eeVector;\u695Eector\u0100;B\u0459\u045A\u61BDar;\u6956ight\u01D4\u0467\0\u0471eeVector;\u695Fector\u0100;B\u047A\u047B\u61C1ar;\u6957ee\u0100;A\u0486\u0487\u62A4rrow;\u61A7\u0100ct\u0492\u0497r;\uC000\u{1D49F}rok;\u4110\u0800NTacdfglmopqstux\u04BD\u04C0\u04C4\u04CB\u04DE\u04E2\u04E7\u04EE\u04F5\u0521\u052F\u0536\u0552\u055D\u0560\u0565G;\u414AH\u803B\xD0\u40D0cute\u803B\xC9\u40C9\u0180aiy\u04D2\u04D7\u04DCron;\u411Arc\u803B\xCA\u40CA;\u442Dot;\u4116r;\uC000\u{1D508}rave\u803B\xC8\u40C8ement;\u6208\u0100ap\u04FA\u04FEcr;\u4112ty\u0253\u0506\0\0\u0512mallSquare;\u65FBerySmallSquare;\u65AB\u0100gp\u0526\u052Aon;\u4118f;\uC000\u{1D53C}silon;\u4395u\u0100ai\u053C\u0549l\u0100;T\u0542\u0543\u6A75ilde;\u6242librium;\u61CC\u0100ci\u0557\u055Ar;\u6130m;\u6A73a;\u4397ml\u803B\xCB\u40CB\u0100ip\u056A\u056Fsts;\u6203onentialE;\u6147\u0280cfios\u0585\u0588\u058D\u05B2\u05CCy;\u4424r;\uC000\u{1D509}lled\u0253\u0597\0\0\u05A3mallSquare;\u65FCerySmallSquare;\u65AA\u0370\u05BA\0\u05BF\0\0\u05C4f;\uC000\u{1D53D}All;\u6200riertrf;\u6131c\xF2\u05CB\u0600JTabcdfgorst\u05E8\u05EC\u05EF\u05FA\u0600\u0612\u0616\u061B\u061D\u0623\u066C\u0672cy;\u4403\u803B>\u403Emma\u0100;d\u05F7\u05F8\u4393;\u43DCreve;\u411E\u0180eiy\u0607\u060C\u0610dil;\u4122rc;\u411C;\u4413ot;\u4120r;\uC000\u{1D50A};\u62D9pf;\uC000\u{1D53E}eater\u0300EFGLST\u0635\u0644\u064E\u0656\u065B\u0666qual\u0100;L\u063E\u063F\u6265ess;\u62DBullEqual;\u6267reater;\u6AA2ess;\u6277lantEqual;\u6A7Eilde;\u6273cr;\uC000\u{1D4A2};\u626B\u0400Aacfiosu\u0685\u068B\u0696\u069B\u069E\u06AA\u06BE\u06CARDcy;\u442A\u0100ct\u0690\u0694ek;\u42C7;\u405Eirc;\u4124r;\u610ClbertSpace;\u610B\u01F0\u06AF\0\u06B2f;\u610DizontalLine;\u6500\u0100ct\u06C3\u06C5\xF2\u06A9rok;\u4126mp\u0144\u06D0\u06D8ownHum\xF0\u012Fqual;\u624F\u0700EJOacdfgmnostu\u06FA\u06FE\u0703\u0707\u070E\u071A\u071E\u0721\u0728\u0744\u0778\u078B\u078F\u0795cy;\u4415lig;\u4132cy;\u4401cute\u803B\xCD\u40CD\u0100iy\u0713\u0718rc\u803B\xCE\u40CE;\u4418ot;\u4130r;\u6111rave\u803B\xCC\u40CC\u0180;ap\u0720\u072F\u073F\u0100cg\u0734\u0737r;\u412AinaryI;\u6148lie\xF3\u03DD\u01F4\u0749\0\u0762\u0100;e\u074D\u074E\u622C\u0100gr\u0753\u0758ral;\u622Bsection;\u62C2isible\u0100CT\u076C\u0772omma;\u6063imes;\u6062\u0180gpt\u077F\u0783\u0788on;\u412Ef;\uC000\u{1D540}a;\u4399cr;\u6110ilde;\u4128\u01EB\u079A\0\u079Ecy;\u4406l\u803B\xCF\u40CF\u0280cfosu\u07AC\u07B7\u07BC\u07C2\u07D0\u0100iy\u07B1\u07B5rc;\u4134;\u4419r;\uC000\u{1D50D}pf;\uC000\u{1D541}\u01E3\u07C7\0\u07CCr;\uC000\u{1D4A5}rcy;\u4408kcy;\u4404\u0380HJacfos\u07E4\u07E8\u07EC\u07F1\u07FD\u0802\u0808cy;\u4425cy;\u440Cppa;\u439A\u0100ey\u07F6\u07FBdil;\u4136;\u441Ar;\uC000\u{1D50E}pf;\uC000\u{1D542}cr;\uC000\u{1D4A6}\u0580JTaceflmost\u0825\u0829\u082C\u0850\u0863\u09B3\u09B8\u09C7\u09CD\u0A37\u0A47cy;\u4409\u803B<\u403C\u0280cmnpr\u0837\u083C\u0841\u0844\u084Dute;\u4139bda;\u439Bg;\u67EAlacetrf;\u6112r;\u619E\u0180aey\u0857\u085C\u0861ron;\u413Ddil;\u413B;\u441B\u0100fs\u0868\u0970t\u0500ACDFRTUVar\u087E\u08A9\u08B1\u08E0\u08E6\u08FC\u092F\u095B\u0390\u096A\u0100nr\u0883\u088FgleBracket;\u67E8row\u0180;BR\u0899\u089A\u089E\u6190ar;\u61E4ightArrow;\u61C6eiling;\u6308o\u01F5\u08B7\0\u08C3bleBracket;\u67E6n\u01D4\u08C8\0\u08D2eeVector;\u6961ector\u0100;B\u08DB\u08DC\u61C3ar;\u6959loor;\u630Aight\u0100AV\u08EF\u08F5rrow;\u6194ector;\u694E\u0100er\u0901\u0917e\u0180;AV\u0909\u090A\u0910\u62A3rrow;\u61A4ector;\u695Aiangle\u0180;BE\u0924\u0925\u0929\u62B2ar;\u69CFqual;\u62B4p\u0180DTV\u0937\u0942\u094CownVector;\u6951eeVector;\u6960ector\u0100;B\u0956\u0957\u61BFar;\u6958ector\u0100;B\u0965\u0966\u61BCar;\u6952ight\xE1\u039Cs\u0300EFGLST\u097E\u098B\u0995\u099D\u09A2\u09ADqualGreater;\u62DAullEqual;\u6266reater;\u6276ess;\u6AA1lantEqual;\u6A7Dilde;\u6272r;\uC000\u{1D50F}\u0100;e\u09BD\u09BE\u62D8ftarrow;\u61DAidot;\u413F\u0180npw\u09D4\u0A16\u0A1Bg\u0200LRlr\u09DE\u09F7\u0A02\u0A10eft\u0100AR\u09E6\u09ECrrow;\u67F5ightArrow;\u67F7ightArrow;\u67F6eft\u0100ar\u03B3\u0A0Aight\xE1\u03BFight\xE1\u03CAf;\uC000\u{1D543}er\u0100LR\u0A22\u0A2CeftArrow;\u6199ightArrow;\u6198\u0180cht\u0A3E\u0A40\u0A42\xF2\u084C;\u61B0rok;\u4141;\u626A\u0400acefiosu\u0A5A\u0A5D\u0A60\u0A77\u0A7C\u0A85\u0A8B\u0A8Ep;\u6905y;\u441C\u0100dl\u0A65\u0A6FiumSpace;\u605Flintrf;\u6133r;\uC000\u{1D510}nusPlus;\u6213pf;\uC000\u{1D544}c\xF2\u0A76;\u439C\u0480Jacefostu\u0AA3\u0AA7\u0AAD\u0AC0\u0B14\u0B19\u0D91\u0D97\u0D9Ecy;\u440Acute;\u4143\u0180aey\u0AB4\u0AB9\u0ABEron;\u4147dil;\u4145;\u441D\u0180gsw\u0AC7\u0AF0\u0B0Eative\u0180MTV\u0AD3\u0ADF\u0AE8ediumSpace;\u600Bhi\u0100cn\u0AE6\u0AD8\xEB\u0AD9eryThi\xEE\u0AD9ted\u0100GL\u0AF8\u0B06reaterGreate\xF2\u0673essLes\xF3\u0A48Line;\u400Ar;\uC000\u{1D511}\u0200Bnpt\u0B22\u0B28\u0B37\u0B3Areak;\u6060BreakingSpace;\u40A0f;\u6115\u0680;CDEGHLNPRSTV\u0B55\u0B56\u0B6A\u0B7C\u0BA1\u0BEB\u0C04\u0C5E\u0C84\u0CA6\u0CD8\u0D61\u0D85\u6AEC\u0100ou\u0B5B\u0B64ngruent;\u6262pCap;\u626DoubleVerticalBar;\u6226\u0180lqx\u0B83\u0B8A\u0B9Bement;\u6209ual\u0100;T\u0B92\u0B93\u6260ilde;\uC000\u2242\u0338ists;\u6204reater\u0380;EFGLST\u0BB6\u0BB7\u0BBD\u0BC9\u0BD3\u0BD8\u0BE5\u626Fqual;\u6271ullEqual;\uC000\u2267\u0338reater;\uC000\u226B\u0338ess;\u6279lantEqual;\uC000\u2A7E\u0338ilde;\u6275ump\u0144\u0BF2\u0BFDownHump;\uC000\u224E\u0338qual;\uC000\u224F\u0338e\u0100fs\u0C0A\u0C27tTriangle\u0180;BE\u0C1A\u0C1B\u0C21\u62EAar;\uC000\u29CF\u0338qual;\u62ECs\u0300;EGLST\u0C35\u0C36\u0C3C\u0C44\u0C4B\u0C58\u626Equal;\u6270reater;\u6278ess;\uC000\u226A\u0338lantEqual;\uC000\u2A7D\u0338ilde;\u6274ested\u0100GL\u0C68\u0C79reaterGreater;\uC000\u2AA2\u0338essLess;\uC000\u2AA1\u0338recedes\u0180;ES\u0C92\u0C93\u0C9B\u6280qual;\uC000\u2AAF\u0338lantEqual;\u62E0\u0100ei\u0CAB\u0CB9verseElement;\u620CghtTriangle\u0180;BE\u0CCB\u0CCC\u0CD2\u62EBar;\uC000\u29D0\u0338qual;\u62ED\u0100qu\u0CDD\u0D0CuareSu\u0100bp\u0CE8\u0CF9set\u0100;E\u0CF0\u0CF3\uC000\u228F\u0338qual;\u62E2erset\u0100;E\u0D03\u0D06\uC000\u2290\u0338qual;\u62E3\u0180bcp\u0D13\u0D24\u0D4Eset\u0100;E\u0D1B\u0D1E\uC000\u2282\u20D2qual;\u6288ceeds\u0200;EST\u0D32\u0D33\u0D3B\u0D46\u6281qual;\uC000\u2AB0\u0338lantEqual;\u62E1ilde;\uC000\u227F\u0338erset\u0100;E\u0D58\u0D5B\uC000\u2283\u20D2qual;\u6289ilde\u0200;EFT\u0D6E\u0D6F\u0D75\u0D7F\u6241qual;\u6244ullEqual;\u6247ilde;\u6249erticalBar;\u6224cr;\uC000\u{1D4A9}ilde\u803B\xD1\u40D1;\u439D\u0700Eacdfgmoprstuv\u0DBD\u0DC2\u0DC9\u0DD5\u0DDB\u0DE0\u0DE7\u0DFC\u0E02\u0E20\u0E22\u0E32\u0E3F\u0E44lig;\u4152cute\u803B\xD3\u40D3\u0100iy\u0DCE\u0DD3rc\u803B\xD4\u40D4;\u441Eblac;\u4150r;\uC000\u{1D512}rave\u803B\xD2\u40D2\u0180aei\u0DEE\u0DF2\u0DF6cr;\u414Cga;\u43A9cron;\u439Fpf;\uC000\u{1D546}enCurly\u0100DQ\u0E0E\u0E1AoubleQuote;\u601Cuote;\u6018;\u6A54\u0100cl\u0E27\u0E2Cr;\uC000\u{1D4AA}ash\u803B\xD8\u40D8i\u016C\u0E37\u0E3Cde\u803B\xD5\u40D5es;\u6A37ml\u803B\xD6\u40D6er\u0100BP\u0E4B\u0E60\u0100ar\u0E50\u0E53r;\u603Eac\u0100ek\u0E5A\u0E5C;\u63DEet;\u63B4arenthesis;\u63DC\u0480acfhilors\u0E7F\u0E87\u0E8A\u0E8F\u0E92\u0E94\u0E9D\u0EB0\u0EFCrtialD;\u6202y;\u441Fr;\uC000\u{1D513}i;\u43A6;\u43A0usMinus;\u40B1\u0100ip\u0EA2\u0EADncareplan\xE5\u069Df;\u6119\u0200;eio\u0EB9\u0EBA\u0EE0\u0EE4\u6ABBcedes\u0200;EST\u0EC8\u0EC9\u0ECF\u0EDA\u627Aqual;\u6AAFlantEqual;\u627Cilde;\u627Eme;\u6033\u0100dp\u0EE9\u0EEEuct;\u620Fortion\u0100;a\u0225\u0EF9l;\u621D\u0100ci\u0F01\u0F06r;\uC000\u{1D4AB};\u43A8\u0200Ufos\u0F11\u0F16\u0F1B\u0F1FOT\u803B"\u4022r;\uC000\u{1D514}pf;\u611Acr;\uC000\u{1D4AC}\u0600BEacefhiorsu\u0F3E\u0F43\u0F47\u0F60\u0F73\u0FA7\u0FAA\u0FAD\u1096\u10A9\u10B4\u10BEarr;\u6910G\u803B\xAE\u40AE\u0180cnr\u0F4E\u0F53\u0F56ute;\u4154g;\u67EBr\u0100;t\u0F5C\u0F5D\u61A0l;\u6916\u0180aey\u0F67\u0F6C\u0F71ron;\u4158dil;\u4156;\u4420\u0100;v\u0F78\u0F79\u611Cerse\u0100EU\u0F82\u0F99\u0100lq\u0F87\u0F8Eement;\u620Builibrium;\u61CBpEquilibrium;\u696Fr\xBB\u0F79o;\u43A1ght\u0400ACDFTUVa\u0FC1\u0FEB\u0FF3\u1022\u1028\u105B\u1087\u03D8\u0100nr\u0FC6\u0FD2gleBracket;\u67E9row\u0180;BL\u0FDC\u0FDD\u0FE1\u6192ar;\u61E5eftArrow;\u61C4eiling;\u6309o\u01F5\u0FF9\0\u1005bleBracket;\u67E7n\u01D4\u100A\0\u1014eeVector;\u695Dector\u0100;B\u101D\u101E\u61C2ar;\u6955loor;\u630B\u0100er\u102D\u1043e\u0180;AV\u1035\u1036\u103C\u62A2rrow;\u61A6ector;\u695Biangle\u0180;BE\u1050\u1051\u1055\u62B3ar;\u69D0qual;\u62B5p\u0180DTV\u1063\u106E\u1078ownVector;\u694FeeVector;\u695Cector\u0100;B\u1082\u1083\u61BEar;\u6954ector\u0100;B\u1091\u1092\u61C0ar;\u6953\u0100pu\u109B\u109Ef;\u611DndImplies;\u6970ightarrow;\u61DB\u0100ch\u10B9\u10BCr;\u611B;\u61B1leDelayed;\u69F4\u0680HOacfhimoqstu\u10E4\u10F1\u10F7\u10FD\u1119\u111E\u1151\u1156\u1161\u1167\u11B5\u11BB\u11BF\u0100Cc\u10E9\u10EEHcy;\u4429y;\u4428FTcy;\u442Ccute;\u415A\u0280;aeiy\u1108\u1109\u110E\u1113\u1117\u6ABCron;\u4160dil;\u415Erc;\u415C;\u4421r;\uC000\u{1D516}ort\u0200DLRU\u112A\u1134\u113E\u1149ownArrow\xBB\u041EeftArrow\xBB\u089AightArrow\xBB\u0FDDpArrow;\u6191gma;\u43A3allCircle;\u6218pf;\uC000\u{1D54A}\u0272\u116D\0\0\u1170t;\u621Aare\u0200;ISU\u117B\u117C\u1189\u11AF\u65A1ntersection;\u6293u\u0100bp\u118F\u119Eset\u0100;E\u1197\u1198\u628Fqual;\u6291erset\u0100;E\u11A8\u11A9\u6290qual;\u6292nion;\u6294cr;\uC000\u{1D4AE}ar;\u62C6\u0200bcmp\u11C8\u11DB\u1209\u120B\u0100;s\u11CD\u11CE\u62D0et\u0100;E\u11CD\u11D5qual;\u6286\u0100ch\u11E0\u1205eeds\u0200;EST\u11ED\u11EE\u11F4\u11FF\u627Bqual;\u6AB0lantEqual;\u627Dilde;\u627FTh\xE1\u0F8C;\u6211\u0180;es\u1212\u1213\u1223\u62D1rset\u0100;E\u121C\u121D\u6283qual;\u6287et\xBB\u1213\u0580HRSacfhiors\u123E\u1244\u1249\u1255\u125E\u1271\u1276\u129F\u12C2\u12C8\u12D1ORN\u803B\xDE\u40DEADE;\u6122\u0100Hc\u124E\u1252cy;\u440By;\u4426\u0100bu\u125A\u125C;\u4009;\u43A4\u0180aey\u1265\u126A\u126Fron;\u4164dil;\u4162;\u4422r;\uC000\u{1D517}\u0100ei\u127B\u1289\u01F2\u1280\0\u1287efore;\u6234a;\u4398\u0100cn\u128E\u1298kSpace;\uC000\u205F\u200ASpace;\u6009lde\u0200;EFT\u12AB\u12AC\u12B2\u12BC\u623Cqual;\u6243ullEqual;\u6245ilde;\u6248pf;\uC000\u{1D54B}ipleDot;\u60DB\u0100ct\u12D6\u12DBr;\uC000\u{1D4AF}rok;\u4166\u0AE1\u12F7\u130E\u131A\u1326\0\u132C\u1331\0\0\0\0\0\u1338\u133D\u1377\u1385\0\u13FF\u1404\u140A\u1410\u0100cr\u12FB\u1301ute\u803B\xDA\u40DAr\u0100;o\u1307\u1308\u619Fcir;\u6949r\u01E3\u1313\0\u1316y;\u440Eve;\u416C\u0100iy\u131E\u1323rc\u803B\xDB\u40DB;\u4423blac;\u4170r;\uC000\u{1D518}rave\u803B\xD9\u40D9acr;\u416A\u0100di\u1341\u1369er\u0100BP\u1348\u135D\u0100ar\u134D\u1350r;\u405Fac\u0100ek\u1357\u1359;\u63DFet;\u63B5arenthesis;\u63DDon\u0100;P\u1370\u1371\u62C3lus;\u628E\u0100gp\u137B\u137Fon;\u4172f;\uC000\u{1D54C}\u0400ADETadps\u1395\u13AE\u13B8\u13C4\u03E8\u13D2\u13D7\u13F3rrow\u0180;BD\u1150\u13A0\u13A4ar;\u6912ownArrow;\u61C5ownArrow;\u6195quilibrium;\u696Eee\u0100;A\u13CB\u13CC\u62A5rrow;\u61A5own\xE1\u03F3er\u0100LR\u13DE\u13E8eftArrow;\u6196ightArrow;\u6197i\u0100;l\u13F9\u13FA\u43D2on;\u43A5ing;\u416Ecr;\uC000\u{1D4B0}ilde;\u4168ml\u803B\xDC\u40DC\u0480Dbcdefosv\u1427\u142C\u1430\u1433\u143E\u1485\u148A\u1490\u1496ash;\u62ABar;\u6AEBy;\u4412ash\u0100;l\u143B\u143C\u62A9;\u6AE6\u0100er\u1443\u1445;\u62C1\u0180bty\u144C\u1450\u147Aar;\u6016\u0100;i\u144F\u1455cal\u0200BLST\u1461\u1465\u146A\u1474ar;\u6223ine;\u407Ceparator;\u6758ilde;\u6240ThinSpace;\u600Ar;\uC000\u{1D519}pf;\uC000\u{1D54D}cr;\uC000\u{1D4B1}dash;\u62AA\u0280cefos\u14A7\u14AC\u14B1\u14B6\u14BCirc;\u4174dge;\u62C0r;\uC000\u{1D51A}pf;\uC000\u{1D54E}cr;\uC000\u{1D4B2}\u0200fios\u14CB\u14D0\u14D2\u14D8r;\uC000\u{1D51B};\u439Epf;\uC000\u{1D54F}cr;\uC000\u{1D4B3}\u0480AIUacfosu\u14F1\u14F5\u14F9\u14FD\u1504\u150F\u1514\u151A\u1520cy;\u442Fcy;\u4407cy;\u442Ecute\u803B\xDD\u40DD\u0100iy\u1509\u150Drc;\u4176;\u442Br;\uC000\u{1D51C}pf;\uC000\u{1D550}cr;\uC000\u{1D4B4}ml;\u4178\u0400Hacdefos\u1535\u1539\u153F\u154B\u154F\u155D\u1560\u1564cy;\u4416cute;\u4179\u0100ay\u1544\u1549ron;\u417D;\u4417ot;\u417B\u01F2\u1554\0\u155BoWidt\xE8\u0AD9a;\u4396r;\u6128pf;\u6124cr;\uC000\u{1D4B5}\u0BE1\u1583\u158A\u1590\0\u15B0\u15B6\u15BF\0\0\0\0\u15C6\u15DB\u15EB\u165F\u166D\0\u1695\u169B\u16B2\u16B9\0\u16BEcute\u803B\xE1\u40E1reve;\u4103\u0300;Ediuy\u159C\u159D\u15A1\u15A3\u15A8\u15AD\u623E;\uC000\u223E\u0333;\u623Frc\u803B\xE2\u40E2te\u80BB\xB4\u0306;\u4430lig\u803B\xE6\u40E6\u0100;r\xB2\u15BA;\uC000\u{1D51E}rave\u803B\xE0\u40E0\u0100ep\u15CA\u15D6\u0100fp\u15CF\u15D4sym;\u6135\xE8\u15D3ha;\u43B1\u0100ap\u15DFc\u0100cl\u15E4\u15E7r;\u4101g;\u6A3F\u0264\u15F0\0\0\u160A\u0280;adsv\u15FA\u15FB\u15FF\u1601\u1607\u6227nd;\u6A55;\u6A5Clope;\u6A58;\u6A5A\u0380;elmrsz\u1618\u1619\u161B\u161E\u163F\u164F\u1659\u6220;\u69A4e\xBB\u1619sd\u0100;a\u1625\u1626\u6221\u0461\u1630\u1632\u1634\u1636\u1638\u163A\u163C\u163E;\u69A8;\u69A9;\u69AA;\u69AB;\u69AC;\u69AD;\u69AE;\u69AFt\u0100;v\u1645\u1646\u621Fb\u0100;d\u164C\u164D\u62BE;\u699D\u0100pt\u1654\u1657h;\u6222\xBB\xB9arr;\u637C\u0100gp\u1663\u1667on;\u4105f;\uC000\u{1D552}\u0380;Eaeiop\u12C1\u167B\u167D\u1682\u1684\u1687\u168A;\u6A70cir;\u6A6F;\u624Ad;\u624Bs;\u4027rox\u0100;e\u12C1\u1692\xF1\u1683ing\u803B\xE5\u40E5\u0180cty\u16A1\u16A6\u16A8r;\uC000\u{1D4B6};\u402Amp\u0100;e\u12C1\u16AF\xF1\u0288ilde\u803B\xE3\u40E3ml\u803B\xE4\u40E4\u0100ci\u16C2\u16C8onin\xF4\u0272nt;\u6A11\u0800Nabcdefiklnoprsu\u16ED\u16F1\u1730\u173C\u1743\u1748\u1778\u177D\u17E0\u17E6\u1839\u1850\u170D\u193D\u1948\u1970ot;\u6AED\u0100cr\u16F6\u171Ek\u0200ceps\u1700\u1705\u170D\u1713ong;\u624Cpsilon;\u43F6rime;\u6035im\u0100;e\u171A\u171B\u623Dq;\u62CD\u0176\u1722\u1726ee;\u62BDed\u0100;g\u172C\u172D\u6305e\xBB\u172Drk\u0100;t\u135C\u1737brk;\u63B6\u0100oy\u1701\u1741;\u4431quo;\u601E\u0280cmprt\u1753\u175B\u1761\u1764\u1768aus\u0100;e\u010A\u0109ptyv;\u69B0s\xE9\u170Cno\xF5\u0113\u0180ahw\u176F\u1771\u1773;\u43B2;\u6136een;\u626Cr;\uC000\u{1D51F}g\u0380costuvw\u178D\u179D\u17B3\u17C1\u17D5\u17DB\u17DE\u0180aiu\u1794\u1796\u179A\xF0\u0760rc;\u65EFp\xBB\u1371\u0180dpt\u17A4\u17A8\u17ADot;\u6A00lus;\u6A01imes;\u6A02\u0271\u17B9\0\0\u17BEcup;\u6A06ar;\u6605riangle\u0100du\u17CD\u17D2own;\u65BDp;\u65B3plus;\u6A04e\xE5\u1444\xE5\u14ADarow;\u690D\u0180ako\u17ED\u1826\u1835\u0100cn\u17F2\u1823k\u0180lst\u17FA\u05AB\u1802ozenge;\u69EBriangle\u0200;dlr\u1812\u1813\u1818\u181D\u65B4own;\u65BEeft;\u65C2ight;\u65B8k;\u6423\u01B1\u182B\0\u1833\u01B2\u182F\0\u1831;\u6592;\u65914;\u6593ck;\u6588\u0100eo\u183E\u184D\u0100;q\u1843\u1846\uC000=\u20E5uiv;\uC000\u2261\u20E5t;\u6310\u0200ptwx\u1859\u185E\u1867\u186Cf;\uC000\u{1D553}\u0100;t\u13CB\u1863om\xBB\u13CCtie;\u62C8\u0600DHUVbdhmptuv\u1885\u1896\u18AA\u18BB\u18D7\u18DB\u18EC\u18FF\u1905\u190A\u1910\u1921\u0200LRlr\u188E\u1890\u1892\u1894;\u6557;\u6554;\u6556;\u6553\u0280;DUdu\u18A1\u18A2\u18A4\u18A6\u18A8\u6550;\u6566;\u6569;\u6564;\u6567\u0200LRlr\u18B3\u18B5\u18B7\u18B9;\u655D;\u655A;\u655C;\u6559\u0380;HLRhlr\u18CA\u18CB\u18CD\u18CF\u18D1\u18D3\u18D5\u6551;\u656C;\u6563;\u6560;\u656B;\u6562;\u655Fox;\u69C9\u0200LRlr\u18E4\u18E6\u18E8\u18EA;\u6555;\u6552;\u6510;\u650C\u0280;DUdu\u06BD\u18F7\u18F9\u18FB\u18FD;\u6565;\u6568;\u652C;\u6534inus;\u629Flus;\u629Eimes;\u62A0\u0200LRlr\u1919\u191B\u191D\u191F;\u655B;\u6558;\u6518;\u6514\u0380;HLRhlr\u1930\u1931\u1933\u1935\u1937\u1939\u193B\u6502;\u656A;\u6561;\u655E;\u653C;\u6524;\u651C\u0100ev\u0123\u1942bar\u803B\xA6\u40A6\u0200ceio\u1951\u1956\u195A\u1960r;\uC000\u{1D4B7}mi;\u604Fm\u0100;e\u171A\u171Cl\u0180;bh\u1968\u1969\u196B\u405C;\u69C5sub;\u67C8\u016C\u1974\u197El\u0100;e\u1979\u197A\u6022t\xBB\u197Ap\u0180;Ee\u012F\u1985\u1987;\u6AAE\u0100;q\u06DC\u06DB\u0CE1\u19A7\0\u19E8\u1A11\u1A15\u1A32\0\u1A37\u1A50\0\0\u1AB4\0\0\u1AC1\0\0\u1B21\u1B2E\u1B4D\u1B52\0\u1BFD\0\u1C0C\u0180cpr\u19AD\u19B2\u19DDute;\u4107\u0300;abcds\u19BF\u19C0\u19C4\u19CA\u19D5\u19D9\u6229nd;\u6A44rcup;\u6A49\u0100au\u19CF\u19D2p;\u6A4Bp;\u6A47ot;\u6A40;\uC000\u2229\uFE00\u0100eo\u19E2\u19E5t;\u6041\xEE\u0693\u0200aeiu\u19F0\u19FB\u1A01\u1A05\u01F0\u19F5\0\u19F8s;\u6A4Don;\u410Ddil\u803B\xE7\u40E7rc;\u4109ps\u0100;s\u1A0C\u1A0D\u6A4Cm;\u6A50ot;\u410B\u0180dmn\u1A1B\u1A20\u1A26il\u80BB\xB8\u01ADptyv;\u69B2t\u8100\xA2;e\u1A2D\u1A2E\u40A2r\xE4\u01B2r;\uC000\u{1D520}\u0180cei\u1A3D\u1A40\u1A4Dy;\u4447ck\u0100;m\u1A47\u1A48\u6713ark\xBB\u1A48;\u43C7r\u0380;Ecefms\u1A5F\u1A60\u1A62\u1A6B\u1AA4\u1AAA\u1AAE\u65CB;\u69C3\u0180;el\u1A69\u1A6A\u1A6D\u42C6q;\u6257e\u0261\u1A74\0\0\u1A88rrow\u0100lr\u1A7C\u1A81eft;\u61BAight;\u61BB\u0280RSacd\u1A92\u1A94\u1A96\u1A9A\u1A9F\xBB\u0F47;\u64C8st;\u629Birc;\u629Aash;\u629Dnint;\u6A10id;\u6AEFcir;\u69C2ubs\u0100;u\u1ABB\u1ABC\u6663it\xBB\u1ABC\u02EC\u1AC7\u1AD4\u1AFA\0\u1B0Aon\u0100;e\u1ACD\u1ACE\u403A\u0100;q\xC7\xC6\u026D\u1AD9\0\0\u1AE2a\u0100;t\u1ADE\u1ADF\u402C;\u4040\u0180;fl\u1AE8\u1AE9\u1AEB\u6201\xEE\u1160e\u0100mx\u1AF1\u1AF6ent\xBB\u1AE9e\xF3\u024D\u01E7\u1AFE\0\u1B07\u0100;d\u12BB\u1B02ot;\u6A6Dn\xF4\u0246\u0180fry\u1B10\u1B14\u1B17;\uC000\u{1D554}o\xE4\u0254\u8100\xA9;s\u0155\u1B1Dr;\u6117\u0100ao\u1B25\u1B29rr;\u61B5ss;\u6717\u0100cu\u1B32\u1B37r;\uC000\u{1D4B8}\u0100bp\u1B3C\u1B44\u0100;e\u1B41\u1B42\u6ACF;\u6AD1\u0100;e\u1B49\u1B4A\u6AD0;\u6AD2dot;\u62EF\u0380delprvw\u1B60\u1B6C\u1B77\u1B82\u1BAC\u1BD4\u1BF9arr\u0100lr\u1B68\u1B6A;\u6938;\u6935\u0270\u1B72\0\0\u1B75r;\u62DEc;\u62DFarr\u0100;p\u1B7F\u1B80\u61B6;\u693D\u0300;bcdos\u1B8F\u1B90\u1B96\u1BA1\u1BA5\u1BA8\u622Arcap;\u6A48\u0100au\u1B9B\u1B9Ep;\u6A46p;\u6A4Aot;\u628Dr;\u6A45;\uC000\u222A\uFE00\u0200alrv\u1BB5\u1BBF\u1BDE\u1BE3rr\u0100;m\u1BBC\u1BBD\u61B7;\u693Cy\u0180evw\u1BC7\u1BD4\u1BD8q\u0270\u1BCE\0\0\u1BD2re\xE3\u1B73u\xE3\u1B75ee;\u62CEedge;\u62CFen\u803B\xA4\u40A4earrow\u0100lr\u1BEE\u1BF3eft\xBB\u1B80ight\xBB\u1BBDe\xE4\u1BDD\u0100ci\u1C01\u1C07onin\xF4\u01F7nt;\u6231lcty;\u632D\u0980AHabcdefhijlorstuwz\u1C38\u1C3B\u1C3F\u1C5D\u1C69\u1C75\u1C8A\u1C9E\u1CAC\u1CB7\u1CFB\u1CFF\u1D0D\u1D7B\u1D91\u1DAB\u1DBB\u1DC6\u1DCDr\xF2\u0381ar;\u6965\u0200glrs\u1C48\u1C4D\u1C52\u1C54ger;\u6020eth;\u6138\xF2\u1133h\u0100;v\u1C5A\u1C5B\u6010\xBB\u090A\u016B\u1C61\u1C67arow;\u690Fa\xE3\u0315\u0100ay\u1C6E\u1C73ron;\u410F;\u4434\u0180;ao\u0332\u1C7C\u1C84\u0100gr\u02BF\u1C81r;\u61CAtseq;\u6A77\u0180glm\u1C91\u1C94\u1C98\u803B\xB0\u40B0ta;\u43B4ptyv;\u69B1\u0100ir\u1CA3\u1CA8sht;\u697F;\uC000\u{1D521}ar\u0100lr\u1CB3\u1CB5\xBB\u08DC\xBB\u101E\u0280aegsv\u1CC2\u0378\u1CD6\u1CDC\u1CE0m\u0180;os\u0326\u1CCA\u1CD4nd\u0100;s\u0326\u1CD1uit;\u6666amma;\u43DDin;\u62F2\u0180;io\u1CE7\u1CE8\u1CF8\u40F7de\u8100\xF7;o\u1CE7\u1CF0ntimes;\u62C7n\xF8\u1CF7cy;\u4452c\u026F\u1D06\0\0\u1D0Arn;\u631Eop;\u630D\u0280lptuw\u1D18\u1D1D\u1D22\u1D49\u1D55lar;\u4024f;\uC000\u{1D555}\u0280;emps\u030B\u1D2D\u1D37\u1D3D\u1D42q\u0100;d\u0352\u1D33ot;\u6251inus;\u6238lus;\u6214quare;\u62A1blebarwedg\xE5\xFAn\u0180adh\u112E\u1D5D\u1D67ownarrow\xF3\u1C83arpoon\u0100lr\u1D72\u1D76ef\xF4\u1CB4igh\xF4\u1CB6\u0162\u1D7F\u1D85karo\xF7\u0F42\u026F\u1D8A\0\0\u1D8Ern;\u631Fop;\u630C\u0180cot\u1D98\u1DA3\u1DA6\u0100ry\u1D9D\u1DA1;\uC000\u{1D4B9};\u4455l;\u69F6rok;\u4111\u0100dr\u1DB0\u1DB4ot;\u62F1i\u0100;f\u1DBA\u1816\u65BF\u0100ah\u1DC0\u1DC3r\xF2\u0429a\xF2\u0FA6angle;\u69A6\u0100ci\u1DD2\u1DD5y;\u445Fgrarr;\u67FF\u0900Dacdefglmnopqrstux\u1E01\u1E09\u1E19\u1E38\u0578\u1E3C\u1E49\u1E61\u1E7E\u1EA5\u1EAF\u1EBD\u1EE1\u1F2A\u1F37\u1F44\u1F4E\u1F5A\u0100Do\u1E06\u1D34o\xF4\u1C89\u0100cs\u1E0E\u1E14ute\u803B\xE9\u40E9ter;\u6A6E\u0200aioy\u1E22\u1E27\u1E31\u1E36ron;\u411Br\u0100;c\u1E2D\u1E2E\u6256\u803B\xEA\u40EAlon;\u6255;\u444Dot;\u4117\u0100Dr\u1E41\u1E45ot;\u6252;\uC000\u{1D522}\u0180;rs\u1E50\u1E51\u1E57\u6A9Aave\u803B\xE8\u40E8\u0100;d\u1E5C\u1E5D\u6A96ot;\u6A98\u0200;ils\u1E6A\u1E6B\u1E72\u1E74\u6A99nters;\u63E7;\u6113\u0100;d\u1E79\u1E7A\u6A95ot;\u6A97\u0180aps\u1E85\u1E89\u1E97cr;\u4113ty\u0180;sv\u1E92\u1E93\u1E95\u6205et\xBB\u1E93p\u01001;\u1E9D\u1EA4\u0133\u1EA1\u1EA3;\u6004;\u6005\u6003\u0100gs\u1EAA\u1EAC;\u414Bp;\u6002\u0100gp\u1EB4\u1EB8on;\u4119f;\uC000\u{1D556}\u0180als\u1EC4\u1ECE\u1ED2r\u0100;s\u1ECA\u1ECB\u62D5l;\u69E3us;\u6A71i\u0180;lv\u1EDA\u1EDB\u1EDF\u43B5on\xBB\u1EDB;\u43F5\u0200csuv\u1EEA\u1EF3\u1F0B\u1F23\u0100io\u1EEF\u1E31rc\xBB\u1E2E\u0269\u1EF9\0\0\u1EFB\xED\u0548ant\u0100gl\u1F02\u1F06tr\xBB\u1E5Dess\xBB\u1E7A\u0180aei\u1F12\u1F16\u1F1Als;\u403Dst;\u625Fv\u0100;D\u0235\u1F20D;\u6A78parsl;\u69E5\u0100Da\u1F2F\u1F33ot;\u6253rr;\u6971\u0180cdi\u1F3E\u1F41\u1EF8r;\u612Fo\xF4\u0352\u0100ah\u1F49\u1F4B;\u43B7\u803B\xF0\u40F0\u0100mr\u1F53\u1F57l\u803B\xEB\u40EBo;\u60AC\u0180cip\u1F61\u1F64\u1F67l;\u4021s\xF4\u056E\u0100eo\u1F6C\u1F74ctatio\xEE\u0559nential\xE5\u0579\u09E1\u1F92\0\u1F9E\0\u1FA1\u1FA7\0\0\u1FC6\u1FCC\0\u1FD3\0\u1FE6\u1FEA\u2000\0\u2008\u205Allingdotse\xF1\u1E44y;\u4444male;\u6640\u0180ilr\u1FAD\u1FB3\u1FC1lig;\u8000\uFB03\u0269\u1FB9\0\0\u1FBDg;\u8000\uFB00ig;\u8000\uFB04;\uC000\u{1D523}lig;\u8000\uFB01lig;\uC000fj\u0180alt\u1FD9\u1FDC\u1FE1t;\u666Dig;\u8000\uFB02ns;\u65B1of;\u4192\u01F0\u1FEE\0\u1FF3f;\uC000\u{1D557}\u0100ak\u05BF\u1FF7\u0100;v\u1FFC\u1FFD\u62D4;\u6AD9artint;\u6A0D\u0100ao\u200C\u2055\u0100cs\u2011\u2052\u03B1\u201A\u2030\u2038\u2045\u2048\0\u2050\u03B2\u2022\u2025\u2027\u202A\u202C\0\u202E\u803B\xBD\u40BD;\u6153\u803B\xBC\u40BC;\u6155;\u6159;\u615B\u01B3\u2034\0\u2036;\u6154;\u6156\u02B4\u203E\u2041\0\0\u2043\u803B\xBE\u40BE;\u6157;\u615C5;\u6158\u01B6\u204C\0\u204E;\u615A;\u615D8;\u615El;\u6044wn;\u6322cr;\uC000\u{1D4BB}\u0880Eabcdefgijlnorstv\u2082\u2089\u209F\u20A5\u20B0\u20B4\u20F0\u20F5\u20FA\u20FF\u2103\u2112\u2138\u0317\u213E\u2152\u219E\u0100;l\u064D\u2087;\u6A8C\u0180cmp\u2090\u2095\u209Dute;\u41F5ma\u0100;d\u209C\u1CDA\u43B3;\u6A86reve;\u411F\u0100iy\u20AA\u20AErc;\u411D;\u4433ot;\u4121\u0200;lqs\u063E\u0642\u20BD\u20C9\u0180;qs\u063E\u064C\u20C4lan\xF4\u0665\u0200;cdl\u0665\u20D2\u20D5\u20E5c;\u6AA9ot\u0100;o\u20DC\u20DD\u6A80\u0100;l\u20E2\u20E3\u6A82;\u6A84\u0100;e\u20EA\u20ED\uC000\u22DB\uFE00s;\u6A94r;\uC000\u{1D524}\u0100;g\u0673\u061Bmel;\u6137cy;\u4453\u0200;Eaj\u065A\u210C\u210E\u2110;\u6A92;\u6AA5;\u6AA4\u0200Eaes\u211B\u211D\u2129\u2134;\u6269p\u0100;p\u2123\u2124\u6A8Arox\xBB\u2124\u0100;q\u212E\u212F\u6A88\u0100;q\u212E\u211Bim;\u62E7pf;\uC000\u{1D558}\u0100ci\u2143\u2146r;\u610Am\u0180;el\u066B\u214E\u2150;\u6A8E;\u6A90\u8300>;cdlqr\u05EE\u2160\u216A\u216E\u2173\u2179\u0100ci\u2165\u2167;\u6AA7r;\u6A7Aot;\u62D7Par;\u6995uest;\u6A7C\u0280adels\u2184\u216A\u2190\u0656\u219B\u01F0\u2189\0\u218Epro\xF8\u209Er;\u6978q\u0100lq\u063F\u2196les\xF3\u2088i\xED\u066B\u0100en\u21A3\u21ADrtneqq;\uC000\u2269\uFE00\xC5\u21AA\u0500Aabcefkosy\u21C4\u21C7\u21F1\u21F5\u21FA\u2218\u221D\u222F\u2268\u227Dr\xF2\u03A0\u0200ilmr\u21D0\u21D4\u21D7\u21DBrs\xF0\u1484f\xBB\u2024il\xF4\u06A9\u0100dr\u21E0\u21E4cy;\u444A\u0180;cw\u08F4\u21EB\u21EFir;\u6948;\u61ADar;\u610Firc;\u4125\u0180alr\u2201\u220E\u2213rts\u0100;u\u2209\u220A\u6665it\xBB\u220Alip;\u6026con;\u62B9r;\uC000\u{1D525}s\u0100ew\u2223\u2229arow;\u6925arow;\u6926\u0280amopr\u223A\u223E\u2243\u225E\u2263rr;\u61FFtht;\u623Bk\u0100lr\u2249\u2253eftarrow;\u61A9ightarrow;\u61AAf;\uC000\u{1D559}bar;\u6015\u0180clt\u226F\u2274\u2278r;\uC000\u{1D4BD}as\xE8\u21F4rok;\u4127\u0100bp\u2282\u2287ull;\u6043hen\xBB\u1C5B\u0AE1\u22A3\0\u22AA\0\u22B8\u22C5\u22CE\0\u22D5\u22F3\0\0\u22F8\u2322\u2367\u2362\u237F\0\u2386\u23AA\u23B4cute\u803B\xED\u40ED\u0180;iy\u0771\u22B0\u22B5rc\u803B\xEE\u40EE;\u4438\u0100cx\u22BC\u22BFy;\u4435cl\u803B\xA1\u40A1\u0100fr\u039F\u22C9;\uC000\u{1D526}rave\u803B\xEC\u40EC\u0200;ino\u073E\u22DD\u22E9\u22EE\u0100in\u22E2\u22E6nt;\u6A0Ct;\u622Dfin;\u69DCta;\u6129lig;\u4133\u0180aop\u22FE\u231A\u231D\u0180cgt\u2305\u2308\u2317r;\u412B\u0180elp\u071F\u230F\u2313in\xE5\u078Ear\xF4\u0720h;\u4131f;\u62B7ed;\u41B5\u0280;cfot\u04F4\u232C\u2331\u233D\u2341are;\u6105in\u0100;t\u2338\u2339\u621Eie;\u69DDdo\xF4\u2319\u0280;celp\u0757\u234C\u2350\u235B\u2361al;\u62BA\u0100gr\u2355\u2359er\xF3\u1563\xE3\u234Darhk;\u6A17rod;\u6A3C\u0200cgpt\u236F\u2372\u2376\u237By;\u4451on;\u412Ff;\uC000\u{1D55A}a;\u43B9uest\u803B\xBF\u40BF\u0100ci\u238A\u238Fr;\uC000\u{1D4BE}n\u0280;Edsv\u04F4\u239B\u239D\u23A1\u04F3;\u62F9ot;\u62F5\u0100;v\u23A6\u23A7\u62F4;\u62F3\u0100;i\u0777\u23AElde;\u4129\u01EB\u23B8\0\u23BCcy;\u4456l\u803B\xEF\u40EF\u0300cfmosu\u23CC\u23D7\u23DC\u23E1\u23E7\u23F5\u0100iy\u23D1\u23D5rc;\u4135;\u4439r;\uC000\u{1D527}ath;\u4237pf;\uC000\u{1D55B}\u01E3\u23EC\0\u23F1r;\uC000\u{1D4BF}rcy;\u4458kcy;\u4454\u0400acfghjos\u240B\u2416\u2422\u2427\u242D\u2431\u2435\u243Bppa\u0100;v\u2413\u2414\u43BA;\u43F0\u0100ey\u241B\u2420dil;\u4137;\u443Ar;\uC000\u{1D528}reen;\u4138cy;\u4445cy;\u445Cpf;\uC000\u{1D55C}cr;\uC000\u{1D4C0}\u0B80ABEHabcdefghjlmnoprstuv\u2470\u2481\u2486\u248D\u2491\u250E\u253D\u255A\u2580\u264E\u265E\u2665\u2679\u267D\u269A\u26B2\u26D8\u275D\u2768\u278B\u27C0\u2801\u2812\u0180art\u2477\u247A\u247Cr\xF2\u09C6\xF2\u0395ail;\u691Barr;\u690E\u0100;g\u0994\u248B;\u6A8Bar;\u6962\u0963\u24A5\0\u24AA\0\u24B1\0\0\0\0\0\u24B5\u24BA\0\u24C6\u24C8\u24CD\0\u24F9ute;\u413Amptyv;\u69B4ra\xEE\u084Cbda;\u43BBg\u0180;dl\u088E\u24C1\u24C3;\u6991\xE5\u088E;\u6A85uo\u803B\xAB\u40ABr\u0400;bfhlpst\u0899\u24DE\u24E6\u24E9\u24EB\u24EE\u24F1\u24F5\u0100;f\u089D\u24E3s;\u691Fs;\u691D\xEB\u2252p;\u61ABl;\u6939im;\u6973l;\u61A2\u0180;ae\u24FF\u2500\u2504\u6AABil;\u6919\u0100;s\u2509\u250A\u6AAD;\uC000\u2AAD\uFE00\u0180abr\u2515\u2519\u251Drr;\u690Crk;\u6772\u0100ak\u2522\u252Cc\u0100ek\u2528\u252A;\u407B;\u405B\u0100es\u2531\u2533;\u698Bl\u0100du\u2539\u253B;\u698F;\u698D\u0200aeuy\u2546\u254B\u2556\u2558ron;\u413E\u0100di\u2550\u2554il;\u413C\xEC\u08B0\xE2\u2529;\u443B\u0200cqrs\u2563\u2566\u256D\u257Da;\u6936uo\u0100;r\u0E19\u1746\u0100du\u2572\u2577har;\u6967shar;\u694Bh;\u61B2\u0280;fgqs\u258B\u258C\u0989\u25F3\u25FF\u6264t\u0280ahlrt\u2598\u25A4\u25B7\u25C2\u25E8rrow\u0100;t\u0899\u25A1a\xE9\u24F6arpoon\u0100du\u25AF\u25B4own\xBB\u045Ap\xBB\u0966eftarrows;\u61C7ight\u0180ahs\u25CD\u25D6\u25DErrow\u0100;s\u08F4\u08A7arpoon\xF3\u0F98quigarro\xF7\u21F0hreetimes;\u62CB\u0180;qs\u258B\u0993\u25FAlan\xF4\u09AC\u0280;cdgs\u09AC\u260A\u260D\u261D\u2628c;\u6AA8ot\u0100;o\u2614\u2615\u6A7F\u0100;r\u261A\u261B\u6A81;\u6A83\u0100;e\u2622\u2625\uC000\u22DA\uFE00s;\u6A93\u0280adegs\u2633\u2639\u263D\u2649\u264Bppro\xF8\u24C6ot;\u62D6q\u0100gq\u2643\u2645\xF4\u0989gt\xF2\u248C\xF4\u099Bi\xED\u09B2\u0180ilr\u2655\u08E1\u265Asht;\u697C;\uC000\u{1D529}\u0100;E\u099C\u2663;\u6A91\u0161\u2669\u2676r\u0100du\u25B2\u266E\u0100;l\u0965\u2673;\u696Alk;\u6584cy;\u4459\u0280;acht\u0A48\u2688\u268B\u2691\u2696r\xF2\u25C1orne\xF2\u1D08ard;\u696Bri;\u65FA\u0100io\u269F\u26A4dot;\u4140ust\u0100;a\u26AC\u26AD\u63B0che\xBB\u26AD\u0200Eaes\u26BB\u26BD\u26C9\u26D4;\u6268p\u0100;p\u26C3\u26C4\u6A89rox\xBB\u26C4\u0100;q\u26CE\u26CF\u6A87\u0100;q\u26CE\u26BBim;\u62E6\u0400abnoptwz\u26E9\u26F4\u26F7\u271A\u272F\u2741\u2747\u2750\u0100nr\u26EE\u26F1g;\u67ECr;\u61FDr\xEB\u08C1g\u0180lmr\u26FF\u270D\u2714eft\u0100ar\u09E6\u2707ight\xE1\u09F2apsto;\u67FCight\xE1\u09FDparrow\u0100lr\u2725\u2729ef\xF4\u24EDight;\u61AC\u0180afl\u2736\u2739\u273Dr;\u6985;\uC000\u{1D55D}us;\u6A2Dimes;\u6A34\u0161\u274B\u274Fst;\u6217\xE1\u134E\u0180;ef\u2757\u2758\u1800\u65CAnge\xBB\u2758ar\u0100;l\u2764\u2765\u4028t;\u6993\u0280achmt\u2773\u2776\u277C\u2785\u2787r\xF2\u08A8orne\xF2\u1D8Car\u0100;d\u0F98\u2783;\u696D;\u600Eri;\u62BF\u0300achiqt\u2798\u279D\u0A40\u27A2\u27AE\u27BBquo;\u6039r;\uC000\u{1D4C1}m\u0180;eg\u09B2\u27AA\u27AC;\u6A8D;\u6A8F\u0100bu\u252A\u27B3o\u0100;r\u0E1F\u27B9;\u601Arok;\u4142\u8400<;cdhilqr\u082B\u27D2\u2639\u27DC\u27E0\u27E5\u27EA\u27F0\u0100ci\u27D7\u27D9;\u6AA6r;\u6A79re\xE5\u25F2mes;\u62C9arr;\u6976uest;\u6A7B\u0100Pi\u27F5\u27F9ar;\u6996\u0180;ef\u2800\u092D\u181B\u65C3r\u0100du\u2807\u280Dshar;\u694Ahar;\u6966\u0100en\u2817\u2821rtneqq;\uC000\u2268\uFE00\xC5\u281E\u0700Dacdefhilnopsu\u2840\u2845\u2882\u288E\u2893\u28A0\u28A5\u28A8\u28DA\u28E2\u28E4\u0A83\u28F3\u2902Dot;\u623A\u0200clpr\u284E\u2852\u2863\u287Dr\u803B\xAF\u40AF\u0100et\u2857\u2859;\u6642\u0100;e\u285E\u285F\u6720se\xBB\u285F\u0100;s\u103B\u2868to\u0200;dlu\u103B\u2873\u2877\u287Bow\xEE\u048Cef\xF4\u090F\xF0\u13D1ker;\u65AE\u0100oy\u2887\u288Cmma;\u6A29;\u443Cash;\u6014asuredangle\xBB\u1626r;\uC000\u{1D52A}o;\u6127\u0180cdn\u28AF\u28B4\u28C9ro\u803B\xB5\u40B5\u0200;acd\u1464\u28BD\u28C0\u28C4s\xF4\u16A7ir;\u6AF0ot\u80BB\xB7\u01B5us\u0180;bd\u28D2\u1903\u28D3\u6212\u0100;u\u1D3C\u28D8;\u6A2A\u0163\u28DE\u28E1p;\u6ADB\xF2\u2212\xF0\u0A81\u0100dp\u28E9\u28EEels;\u62A7f;\uC000\u{1D55E}\u0100ct\u28F8\u28FDr;\uC000\u{1D4C2}pos\xBB\u159D\u0180;lm\u2909\u290A\u290D\u43BCtimap;\u62B8\u0C00GLRVabcdefghijlmoprstuvw\u2942\u2953\u297E\u2989\u2998\u29DA\u29E9\u2A15\u2A1A\u2A58\u2A5D\u2A83\u2A95\u2AA4\u2AA8\u2B04\u2B07\u2B44\u2B7F\u2BAE\u2C34\u2C67\u2C7C\u2CE9\u0100gt\u2947\u294B;\uC000\u22D9\u0338\u0100;v\u2950\u0BCF\uC000\u226B\u20D2\u0180elt\u295A\u2972\u2976ft\u0100ar\u2961\u2967rrow;\u61CDightarrow;\u61CE;\uC000\u22D8\u0338\u0100;v\u297B\u0C47\uC000\u226A\u20D2ightarrow;\u61CF\u0100Dd\u298E\u2993ash;\u62AFash;\u62AE\u0280bcnpt\u29A3\u29A7\u29AC\u29B1\u29CCla\xBB\u02DEute;\u4144g;\uC000\u2220\u20D2\u0280;Eiop\u0D84\u29BC\u29C0\u29C5\u29C8;\uC000\u2A70\u0338d;\uC000\u224B\u0338s;\u4149ro\xF8\u0D84ur\u0100;a\u29D3\u29D4\u666El\u0100;s\u29D3\u0B38\u01F3\u29DF\0\u29E3p\u80BB\xA0\u0B37mp\u0100;e\u0BF9\u0C00\u0280aeouy\u29F4\u29FE\u2A03\u2A10\u2A13\u01F0\u29F9\0\u29FB;\u6A43on;\u4148dil;\u4146ng\u0100;d\u0D7E\u2A0Aot;\uC000\u2A6D\u0338p;\u6A42;\u443Dash;\u6013\u0380;Aadqsx\u0B92\u2A29\u2A2D\u2A3B\u2A41\u2A45\u2A50rr;\u61D7r\u0100hr\u2A33\u2A36k;\u6924\u0100;o\u13F2\u13F0ot;\uC000\u2250\u0338ui\xF6\u0B63\u0100ei\u2A4A\u2A4Ear;\u6928\xED\u0B98ist\u0100;s\u0BA0\u0B9Fr;\uC000\u{1D52B}\u0200Eest\u0BC5\u2A66\u2A79\u2A7C\u0180;qs\u0BBC\u2A6D\u0BE1\u0180;qs\u0BBC\u0BC5\u2A74lan\xF4\u0BE2i\xED\u0BEA\u0100;r\u0BB6\u2A81\xBB\u0BB7\u0180Aap\u2A8A\u2A8D\u2A91r\xF2\u2971rr;\u61AEar;\u6AF2\u0180;sv\u0F8D\u2A9C\u0F8C\u0100;d\u2AA1\u2AA2\u62FC;\u62FAcy;\u445A\u0380AEadest\u2AB7\u2ABA\u2ABE\u2AC2\u2AC5\u2AF6\u2AF9r\xF2\u2966;\uC000\u2266\u0338rr;\u619Ar;\u6025\u0200;fqs\u0C3B\u2ACE\u2AE3\u2AEFt\u0100ar\u2AD4\u2AD9rro\xF7\u2AC1ightarro\xF7\u2A90\u0180;qs\u0C3B\u2ABA\u2AEAlan\xF4\u0C55\u0100;s\u0C55\u2AF4\xBB\u0C36i\xED\u0C5D\u0100;r\u0C35\u2AFEi\u0100;e\u0C1A\u0C25i\xE4\u0D90\u0100pt\u2B0C\u2B11f;\uC000\u{1D55F}\u8180\xAC;in\u2B19\u2B1A\u2B36\u40ACn\u0200;Edv\u0B89\u2B24\u2B28\u2B2E;\uC000\u22F9\u0338ot;\uC000\u22F5\u0338\u01E1\u0B89\u2B33\u2B35;\u62F7;\u62F6i\u0100;v\u0CB8\u2B3C\u01E1\u0CB8\u2B41\u2B43;\u62FE;\u62FD\u0180aor\u2B4B\u2B63\u2B69r\u0200;ast\u0B7B\u2B55\u2B5A\u2B5Flle\xEC\u0B7Bl;\uC000\u2AFD\u20E5;\uC000\u2202\u0338lint;\u6A14\u0180;ce\u0C92\u2B70\u2B73u\xE5\u0CA5\u0100;c\u0C98\u2B78\u0100;e\u0C92\u2B7D\xF1\u0C98\u0200Aait\u2B88\u2B8B\u2B9D\u2BA7r\xF2\u2988rr\u0180;cw\u2B94\u2B95\u2B99\u619B;\uC000\u2933\u0338;\uC000\u219D\u0338ghtarrow\xBB\u2B95ri\u0100;e\u0CCB\u0CD6\u0380chimpqu\u2BBD\u2BCD\u2BD9\u2B04\u0B78\u2BE4\u2BEF\u0200;cer\u0D32\u2BC6\u0D37\u2BC9u\xE5\u0D45;\uC000\u{1D4C3}ort\u026D\u2B05\0\0\u2BD6ar\xE1\u2B56m\u0100;e\u0D6E\u2BDF\u0100;q\u0D74\u0D73su\u0100bp\u2BEB\u2BED\xE5\u0CF8\xE5\u0D0B\u0180bcp\u2BF6\u2C11\u2C19\u0200;Ees\u2BFF\u2C00\u0D22\u2C04\u6284;\uC000\u2AC5\u0338et\u0100;e\u0D1B\u2C0Bq\u0100;q\u0D23\u2C00c\u0100;e\u0D32\u2C17\xF1\u0D38\u0200;Ees\u2C22\u2C23\u0D5F\u2C27\u6285;\uC000\u2AC6\u0338et\u0100;e\u0D58\u2C2Eq\u0100;q\u0D60\u2C23\u0200gilr\u2C3D\u2C3F\u2C45\u2C47\xEC\u0BD7lde\u803B\xF1\u40F1\xE7\u0C43iangle\u0100lr\u2C52\u2C5Ceft\u0100;e\u0C1A\u2C5A\xF1\u0C26ight\u0100;e\u0CCB\u2C65\xF1\u0CD7\u0100;m\u2C6C\u2C6D\u43BD\u0180;es\u2C74\u2C75\u2C79\u4023ro;\u6116p;\u6007\u0480DHadgilrs\u2C8F\u2C94\u2C99\u2C9E\u2CA3\u2CB0\u2CB6\u2CD3\u2CE3ash;\u62ADarr;\u6904p;\uC000\u224D\u20D2ash;\u62AC\u0100et\u2CA8\u2CAC;\uC000\u2265\u20D2;\uC000>\u20D2nfin;\u69DE\u0180Aet\u2CBD\u2CC1\u2CC5rr;\u6902;\uC000\u2264\u20D2\u0100;r\u2CCA\u2CCD\uC000<\u20D2ie;\uC000\u22B4\u20D2\u0100At\u2CD8\u2CDCrr;\u6903rie;\uC000\u22B5\u20D2im;\uC000\u223C\u20D2\u0180Aan\u2CF0\u2CF4\u2D02rr;\u61D6r\u0100hr\u2CFA\u2CFDk;\u6923\u0100;o\u13E7\u13E5ear;\u6927\u1253\u1A95\0\0\0\0\0\0\0\0\0\0\0\0\0\u2D2D\0\u2D38\u2D48\u2D60\u2D65\u2D72\u2D84\u1B07\0\0\u2D8D\u2DAB\0\u2DC8\u2DCE\0\u2DDC\u2E19\u2E2B\u2E3E\u2E43\u0100cs\u2D31\u1A97ute\u803B\xF3\u40F3\u0100iy\u2D3C\u2D45r\u0100;c\u1A9E\u2D42\u803B\xF4\u40F4;\u443E\u0280abios\u1AA0\u2D52\u2D57\u01C8\u2D5Alac;\u4151v;\u6A38old;\u69BClig;\u4153\u0100cr\u2D69\u2D6Dir;\u69BF;\uC000\u{1D52C}\u036F\u2D79\0\0\u2D7C\0\u2D82n;\u42DBave\u803B\xF2\u40F2;\u69C1\u0100bm\u2D88\u0DF4ar;\u69B5\u0200acit\u2D95\u2D98\u2DA5\u2DA8r\xF2\u1A80\u0100ir\u2D9D\u2DA0r;\u69BEoss;\u69BBn\xE5\u0E52;\u69C0\u0180aei\u2DB1\u2DB5\u2DB9cr;\u414Dga;\u43C9\u0180cdn\u2DC0\u2DC5\u01CDron;\u43BF;\u69B6pf;\uC000\u{1D560}\u0180ael\u2DD4\u2DD7\u01D2r;\u69B7rp;\u69B9\u0380;adiosv\u2DEA\u2DEB\u2DEE\u2E08\u2E0D\u2E10\u2E16\u6228r\xF2\u1A86\u0200;efm\u2DF7\u2DF8\u2E02\u2E05\u6A5Dr\u0100;o\u2DFE\u2DFF\u6134f\xBB\u2DFF\u803B\xAA\u40AA\u803B\xBA\u40BAgof;\u62B6r;\u6A56lope;\u6A57;\u6A5B\u0180clo\u2E1F\u2E21\u2E27\xF2\u2E01ash\u803B\xF8\u40F8l;\u6298i\u016C\u2E2F\u2E34de\u803B\xF5\u40F5es\u0100;a\u01DB\u2E3As;\u6A36ml\u803B\xF6\u40F6bar;\u633D\u0AE1\u2E5E\0\u2E7D\0\u2E80\u2E9D\0\u2EA2\u2EB9\0\0\u2ECB\u0E9C\0\u2F13\0\0\u2F2B\u2FBC\0\u2FC8r\u0200;ast\u0403\u2E67\u2E72\u0E85\u8100\xB6;l\u2E6D\u2E6E\u40B6le\xEC\u0403\u0269\u2E78\0\0\u2E7Bm;\u6AF3;\u6AFDy;\u443Fr\u0280cimpt\u2E8B\u2E8F\u2E93\u1865\u2E97nt;\u4025od;\u402Eil;\u6030enk;\u6031r;\uC000\u{1D52D}\u0180imo\u2EA8\u2EB0\u2EB4\u0100;v\u2EAD\u2EAE\u43C6;\u43D5ma\xF4\u0A76ne;\u660E\u0180;tv\u2EBF\u2EC0\u2EC8\u43C0chfork\xBB\u1FFD;\u43D6\u0100au\u2ECF\u2EDFn\u0100ck\u2ED5\u2EDDk\u0100;h\u21F4\u2EDB;\u610E\xF6\u21F4s\u0480;abcdemst\u2EF3\u2EF4\u1908\u2EF9\u2EFD\u2F04\u2F06\u2F0A\u2F0E\u402Bcir;\u6A23ir;\u6A22\u0100ou\u1D40\u2F02;\u6A25;\u6A72n\u80BB\xB1\u0E9Dim;\u6A26wo;\u6A27\u0180ipu\u2F19\u2F20\u2F25ntint;\u6A15f;\uC000\u{1D561}nd\u803B\xA3\u40A3\u0500;Eaceinosu\u0EC8\u2F3F\u2F41\u2F44\u2F47\u2F81\u2F89\u2F92\u2F7E\u2FB6;\u6AB3p;\u6AB7u\xE5\u0ED9\u0100;c\u0ECE\u2F4C\u0300;acens\u0EC8\u2F59\u2F5F\u2F66\u2F68\u2F7Eppro\xF8\u2F43urlye\xF1\u0ED9\xF1\u0ECE\u0180aes\u2F6F\u2F76\u2F7Approx;\u6AB9qq;\u6AB5im;\u62E8i\xED\u0EDFme\u0100;s\u2F88\u0EAE\u6032\u0180Eas\u2F78\u2F90\u2F7A\xF0\u2F75\u0180dfp\u0EEC\u2F99\u2FAF\u0180als\u2FA0\u2FA5\u2FAAlar;\u632Eine;\u6312urf;\u6313\u0100;t\u0EFB\u2FB4\xEF\u0EFBrel;\u62B0\u0100ci\u2FC0\u2FC5r;\uC000\u{1D4C5};\u43C8ncsp;\u6008\u0300fiopsu\u2FDA\u22E2\u2FDF\u2FE5\u2FEB\u2FF1r;\uC000\u{1D52E}pf;\uC000\u{1D562}rime;\u6057cr;\uC000\u{1D4C6}\u0180aeo\u2FF8\u3009\u3013t\u0100ei\u2FFE\u3005rnion\xF3\u06B0nt;\u6A16st\u0100;e\u3010\u3011\u403F\xF1\u1F19\xF4\u0F14\u0A80ABHabcdefhilmnoprstux\u3040\u3051\u3055\u3059\u30E0\u310E\u312B\u3147\u3162\u3172\u318E\u3206\u3215\u3224\u3229\u3258\u326E\u3272\u3290\u32B0\u32B7\u0180art\u3047\u304A\u304Cr\xF2\u10B3\xF2\u03DDail;\u691Car\xF2\u1C65ar;\u6964\u0380cdenqrt\u3068\u3075\u3078\u307F\u308F\u3094\u30CC\u0100eu\u306D\u3071;\uC000\u223D\u0331te;\u4155i\xE3\u116Emptyv;\u69B3g\u0200;del\u0FD1\u3089\u308B\u308D;\u6992;\u69A5\xE5\u0FD1uo\u803B\xBB\u40BBr\u0580;abcfhlpstw\u0FDC\u30AC\u30AF\u30B7\u30B9\u30BC\u30BE\u30C0\u30C3\u30C7\u30CAp;\u6975\u0100;f\u0FE0\u30B4s;\u6920;\u6933s;\u691E\xEB\u225D\xF0\u272El;\u6945im;\u6974l;\u61A3;\u619D\u0100ai\u30D1\u30D5il;\u691Ao\u0100;n\u30DB\u30DC\u6236al\xF3\u0F1E\u0180abr\u30E7\u30EA\u30EEr\xF2\u17E5rk;\u6773\u0100ak\u30F3\u30FDc\u0100ek\u30F9\u30FB;\u407D;\u405D\u0100es\u3102\u3104;\u698Cl\u0100du\u310A\u310C;\u698E;\u6990\u0200aeuy\u3117\u311C\u3127\u3129ron;\u4159\u0100di\u3121\u3125il;\u4157\xEC\u0FF2\xE2\u30FA;\u4440\u0200clqs\u3134\u3137\u313D\u3144a;\u6937dhar;\u6969uo\u0100;r\u020E\u020Dh;\u61B3\u0180acg\u314E\u315F\u0F44l\u0200;ips\u0F78\u3158\u315B\u109Cn\xE5\u10BBar\xF4\u0FA9t;\u65AD\u0180ilr\u3169\u1023\u316Esht;\u697D;\uC000\u{1D52F}\u0100ao\u3177\u3186r\u0100du\u317D\u317F\xBB\u047B\u0100;l\u1091\u3184;\u696C\u0100;v\u318B\u318C\u43C1;\u43F1\u0180gns\u3195\u31F9\u31FCht\u0300ahlrst\u31A4\u31B0\u31C2\u31D8\u31E4\u31EErrow\u0100;t\u0FDC\u31ADa\xE9\u30C8arpoon\u0100du\u31BB\u31BFow\xEE\u317Ep\xBB\u1092eft\u0100ah\u31CA\u31D0rrow\xF3\u0FEAarpoon\xF3\u0551ightarrows;\u61C9quigarro\xF7\u30CBhreetimes;\u62CCg;\u42DAingdotse\xF1\u1F32\u0180ahm\u320D\u3210\u3213r\xF2\u0FEAa\xF2\u0551;\u600Foust\u0100;a\u321E\u321F\u63B1che\xBB\u321Fmid;\u6AEE\u0200abpt\u3232\u323D\u3240\u3252\u0100nr\u3237\u323Ag;\u67EDr;\u61FEr\xEB\u1003\u0180afl\u3247\u324A\u324Er;\u6986;\uC000\u{1D563}us;\u6A2Eimes;\u6A35\u0100ap\u325D\u3267r\u0100;g\u3263\u3264\u4029t;\u6994olint;\u6A12ar\xF2\u31E3\u0200achq\u327B\u3280\u10BC\u3285quo;\u603Ar;\uC000\u{1D4C7}\u0100bu\u30FB\u328Ao\u0100;r\u0214\u0213\u0180hir\u3297\u329B\u32A0re\xE5\u31F8mes;\u62CAi\u0200;efl\u32AA\u1059\u1821\u32AB\u65B9tri;\u69CEluhar;\u6968;\u611E\u0D61\u32D5\u32DB\u32DF\u332C\u3338\u3371\0\u337A\u33A4\0\0\u33EC\u33F0\0\u3428\u3448\u345A\u34AD\u34B1\u34CA\u34F1\0\u3616\0\0\u3633cute;\u415Bqu\xEF\u27BA\u0500;Eaceinpsy\u11ED\u32F3\u32F5\u32FF\u3302\u330B\u330F\u331F\u3326\u3329;\u6AB4\u01F0\u32FA\0\u32FC;\u6AB8on;\u4161u\xE5\u11FE\u0100;d\u11F3\u3307il;\u415Frc;\u415D\u0180Eas\u3316\u3318\u331B;\u6AB6p;\u6ABAim;\u62E9olint;\u6A13i\xED\u1204;\u4441ot\u0180;be\u3334\u1D47\u3335\u62C5;\u6A66\u0380Aacmstx\u3346\u334A\u3357\u335B\u335E\u3363\u336Drr;\u61D8r\u0100hr\u3350\u3352\xEB\u2228\u0100;o\u0A36\u0A34t\u803B\xA7\u40A7i;\u403Bwar;\u6929m\u0100in\u3369\xF0nu\xF3\xF1t;\u6736r\u0100;o\u3376\u2055\uC000\u{1D530}\u0200acoy\u3382\u3386\u3391\u33A0rp;\u666F\u0100hy\u338B\u338Fcy;\u4449;\u4448rt\u026D\u3399\0\0\u339Ci\xE4\u1464ara\xEC\u2E6F\u803B\xAD\u40AD\u0100gm\u33A8\u33B4ma\u0180;fv\u33B1\u33B2\u33B2\u43C3;\u43C2\u0400;deglnpr\u12AB\u33C5\u33C9\u33CE\u33D6\u33DE\u33E1\u33E6ot;\u6A6A\u0100;q\u12B1\u12B0\u0100;E\u33D3\u33D4\u6A9E;\u6AA0\u0100;E\u33DB\u33DC\u6A9D;\u6A9Fe;\u6246lus;\u6A24arr;\u6972ar\xF2\u113D\u0200aeit\u33F8\u3408\u340F\u3417\u0100ls\u33FD\u3404lsetm\xE9\u336Ahp;\u6A33parsl;\u69E4\u0100dl\u1463\u3414e;\u6323\u0100;e\u341C\u341D\u6AAA\u0100;s\u3422\u3423\u6AAC;\uC000\u2AAC\uFE00\u0180flp\u342E\u3433\u3442tcy;\u444C\u0100;b\u3438\u3439\u402F\u0100;a\u343E\u343F\u69C4r;\u633Ff;\uC000\u{1D564}a\u0100dr\u344D\u0402es\u0100;u\u3454\u3455\u6660it\xBB\u3455\u0180csu\u3460\u3479\u349F\u0100au\u3465\u346Fp\u0100;s\u1188\u346B;\uC000\u2293\uFE00p\u0100;s\u11B4\u3475;\uC000\u2294\uFE00u\u0100bp\u347F\u348F\u0180;es\u1197\u119C\u3486et\u0100;e\u1197\u348D\xF1\u119D\u0180;es\u11A8\u11AD\u3496et\u0100;e\u11A8\u349D\xF1\u11AE\u0180;af\u117B\u34A6\u05B0r\u0165\u34AB\u05B1\xBB\u117Car\xF2\u1148\u0200cemt\u34B9\u34BE\u34C2\u34C5r;\uC000\u{1D4C8}tm\xEE\xF1i\xEC\u3415ar\xE6\u11BE\u0100ar\u34CE\u34D5r\u0100;f\u34D4\u17BF\u6606\u0100an\u34DA\u34EDight\u0100ep\u34E3\u34EApsilo\xEE\u1EE0h\xE9\u2EAFs\xBB\u2852\u0280bcmnp\u34FB\u355E\u1209\u358B\u358E\u0480;Edemnprs\u350E\u350F\u3511\u3515\u351E\u3523\u352C\u3531\u3536\u6282;\u6AC5ot;\u6ABD\u0100;d\u11DA\u351Aot;\u6AC3ult;\u6AC1\u0100Ee\u3528\u352A;\u6ACB;\u628Alus;\u6ABFarr;\u6979\u0180eiu\u353D\u3552\u3555t\u0180;en\u350E\u3545\u354Bq\u0100;q\u11DA\u350Feq\u0100;q\u352B\u3528m;\u6AC7\u0100bp\u355A\u355C;\u6AD5;\u6AD3c\u0300;acens\u11ED\u356C\u3572\u3579\u357B\u3326ppro\xF8\u32FAurlye\xF1\u11FE\xF1\u11F3\u0180aes\u3582\u3588\u331Bppro\xF8\u331Aq\xF1\u3317g;\u666A\u0680123;Edehlmnps\u35A9\u35AC\u35AF\u121C\u35B2\u35B4\u35C0\u35C9\u35D5\u35DA\u35DF\u35E8\u35ED\u803B\xB9\u40B9\u803B\xB2\u40B2\u803B\xB3\u40B3;\u6AC6\u0100os\u35B9\u35BCt;\u6ABEub;\u6AD8\u0100;d\u1222\u35C5ot;\u6AC4s\u0100ou\u35CF\u35D2l;\u67C9b;\u6AD7arr;\u697Bult;\u6AC2\u0100Ee\u35E4\u35E6;\u6ACC;\u628Blus;\u6AC0\u0180eiu\u35F4\u3609\u360Ct\u0180;en\u121C\u35FC\u3602q\u0100;q\u1222\u35B2eq\u0100;q\u35E7\u35E4m;\u6AC8\u0100bp\u3611\u3613;\u6AD4;\u6AD6\u0180Aan\u361C\u3620\u362Drr;\u61D9r\u0100hr\u3626\u3628\xEB\u222E\u0100;o\u0A2B\u0A29war;\u692Alig\u803B\xDF\u40DF\u0BE1\u3651\u365D\u3660\u12CE\u3673\u3679\0\u367E\u36C2\0\0\0\0\0\u36DB\u3703\0\u3709\u376C\0\0\0\u3787\u0272\u3656\0\0\u365Bget;\u6316;\u43C4r\xEB\u0E5F\u0180aey\u3666\u366B\u3670ron;\u4165dil;\u4163;\u4442lrec;\u6315r;\uC000\u{1D531}\u0200eiko\u3686\u369D\u36B5\u36BC\u01F2\u368B\0\u3691e\u01004f\u1284\u1281a\u0180;sv\u3698\u3699\u369B\u43B8ym;\u43D1\u0100cn\u36A2\u36B2k\u0100as\u36A8\u36AEppro\xF8\u12C1im\xBB\u12ACs\xF0\u129E\u0100as\u36BA\u36AE\xF0\u12C1rn\u803B\xFE\u40FE\u01EC\u031F\u36C6\u22E7es\u8180\xD7;bd\u36CF\u36D0\u36D8\u40D7\u0100;a\u190F\u36D5r;\u6A31;\u6A30\u0180eps\u36E1\u36E3\u3700\xE1\u2A4D\u0200;bcf\u0486\u36EC\u36F0\u36F4ot;\u6336ir;\u6AF1\u0100;o\u36F9\u36FC\uC000\u{1D565}rk;\u6ADA\xE1\u3362rime;\u6034\u0180aip\u370F\u3712\u3764d\xE5\u1248\u0380adempst\u3721\u374D\u3740\u3751\u3757\u375C\u375Fngle\u0280;dlqr\u3730\u3731\u3736\u3740\u3742\u65B5own\xBB\u1DBBeft\u0100;e\u2800\u373E\xF1\u092E;\u625Cight\u0100;e\u32AA\u374B\xF1\u105Aot;\u65ECinus;\u6A3Alus;\u6A39b;\u69CDime;\u6A3Bezium;\u63E2\u0180cht\u3772\u377D\u3781\u0100ry\u3777\u377B;\uC000\u{1D4C9};\u4446cy;\u445Brok;\u4167\u0100io\u378B\u378Ex\xF4\u1777head\u0100lr\u3797\u37A0eftarro\xF7\u084Fightarrow\xBB\u0F5D\u0900AHabcdfghlmoprstuw\u37D0\u37D3\u37D7\u37E4\u37F0\u37FC\u380E\u381C\u3823\u3834\u3851\u385D\u386B\u38A9\u38CC\u38D2\u38EA\u38F6r\xF2\u03EDar;\u6963\u0100cr\u37DC\u37E2ute\u803B\xFA\u40FA\xF2\u1150r\u01E3\u37EA\0\u37EDy;\u445Eve;\u416D\u0100iy\u37F5\u37FArc\u803B\xFB\u40FB;\u4443\u0180abh\u3803\u3806\u380Br\xF2\u13ADlac;\u4171a\xF2\u13C3\u0100ir\u3813\u3818sht;\u697E;\uC000\u{1D532}rave\u803B\xF9\u40F9\u0161\u3827\u3831r\u0100lr\u382C\u382E\xBB\u0957\xBB\u1083lk;\u6580\u0100ct\u3839\u384D\u026F\u383F\0\0\u384Arn\u0100;e\u3845\u3846\u631Cr\xBB\u3846op;\u630Fri;\u65F8\u0100al\u3856\u385Acr;\u416B\u80BB\xA8\u0349\u0100gp\u3862\u3866on;\u4173f;\uC000\u{1D566}\u0300adhlsu\u114B\u3878\u387D\u1372\u3891\u38A0own\xE1\u13B3arpoon\u0100lr\u3888\u388Cef\xF4\u382Digh\xF4\u382Fi\u0180;hl\u3899\u389A\u389C\u43C5\xBB\u13FAon\xBB\u389Aparrows;\u61C8\u0180cit\u38B0\u38C4\u38C8\u026F\u38B6\0\0\u38C1rn\u0100;e\u38BC\u38BD\u631Dr\xBB\u38BDop;\u630Eng;\u416Fri;\u65F9cr;\uC000\u{1D4CA}\u0180dir\u38D9\u38DD\u38E2ot;\u62F0lde;\u4169i\u0100;f\u3730\u38E8\xBB\u1813\u0100am\u38EF\u38F2r\xF2\u38A8l\u803B\xFC\u40FCangle;\u69A7\u0780ABDacdeflnoprsz\u391C\u391F\u3929\u392D\u39B5\u39B8\u39BD\u39DF\u39E4\u39E8\u39F3\u39F9\u39FD\u3A01\u3A20r\xF2\u03F7ar\u0100;v\u3926\u3927\u6AE8;\u6AE9as\xE8\u03E1\u0100nr\u3932\u3937grt;\u699C\u0380eknprst\u34E3\u3946\u394B\u3952\u395D\u3964\u3996app\xE1\u2415othin\xE7\u1E96\u0180hir\u34EB\u2EC8\u3959op\xF4\u2FB5\u0100;h\u13B7\u3962\xEF\u318D\u0100iu\u3969\u396Dgm\xE1\u33B3\u0100bp\u3972\u3984setneq\u0100;q\u397D\u3980\uC000\u228A\uFE00;\uC000\u2ACB\uFE00setneq\u0100;q\u398F\u3992\uC000\u228B\uFE00;\uC000\u2ACC\uFE00\u0100hr\u399B\u399Fet\xE1\u369Ciangle\u0100lr\u39AA\u39AFeft\xBB\u0925ight\xBB\u1051y;\u4432ash\xBB\u1036\u0180elr\u39C4\u39D2\u39D7\u0180;be\u2DEA\u39CB\u39CFar;\u62BBq;\u625Alip;\u62EE\u0100bt\u39DC\u1468a\xF2\u1469r;\uC000\u{1D533}tr\xE9\u39AEsu\u0100bp\u39EF\u39F1\xBB\u0D1C\xBB\u0D59pf;\uC000\u{1D567}ro\xF0\u0EFBtr\xE9\u39B4\u0100cu\u3A06\u3A0Br;\uC000\u{1D4CB}\u0100bp\u3A10\u3A18n\u0100Ee\u3980\u3A16\xBB\u397En\u0100Ee\u3992\u3A1E\xBB\u3990igzag;\u699A\u0380cefoprs\u3A36\u3A3B\u3A56\u3A5B\u3A54\u3A61\u3A6Airc;\u4175\u0100di\u3A40\u3A51\u0100bg\u3A45\u3A49ar;\u6A5Fe\u0100;q\u15FA\u3A4F;\u6259erp;\u6118r;\uC000\u{1D534}pf;\uC000\u{1D568}\u0100;e\u1479\u3A66at\xE8\u1479cr;\uC000\u{1D4CC}\u0AE3\u178E\u3A87\0\u3A8B\0\u3A90\u3A9B\0\0\u3A9D\u3AA8\u3AAB\u3AAF\0\0\u3AC3\u3ACE\0\u3AD8\u17DC\u17DFtr\xE9\u17D1r;\uC000\u{1D535}\u0100Aa\u3A94\u3A97r\xF2\u03C3r\xF2\u09F6;\u43BE\u0100Aa\u3AA1\u3AA4r\xF2\u03B8r\xF2\u09EBa\xF0\u2713is;\u62FB\u0180dpt\u17A4\u3AB5\u3ABE\u0100fl\u3ABA\u17A9;\uC000\u{1D569}im\xE5\u17B2\u0100Aa\u3AC7\u3ACAr\xF2\u03CEr\xF2\u0A01\u0100cq\u3AD2\u17B8r;\uC000\u{1D4CD}\u0100pt\u17D6\u3ADCr\xE9\u17D4\u0400acefiosu\u3AF0\u3AFD\u3B08\u3B0C\u3B11\u3B15\u3B1B\u3B21c\u0100uy\u3AF6\u3AFBte\u803B\xFD\u40FD;\u444F\u0100iy\u3B02\u3B06rc;\u4177;\u444Bn\u803B\xA5\u40A5r;\uC000\u{1D536}cy;\u4457pf;\uC000\u{1D56A}cr;\uC000\u{1D4CE}\u0100cm\u3B26\u3B29y;\u444El\u803B\xFF\u40FF\u0500acdefhiosw\u3B42\u3B48\u3B54\u3B58\u3B64\u3B69\u3B6D\u3B74\u3B7A\u3B80cute;\u417A\u0100ay\u3B4D\u3B52ron;\u417E;\u4437ot;\u417C\u0100et\u3B5D\u3B61tr\xE6\u155Fa;\u43B6r;\uC000\u{1D537}cy;\u4436grarr;\u61DDpf;\uC000\u{1D56B}cr;\uC000\u{1D4CF}\u0100jn\u3B85\u3B87;\u600Dj;\u600C'.split("").map(e=>e.charCodeAt(0)));var ac=new Uint16Array("\u0200aglq	\x1B\u026D\0\0p;\u4026os;\u4027t;\u403Et;\u403Cuot;\u4022".split("").map(e=>e.charCodeAt(0)));var Za,dp=new Map([[0,65533],[128,8364],[130,8218],[131,402],[132,8222],[133,8230],[134,8224],[135,8225],[136,710],[137,8240],[138,352],[139,8249],[140,338],[142,381],[145,8216],[146,8217],[147,8220],[148,8221],[149,8226],[150,8211],[151,8212],[152,732],[153,8482],[154,353],[155,8250],[156,339],[158,382],[159,376]]),Xa=(Za=String.fromCodePoint)!==null&&Za!==void 0?Za:function(e){let t="";return e>65535&&(e-=65536,t+=String.fromCharCode(e>>>10&1023|55296),e=56320|e&1023),t+=String.fromCharCode(e),t};function Ka(e){var t;return e>=55296&&e<=57343||e>1114111?65533:(t=dp.get(e))!==null&&t!==void 0?t:e}var Je;(function(e){e[e.NUM=35]="NUM",e[e.SEMI=59]="SEMI",e[e.EQUALS=61]="EQUALS",e[e.ZERO=48]="ZERO",e[e.NINE=57]="NINE",e[e.LOWER_A=97]="LOWER_A",e[e.LOWER_F=102]="LOWER_F",e[e.LOWER_X=120]="LOWER_X",e[e.LOWER_Z=122]="LOWER_Z",e[e.UPPER_A=65]="UPPER_A",e[e.UPPER_F=70]="UPPER_F",e[e.UPPER_Z=90]="UPPER_Z"})(Je||(Je={}));var fp=32,Nr;(function(e){e[e.VALUE_LENGTH=49152]="VALUE_LENGTH",e[e.BRANCH_LENGTH=16256]="BRANCH_LENGTH",e[e.JUMP_TABLE=127]="JUMP_TABLE"})(Nr||(Nr={}));function Ja(e){return e>=Je.ZERO&&e<=Je.NINE}function pp(e){return e>=Je.UPPER_A&&e<=Je.UPPER_F||e>=Je.LOWER_A&&e<=Je.LOWER_F}function mp(e){return e>=Je.UPPER_A&&e<=Je.UPPER_Z||e>=Je.LOWER_A&&e<=Je.LOWER_Z||Ja(e)}function hp(e){return e===Je.EQUALS||mp(e)}var Ke;(function(e){e[e.EntityStart=0]="EntityStart",e[e.NumericStart=1]="NumericStart",e[e.NumericDecimal=2]="NumericDecimal",e[e.NumericHex=3]="NumericHex",e[e.NamedEntity=4]="NamedEntity"})(Ke||(Ke={}));var Wt;(function(e){e[e.Legacy=0]="Legacy",e[e.Strict=1]="Strict",e[e.Attribute=2]="Attribute"})(Wt||(Wt={}));var Ti=class{constructor(t,r,o){this.decodeTree=t,this.emitCodePoint=r,this.errors=o,this.state=Ke.EntityStart,this.consumed=1,this.result=0,this.treeIndex=0,this.excess=1,this.decodeMode=Wt.Strict}startEntity(t){this.decodeMode=t,this.state=Ke.EntityStart,this.result=0,this.treeIndex=0,this.excess=1,this.consumed=1}write(t,r){switch(this.state){case Ke.EntityStart:return t.charCodeAt(r)===Je.NUM?(this.state=Ke.NumericStart,this.consumed+=1,this.stateNumericStart(t,r+1)):(this.state=Ke.NamedEntity,this.stateNamedEntity(t,r));case Ke.NumericStart:return this.stateNumericStart(t,r);case Ke.NumericDecimal:return this.stateNumericDecimal(t,r);case Ke.NumericHex:return this.stateNumericHex(t,r);case Ke.NamedEntity:return this.stateNamedEntity(t,r)}}stateNumericStart(t,r){return r>=t.length?-1:(t.charCodeAt(r)|fp)===Je.LOWER_X?(this.state=Ke.NumericHex,this.consumed+=1,this.stateNumericHex(t,r+1)):(this.state=Ke.NumericDecimal,this.stateNumericDecimal(t,r))}addToNumericResult(t,r,o,n){if(r!==o){let i=o-r;this.result=this.result*Math.pow(n,i)+parseInt(t.substr(r,i),n),this.consumed+=i}}stateNumericHex(t,r){let o=r;for(;r<t.length;){let n=t.charCodeAt(r);if(Ja(n)||pp(n))r+=1;else return this.addToNumericResult(t,o,r,16),this.emitNumericEntity(n,3)}return this.addToNumericResult(t,o,r,16),-1}stateNumericDecimal(t,r){let o=r;for(;r<t.length;){let n=t.charCodeAt(r);if(Ja(n))r+=1;else return this.addToNumericResult(t,o,r,10),this.emitNumericEntity(n,2)}return this.addToNumericResult(t,o,r,10),-1}emitNumericEntity(t,r){var o;if(this.consumed<=r)return(o=this.errors)===null||o===void 0||o.absenceOfDigitsInNumericCharacterReference(this.consumed),0;if(t===Je.SEMI)this.consumed+=1;else if(this.decodeMode===Wt.Strict)return 0;return this.emitCodePoint(Ka(this.result),this.consumed),this.errors&&(t!==Je.SEMI&&this.errors.missingSemicolonAfterCharacterReference(),this.errors.validateNumericCharacterReference(this.result)),this.consumed}stateNamedEntity(t,r){let{decodeTree:o}=this,n=o[this.treeIndex],i=(n&Nr.VALUE_LENGTH)>>14;for(;r<t.length;r++,this.excess++){let a=t.charCodeAt(r);if(this.treeIndex=bp(o,n,this.treeIndex+Math.max(1,i),a),this.treeIndex<0)return this.result===0||this.decodeMode===Wt.Attribute&&(i===0||hp(a))?0:this.emitNotTerminatedNamedEntity();if(n=o[this.treeIndex],i=(n&Nr.VALUE_LENGTH)>>14,i!==0){if(a===Je.SEMI)return this.emitNamedEntityData(this.treeIndex,i,this.consumed+this.excess);this.decodeMode!==Wt.Strict&&(this.result=this.treeIndex,this.consumed+=this.excess,this.excess=0)}}return-1}emitNotTerminatedNamedEntity(){var t;let{result:r,decodeTree:o}=this,n=(o[r]&Nr.VALUE_LENGTH)>>14;return this.emitNamedEntityData(r,n,this.consumed),(t=this.errors)===null||t===void 0||t.missingSemicolonAfterCharacterReference(),this.consumed}emitNamedEntityData(t,r,o){let{decodeTree:n}=this;return this.emitCodePoint(r===1?n[t]&~Nr.VALUE_LENGTH:n[t+1],o),r===3&&this.emitCodePoint(n[t+2],o),o}end(){var t;switch(this.state){case Ke.NamedEntity:return this.result!==0&&(this.decodeMode!==Wt.Attribute||this.result===this.treeIndex)?this.emitNotTerminatedNamedEntity():0;case Ke.NumericDecimal:return this.emitNumericEntity(0,2);case Ke.NumericHex:return this.emitNumericEntity(0,3);case Ke.NumericStart:return(t=this.errors)===null||t===void 0||t.absenceOfDigitsInNumericCharacterReference(this.consumed),0;case Ke.EntityStart:return 0}}};function sc(e){let t="",r=new Ti(e,o=>t+=Xa(o));return function(n,i){let a=0,s=0;for(;(s=n.indexOf("&",s))>=0;){t+=n.slice(a,s),r.startEntity(i);let l=r.write(n,s+1);if(l<0){a=s+r.end();break}a=s+l,s=l===0?a+1:a}let u=t+n.slice(a);return t="",u}}function bp(e,t,r,o){let n=(t&Nr.BRANCH_LENGTH)>>7,i=t&Nr.JUMP_TABLE;if(n===0)return i!==0&&o===i?r:-1;if(i){let u=o-i;return u<0||u>=n?-1:e[r+u]-1}let a=r,s=a+n-1;for(;a<=s;){let u=a+s>>>1,l=e[u];if(l<o)a=u+1;else if(l>o)s=u-1;else return e[u+n]}return-1}var uc=sc(ic),r9=sc(ac);function Ro(e,t=Wt.Legacy){return uc(e,t)}function dn(e){return uc(e,Wt.Strict)}function Fi(e){for(let t=1;t<e.length;t++)e[t][0]+=e[t-1][0]+1;return e}var vp=new Map(Fi([[9,"&Tab;"],[0,"&NewLine;"],[22,"&excl;"],[0,"&quot;"],[0,"&num;"],[0,"&dollar;"],[0,"&percnt;"],[0,"&amp;"],[0,"&apos;"],[0,"&lpar;"],[0,"&rpar;"],[0,"&ast;"],[0,"&plus;"],[0,"&comma;"],[1,"&period;"],[0,"&sol;"],[10,"&colon;"],[0,"&semi;"],[0,{v:"&lt;",n:8402,o:"&nvlt;"}],[0,{v:"&equals;",n:8421,o:"&bne;"}],[0,{v:"&gt;",n:8402,o:"&nvgt;"}],[0,"&quest;"],[0,"&commat;"],[26,"&lbrack;"],[0,"&bsol;"],[0,"&rbrack;"],[0,"&Hat;"],[0,"&lowbar;"],[0,"&DiacriticalGrave;"],[5,{n:106,o:"&fjlig;"}],[20,"&lbrace;"],[0,"&verbar;"],[0,"&rbrace;"],[34,"&nbsp;"],[0,"&iexcl;"],[0,"&cent;"],[0,"&pound;"],[0,"&curren;"],[0,"&yen;"],[0,"&brvbar;"],[0,"&sect;"],[0,"&die;"],[0,"&copy;"],[0,"&ordf;"],[0,"&laquo;"],[0,"&not;"],[0,"&shy;"],[0,"&circledR;"],[0,"&macr;"],[0,"&deg;"],[0,"&PlusMinus;"],[0,"&sup2;"],[0,"&sup3;"],[0,"&acute;"],[0,"&micro;"],[0,"&para;"],[0,"&centerdot;"],[0,"&cedil;"],[0,"&sup1;"],[0,"&ordm;"],[0,"&raquo;"],[0,"&frac14;"],[0,"&frac12;"],[0,"&frac34;"],[0,"&iquest;"],[0,"&Agrave;"],[0,"&Aacute;"],[0,"&Acirc;"],[0,"&Atilde;"],[0,"&Auml;"],[0,"&angst;"],[0,"&AElig;"],[0,"&Ccedil;"],[0,"&Egrave;"],[0,"&Eacute;"],[0,"&Ecirc;"],[0,"&Euml;"],[0,"&Igrave;"],[0,"&Iacute;"],[0,"&Icirc;"],[0,"&Iuml;"],[0,"&ETH;"],[0,"&Ntilde;"],[0,"&Ograve;"],[0,"&Oacute;"],[0,"&Ocirc;"],[0,"&Otilde;"],[0,"&Ouml;"],[0,"&times;"],[0,"&Oslash;"],[0,"&Ugrave;"],[0,"&Uacute;"],[0,"&Ucirc;"],[0,"&Uuml;"],[0,"&Yacute;"],[0,"&THORN;"],[0,"&szlig;"],[0,"&agrave;"],[0,"&aacute;"],[0,"&acirc;"],[0,"&atilde;"],[0,"&auml;"],[0,"&aring;"],[0,"&aelig;"],[0,"&ccedil;"],[0,"&egrave;"],[0,"&eacute;"],[0,"&ecirc;"],[0,"&euml;"],[0,"&igrave;"],[0,"&iacute;"],[0,"&icirc;"],[0,"&iuml;"],[0,"&eth;"],[0,"&ntilde;"],[0,"&ograve;"],[0,"&oacute;"],[0,"&ocirc;"],[0,"&otilde;"],[0,"&ouml;"],[0,"&div;"],[0,"&oslash;"],[0,"&ugrave;"],[0,"&uacute;"],[0,"&ucirc;"],[0,"&uuml;"],[0,"&yacute;"],[0,"&thorn;"],[0,"&yuml;"],[0,"&Amacr;"],[0,"&amacr;"],[0,"&Abreve;"],[0,"&abreve;"],[0,"&Aogon;"],[0,"&aogon;"],[0,"&Cacute;"],[0,"&cacute;"],[0,"&Ccirc;"],[0,"&ccirc;"],[0,"&Cdot;"],[0,"&cdot;"],[0,"&Ccaron;"],[0,"&ccaron;"],[0,"&Dcaron;"],[0,"&dcaron;"],[0,"&Dstrok;"],[0,"&dstrok;"],[0,"&Emacr;"],[0,"&emacr;"],[2,"&Edot;"],[0,"&edot;"],[0,"&Eogon;"],[0,"&eogon;"],[0,"&Ecaron;"],[0,"&ecaron;"],[0,"&Gcirc;"],[0,"&gcirc;"],[0,"&Gbreve;"],[0,"&gbreve;"],[0,"&Gdot;"],[0,"&gdot;"],[0,"&Gcedil;"],[1,"&Hcirc;"],[0,"&hcirc;"],[0,"&Hstrok;"],[0,"&hstrok;"],[0,"&Itilde;"],[0,"&itilde;"],[0,"&Imacr;"],[0,"&imacr;"],[2,"&Iogon;"],[0,"&iogon;"],[0,"&Idot;"],[0,"&imath;"],[0,"&IJlig;"],[0,"&ijlig;"],[0,"&Jcirc;"],[0,"&jcirc;"],[0,"&Kcedil;"],[0,"&kcedil;"],[0,"&kgreen;"],[0,"&Lacute;"],[0,"&lacute;"],[0,"&Lcedil;"],[0,"&lcedil;"],[0,"&Lcaron;"],[0,"&lcaron;"],[0,"&Lmidot;"],[0,"&lmidot;"],[0,"&Lstrok;"],[0,"&lstrok;"],[0,"&Nacute;"],[0,"&nacute;"],[0,"&Ncedil;"],[0,"&ncedil;"],[0,"&Ncaron;"],[0,"&ncaron;"],[0,"&napos;"],[0,"&ENG;"],[0,"&eng;"],[0,"&Omacr;"],[0,"&omacr;"],[2,"&Odblac;"],[0,"&odblac;"],[0,"&OElig;"],[0,"&oelig;"],[0,"&Racute;"],[0,"&racute;"],[0,"&Rcedil;"],[0,"&rcedil;"],[0,"&Rcaron;"],[0,"&rcaron;"],[0,"&Sacute;"],[0,"&sacute;"],[0,"&Scirc;"],[0,"&scirc;"],[0,"&Scedil;"],[0,"&scedil;"],[0,"&Scaron;"],[0,"&scaron;"],[0,"&Tcedil;"],[0,"&tcedil;"],[0,"&Tcaron;"],[0,"&tcaron;"],[0,"&Tstrok;"],[0,"&tstrok;"],[0,"&Utilde;"],[0,"&utilde;"],[0,"&Umacr;"],[0,"&umacr;"],[0,"&Ubreve;"],[0,"&ubreve;"],[0,"&Uring;"],[0,"&uring;"],[0,"&Udblac;"],[0,"&udblac;"],[0,"&Uogon;"],[0,"&uogon;"],[0,"&Wcirc;"],[0,"&wcirc;"],[0,"&Ycirc;"],[0,"&ycirc;"],[0,"&Yuml;"],[0,"&Zacute;"],[0,"&zacute;"],[0,"&Zdot;"],[0,"&zdot;"],[0,"&Zcaron;"],[0,"&zcaron;"],[19,"&fnof;"],[34,"&imped;"],[63,"&gacute;"],[65,"&jmath;"],[142,"&circ;"],[0,"&caron;"],[16,"&breve;"],[0,"&DiacriticalDot;"],[0,"&ring;"],[0,"&ogon;"],[0,"&DiacriticalTilde;"],[0,"&dblac;"],[51,"&DownBreve;"],[127,"&Alpha;"],[0,"&Beta;"],[0,"&Gamma;"],[0,"&Delta;"],[0,"&Epsilon;"],[0,"&Zeta;"],[0,"&Eta;"],[0,"&Theta;"],[0,"&Iota;"],[0,"&Kappa;"],[0,"&Lambda;"],[0,"&Mu;"],[0,"&Nu;"],[0,"&Xi;"],[0,"&Omicron;"],[0,"&Pi;"],[0,"&Rho;"],[1,"&Sigma;"],[0,"&Tau;"],[0,"&Upsilon;"],[0,"&Phi;"],[0,"&Chi;"],[0,"&Psi;"],[0,"&ohm;"],[7,"&alpha;"],[0,"&beta;"],[0,"&gamma;"],[0,"&delta;"],[0,"&epsi;"],[0,"&zeta;"],[0,"&eta;"],[0,"&theta;"],[0,"&iota;"],[0,"&kappa;"],[0,"&lambda;"],[0,"&mu;"],[0,"&nu;"],[0,"&xi;"],[0,"&omicron;"],[0,"&pi;"],[0,"&rho;"],[0,"&sigmaf;"],[0,"&sigma;"],[0,"&tau;"],[0,"&upsi;"],[0,"&phi;"],[0,"&chi;"],[0,"&psi;"],[0,"&omega;"],[7,"&thetasym;"],[0,"&Upsi;"],[2,"&phiv;"],[0,"&piv;"],[5,"&Gammad;"],[0,"&digamma;"],[18,"&kappav;"],[0,"&rhov;"],[3,"&epsiv;"],[0,"&backepsilon;"],[10,"&IOcy;"],[0,"&DJcy;"],[0,"&GJcy;"],[0,"&Jukcy;"],[0,"&DScy;"],[0,"&Iukcy;"],[0,"&YIcy;"],[0,"&Jsercy;"],[0,"&LJcy;"],[0,"&NJcy;"],[0,"&TSHcy;"],[0,"&KJcy;"],[1,"&Ubrcy;"],[0,"&DZcy;"],[0,"&Acy;"],[0,"&Bcy;"],[0,"&Vcy;"],[0,"&Gcy;"],[0,"&Dcy;"],[0,"&IEcy;"],[0,"&ZHcy;"],[0,"&Zcy;"],[0,"&Icy;"],[0,"&Jcy;"],[0,"&Kcy;"],[0,"&Lcy;"],[0,"&Mcy;"],[0,"&Ncy;"],[0,"&Ocy;"],[0,"&Pcy;"],[0,"&Rcy;"],[0,"&Scy;"],[0,"&Tcy;"],[0,"&Ucy;"],[0,"&Fcy;"],[0,"&KHcy;"],[0,"&TScy;"],[0,"&CHcy;"],[0,"&SHcy;"],[0,"&SHCHcy;"],[0,"&HARDcy;"],[0,"&Ycy;"],[0,"&SOFTcy;"],[0,"&Ecy;"],[0,"&YUcy;"],[0,"&YAcy;"],[0,"&acy;"],[0,"&bcy;"],[0,"&vcy;"],[0,"&gcy;"],[0,"&dcy;"],[0,"&iecy;"],[0,"&zhcy;"],[0,"&zcy;"],[0,"&icy;"],[0,"&jcy;"],[0,"&kcy;"],[0,"&lcy;"],[0,"&mcy;"],[0,"&ncy;"],[0,"&ocy;"],[0,"&pcy;"],[0,"&rcy;"],[0,"&scy;"],[0,"&tcy;"],[0,"&ucy;"],[0,"&fcy;"],[0,"&khcy;"],[0,"&tscy;"],[0,"&chcy;"],[0,"&shcy;"],[0,"&shchcy;"],[0,"&hardcy;"],[0,"&ycy;"],[0,"&softcy;"],[0,"&ecy;"],[0,"&yucy;"],[0,"&yacy;"],[1,"&iocy;"],[0,"&djcy;"],[0,"&gjcy;"],[0,"&jukcy;"],[0,"&dscy;"],[0,"&iukcy;"],[0,"&yicy;"],[0,"&jsercy;"],[0,"&ljcy;"],[0,"&njcy;"],[0,"&tshcy;"],[0,"&kjcy;"],[1,"&ubrcy;"],[0,"&dzcy;"],[7074,"&ensp;"],[0,"&emsp;"],[0,"&emsp13;"],[0,"&emsp14;"],[1,"&numsp;"],[0,"&puncsp;"],[0,"&ThinSpace;"],[0,"&hairsp;"],[0,"&NegativeMediumSpace;"],[0,"&zwnj;"],[0,"&zwj;"],[0,"&lrm;"],[0,"&rlm;"],[0,"&dash;"],[2,"&ndash;"],[0,"&mdash;"],[0,"&horbar;"],[0,"&Verbar;"],[1,"&lsquo;"],[0,"&CloseCurlyQuote;"],[0,"&lsquor;"],[1,"&ldquo;"],[0,"&CloseCurlyDoubleQuote;"],[0,"&bdquo;"],[1,"&dagger;"],[0,"&Dagger;"],[0,"&bull;"],[2,"&nldr;"],[0,"&hellip;"],[9,"&permil;"],[0,"&pertenk;"],[0,"&prime;"],[0,"&Prime;"],[0,"&tprime;"],[0,"&backprime;"],[3,"&lsaquo;"],[0,"&rsaquo;"],[3,"&oline;"],[2,"&caret;"],[1,"&hybull;"],[0,"&frasl;"],[10,"&bsemi;"],[7,"&qprime;"],[7,{v:"&MediumSpace;",n:8202,o:"&ThickSpace;"}],[0,"&NoBreak;"],[0,"&af;"],[0,"&InvisibleTimes;"],[0,"&ic;"],[72,"&euro;"],[46,"&tdot;"],[0,"&DotDot;"],[37,"&complexes;"],[2,"&incare;"],[4,"&gscr;"],[0,"&hamilt;"],[0,"&Hfr;"],[0,"&Hopf;"],[0,"&planckh;"],[0,"&hbar;"],[0,"&imagline;"],[0,"&Ifr;"],[0,"&lagran;"],[0,"&ell;"],[1,"&naturals;"],[0,"&numero;"],[0,"&copysr;"],[0,"&weierp;"],[0,"&Popf;"],[0,"&Qopf;"],[0,"&realine;"],[0,"&real;"],[0,"&reals;"],[0,"&rx;"],[3,"&trade;"],[1,"&integers;"],[2,"&mho;"],[0,"&zeetrf;"],[0,"&iiota;"],[2,"&bernou;"],[0,"&Cayleys;"],[1,"&escr;"],[0,"&Escr;"],[0,"&Fouriertrf;"],[1,"&Mellintrf;"],[0,"&order;"],[0,"&alefsym;"],[0,"&beth;"],[0,"&gimel;"],[0,"&daleth;"],[12,"&CapitalDifferentialD;"],[0,"&dd;"],[0,"&ee;"],[0,"&ii;"],[10,"&frac13;"],[0,"&frac23;"],[0,"&frac15;"],[0,"&frac25;"],[0,"&frac35;"],[0,"&frac45;"],[0,"&frac16;"],[0,"&frac56;"],[0,"&frac18;"],[0,"&frac38;"],[0,"&frac58;"],[0,"&frac78;"],[49,"&larr;"],[0,"&ShortUpArrow;"],[0,"&rarr;"],[0,"&darr;"],[0,"&harr;"],[0,"&updownarrow;"],[0,"&nwarr;"],[0,"&nearr;"],[0,"&LowerRightArrow;"],[0,"&LowerLeftArrow;"],[0,"&nlarr;"],[0,"&nrarr;"],[1,{v:"&rarrw;",n:824,o:"&nrarrw;"}],[0,"&Larr;"],[0,"&Uarr;"],[0,"&Rarr;"],[0,"&Darr;"],[0,"&larrtl;"],[0,"&rarrtl;"],[0,"&LeftTeeArrow;"],[0,"&mapstoup;"],[0,"&map;"],[0,"&DownTeeArrow;"],[1,"&hookleftarrow;"],[0,"&hookrightarrow;"],[0,"&larrlp;"],[0,"&looparrowright;"],[0,"&harrw;"],[0,"&nharr;"],[1,"&lsh;"],[0,"&rsh;"],[0,"&ldsh;"],[0,"&rdsh;"],[1,"&crarr;"],[0,"&cularr;"],[0,"&curarr;"],[2,"&circlearrowleft;"],[0,"&circlearrowright;"],[0,"&leftharpoonup;"],[0,"&DownLeftVector;"],[0,"&RightUpVector;"],[0,"&LeftUpVector;"],[0,"&rharu;"],[0,"&DownRightVector;"],[0,"&dharr;"],[0,"&dharl;"],[0,"&RightArrowLeftArrow;"],[0,"&udarr;"],[0,"&LeftArrowRightArrow;"],[0,"&leftleftarrows;"],[0,"&upuparrows;"],[0,"&rightrightarrows;"],[0,"&ddarr;"],[0,"&leftrightharpoons;"],[0,"&Equilibrium;"],[0,"&nlArr;"],[0,"&nhArr;"],[0,"&nrArr;"],[0,"&DoubleLeftArrow;"],[0,"&DoubleUpArrow;"],[0,"&DoubleRightArrow;"],[0,"&dArr;"],[0,"&DoubleLeftRightArrow;"],[0,"&DoubleUpDownArrow;"],[0,"&nwArr;"],[0,"&neArr;"],[0,"&seArr;"],[0,"&swArr;"],[0,"&lAarr;"],[0,"&rAarr;"],[1,"&zigrarr;"],[6,"&larrb;"],[0,"&rarrb;"],[15,"&DownArrowUpArrow;"],[7,"&loarr;"],[0,"&roarr;"],[0,"&hoarr;"],[0,"&forall;"],[0,"&comp;"],[0,{v:"&part;",n:824,o:"&npart;"}],[0,"&exist;"],[0,"&nexist;"],[0,"&empty;"],[1,"&Del;"],[0,"&Element;"],[0,"&NotElement;"],[1,"&ni;"],[0,"&notni;"],[2,"&prod;"],[0,"&coprod;"],[0,"&sum;"],[0,"&minus;"],[0,"&MinusPlus;"],[0,"&dotplus;"],[1,"&Backslash;"],[0,"&lowast;"],[0,"&compfn;"],[1,"&radic;"],[2,"&prop;"],[0,"&infin;"],[0,"&angrt;"],[0,{v:"&ang;",n:8402,o:"&nang;"}],[0,"&angmsd;"],[0,"&angsph;"],[0,"&mid;"],[0,"&nmid;"],[0,"&DoubleVerticalBar;"],[0,"&NotDoubleVerticalBar;"],[0,"&and;"],[0,"&or;"],[0,{v:"&cap;",n:65024,o:"&caps;"}],[0,{v:"&cup;",n:65024,o:"&cups;"}],[0,"&int;"],[0,"&Int;"],[0,"&iiint;"],[0,"&conint;"],[0,"&Conint;"],[0,"&Cconint;"],[0,"&cwint;"],[0,"&ClockwiseContourIntegral;"],[0,"&awconint;"],[0,"&there4;"],[0,"&becaus;"],[0,"&ratio;"],[0,"&Colon;"],[0,"&dotminus;"],[1,"&mDDot;"],[0,"&homtht;"],[0,{v:"&sim;",n:8402,o:"&nvsim;"}],[0,{v:"&backsim;",n:817,o:"&race;"}],[0,{v:"&ac;",n:819,o:"&acE;"}],[0,"&acd;"],[0,"&VerticalTilde;"],[0,"&NotTilde;"],[0,{v:"&eqsim;",n:824,o:"&nesim;"}],[0,"&sime;"],[0,"&NotTildeEqual;"],[0,"&cong;"],[0,"&simne;"],[0,"&ncong;"],[0,"&ap;"],[0,"&nap;"],[0,"&ape;"],[0,{v:"&apid;",n:824,o:"&napid;"}],[0,"&backcong;"],[0,{v:"&asympeq;",n:8402,o:"&nvap;"}],[0,{v:"&bump;",n:824,o:"&nbump;"}],[0,{v:"&bumpe;",n:824,o:"&nbumpe;"}],[0,{v:"&doteq;",n:824,o:"&nedot;"}],[0,"&doteqdot;"],[0,"&efDot;"],[0,"&erDot;"],[0,"&Assign;"],[0,"&ecolon;"],[0,"&ecir;"],[0,"&circeq;"],[1,"&wedgeq;"],[0,"&veeeq;"],[1,"&triangleq;"],[2,"&equest;"],[0,"&ne;"],[0,{v:"&Congruent;",n:8421,o:"&bnequiv;"}],[0,"&nequiv;"],[1,{v:"&le;",n:8402,o:"&nvle;"}],[0,{v:"&ge;",n:8402,o:"&nvge;"}],[0,{v:"&lE;",n:824,o:"&nlE;"}],[0,{v:"&gE;",n:824,o:"&ngE;"}],[0,{v:"&lnE;",n:65024,o:"&lvertneqq;"}],[0,{v:"&gnE;",n:65024,o:"&gvertneqq;"}],[0,{v:"&ll;",n:new Map(Fi([[824,"&nLtv;"],[7577,"&nLt;"]]))}],[0,{v:"&gg;",n:new Map(Fi([[824,"&nGtv;"],[7577,"&nGt;"]]))}],[0,"&between;"],[0,"&NotCupCap;"],[0,"&nless;"],[0,"&ngt;"],[0,"&nle;"],[0,"&nge;"],[0,"&lesssim;"],[0,"&GreaterTilde;"],[0,"&nlsim;"],[0,"&ngsim;"],[0,"&LessGreater;"],[0,"&gl;"],[0,"&NotLessGreater;"],[0,"&NotGreaterLess;"],[0,"&pr;"],[0,"&sc;"],[0,"&prcue;"],[0,"&sccue;"],[0,"&PrecedesTilde;"],[0,{v:"&scsim;",n:824,o:"&NotSucceedsTilde;"}],[0,"&NotPrecedes;"],[0,"&NotSucceeds;"],[0,{v:"&sub;",n:8402,o:"&NotSubset;"}],[0,{v:"&sup;",n:8402,o:"&NotSuperset;"}],[0,"&nsub;"],[0,"&nsup;"],[0,"&sube;"],[0,"&supe;"],[0,"&NotSubsetEqual;"],[0,"&NotSupersetEqual;"],[0,{v:"&subne;",n:65024,o:"&varsubsetneq;"}],[0,{v:"&supne;",n:65024,o:"&varsupsetneq;"}],[1,"&cupdot;"],[0,"&UnionPlus;"],[0,{v:"&sqsub;",n:824,o:"&NotSquareSubset;"}],[0,{v:"&sqsup;",n:824,o:"&NotSquareSuperset;"}],[0,"&sqsube;"],[0,"&sqsupe;"],[0,{v:"&sqcap;",n:65024,o:"&sqcaps;"}],[0,{v:"&sqcup;",n:65024,o:"&sqcups;"}],[0,"&CirclePlus;"],[0,"&CircleMinus;"],[0,"&CircleTimes;"],[0,"&osol;"],[0,"&CircleDot;"],[0,"&circledcirc;"],[0,"&circledast;"],[1,"&circleddash;"],[0,"&boxplus;"],[0,"&boxminus;"],[0,"&boxtimes;"],[0,"&dotsquare;"],[0,"&RightTee;"],[0,"&dashv;"],[0,"&DownTee;"],[0,"&bot;"],[1,"&models;"],[0,"&DoubleRightTee;"],[0,"&Vdash;"],[0,"&Vvdash;"],[0,"&VDash;"],[0,"&nvdash;"],[0,"&nvDash;"],[0,"&nVdash;"],[0,"&nVDash;"],[0,"&prurel;"],[1,"&LeftTriangle;"],[0,"&RightTriangle;"],[0,{v:"&LeftTriangleEqual;",n:8402,o:"&nvltrie;"}],[0,{v:"&RightTriangleEqual;",n:8402,o:"&nvrtrie;"}],[0,"&origof;"],[0,"&imof;"],[0,"&multimap;"],[0,"&hercon;"],[0,"&intcal;"],[0,"&veebar;"],[1,"&barvee;"],[0,"&angrtvb;"],[0,"&lrtri;"],[0,"&bigwedge;"],[0,"&bigvee;"],[0,"&bigcap;"],[0,"&bigcup;"],[0,"&diam;"],[0,"&sdot;"],[0,"&sstarf;"],[0,"&divideontimes;"],[0,"&bowtie;"],[0,"&ltimes;"],[0,"&rtimes;"],[0,"&leftthreetimes;"],[0,"&rightthreetimes;"],[0,"&backsimeq;"],[0,"&curlyvee;"],[0,"&curlywedge;"],[0,"&Sub;"],[0,"&Sup;"],[0,"&Cap;"],[0,"&Cup;"],[0,"&fork;"],[0,"&epar;"],[0,"&lessdot;"],[0,"&gtdot;"],[0,{v:"&Ll;",n:824,o:"&nLl;"}],[0,{v:"&Gg;",n:824,o:"&nGg;"}],[0,{v:"&leg;",n:65024,o:"&lesg;"}],[0,{v:"&gel;",n:65024,o:"&gesl;"}],[2,"&cuepr;"],[0,"&cuesc;"],[0,"&NotPrecedesSlantEqual;"],[0,"&NotSucceedsSlantEqual;"],[0,"&NotSquareSubsetEqual;"],[0,"&NotSquareSupersetEqual;"],[2,"&lnsim;"],[0,"&gnsim;"],[0,"&precnsim;"],[0,"&scnsim;"],[0,"&nltri;"],[0,"&NotRightTriangle;"],[0,"&nltrie;"],[0,"&NotRightTriangleEqual;"],[0,"&vellip;"],[0,"&ctdot;"],[0,"&utdot;"],[0,"&dtdot;"],[0,"&disin;"],[0,"&isinsv;"],[0,"&isins;"],[0,{v:"&isindot;",n:824,o:"&notindot;"}],[0,"&notinvc;"],[0,"&notinvb;"],[1,{v:"&isinE;",n:824,o:"&notinE;"}],[0,"&nisd;"],[0,"&xnis;"],[0,"&nis;"],[0,"&notnivc;"],[0,"&notnivb;"],[6,"&barwed;"],[0,"&Barwed;"],[1,"&lceil;"],[0,"&rceil;"],[0,"&LeftFloor;"],[0,"&rfloor;"],[0,"&drcrop;"],[0,"&dlcrop;"],[0,"&urcrop;"],[0,"&ulcrop;"],[0,"&bnot;"],[1,"&profline;"],[0,"&profsurf;"],[1,"&telrec;"],[0,"&target;"],[5,"&ulcorn;"],[0,"&urcorn;"],[0,"&dlcorn;"],[0,"&drcorn;"],[2,"&frown;"],[0,"&smile;"],[9,"&cylcty;"],[0,"&profalar;"],[7,"&topbot;"],[6,"&ovbar;"],[1,"&solbar;"],[60,"&angzarr;"],[51,"&lmoustache;"],[0,"&rmoustache;"],[2,"&OverBracket;"],[0,"&bbrk;"],[0,"&bbrktbrk;"],[37,"&OverParenthesis;"],[0,"&UnderParenthesis;"],[0,"&OverBrace;"],[0,"&UnderBrace;"],[2,"&trpezium;"],[4,"&elinters;"],[59,"&blank;"],[164,"&circledS;"],[55,"&boxh;"],[1,"&boxv;"],[9,"&boxdr;"],[3,"&boxdl;"],[3,"&boxur;"],[3,"&boxul;"],[3,"&boxvr;"],[7,"&boxvl;"],[7,"&boxhd;"],[7,"&boxhu;"],[7,"&boxvh;"],[19,"&boxH;"],[0,"&boxV;"],[0,"&boxdR;"],[0,"&boxDr;"],[0,"&boxDR;"],[0,"&boxdL;"],[0,"&boxDl;"],[0,"&boxDL;"],[0,"&boxuR;"],[0,"&boxUr;"],[0,"&boxUR;"],[0,"&boxuL;"],[0,"&boxUl;"],[0,"&boxUL;"],[0,"&boxvR;"],[0,"&boxVr;"],[0,"&boxVR;"],[0,"&boxvL;"],[0,"&boxVl;"],[0,"&boxVL;"],[0,"&boxHd;"],[0,"&boxhD;"],[0,"&boxHD;"],[0,"&boxHu;"],[0,"&boxhU;"],[0,"&boxHU;"],[0,"&boxvH;"],[0,"&boxVh;"],[0,"&boxVH;"],[19,"&uhblk;"],[3,"&lhblk;"],[3,"&block;"],[8,"&blk14;"],[0,"&blk12;"],[0,"&blk34;"],[13,"&square;"],[8,"&blacksquare;"],[0,"&EmptyVerySmallSquare;"],[1,"&rect;"],[0,"&marker;"],[2,"&fltns;"],[1,"&bigtriangleup;"],[0,"&blacktriangle;"],[0,"&triangle;"],[2,"&blacktriangleright;"],[0,"&rtri;"],[3,"&bigtriangledown;"],[0,"&blacktriangledown;"],[0,"&dtri;"],[2,"&blacktriangleleft;"],[0,"&ltri;"],[6,"&loz;"],[0,"&cir;"],[32,"&tridot;"],[2,"&bigcirc;"],[8,"&ultri;"],[0,"&urtri;"],[0,"&lltri;"],[0,"&EmptySmallSquare;"],[0,"&FilledSmallSquare;"],[8,"&bigstar;"],[0,"&star;"],[7,"&phone;"],[49,"&female;"],[1,"&male;"],[29,"&spades;"],[2,"&clubs;"],[1,"&hearts;"],[0,"&diamondsuit;"],[3,"&sung;"],[2,"&flat;"],[0,"&natural;"],[0,"&sharp;"],[163,"&check;"],[3,"&cross;"],[8,"&malt;"],[21,"&sext;"],[33,"&VerticalSeparator;"],[25,"&lbbrk;"],[0,"&rbbrk;"],[84,"&bsolhsub;"],[0,"&suphsol;"],[28,"&LeftDoubleBracket;"],[0,"&RightDoubleBracket;"],[0,"&lang;"],[0,"&rang;"],[0,"&Lang;"],[0,"&Rang;"],[0,"&loang;"],[0,"&roang;"],[7,"&longleftarrow;"],[0,"&longrightarrow;"],[0,"&longleftrightarrow;"],[0,"&DoubleLongLeftArrow;"],[0,"&DoubleLongRightArrow;"],[0,"&DoubleLongLeftRightArrow;"],[1,"&longmapsto;"],[2,"&dzigrarr;"],[258,"&nvlArr;"],[0,"&nvrArr;"],[0,"&nvHarr;"],[0,"&Map;"],[6,"&lbarr;"],[0,"&bkarow;"],[0,"&lBarr;"],[0,"&dbkarow;"],[0,"&drbkarow;"],[0,"&DDotrahd;"],[0,"&UpArrowBar;"],[0,"&DownArrowBar;"],[2,"&Rarrtl;"],[2,"&latail;"],[0,"&ratail;"],[0,"&lAtail;"],[0,"&rAtail;"],[0,"&larrfs;"],[0,"&rarrfs;"],[0,"&larrbfs;"],[0,"&rarrbfs;"],[2,"&nwarhk;"],[0,"&nearhk;"],[0,"&hksearow;"],[0,"&hkswarow;"],[0,"&nwnear;"],[0,"&nesear;"],[0,"&seswar;"],[0,"&swnwar;"],[8,{v:"&rarrc;",n:824,o:"&nrarrc;"}],[1,"&cudarrr;"],[0,"&ldca;"],[0,"&rdca;"],[0,"&cudarrl;"],[0,"&larrpl;"],[2,"&curarrm;"],[0,"&cularrp;"],[7,"&rarrpl;"],[2,"&harrcir;"],[0,"&Uarrocir;"],[0,"&lurdshar;"],[0,"&ldrushar;"],[2,"&LeftRightVector;"],[0,"&RightUpDownVector;"],[0,"&DownLeftRightVector;"],[0,"&LeftUpDownVector;"],[0,"&LeftVectorBar;"],[0,"&RightVectorBar;"],[0,"&RightUpVectorBar;"],[0,"&RightDownVectorBar;"],[0,"&DownLeftVectorBar;"],[0,"&DownRightVectorBar;"],[0,"&LeftUpVectorBar;"],[0,"&LeftDownVectorBar;"],[0,"&LeftTeeVector;"],[0,"&RightTeeVector;"],[0,"&RightUpTeeVector;"],[0,"&RightDownTeeVector;"],[0,"&DownLeftTeeVector;"],[0,"&DownRightTeeVector;"],[0,"&LeftUpTeeVector;"],[0,"&LeftDownTeeVector;"],[0,"&lHar;"],[0,"&uHar;"],[0,"&rHar;"],[0,"&dHar;"],[0,"&luruhar;"],[0,"&ldrdhar;"],[0,"&ruluhar;"],[0,"&rdldhar;"],[0,"&lharul;"],[0,"&llhard;"],[0,"&rharul;"],[0,"&lrhard;"],[0,"&udhar;"],[0,"&duhar;"],[0,"&RoundImplies;"],[0,"&erarr;"],[0,"&simrarr;"],[0,"&larrsim;"],[0,"&rarrsim;"],[0,"&rarrap;"],[0,"&ltlarr;"],[1,"&gtrarr;"],[0,"&subrarr;"],[1,"&suplarr;"],[0,"&lfisht;"],[0,"&rfisht;"],[0,"&ufisht;"],[0,"&dfisht;"],[5,"&lopar;"],[0,"&ropar;"],[4,"&lbrke;"],[0,"&rbrke;"],[0,"&lbrkslu;"],[0,"&rbrksld;"],[0,"&lbrksld;"],[0,"&rbrkslu;"],[0,"&langd;"],[0,"&rangd;"],[0,"&lparlt;"],[0,"&rpargt;"],[0,"&gtlPar;"],[0,"&ltrPar;"],[3,"&vzigzag;"],[1,"&vangrt;"],[0,"&angrtvbd;"],[6,"&ange;"],[0,"&range;"],[0,"&dwangle;"],[0,"&uwangle;"],[0,"&angmsdaa;"],[0,"&angmsdab;"],[0,"&angmsdac;"],[0,"&angmsdad;"],[0,"&angmsdae;"],[0,"&angmsdaf;"],[0,"&angmsdag;"],[0,"&angmsdah;"],[0,"&bemptyv;"],[0,"&demptyv;"],[0,"&cemptyv;"],[0,"&raemptyv;"],[0,"&laemptyv;"],[0,"&ohbar;"],[0,"&omid;"],[0,"&opar;"],[1,"&operp;"],[1,"&olcross;"],[0,"&odsold;"],[1,"&olcir;"],[0,"&ofcir;"],[0,"&olt;"],[0,"&ogt;"],[0,"&cirscir;"],[0,"&cirE;"],[0,"&solb;"],[0,"&bsolb;"],[3,"&boxbox;"],[3,"&trisb;"],[0,"&rtriltri;"],[0,{v:"&LeftTriangleBar;",n:824,o:"&NotLeftTriangleBar;"}],[0,{v:"&RightTriangleBar;",n:824,o:"&NotRightTriangleBar;"}],[11,"&iinfin;"],[0,"&infintie;"],[0,"&nvinfin;"],[4,"&eparsl;"],[0,"&smeparsl;"],[0,"&eqvparsl;"],[5,"&blacklozenge;"],[8,"&RuleDelayed;"],[1,"&dsol;"],[9,"&bigodot;"],[0,"&bigoplus;"],[0,"&bigotimes;"],[1,"&biguplus;"],[1,"&bigsqcup;"],[5,"&iiiint;"],[0,"&fpartint;"],[2,"&cirfnint;"],[0,"&awint;"],[0,"&rppolint;"],[0,"&scpolint;"],[0,"&npolint;"],[0,"&pointint;"],[0,"&quatint;"],[0,"&intlarhk;"],[10,"&pluscir;"],[0,"&plusacir;"],[0,"&simplus;"],[0,"&plusdu;"],[0,"&plussim;"],[0,"&plustwo;"],[1,"&mcomma;"],[0,"&minusdu;"],[2,"&loplus;"],[0,"&roplus;"],[0,"&Cross;"],[0,"&timesd;"],[0,"&timesbar;"],[1,"&smashp;"],[0,"&lotimes;"],[0,"&rotimes;"],[0,"&otimesas;"],[0,"&Otimes;"],[0,"&odiv;"],[0,"&triplus;"],[0,"&triminus;"],[0,"&tritime;"],[0,"&intprod;"],[2,"&amalg;"],[0,"&capdot;"],[1,"&ncup;"],[0,"&ncap;"],[0,"&capand;"],[0,"&cupor;"],[0,"&cupcap;"],[0,"&capcup;"],[0,"&cupbrcap;"],[0,"&capbrcup;"],[0,"&cupcup;"],[0,"&capcap;"],[0,"&ccups;"],[0,"&ccaps;"],[2,"&ccupssm;"],[2,"&And;"],[0,"&Or;"],[0,"&andand;"],[0,"&oror;"],[0,"&orslope;"],[0,"&andslope;"],[1,"&andv;"],[0,"&orv;"],[0,"&andd;"],[0,"&ord;"],[1,"&wedbar;"],[6,"&sdote;"],[3,"&simdot;"],[2,{v:"&congdot;",n:824,o:"&ncongdot;"}],[0,"&easter;"],[0,"&apacir;"],[0,{v:"&apE;",n:824,o:"&napE;"}],[0,"&eplus;"],[0,"&pluse;"],[0,"&Esim;"],[0,"&Colone;"],[0,"&Equal;"],[1,"&ddotseq;"],[0,"&equivDD;"],[0,"&ltcir;"],[0,"&gtcir;"],[0,"&ltquest;"],[0,"&gtquest;"],[0,{v:"&leqslant;",n:824,o:"&nleqslant;"}],[0,{v:"&geqslant;",n:824,o:"&ngeqslant;"}],[0,"&lesdot;"],[0,"&gesdot;"],[0,"&lesdoto;"],[0,"&gesdoto;"],[0,"&lesdotor;"],[0,"&gesdotol;"],[0,"&lap;"],[0,"&gap;"],[0,"&lne;"],[0,"&gne;"],[0,"&lnap;"],[0,"&gnap;"],[0,"&lEg;"],[0,"&gEl;"],[0,"&lsime;"],[0,"&gsime;"],[0,"&lsimg;"],[0,"&gsiml;"],[0,"&lgE;"],[0,"&glE;"],[0,"&lesges;"],[0,"&gesles;"],[0,"&els;"],[0,"&egs;"],[0,"&elsdot;"],[0,"&egsdot;"],[0,"&el;"],[0,"&eg;"],[2,"&siml;"],[0,"&simg;"],[0,"&simlE;"],[0,"&simgE;"],[0,{v:"&LessLess;",n:824,o:"&NotNestedLessLess;"}],[0,{v:"&GreaterGreater;",n:824,o:"&NotNestedGreaterGreater;"}],[1,"&glj;"],[0,"&gla;"],[0,"&ltcc;"],[0,"&gtcc;"],[0,"&lescc;"],[0,"&gescc;"],[0,"&smt;"],[0,"&lat;"],[0,{v:"&smte;",n:65024,o:"&smtes;"}],[0,{v:"&late;",n:65024,o:"&lates;"}],[0,"&bumpE;"],[0,{v:"&PrecedesEqual;",n:824,o:"&NotPrecedesEqual;"}],[0,{v:"&sce;",n:824,o:"&NotSucceedsEqual;"}],[2,"&prE;"],[0,"&scE;"],[0,"&precneqq;"],[0,"&scnE;"],[0,"&prap;"],[0,"&scap;"],[0,"&precnapprox;"],[0,"&scnap;"],[0,"&Pr;"],[0,"&Sc;"],[0,"&subdot;"],[0,"&supdot;"],[0,"&subplus;"],[0,"&supplus;"],[0,"&submult;"],[0,"&supmult;"],[0,"&subedot;"],[0,"&supedot;"],[0,{v:"&subE;",n:824,o:"&nsubE;"}],[0,{v:"&supE;",n:824,o:"&nsupE;"}],[0,"&subsim;"],[0,"&supsim;"],[2,{v:"&subnE;",n:65024,o:"&varsubsetneqq;"}],[0,{v:"&supnE;",n:65024,o:"&varsupsetneqq;"}],[2,"&csub;"],[0,"&csup;"],[0,"&csube;"],[0,"&csupe;"],[0,"&subsup;"],[0,"&supsub;"],[0,"&subsub;"],[0,"&supsup;"],[0,"&suphsub;"],[0,"&supdsub;"],[0,"&forkv;"],[0,"&topfork;"],[0,"&mlcp;"],[8,"&Dashv;"],[1,"&Vdashl;"],[0,"&Barv;"],[0,"&vBar;"],[0,"&vBarv;"],[1,"&Vbar;"],[0,"&Not;"],[0,"&bNot;"],[0,"&rnmid;"],[0,"&cirmid;"],[0,"&midcir;"],[0,"&topcir;"],[0,"&nhpar;"],[0,"&parsim;"],[9,{v:"&parsl;",n:8421,o:"&nparsl;"}],[44343,{n:new Map(Fi([[56476,"&Ascr;"],[1,"&Cscr;"],[0,"&Dscr;"],[2,"&Gscr;"],[2,"&Jscr;"],[0,"&Kscr;"],[2,"&Nscr;"],[0,"&Oscr;"],[0,"&Pscr;"],[0,"&Qscr;"],[1,"&Sscr;"],[0,"&Tscr;"],[0,"&Uscr;"],[0,"&Vscr;"],[0,"&Wscr;"],[0,"&Xscr;"],[0,"&Yscr;"],[0,"&Zscr;"],[0,"&ascr;"],[0,"&bscr;"],[0,"&cscr;"],[0,"&dscr;"],[1,"&fscr;"],[1,"&hscr;"],[0,"&iscr;"],[0,"&jscr;"],[0,"&kscr;"],[0,"&lscr;"],[0,"&mscr;"],[0,"&nscr;"],[1,"&pscr;"],[0,"&qscr;"],[0,"&rscr;"],[0,"&sscr;"],[0,"&tscr;"],[0,"&uscr;"],[0,"&vscr;"],[0,"&wscr;"],[0,"&xscr;"],[0,"&yscr;"],[0,"&zscr;"],[52,"&Afr;"],[0,"&Bfr;"],[1,"&Dfr;"],[0,"&Efr;"],[0,"&Ffr;"],[0,"&Gfr;"],[2,"&Jfr;"],[0,"&Kfr;"],[0,"&Lfr;"],[0,"&Mfr;"],[0,"&Nfr;"],[0,"&Ofr;"],[0,"&Pfr;"],[0,"&Qfr;"],[1,"&Sfr;"],[0,"&Tfr;"],[0,"&Ufr;"],[0,"&Vfr;"],[0,"&Wfr;"],[0,"&Xfr;"],[0,"&Yfr;"],[1,"&afr;"],[0,"&bfr;"],[0,"&cfr;"],[0,"&dfr;"],[0,"&efr;"],[0,"&ffr;"],[0,"&gfr;"],[0,"&hfr;"],[0,"&ifr;"],[0,"&jfr;"],[0,"&kfr;"],[0,"&lfr;"],[0,"&mfr;"],[0,"&nfr;"],[0,"&ofr;"],[0,"&pfr;"],[0,"&qfr;"],[0,"&rfr;"],[0,"&sfr;"],[0,"&tfr;"],[0,"&ufr;"],[0,"&vfr;"],[0,"&wfr;"],[0,"&xfr;"],[0,"&yfr;"],[0,"&zfr;"],[0,"&Aopf;"],[0,"&Bopf;"],[1,"&Dopf;"],[0,"&Eopf;"],[0,"&Fopf;"],[0,"&Gopf;"],[1,"&Iopf;"],[0,"&Jopf;"],[0,"&Kopf;"],[0,"&Lopf;"],[0,"&Mopf;"],[1,"&Oopf;"],[3,"&Sopf;"],[0,"&Topf;"],[0,"&Uopf;"],[0,"&Vopf;"],[0,"&Wopf;"],[0,"&Xopf;"],[0,"&Yopf;"],[1,"&aopf;"],[0,"&bopf;"],[0,"&copf;"],[0,"&dopf;"],[0,"&eopf;"],[0,"&fopf;"],[0,"&gopf;"],[0,"&hopf;"],[0,"&iopf;"],[0,"&jopf;"],[0,"&kopf;"],[0,"&lopf;"],[0,"&mopf;"],[0,"&nopf;"],[0,"&oopf;"],[0,"&popf;"],[0,"&qopf;"],[0,"&ropf;"],[0,"&sopf;"],[0,"&topf;"],[0,"&uopf;"],[0,"&vopf;"],[0,"&wopf;"],[0,"&xopf;"],[0,"&yopf;"],[0,"&zopf;"]]))}],[8906,"&fflig;"],[0,"&filig;"],[0,"&fllig;"],[0,"&ffilig;"],[0,"&ffllig;"]]));var gp=new Map([[34,"&quot;"],[38,"&amp;"],[39,"&apos;"],[60,"&lt;"],[62,"&gt;"]]),_p=String.prototype.codePointAt!=null?(e,t)=>e.codePointAt(t):(e,t)=>(e.charCodeAt(t)&64512)===55296?(e.charCodeAt(t)-55296)*1024+e.charCodeAt(t+1)-56320+65536:e.charCodeAt(t);function Qa(e,t){return function(o){let n,i=0,a="";for(;n=e.exec(o);)i!==n.index&&(a+=o.substring(i,n.index)),a+=t.get(n[0].charCodeAt(0)),i=n.index+1;return a+o.substring(i)}}var lc=Qa(/[&<>'"]/g,gp),cc=Qa(/["&\u00A0]/g,new Map([[34,"&quot;"],[38,"&amp;"],[160,"&nbsp;"]])),dc=Qa(/[&<>\u00A0]/g,new Map([[38,"&amp;"],[60,"&lt;"],[62,"&gt;"],[160,"&nbsp;"]]));var fc;(function(e){e[e.XML=0]="XML",e[e.HTML=1]="HTML"})(fc||(fc={}));var pc;(function(e){e[e.UTF8=0]="UTF8",e[e.ASCII=1]="ASCII",e[e.Extensive=2]="Extensive",e[e.Attribute=3]="Attribute",e[e.Text=4]="Text"})(pc||(pc={}));function wp(e){return Object.prototype.toString.call(e)}function Mi(e){return wp(e)==="[object String]"}var kp=Object.prototype.hasOwnProperty;function $p(e,t){return kp.call(e,t)}function zo(e){return Array.prototype.slice.call(arguments,1).forEach(function(r){if(r){if(typeof r!="object")throw new TypeError(r+"must be object");Object.keys(r).forEach(function(o){e[o]=r[o]})}}),e}function ts(e,t,r){return[].concat(e.slice(0,t),r,e.slice(t+1))}function Ri(e){return!(e>=55296&&e<=57343||e>=64976&&e<=65007||(e&65535)===65535||(e&65535)===65534||e>=0&&e<=8||e===11||e>=14&&e<=31||e>=127&&e<=159||e>1114111)}function Lo(e){if(e>65535){e-=65536;let t=55296+(e>>10),r=56320+(e&1023);return String.fromCharCode(t,r)}return String.fromCharCode(e)}var bc=/\\([!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~])/g,Ep=/&([a-z#][a-z0-9]{1,31});/gi,Cp=new RegExp(bc.source+"|"+Ep.source,"gi"),Ap=/^#((?:x[a-f0-9]{1,8}|[0-9]{1,8}))$/i;function Dp(e,t){if(t.charCodeAt(0)===35&&Ap.test(t)){let o=t[1].toLowerCase()==="x"?parseInt(t.slice(2),16):parseInt(t.slice(1),10);return Ri(o)?Lo(o):e}let r=Ro(e);return r!==e?r:e}function Sp(e){return e.indexOf("\\")<0?e:e.replace(bc,"$1")}function xr(e){return e.indexOf("\\")<0&&e.indexOf("&")<0?e:e.replace(Cp,function(t,r,o){return r||Dp(t,o)})}var Tp=/[&<>"]/,Fp=/[&<>"]/g,Mp={"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"};function Rp(e){return Mp[e]}function yr(e){return Tp.test(e)?e.replace(Fp,Rp):e}var zp=/[.?*+^$[\]\\(){}|-]/g;function Lp(e){return e.replace(zp,"\\$&")}function oe(e){switch(e){case 9:case 32:return!0}return!1}function ro(e){if(e>=8192&&e<=8202)return!0;switch(e){case 9:case 10:case 11:case 12:case 13:case 32:case 160:case 5760:case 8239:case 8287:case 12288:return!0}return!1}function vc(e){return Mo.test(e)||Di.test(e)}function oo(e){return vc(Lo(e))}function no(e){switch(e){case 33:case 34:case 35:case 36:case 37:case 38:case 39:case 40:case 41:case 42:case 43:case 44:case 45:case 46:case 47:case 58:case 59:case 60:case 61:case 62:case 63:case 64:case 91:case 92:case 93:case 94:case 95:case 96:case 123:case 124:case 125:case 126:return!0;default:return!1}}function io(e){return e=e.trim().replace(/\s+/g," "),"\u1E9E".toLowerCase()==="\u1E7E"&&(e=e.replace(/ẞ/g,"\xDF")),e.toLowerCase().toUpperCase()}function hc(e){return e===32||e===9||e===10||e===13}function ao(e){let t=0;for(;t<e.length&&hc(e.charCodeAt(t));t++);let r=e.length-1;for(;r>=t&&hc(e.charCodeAt(r));r--);return e.slice(t,r+1)}var Np={mdurl:Ei,ucmicro:Wa};var as={};gn(as,{parseLinkDestination:()=>ns,parseLinkLabel:()=>os,parseLinkTitle:()=>is});function os(e,t,r){let o,n,i,a,s=e.posMax,u=e.pos;for(e.pos=t+1,o=1;e.pos<s;){if(i=e.src.charCodeAt(e.pos),i===93&&(o--,o===0)){n=!0;break}if(a=e.pos,e.md.inline.skipToken(e),i===91){if(a===e.pos-1)o++;else if(r)return e.pos=u,-1}}let l=-1;return n&&(l=e.pos),e.pos=u,l}function ns(e,t,r){let o,n=t,i={ok:!1,pos:0,str:""};if(e.charCodeAt(n)===60){for(n++;n<r;){if(o=e.charCodeAt(n),o===10||o===60)return i;if(o===62)return i.pos=n+1,i.str=xr(e.slice(t+1,n)),i.ok=!0,i;if(o===92&&n+1<r){n+=2;continue}n++}return i}let a=0;for(;n<r&&(o=e.charCodeAt(n),!(o===32||o<32||o===127));){if(o===92&&n+1<r){if(e.charCodeAt(n+1)===32)break;n+=2;continue}if(o===40&&(a++,a>32))return i;if(o===41){if(a===0)break;a--}n++}return t===n||a!==0||(i.str=xr(e.slice(t,n)),i.pos=n,i.ok=!0),i}function is(e,t,r,o){let n,i=t,a={ok:!1,can_continue:!1,pos:0,str:"",marker:0};if(o)a.str=o.str,a.marker=o.marker;else{if(i>=r)return a;let s=e.charCodeAt(i);if(s!==34&&s!==39&&s!==40)return a;t++,i++,s===40&&(s=41),a.marker=s}for(;i<r;){if(n=e.charCodeAt(i),n===a.marker)return a.pos=i+1,a.str+=xr(e.slice(t,i)),a.ok=!0,a;if(n===40&&a.marker===41)return a;n===92&&i+1<r&&i++,i++}return a.can_continue=!0,a.str+=xr(e.slice(t,i)),a}var lr={};lr.code_inline=function(e,t,r,o,n){let i=e[t];return"<code"+n.renderAttrs(i)+">"+yr(i.content)+"</code>"};lr.code_block=function(e,t,r,o,n){let i=e[t];return"<pre"+n.renderAttrs(i)+"><code>"+yr(e[t].content)+`</code></pre>
-`};lr.fence=function(e,t,r,o,n){let i=e[t],a=i.info?xr(i.info).trim():"",s="",u="";if(a){let c=a.split(/(\s+)/g);s=c[0],u=c.slice(2).join("")}let l;if(r.highlight?l=r.highlight(i.content,s,u)||yr(i.content):l=yr(i.content),l.indexOf("<pre")===0)return l+`
-`;if(a){let c=i.attrIndex("class"),f=i.attrs?i.attrs.slice():[];c<0?f.push(["class",r.langPrefix+s]):(f[c]=f[c].slice(),f[c][1]+=" "+r.langPrefix+s);let p={attrs:f};return`<pre><code${n.renderAttrs(p)}>${l}</code></pre>
-`}return`<pre><code${n.renderAttrs(i)}>${l}</code></pre>
-`};lr.image=function(e,t,r,o,n){let i=e[t];return i.attrs[i.attrIndex("alt")][1]=n.renderInlineAsText(i.children,r,o),n.renderToken(e,t,r)};lr.hardbreak=function(e,t,r){return r.xhtmlOut?`<br />
-`:`<br>
-`};lr.softbreak=function(e,t,r){return r.breaks?r.xhtmlOut?`<br />
-`:`<br>
-`:`
-`};lr.text=function(e,t){return yr(e[t].content)};lr.html_block=function(e,t){return e[t].content};lr.html_inline=function(e,t){return e[t].content};function No(){this.rules=zo({},lr)}No.prototype.renderAttrs=function(t){let r,o,n;if(!t.attrs)return"";for(n="",r=0,o=t.attrs.length;r<o;r++)n+=" "+yr(t.attrs[r][0])+'="'+yr(t.attrs[r][1])+'"';return n};No.prototype.renderToken=function(t,r,o){let n=t[r],i="";if(n.hidden)return"";n.block&&n.nesting!==-1&&r&&t[r-1].hidden&&(i+=`
-`),i+=(n.nesting===-1?"</":"<")+n.tag,i+=this.renderAttrs(n),n.nesting===0&&o.xhtmlOut&&(i+=" /");let a=!1;if(n.block&&(a=!0,n.nesting===1&&r+1<t.length)){let s=t[r+1];(s.type==="inline"||s.hidden||s.nesting===-1&&s.tag===n.tag)&&(a=!1)}return i+=a?`>
-`:">",i};No.prototype.renderInline=function(e,t,r){let o="",n=this.rules;for(let i=0,a=e.length;i<a;i++){let s=e[i].type;typeof n[s]<"u"?o+=n[s](e,i,t,r,this):o+=this.renderToken(e,i,t)}return o};No.prototype.renderInlineAsText=function(e,t,r){let o="";for(let n=0,i=e.length;n<i;n++)switch(e[n].type){case"text":o+=e[n].content;break;case"image":o+=this.renderInlineAsText(e[n].children,t,r);break;case"html_inline":case"html_block":o+=e[n].content;break;case"softbreak":case"hardbreak":o+=`
-`;break;default:}return o};No.prototype.render=function(e,t,r){let o="",n=this.rules;for(let i=0,a=e.length;i<a;i++){let s=e[i].type;s==="inline"?o+=this.renderInline(e[i].children,t,r):typeof n[s]<"u"?o+=n[s](e,i,t,r,this):o+=this.renderToken(e,i,t,r)}return o};var gc=No;function Zt(){this.__rules__=[],this.__cache__=null}Zt.prototype.__find__=function(e){for(let t=0;t<this.__rules__.length;t++)if(this.__rules__[t].name===e)return t;return-1};Zt.prototype.__compile__=function(){let e=this,t=[""];e.__rules__.forEach(function(r){r.enabled&&r.alt.forEach(function(o){t.indexOf(o)<0&&t.push(o)})}),e.__cache__={},t.forEach(function(r){e.__cache__[r]=[],e.__rules__.forEach(function(o){o.enabled&&(r&&o.alt.indexOf(r)<0||e.__cache__[r].push(o.fn))})})};Zt.prototype.at=function(e,t,r){let o=this.__find__(e),n=r||{};if(o===-1)throw new Error("Parser rule not found: "+e);this.__rules__[o].fn=t,this.__rules__[o].alt=n.alt||[],this.__cache__=null};Zt.prototype.before=function(e,t,r,o){let n=this.__find__(e),i=o||{};if(n===-1)throw new Error("Parser rule not found: "+e);this.__rules__.splice(n,0,{name:t,enabled:!0,fn:r,alt:i.alt||[]}),this.__cache__=null};Zt.prototype.after=function(e,t,r,o){let n=this.__find__(e),i=o||{};if(n===-1)throw new Error("Parser rule not found: "+e);this.__rules__.splice(n+1,0,{name:t,enabled:!0,fn:r,alt:i.alt||[]}),this.__cache__=null};Zt.prototype.push=function(e,t,r){let o=r||{};this.__rules__.push({name:e,enabled:!0,fn:t,alt:o.alt||[]}),this.__cache__=null};Zt.prototype.enable=function(e,t){Array.isArray(e)||(e=[e]);let r=[];return e.forEach(function(o){let n=this.__find__(o);if(n<0){if(t)return;throw new Error("Rules manager: invalid rule name "+o)}this.__rules__[n].enabled=!0,r.push(o)},this),this.__cache__=null,r};Zt.prototype.enableOnly=function(e,t){Array.isArray(e)||(e=[e]),this.__rules__.forEach(function(r){r.enabled=!1}),this.enable(e,t)};Zt.prototype.disable=function(e,t){Array.isArray(e)||(e=[e]);let r=[];return e.forEach(function(o){let n=this.__find__(o);if(n<0){if(t)return;throw new Error("Rules manager: invalid rule name "+o)}this.__rules__[n].enabled=!1,r.push(o)},this),this.__cache__=null,r};Zt.prototype.getRules=function(e){return this.__cache__===null&&this.__compile__(),this.__cache__[e]||[]};var so=Zt;function Po(e,t,r){this.type=e,this.tag=t,this.attrs=null,this.map=null,this.nesting=r,this.level=0,this.children=null,this.content="",this.markup="",this.info="",this.meta=null,this.block=!1,this.hidden=!1}Po.prototype.attrIndex=function(t){if(!this.attrs)return-1;let r=this.attrs;for(let o=0,n=r.length;o<n;o++)if(r[o][0]===t)return o;return-1};Po.prototype.attrPush=function(t){this.attrs?this.attrs.push(t):this.attrs=[t]};Po.prototype.attrSet=function(t,r){let o=this.attrIndex(t),n=[t,r];o<0?this.attrPush(n):this.attrs[o]=n};Po.prototype.attrGet=function(t){let r=this.attrIndex(t),o=null;return r>=0&&(o=this.attrs[r][1]),o};Po.prototype.attrJoin=function(t,r){let o=this.attrIndex(t);o<0?this.attrPush([t,r]):this.attrs[o][1]=this.attrs[o][1]+" "+r};var wr=Po;function _c(e,t,r){this.src=e,this.env=r,this.tokens=[],this.inlineMode=!1,this.md=t}_c.prototype.Token=wr;var xc=_c;var Pp=/\r\n?|\n/g,Ip=/\0/g;function ss(e){let t;t=e.src.replace(Pp,`
-`),t=t.replace(Ip,"\uFFFD"),e.src=t}function us(e){let t;e.inlineMode?(t=new e.Token("inline","",0),t.content=e.src,t.map=[0,1],t.children=[],e.tokens.push(t)):e.md.block.parse(e.src,e.md,e.env,e.tokens)}function ls(e){let t=e.tokens;for(let r=0,o=t.length;r<o;r++){let n=t[r];n.type==="inline"&&e.md.inline.parse(n.content,e.md,e.env,n.children)}}function qp(e){return/^<a[>\s]/i.test(e)}function Op(e){return/^<\/a\s*>/i.test(e)}function cs(e){let t=e.tokens;if(e.md.options.linkify)for(let r=0,o=t.length;r<o;r++){if(t[r].type!=="inline"||!e.md.linkify.pretest(t[r].content))continue;let n=t[r].children,i=0;for(let a=n.length-1;a>=0;a--){let s=n[a];if(s.type==="link_close"){for(a--;n[a].level!==s.level&&n[a].type!=="link_open";)a--;continue}if(s.type==="html_inline"&&(qp(s.content)&&i>0&&i--,Op(s.content)&&i++),!(i>0)&&s.type==="text"&&e.md.linkify.test(s.content)){let u=s.content,l=e.md.linkify.match(u),c=[],f=s.level,p=0;l.length>0&&l[0].index===0&&a>0&&n[a-1].type==="text_special"&&(l=l.slice(1));for(let d=0;d<l.length;d++){let h=l[d].url,b=e.md.normalizeLink(h);if(!e.md.validateLink(b))continue;let g=l[d].text;l[d].schema?l[d].schema==="mailto:"&&!/^mailto:/i.test(g)?g=e.md.normalizeLinkText("mailto:"+g).replace(/^mailto:/,""):g=e.md.normalizeLinkText(g):g=e.md.normalizeLinkText("http://"+g).replace(/^http:\/\//,"");let D=l[d].index;if(D>p){let T=new e.Token("text","",0);T.content=u.slice(p,D),T.level=f,c.push(T)}let E=new e.Token("link_open","a",1);E.attrs=[["href",b]],E.level=f++,E.markup="linkify",E.info="auto",c.push(E);let C=new e.Token("text","",0);C.content=g,C.level=f,c.push(C);let A=new e.Token("link_close","a",-1);A.level=--f,A.markup="linkify",A.info="auto",c.push(A),p=l[d].lastIndex}if(p<u.length){let d=new e.Token("text","",0);d.content=u.slice(p),d.level=f,c.push(d)}t[r].children=n=ts(n,a,c)}}}}var yc=/\+-|\.\.|\?\?\?\?|!!!!|,,|--/,Bp=/\((c|tm|r)\)/i,jp=/\((c|tm|r)\)/ig,Hp={c:"\xA9",r:"\xAE",tm:"\u2122"};function Up(e,t){return Hp[t.toLowerCase()]}function Vp(e){let t=0;for(let r=e.length-1;r>=0;r--){let o=e[r];o.type==="text"&&!t&&(o.content=o.content.replace(jp,Up)),o.type==="link_open"&&o.info==="auto"&&t--,o.type==="link_close"&&o.info==="auto"&&t++}}function Yp(e){let t=0;for(let r=e.length-1;r>=0;r--){let o=e[r];o.type==="text"&&!t&&yc.test(o.content)&&(o.content=o.content.replace(/\+-/g,"\xB1").replace(/\.{2,}/g,"\u2026").replace(/([?!])…/g,"$1..").replace(/([?!]){4,}/g,"$1$1$1").replace(/,{2,}/g,",").replace(/(^|[^-])---(?=[^-]|$)/mg,"$1\u2014").replace(/(^|\s)--(?=\s|$)/mg,"$1\u2013").replace(/(^|[^-\s])--(?=[^-\s]|$)/mg,"$1\u2013")),o.type==="link_open"&&o.info==="auto"&&t--,o.type==="link_close"&&o.info==="auto"&&t++}}function ds(e){let t;if(e.md.options.typographer)for(t=e.tokens.length-1;t>=0;t--)e.tokens[t].type==="inline"&&(Bp.test(e.tokens[t].content)&&Vp(e.tokens[t].children),yc.test(e.tokens[t].content)&&Yp(e.tokens[t].children))}var Gp=/['"]/,wc=/['"]/g,kc="\u2019";function zi(e,t,r,o){e[t]||(e[t]=[]),e[t].push({pos:r,ch:o})}function Wp(e,t){let r="",o=0;t.sort((n,i)=>n.pos-i.pos);for(let n=0;n<t.length;n++){let i=t[n];r+=e.slice(o,i.pos)+i.ch,o=i.pos+1}return r+e.slice(o)}function Zp(e,t){let r,o=[],n={};for(let i=0;i<e.length;i++){let a=e[i],s=e[i].level;for(r=o.length-1;r>=0&&!(o[r].level<=s);r--);if(o.length=r+1,a.type!=="text")continue;let u=a.content,l=0,c=u.length;e:for(;l<c;){wc.lastIndex=l;let f=wc.exec(u);if(!f)break;let p=!0,d=!0;l=f.index+1;let h=f[0]==="'",b=32;if(f.index-1>=0)b=u.charCodeAt(f.index-1);else for(r=i-1;r>=0&&!(e[r].type==="softbreak"||e[r].type==="hardbreak");r--)if(e[r].content){b=e[r].content.charCodeAt(e[r].content.length-1);break}let g=32;if(l<c)g=u.charCodeAt(l);else for(r=i+1;r<e.length&&!(e[r].type==="softbreak"||e[r].type==="hardbreak");r++)if(e[r].content){g=e[r].content.charCodeAt(0);break}let D=no(b)||oo(b),E=no(g)||oo(g),C=ro(b),A=ro(g);if(A?p=!1:E&&(C||D||(p=!1)),C?d=!1:D&&(A||E||(d=!1)),g===34&&f[0]==='"'&&b>=48&&b<=57&&(d=p=!1),p&&d&&(p=D,d=E),!p&&!d){h&&zi(n,i,f.index,kc);continue}if(d)for(r=o.length-1;r>=0;r--){let T=o[r];if(o[r].level<s)break;if(T.single===h&&o[r].level===s){T=o[r];let k,S;h?(k=t.md.options.quotes[2],S=t.md.options.quotes[3]):(k=t.md.options.quotes[0],S=t.md.options.quotes[1]),zi(n,i,f.index,S),zi(n,T.token,T.pos,k),o.length=r;continue e}}p?o.push({token:i,pos:f.index,single:h,level:s}):d&&h&&zi(n,i,f.index,kc)}}Object.keys(n).forEach(function(i){e[i].content=Wp(e[i].content,n[i])})}function fs(e){if(e.md.options.typographer)for(let t=e.tokens.length-1;t>=0;t--)e.tokens[t].type!=="inline"||!Gp.test(e.tokens[t].content)||Zp(e.tokens[t].children,e)}function ps(e){let t,r,o=e.tokens,n=o.length;for(let i=0;i<n;i++){if(o[i].type!=="inline")continue;let a=o[i].children,s=a.length;for(t=0;t<s;t++)a[t].type==="text_special"&&(a[t].type="text");for(t=r=0;t<s;t++)a[t].type==="text"&&t+1<s&&a[t+1].type==="text"?a[t+1].content=a[t].content+a[t+1].content:(t!==r&&(a[r]=a[t]),r++);t!==r&&(a.length=r)}}var ms=[["normalize",ss],["block",us],["inline",ls],["linkify",cs],["replacements",ds],["smartquotes",fs],["text_join",ps]];function hs(){this.ruler=new so;for(let e=0;e<ms.length;e++)this.ruler.push(ms[e][0],ms[e][1])}hs.prototype.process=function(e){let t=this.ruler.getRules("");for(let r=0,o=t.length;r<o;r++)t[r](e)};hs.prototype.State=xc;var $c=hs;function cr(e,t,r,o){this.src=e,this.md=t,this.env=r,this.tokens=o,this.bMarks=[],this.eMarks=[],this.tShift=[],this.sCount=[],this.bsCount=[],this.blkIndent=0,this.line=0,this.lineMax=0,this.tight=!1,this.ddIndent=-1,this.listIndent=-1,this.parentType="root",this.level=0;let n=this.src;for(let i=0,a=0,s=0,u=0,l=n.length,c=!1;a<l;a++){let f=n.charCodeAt(a);if(!c)if(oe(f)){s++,f===9?u+=4-u%4:u++;continue}else c=!0;(f===10||a===l-1)&&(f!==10&&a++,this.bMarks.push(i),this.eMarks.push(a),this.tShift.push(s),this.sCount.push(u),this.bsCount.push(0),c=!1,s=0,u=0,i=a+1)}this.bMarks.push(n.length),this.eMarks.push(n.length),this.tShift.push(0),this.sCount.push(0),this.bsCount.push(0),this.lineMax=this.bMarks.length-1}cr.prototype.push=function(e,t,r){let o=new wr(e,t,r);return o.block=!0,r<0&&this.level--,o.level=this.level,r>0&&this.level++,this.tokens.push(o),o};cr.prototype.isEmpty=function(t){return this.bMarks[t]+this.tShift[t]>=this.eMarks[t]};cr.prototype.skipEmptyLines=function(t){for(let r=this.lineMax;t<r&&!(this.bMarks[t]+this.tShift[t]<this.eMarks[t]);t++);return t};cr.prototype.skipSpaces=function(t){for(let r=this.src.length;t<r;t++){let o=this.src.charCodeAt(t);if(!oe(o))break}return t};cr.prototype.skipSpacesBack=function(t,r){if(t<=r)return t;for(;t>r;)if(!oe(this.src.charCodeAt(--t)))return t+1;return t};cr.prototype.skipChars=function(t,r){for(let o=this.src.length;t<o&&this.src.charCodeAt(t)===r;t++);return t};cr.prototype.skipCharsBack=function(t,r,o){if(t<=o)return t;for(;t>o;)if(r!==this.src.charCodeAt(--t))return t+1;return t};cr.prototype.getLines=function(t,r,o,n){if(t>=r)return"";let i=new Array(r-t);for(let a=0,s=t;s<r;s++,a++){let u=0,l=this.bMarks[s],c=l,f;for(s+1<r||n?f=this.eMarks[s]+1:f=this.eMarks[s];c<f&&u<o;){let p=this.src.charCodeAt(c);if(oe(p))p===9?u+=4-(u+this.bsCount[s])%4:u++;else if(c-l<this.tShift[s])u++;else break;c++}u>o?i[a]=new Array(u-o+1).join(" ")+this.src.slice(c,f):i[a]=this.src.slice(c,f)}return i.join("")};cr.prototype.Token=wr;var Ec=cr;var Xp=65536;function bs(e,t){let r=e.bMarks[t]+e.tShift[t],o=e.eMarks[t];return e.src.slice(r,o)}function Cc(e){let t=[],r=e.length,o=0,n=e.charCodeAt(o),i=!1,a=0,s="";for(;o<r;)n===124&&(i?(s+=e.substring(a,o-1),a=o):(t.push(s+e.substring(a,o)),s="",a=o+1)),i=n===92,o++,n=e.charCodeAt(o);return t.push(s+e.substring(a)),t}function vs(e,t,r,o){if(t+2>r)return!1;let n=t+1;if(e.sCount[n]<e.blkIndent||e.sCount[n]-e.blkIndent>=4)return!1;let i=e.bMarks[n]+e.tShift[n];if(i>=e.eMarks[n])return!1;let a=e.src.charCodeAt(i++);if(a!==124&&a!==45&&a!==58||i>=e.eMarks[n])return!1;let s=e.src.charCodeAt(i++);if(s!==124&&s!==45&&s!==58&&!oe(s)||a===45&&oe(s))return!1;for(;i<e.eMarks[n];){let A=e.src.charCodeAt(i);if(A!==124&&A!==45&&A!==58&&!oe(A))return!1;i++}let u=bs(e,t+1),l=u.split("|"),c=[];for(let A=0;A<l.length;A++){let T=l[A].trim();if(!T){if(A===0||A===l.length-1)continue;return!1}if(!/^:?-+:?$/.test(T))return!1;T.charCodeAt(T.length-1)===58?c.push(T.charCodeAt(0)===58?"center":"right"):T.charCodeAt(0)===58?c.push("left"):c.push("")}if(u=bs(e,t).trim(),u.indexOf("|")===-1||e.sCount[t]-e.blkIndent>=4)return!1;l=Cc(u),l.length&&l[0]===""&&l.shift(),l.length&&l[l.length-1]===""&&l.pop();let f=l.length;if(f===0||f!==c.length)return!1;if(o)return!0;let p=e.parentType;e.parentType="table";let d=e.md.block.ruler.getRules("blockquote"),h=e.push("table_open","table",1),b=[t,0];h.map=b;let g=e.push("thead_open","thead",1);g.map=[t,t+1];let D=e.push("tr_open","tr",1);D.map=[t,t+1];for(let A=0;A<l.length;A++){let T=e.push("th_open","th",1);c[A]&&(T.attrs=[["style","text-align:"+c[A]]]);let k=e.push("inline","",0);k.content=l[A].trim(),k.children=[],e.push("th_close","th",-1)}e.push("tr_close","tr",-1),e.push("thead_close","thead",-1);let E,C=0;for(n=t+2;n<r&&!(e.sCount[n]<e.blkIndent);n++){let A=!1;for(let k=0,S=d.length;k<S;k++)if(d[k](e,n,r,!0)){A=!0;break}if(A||(u=bs(e,n).trim(),!u)||e.sCount[n]-e.blkIndent>=4||(l=Cc(u),l.length&&l[0]===""&&l.shift(),l.length&&l[l.length-1]===""&&l.pop(),C+=f-l.length,C>Xp))break;if(n===t+2){let k=e.push("tbody_open","tbody",1);k.map=E=[t+2,0]}let T=e.push("tr_open","tr",1);T.map=[n,n+1];for(let k=0;k<f;k++){let S=e.push("td_open","td",1);c[k]&&(S.attrs=[["style","text-align:"+c[k]]]);let N=e.push("inline","",0);N.content=l[k]?l[k].trim():"",N.children=[],e.push("td_close","td",-1)}e.push("tr_close","tr",-1)}return E&&(e.push("tbody_close","tbody",-1),E[1]=n),e.push("table_close","table",-1),b[1]=n,e.parentType=p,e.line=n,!0}function gs(e,t,r){if(e.sCount[t]-e.blkIndent<4)return!1;let o=t+1,n=o;for(;o<r;){if(e.isEmpty(o)){o++;continue}if(e.sCount[o]-e.blkIndent>=4){o++,n=o;continue}break}e.line=n;let i=e.push("code_block","code",0);return i.content=e.getLines(t,n,4+e.blkIndent,!1)+`
-`,i.map=[t,e.line],!0}function _s(e,t,r,o){let n=e.bMarks[t]+e.tShift[t],i=e.eMarks[t];if(e.sCount[t]-e.blkIndent>=4||n+3>i)return!1;let a=e.src.charCodeAt(n);if(a!==126&&a!==96)return!1;let s=n;n=e.skipChars(n,a);let u=n-s;if(u<3)return!1;let l=e.src.slice(s,n),c=e.src.slice(n,i);if(a===96&&c.indexOf(String.fromCharCode(a))>=0)return!1;if(o)return!0;let f=t,p=!1;for(;f++,!(f>=r||(n=s=e.bMarks[f]+e.tShift[f],i=e.eMarks[f],n<i&&e.sCount[f]<e.blkIndent));)if(e.src.charCodeAt(n)===a&&!(e.sCount[f]-e.blkIndent>=4)&&(n=e.skipChars(n,a),!(n-s<u)&&(n=e.skipSpaces(n),!(n<i)))){p=!0;break}u=e.sCount[t],e.line=f+(p?1:0);let d=e.push("fence","code",0);return d.info=c,d.content=e.getLines(t+1,f,u,!0),d.markup=l,d.map=[t,e.line],!0}function xs(e,t,r,o){let n=e.bMarks[t]+e.tShift[t],i=e.eMarks[t],a=e.lineMax;if(e.sCount[t]-e.blkIndent>=4||e.src.charCodeAt(n)!==62)return!1;if(o)return!0;let s=[],u=[],l=[],c=[],f=e.md.block.ruler.getRules("blockquote"),p=e.parentType;e.parentType="blockquote";let d=!1,h;for(h=t;h<r;h++){let C=e.sCount[h]<e.blkIndent;if(n=e.bMarks[h]+e.tShift[h],i=e.eMarks[h],n>=i)break;if(e.src.charCodeAt(n++)===62&&!C){let T=e.sCount[h]+1,k,S;e.src.charCodeAt(n)===32?(n++,T++,S=!1,k=!0):e.src.charCodeAt(n)===9?(k=!0,(e.bsCount[h]+T)%4===3?(n++,T++,S=!1):S=!0):k=!1;let N=T;for(s.push(e.bMarks[h]),e.bMarks[h]=n;n<i;){let j=e.src.charCodeAt(n);if(oe(j))j===9?N+=4-(N+e.bsCount[h]+(S?1:0))%4:N++;else break;n++}d=n>=i,u.push(e.bsCount[h]),e.bsCount[h]=e.sCount[h]+1+(k?1:0),l.push(e.sCount[h]),e.sCount[h]=N-T,c.push(e.tShift[h]),e.tShift[h]=n-e.bMarks[h];continue}if(d)break;let A=!1;for(let T=0,k=f.length;T<k;T++)if(f[T](e,h,r,!0)){A=!0;break}if(A){e.lineMax=h,e.blkIndent!==0&&(s.push(e.bMarks[h]),u.push(e.bsCount[h]),c.push(e.tShift[h]),l.push(e.sCount[h]),e.sCount[h]-=e.blkIndent);break}s.push(e.bMarks[h]),u.push(e.bsCount[h]),c.push(e.tShift[h]),l.push(e.sCount[h]),e.sCount[h]=-1}let b=e.blkIndent;e.blkIndent=0;let g=e.push("blockquote_open","blockquote",1);g.markup=">";let D=[t,0];g.map=D,e.md.block.tokenize(e,t,h);let E=e.push("blockquote_close","blockquote",-1);E.markup=">",e.lineMax=a,e.parentType=p,D[1]=e.line;for(let C=0;C<c.length;C++)e.bMarks[C+t]=s[C],e.tShift[C+t]=c[C],e.sCount[C+t]=l[C],e.bsCount[C+t]=u[C];return e.blkIndent=b,!0}function ys(e,t,r,o){let n=e.eMarks[t];if(e.sCount[t]-e.blkIndent>=4)return!1;let i=e.bMarks[t]+e.tShift[t],a=e.src.charCodeAt(i++);if(a!==42&&a!==45&&a!==95)return!1;let s=1;for(;i<n;){let l=e.src.charCodeAt(i++);if(l!==a&&!oe(l))return!1;l===a&&s++}if(s<3)return!1;if(o)return!0;e.line=t+1;let u=e.push("hr","hr",0);return u.map=[t,e.line],u.markup=Array(s+1).join(String.fromCharCode(a)),!0}function Ac(e,t){let r=e.eMarks[t],o=e.bMarks[t]+e.tShift[t],n=e.src.charCodeAt(o++);if(n!==42&&n!==45&&n!==43)return-1;if(o<r){let i=e.src.charCodeAt(o);if(!oe(i))return-1}return o}function Dc(e,t){let r=e.bMarks[t]+e.tShift[t],o=e.eMarks[t],n=r;if(n+1>=o)return-1;let i=e.src.charCodeAt(n++);if(i<48||i>57)return-1;for(;;){if(n>=o)return-1;if(i=e.src.charCodeAt(n++),i>=48&&i<=57){if(n-r>=10)return-1;continue}if(i===41||i===46)break;return-1}return n<o&&(i=e.src.charCodeAt(n),!oe(i))?-1:n}function Kp(e,t){let r=e.level+2;for(let o=t+2,n=e.tokens.length-2;o<n;o++)e.tokens[o].level===r&&e.tokens[o].type==="paragraph_open"&&(e.tokens[o+2].hidden=!0,e.tokens[o].hidden=!0,o+=2)}function ws(e,t,r,o){let n,i,a,s,u=t,l=!0;if(e.sCount[u]-e.blkIndent>=4||e.listIndent>=0&&e.sCount[u]-e.listIndent>=4&&e.sCount[u]<e.blkIndent)return!1;let c=!1;o&&e.parentType==="paragraph"&&e.sCount[u]>=e.blkIndent&&(c=!0);let f,p,d;if((d=Dc(e,u))>=0){if(f=!0,a=e.bMarks[u]+e.tShift[u],p=Number(e.src.slice(a,d-1)),c&&p!==1)return!1}else if((d=Ac(e,u))>=0)f=!1;else return!1;if(c&&e.skipSpaces(d)>=e.eMarks[u])return!1;if(o)return!0;let h=e.src.charCodeAt(d-1),b=e.tokens.length;f?(s=e.push("ordered_list_open","ol",1),p!==1&&(s.attrs=[["start",p]])):s=e.push("bullet_list_open","ul",1);let g=[u,0];s.map=g,s.markup=String.fromCharCode(h);let D=!1,E=e.md.block.ruler.getRules("list"),C=e.parentType;for(e.parentType="list";u<r;){i=d,n=e.eMarks[u];let A=e.sCount[u]+d-(e.bMarks[u]+e.tShift[u]),T=A;for(;i<n;){let Z=e.src.charCodeAt(i);if(Z===9)T+=4-(T+e.bsCount[u])%4;else if(Z===32)T++;else break;i++}let k=i,S;k>=n?S=1:S=T-A,S>4&&(S=1);let N=A+S;s=e.push("list_item_open","li",1),s.markup=String.fromCharCode(h);let j=[u,0];s.map=j,f&&(s.info=e.src.slice(a,d-1));let O=e.tight,w=e.tShift[u],y=e.sCount[u],M=e.listIndent;if(e.listIndent=e.blkIndent,e.blkIndent=N,e.tight=!0,e.tShift[u]=k-e.bMarks[u],e.sCount[u]=T,k>=n&&e.isEmpty(u+1)?e.line=Math.min(e.line+2,r):e.md.block.tokenize(e,u,r,!0),(!e.tight||D)&&(l=!1),D=e.line-u>1&&e.isEmpty(e.line-1),e.blkIndent=e.listIndent,e.listIndent=M,e.tShift[u]=w,e.sCount[u]=y,e.tight=O,s=e.push("list_item_close","li",-1),s.markup=String.fromCharCode(h),u=e.line,j[1]=u,u>=r||e.sCount[u]<e.blkIndent||e.sCount[u]-e.blkIndent>=4)break;let B=!1;for(let Z=0,ue=E.length;Z<ue;Z++)if(E[Z](e,u,r,!0)){B=!0;break}if(B)break;if(f){if(d=Dc(e,u),d<0)break;a=e.bMarks[u]+e.tShift[u]}else if(d=Ac(e,u),d<0)break;if(h!==e.src.charCodeAt(d-1))break}return f?s=e.push("ordered_list_close","ol",-1):s=e.push("bullet_list_close","ul",-1),s.markup=String.fromCharCode(h),g[1]=u,e.line=u,e.parentType=C,l&&Kp(e,b),!0}function ks(e,t,r,o){let n=e.bMarks[t]+e.tShift[t],i=e.eMarks[t],a=t+1;if(e.sCount[t]-e.blkIndent>=4||e.src.charCodeAt(n)!==91)return!1;function s(E){let C=e.lineMax;if(E>=C||e.isEmpty(E))return null;let A=!1;if(e.sCount[E]-e.blkIndent>3&&(A=!0),e.sCount[E]<0&&(A=!0),!A){let S=e.md.block.ruler.getRules("reference"),N=e.parentType;e.parentType="reference";let j=!1;for(let O=0,w=S.length;O<w;O++)if(S[O](e,E,C,!0)){j=!0;break}if(e.parentType=N,j)return null}let T=e.bMarks[E]+e.tShift[E],k=e.eMarks[E];return e.src.slice(T,k+1)}let u=e.src.slice(n,i+1);i=u.length;let l=-1;for(n=1;n<i;n++){let E=u.charCodeAt(n);if(E===91)return!1;if(E===93){l=n;break}else if(E===10){let C=s(a);C!==null&&(u+=C,i=u.length,a++)}else if(E===92&&(n++,n<i&&u.charCodeAt(n)===10)){let C=s(a);C!==null&&(u+=C,i=u.length,a++)}}if(l<0||u.charCodeAt(l+1)!==58)return!1;for(n=l+2;n<i;n++){let E=u.charCodeAt(n);if(E===10){let C=s(a);C!==null&&(u+=C,i=u.length,a++)}else if(!oe(E))break}let c=e.md.helpers.parseLinkDestination(u,n,i);if(!c.ok)return!1;let f=e.md.normalizeLink(c.str);if(!e.md.validateLink(f))return!1;n=c.pos;let p=n,d=a,h=n;for(;n<i;n++){let E=u.charCodeAt(n);if(E===10){let C=s(a);C!==null&&(u+=C,i=u.length,a++)}else if(!oe(E))break}let b=e.md.helpers.parseLinkTitle(u,n,i);for(;b.can_continue;){let E=s(a);if(E===null)break;u+=E,n=i,i=u.length,a++,b=e.md.helpers.parseLinkTitle(u,n,i,b)}let g;for(n<i&&h!==n&&b.ok?(g=b.str,n=b.pos):(g="",n=p,a=d);n<i;){let E=u.charCodeAt(n);if(!oe(E))break;n++}if(n<i&&u.charCodeAt(n)!==10&&g)for(g="",n=p,a=d;n<i;){let E=u.charCodeAt(n);if(!oe(E))break;n++}if(n<i&&u.charCodeAt(n)!==10)return!1;let D=io(u.slice(1,l));return D?(o||(typeof e.env.references>"u"&&(e.env.references={}),typeof e.env.references[D]>"u"&&(e.env.references[D]={title:g,href:f}),e.line=a),!0):!1}var Sc=["address","article","aside","base","basefont","blockquote","body","caption","center","col","colgroup","dd","details","dialog","dir","div","dl","dt","fieldset","figcaption","figure","footer","form","frame","frameset","h1","h2","h3","h4","h5","h6","head","header","hr","html","iframe","legend","li","link","main","menu","menuitem","nav","noframes","ol","optgroup","option","p","param","search","section","summary","table","tbody","td","tfoot","th","thead","title","tr","track","ul"];var Jp="[a-zA-Z_:][a-zA-Z0-9:._-]*",Qp="[^\"'=<>`\\x00-\\x20]+",em="'[^']*'",tm='"[^"]*"',rm="(?:"+Qp+"|"+em+"|"+tm+")",om="(?:\\s+"+Jp+"(?:\\s*=\\s*"+rm+")?)",Tc="<[A-Za-z][A-Za-z0-9\\-]*"+om+"*\\s*\\/?>",Fc="<\\/[A-Za-z][A-Za-z0-9\\-]*\\s*>",nm="<!---?>|<!--(?:[^-]|-[^-]|--[^>])*-->",im="<[?][\\s\\S]*?[?]>",am="<![A-Za-z][^>]*>",sm="<!\\[CDATA\\[[\\s\\S]*?\\]\\]>",Mc=new RegExp("^(?:"+Tc+"|"+Fc+"|"+nm+"|"+im+"|"+am+"|"+sm+")"),Rc=new RegExp("^(?:"+Tc+"|"+Fc+")");var uo=[[/^<(script|pre|style|textarea)(?=(\s|>|$))/i,/<\/(script|pre|style|textarea)>/i,!0],[/^<!--/,/-->/,!0],[/^<\?/,/\?>/,!0],[/^<![A-Z]/,/>/,!0],[/^<!\[CDATA\[/,/\]\]>/,!0],[new RegExp("^</?("+Sc.join("|")+")(?=(\\s|/?>|$))","i"),/^$/,!0],[new RegExp(Rc.source+"\\s*$"),/^$/,!1]];function $s(e,t,r,o){let n=e.bMarks[t]+e.tShift[t],i=e.eMarks[t];if(e.sCount[t]-e.blkIndent>=4||!e.md.options.html||e.src.charCodeAt(n)!==60)return!1;let a=e.src.slice(n,i),s=0;for(;s<uo.length&&!uo[s][0].test(a);s++);if(s===uo.length)return!1;if(o)return uo[s][2];let u=t+1,l=uo[s][1].test("");if(!uo[s][1].test(a)){for(;u<r&&!(e.sCount[u]<e.blkIndent&&(l||!e.isEmpty(u)));u++)if(n=e.bMarks[u]+e.tShift[u],i=e.eMarks[u],a=e.src.slice(n,i),uo[s][1].test(a)){a.length!==0&&u++;break}}e.line=u;let c=e.push("html_block","",0);return c.map=[t,u],c.content=e.getLines(t,u,e.blkIndent,!0),!0}function Es(e,t,r,o){let n=e.bMarks[t]+e.tShift[t],i=e.eMarks[t];if(e.sCount[t]-e.blkIndent>=4)return!1;let a=e.src.charCodeAt(n);if(a!==35||n>=i)return!1;let s=1;for(a=e.src.charCodeAt(++n);a===35&&n<i&&s<=6;)s++,a=e.src.charCodeAt(++n);if(s>6||n<i&&!oe(a))return!1;if(o)return!0;i=e.skipSpacesBack(i,n);let u=e.skipCharsBack(i,35,n);u>n&&oe(e.src.charCodeAt(u-1))&&(i=u),e.line=t+1;let l=e.push("heading_open","h"+String(s),1);l.markup="########".slice(0,s),l.map=[t,e.line];let c=e.push("inline","",0);c.content=ao(e.src.slice(n,i)),c.map=[t,e.line],c.children=[];let f=e.push("heading_close","h"+String(s),-1);return f.markup="########".slice(0,s),!0}function Cs(e,t,r){let o=e.md.block.ruler.getRules("paragraph");if(e.sCount[t]-e.blkIndent>=4)return!1;let n=e.parentType;e.parentType="paragraph";let i=0,a,s=t+1;for(;s<r&&!e.isEmpty(s);s++){if(e.sCount[s]-e.blkIndent>3)continue;if(e.sCount[s]>=e.blkIndent){let d=e.bMarks[s]+e.tShift[s],h=e.eMarks[s];if(d<h&&(a=e.src.charCodeAt(d),(a===45||a===61)&&(d=e.skipChars(d,a),d=e.skipSpaces(d),d>=h))){i=a===61?1:2;break}}if(e.sCount[s]<0)continue;let p=!1;for(let d=0,h=o.length;d<h;d++)if(o[d](e,s,r,!0)){p=!0;break}if(p)break}if(!i)return e.parentType=n,!1;let u=ao(e.getLines(t,s,e.blkIndent,!1));e.line=s+1;let l=e.push("heading_open","h"+String(i),1);l.markup=String.fromCharCode(a),l.map=[t,e.line];let c=e.push("inline","",0);c.content=u,c.map=[t,e.line-1],c.children=[];let f=e.push("heading_close","h"+String(i),-1);return f.markup=String.fromCharCode(a),e.parentType=n,!0}function As(e,t,r){let o=e.md.block.ruler.getRules("paragraph"),n=e.parentType,i=t+1;for(e.parentType="paragraph";i<r&&!e.isEmpty(i);i++){if(e.sCount[i]-e.blkIndent>3||e.sCount[i]<0)continue;let l=!1;for(let c=0,f=o.length;c<f;c++)if(o[c](e,i,r,!0)){l=!0;break}if(l)break}let a=ao(e.getLines(t,i,e.blkIndent,!1));e.line=i;let s=e.push("paragraph_open","p",1);s.map=[t,e.line];let u=e.push("inline","",0);return u.content=a,u.map=[t,e.line],u.children=[],e.push("paragraph_close","p",-1),e.parentType=n,!0}var Li=[["table",vs,["paragraph","reference"]],["code",gs],["fence",_s,["paragraph","reference","blockquote","list"]],["blockquote",xs,["paragraph","reference","blockquote","list"]],["hr",ys,["paragraph","reference","blockquote","list"]],["list",ws,["paragraph","reference","blockquote"]],["reference",ks],["html_block",$s,["paragraph","reference","blockquote"]],["heading",Es,["paragraph","reference","blockquote"]],["lheading",Cs],["paragraph",As]];function Ni(){this.ruler=new so;for(let e=0;e<Li.length;e++)this.ruler.push(Li[e][0],Li[e][1],{alt:(Li[e][2]||[]).slice()})}Ni.prototype.tokenize=function(e,t,r){let o=this.ruler.getRules(""),n=o.length,i=e.md.options.maxNesting,a=t,s=!1;for(;a<r&&(e.line=a=e.skipEmptyLines(a),!(a>=r||e.sCount[a]<e.blkIndent));){if(e.level>=i){e.line=r;break}let u=e.line,l=!1;for(let c=0;c<n;c++)if(l=o[c](e,a,r,!1),l){if(u>=e.line)throw new Error("block rule didn't increment state.line");break}if(!l)throw new Error("none of the block rules matched");e.tight=!s,e.isEmpty(e.line-1)&&(s=!0),a=e.line,a<r&&e.isEmpty(a)&&(s=!0,a++,e.line=a)}};Ni.prototype.parse=function(e,t,r,o){if(!e)return;let n=new this.State(e,t,r,o);this.tokenize(n,n.line,n.lineMax)};Ni.prototype.State=Ec;var zc=Ni;function fn(e,t,r,o){this.src=e,this.env=r,this.md=t,this.tokens=o,this.tokens_meta=Array(o.length),this.pos=0,this.posMax=this.src.length,this.level=0,this.pending="",this.pendingLevel=0,this.cache={},this.delimiters=[],this._prev_delimiters=[],this.backticks={},this.backticksScanned=!1,this.linkLevel=0}fn.prototype.pushPending=function(){let e=new wr("text","",0);return e.content=this.pending,e.level=this.pendingLevel,this.tokens.push(e),this.pending="",e};fn.prototype.push=function(e,t,r){this.pending&&this.pushPending();let o=new wr(e,t,r),n=null;return r<0&&(this.level--,this.delimiters=this._prev_delimiters.pop()),o.level=this.level,r>0&&(this.level++,this._prev_delimiters.push(this.delimiters),this.delimiters=[],n={delimiters:this.delimiters}),this.pendingLevel=this.level,this.tokens.push(o),this.tokens_meta.push(n),o};fn.prototype.scanDelims=function(e,t){let r=this.posMax,o=this.src.charCodeAt(e),n;if(e===0)n=32;else if(e===1)n=this.src.charCodeAt(0),(n&63488)===55296&&(n=65533);else if(n=this.src.charCodeAt(e-1),(n&64512)===56320){let g=this.src.charCodeAt(e-2);n=(g&64512)===55296?65536+(g-55296<<10)+(n-56320):65533}else(n&64512)===55296&&(n=65533);let i=e;for(;i<r&&this.src.charCodeAt(i)===o;)i++;let a=i-e,s=i<r?this.src.charCodeAt(i):32;if((s&64512)===55296){let g=this.src.charCodeAt(i+1);s=(g&64512)===56320?65536+(s-55296<<10)+(g-56320):65533}else(s&64512)===56320&&(s=65533);let u=no(n)||oo(n),l=no(s)||oo(s),c=ro(n),f=ro(s),p=!f&&(!l||c||u),d=!c&&(!u||f||l);return{can_open:p&&(t||!d||u),can_close:d&&(t||!p||l),length:a}};fn.prototype.Token=wr;var Lc=fn;function um(e){switch(e){case 10:case 33:case 35:case 36:case 37:case 38:case 42:case 43:case 45:case 58:case 60:case 61:case 62:case 64:case 91:case 92:case 93:case 94:case 95:case 96:case 123:case 125:case 126:return!0;default:return!1}}function Ds(e,t){let r=e.pos;for(;r<e.posMax&&!um(e.src.charCodeAt(r));)r++;return r===e.pos?!1:(t||(e.pending+=e.src.slice(e.pos,r)),e.pos=r,!0)}var lm=/(?:^|[^a-z0-9.+-])([a-z][a-z0-9.+-]*)$/i;function Ss(e,t){if(!e.md.options.linkify||e.linkLevel>0)return!1;let r=e.pos,o=e.posMax;if(r+3>o||e.src.charCodeAt(r)!==58||e.src.charCodeAt(r+1)!==47||e.src.charCodeAt(r+2)!==47)return!1;let n=e.pending.match(lm);if(!n)return!1;let i=n[1],a=e.md.linkify.matchAtStart(e.src.slice(r-i.length));if(!a)return!1;let s=a.url;if(s.length<=i.length)return!1;let u=s.length;for(;u>0&&s.charCodeAt(u-1)===42;)u--;u!==s.length&&(s=s.slice(0,u));let l=e.md.normalizeLink(s);if(!e.md.validateLink(l))return!1;if(!t){e.pending=e.pending.slice(0,-i.length);let c=e.push("link_open","a",1);c.attrs=[["href",l]],c.markup="linkify",c.info="auto";let f=e.push("text","",0);f.content=e.md.normalizeLinkText(s);let p=e.push("link_close","a",-1);p.markup="linkify",p.info="auto"}return e.pos+=s.length-i.length,!0}function Ts(e,t){let r=e.pos;if(e.src.charCodeAt(r)!==10)return!1;let o=e.pending.length-1,n=e.posMax;if(!t)if(o>=0&&e.pending.charCodeAt(o)===32)if(o>=1&&e.pending.charCodeAt(o-1)===32){let i=o-1;for(;i>=1&&e.pending.charCodeAt(i-1)===32;)i--;e.pending=e.pending.slice(0,i),e.push("hardbreak","br",0)}else e.pending=e.pending.slice(0,-1),e.push("softbreak","br",0);else e.push("softbreak","br",0);for(r++;r<n&&oe(e.src.charCodeAt(r));)r++;return e.pos=r,!0}var Fs=[];for(let e=0;e<256;e++)Fs.push(0);"\\!\"#$%&'()*+,./:;<=>?@[]^_`{|}~-".split("").forEach(function(e){Fs[e.charCodeAt(0)]=1});function Ms(e,t){let r=e.pos,o=e.posMax;if(e.src.charCodeAt(r)!==92||(r++,r>=o))return!1;let n=e.src.charCodeAt(r);if(n===10){for(t||e.push("hardbreak","br",0),r++;r<o&&(n=e.src.charCodeAt(r),!!oe(n));)r++;return e.pos=r,!0}let i=e.src[r];if(n>=55296&&n<=56319&&r+1<o){let s=e.src.charCodeAt(r+1);s>=56320&&s<=57343&&(i+=e.src[r+1],r++)}let a="\\"+i;if(!t){let s=e.push("text_special","",0);n<256&&Fs[n]!==0?s.content=i:s.content=a,s.markup=a,s.info="escape"}return e.pos=r+1,!0}function Rs(e,t){let r=e.pos;if(e.src.charCodeAt(r)!==96)return!1;let n=r;r++;let i=e.posMax;for(;r<i&&e.src.charCodeAt(r)===96;)r++;let a=e.src.slice(n,r),s=a.length;if(e.backticksScanned&&(e.backticks[s]||0)<=n)return t||(e.pending+=a),e.pos+=s,!0;let u=r,l;for(;(l=e.src.indexOf("`",u))!==-1;){for(u=l+1;u<i&&e.src.charCodeAt(u)===96;)u++;let c=u-l;if(c===s){if(!t){let f=e.push("code_inline","code",0);f.markup=a,f.content=e.src.slice(r,l).replace(/\n/g," ").replace(/^ (.+) $/,"$1")}return e.pos=u,!0}e.backticks[c]=l}return e.backticksScanned=!0,t||(e.pending+=a),e.pos+=s,!0}function cm(e,t){let r=e.pos,o=e.src.charCodeAt(r);if(t||o!==126)return!1;let n=e.scanDelims(e.pos,!0),i=n.length,a=String.fromCharCode(o);if(i<2)return!1;let s;i%2&&(s=e.push("text","",0),s.content=a,i--);for(let u=0;u<i;u+=2)s=e.push("text","",0),s.content=a+a,e.delimiters.push({marker:o,length:0,token:e.tokens.length-1,end:-1,open:n.can_open,close:n.can_close});return e.pos+=n.length,!0}function Nc(e,t){let r,o=[],n=t.length;for(let i=0;i<n;i++){let a=t[i];if(a.marker!==126||a.end===-1)continue;let s=t[a.end];r=e.tokens[a.token],r.type="s_open",r.tag="s",r.nesting=1,r.markup="~~",r.content="",r=e.tokens[s.token],r.type="s_close",r.tag="s",r.nesting=-1,r.markup="~~",r.content="",e.tokens[s.token-1].type==="text"&&e.tokens[s.token-1].content==="~"&&o.push(s.token-1)}for(;o.length;){let i=o.pop(),a=i+1;for(;a<e.tokens.length&&e.tokens[a].type==="s_close";)a++;a--,i!==a&&(r=e.tokens[a],e.tokens[a]=e.tokens[i],e.tokens[i]=r)}}function dm(e){let t=e.tokens_meta,r=e.tokens_meta.length;Nc(e,e.delimiters);for(let o=0;o<r;o++)t[o]&&t[o].delimiters&&Nc(e,t[o].delimiters)}var zs={tokenize:cm,postProcess:dm};function fm(e,t){let r=e.pos,o=e.src.charCodeAt(r);if(t||o!==95&&o!==42)return!1;let n=e.scanDelims(e.pos,o===42);for(let i=0;i<n.length;i++){let a=e.push("text","",0);a.content=String.fromCharCode(o),e.delimiters.push({marker:o,length:n.length,token:e.tokens.length-1,end:-1,open:n.can_open,close:n.can_close})}return e.pos+=n.length,!0}function Pc(e,t){let r=t.length;for(let o=r-1;o>=0;o--){let n=t[o];if(n.marker!==95&&n.marker!==42||n.end===-1)continue;let i=t[n.end],a=o>0&&t[o-1].end===n.end+1&&t[o-1].marker===n.marker&&t[o-1].token===n.token-1&&t[n.end+1].token===i.token+1,s=String.fromCharCode(n.marker),u=e.tokens[n.token];u.type=a?"strong_open":"em_open",u.tag=a?"strong":"em",u.nesting=1,u.markup=a?s+s:s,u.content="";let l=e.tokens[i.token];l.type=a?"strong_close":"em_close",l.tag=a?"strong":"em",l.nesting=-1,l.markup=a?s+s:s,l.content="",a&&(e.tokens[t[o-1].token].content="",e.tokens[t[n.end+1].token].content="",o--)}}function pm(e){let t=e.tokens_meta,r=e.tokens_meta.length;Pc(e,e.delimiters);for(let o=0;o<r;o++)t[o]&&t[o].delimiters&&Pc(e,t[o].delimiters)}var Ls={tokenize:fm,postProcess:pm};function Ns(e,t){let r,o,n,i,a="",s="",u=e.pos,l=!0;if(e.src.charCodeAt(e.pos)!==91)return!1;let c=e.pos,f=e.posMax,p=e.pos+1,d=e.md.helpers.parseLinkLabel(e,e.pos,!0);if(d<0)return!1;let h=d+1;if(h<f&&e.src.charCodeAt(h)===40){for(l=!1,h++;h<f&&(r=e.src.charCodeAt(h),!(!oe(r)&&r!==10));h++);if(h>=f)return!1;if(u=h,n=e.md.helpers.parseLinkDestination(e.src,h,e.posMax),n.ok){for(a=e.md.normalizeLink(n.str),e.md.validateLink(a)?h=n.pos:a="",u=h;h<f&&(r=e.src.charCodeAt(h),!(!oe(r)&&r!==10));h++);if(n=e.md.helpers.parseLinkTitle(e.src,h,e.posMax),h<f&&u!==h&&n.ok)for(s=n.str,h=n.pos;h<f&&(r=e.src.charCodeAt(h),!(!oe(r)&&r!==10));h++);}(h>=f||e.src.charCodeAt(h)!==41)&&(l=!0),h++}if(l){if(typeof e.env.references>"u")return!1;if(h<f&&e.src.charCodeAt(h)===91?(u=h+1,h=e.md.helpers.parseLinkLabel(e,h),h>=0?o=e.src.slice(u,h++):h=d+1):h=d+1,o||(o=e.src.slice(p,d)),i=e.env.references[io(o)],!i)return e.pos=c,!1;a=i.href,s=i.title}if(!t){e.pos=p,e.posMax=d;let b=e.push("link_open","a",1),g=[["href",a]];b.attrs=g,s&&g.push(["title",s]),e.linkLevel++,e.md.inline.tokenize(e),e.linkLevel--,e.push("link_close","a",-1)}return e.pos=h,e.posMax=f,!0}function Ps(e,t){let r,o,n,i,a,s,u,l,c="",f=e.pos,p=e.posMax;if(e.src.charCodeAt(e.pos)!==33||e.src.charCodeAt(e.pos+1)!==91)return!1;let d=e.pos+2,h=e.md.helpers.parseLinkLabel(e,e.pos+1,!1);if(h<0)return!1;if(i=h+1,i<p&&e.src.charCodeAt(i)===40){for(i++;i<p&&(r=e.src.charCodeAt(i),!(!oe(r)&&r!==10));i++);if(i>=p)return!1;for(l=i,s=e.md.helpers.parseLinkDestination(e.src,i,e.posMax),s.ok&&(c=e.md.normalizeLink(s.str),e.md.validateLink(c)?i=s.pos:c=""),l=i;i<p&&(r=e.src.charCodeAt(i),!(!oe(r)&&r!==10));i++);if(s=e.md.helpers.parseLinkTitle(e.src,i,e.posMax),i<p&&l!==i&&s.ok)for(u=s.str,i=s.pos;i<p&&(r=e.src.charCodeAt(i),!(!oe(r)&&r!==10));i++);else u="";if(i>=p||e.src.charCodeAt(i)!==41)return e.pos=f,!1;i++}else{if(typeof e.env.references>"u")return!1;if(i<p&&e.src.charCodeAt(i)===91?(l=i+1,i=e.md.helpers.parseLinkLabel(e,i),i>=0?n=e.src.slice(l,i++):i=h+1):i=h+1,n||(n=e.src.slice(d,h)),a=e.env.references[io(n)],!a)return e.pos=f,!1;c=a.href,u=a.title}if(!t){o=e.src.slice(d,h);let b=[];e.md.inline.parse(o,e.md,e.env,b);let g=e.push("image","img",0),D=[["src",c],["alt",""]];g.attrs=D,g.children=b,g.content=o,u&&D.push(["title",u])}return e.pos=i,e.posMax=p,!0}var mm=/^([a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)$/,hm=/^([a-zA-Z][a-zA-Z0-9+.-]{1,31}):([^<>\x00-\x20]*)$/;function Is(e,t){let r=e.pos;if(e.src.charCodeAt(r)!==60)return!1;let o=e.pos,n=e.posMax;for(;;){if(++r>=n)return!1;let a=e.src.charCodeAt(r);if(a===60)return!1;if(a===62)break}let i=e.src.slice(o+1,r);if(hm.test(i)){let a=e.md.normalizeLink(i);if(!e.md.validateLink(a))return!1;if(!t){let s=e.push("link_open","a",1);s.attrs=[["href",a]],s.markup="autolink",s.info="auto";let u=e.push("text","",0);u.content=e.md.normalizeLinkText(i);let l=e.push("link_close","a",-1);l.markup="autolink",l.info="auto"}return e.pos+=i.length+2,!0}if(mm.test(i)){let a=e.md.normalizeLink("mailto:"+i);if(!e.md.validateLink(a))return!1;if(!t){let s=e.push("link_open","a",1);s.attrs=[["href",a]],s.markup="autolink",s.info="auto";let u=e.push("text","",0);u.content=e.md.normalizeLinkText(i);let l=e.push("link_close","a",-1);l.markup="autolink",l.info="auto"}return e.pos+=i.length+2,!0}return!1}function bm(e){return/^<a[>\s]/i.test(e)}function vm(e){return/^<\/a\s*>/i.test(e)}function gm(e){let t=e|32;return t>=97&&t<=122}function qs(e,t){if(!e.md.options.html)return!1;let r=e.posMax,o=e.pos;if(e.src.charCodeAt(o)!==60||o+2>=r)return!1;let n=e.src.charCodeAt(o+1);if(n!==33&&n!==63&&n!==47&&!gm(n))return!1;let i=e.src.slice(o).match(Mc);if(!i)return!1;if(!t){let a=e.push("html_inline","",0);a.content=i[0],bm(a.content)&&e.linkLevel++,vm(a.content)&&e.linkLevel--}return e.pos+=i[0].length,!0}var _m=/^&#((?:x[a-f0-9]{1,6}|[0-9]{1,7}));/i,xm=/^&([a-z][a-z0-9]{1,31});/i;function Os(e,t){let r=e.pos,o=e.posMax;if(e.src.charCodeAt(r)!==38||r+1>=o)return!1;if(e.src.charCodeAt(r+1)===35){let i=e.src.slice(r).match(_m);if(i){if(!t){let a=i[1][0].toLowerCase()==="x"?parseInt(i[1].slice(1),16):parseInt(i[1],10),s=e.push("text_special","",0);s.content=Ri(a)?Lo(a):Lo(65533),s.markup=i[0],s.info="entity"}return e.pos+=i[0].length,!0}}else{let i=e.src.slice(r).match(xm);if(i){let a=dn(i[0]);if(a!==i[0]){if(!t){let s=e.push("text_special","",0);s.content=a,s.markup=i[0],s.info="entity"}return e.pos+=i[0].length,!0}}}return!1}function Ic(e){let t={},r=e.length;if(!r)return;let o=0,n=-2,i=[];for(let a=0;a<r;a++){let s=e[a];if(i.push(0),(e[o].marker!==s.marker||n!==s.token-1)&&(o=a),n=s.token,s.length=s.length||0,!s.close)continue;t.hasOwnProperty(s.marker)||(t[s.marker]=[-1,-1,-1,-1,-1,-1]);let u=t[s.marker][(s.open?3:0)+s.length%3],l=o-i[o]-1,c=l;for(;l>u;l-=i[l]+1){let f=e[l];if(f.marker===s.marker&&f.open&&f.end<0){let p=!1;if((f.close||s.open)&&(f.length+s.length)%3===0&&(f.length%3!==0||s.length%3!==0)&&(p=!0),!p){let d=l>0&&!e[l-1].open?i[l-1]+1:0;i[a]=a-l+d,i[l]=d,s.open=!1,f.end=a,f.close=!1,c=-1,n=-2;break}}}c!==-1&&(t[s.marker][(s.open?3:0)+(s.length||0)%3]=c)}}function Bs(e){let t=e.tokens_meta,r=e.tokens_meta.length;Ic(e.delimiters);for(let o=0;o<r;o++)t[o]&&t[o].delimiters&&Ic(t[o].delimiters)}function js(e){let t,r,o=0,n=e.tokens,i=e.tokens.length;for(t=r=0;t<i;t++)n[t].nesting<0&&o--,n[t].level=o,n[t].nesting>0&&o++,n[t].type==="text"&&t+1<i&&n[t+1].type==="text"?n[t+1].content=n[t].content+n[t+1].content:(t!==r&&(n[r]=n[t]),r++);t!==r&&(n.length=r)}var Hs=[["text",Ds],["linkify",Ss],["newline",Ts],["escape",Ms],["backticks",Rs],["strikethrough",zs.tokenize],["emphasis",Ls.tokenize],["link",Ns],["image",Ps],["autolink",Is],["html_inline",qs],["entity",Os]],Us=[["balance_pairs",Bs],["strikethrough",zs.postProcess],["emphasis",Ls.postProcess],["fragments_join",js]];function pn(){this.ruler=new so;for(let e=0;e<Hs.length;e++)this.ruler.push(Hs[e][0],Hs[e][1]);this.ruler2=new so;for(let e=0;e<Us.length;e++)this.ruler2.push(Us[e][0],Us[e][1])}pn.prototype.skipToken=function(e){let t=e.pos,r=this.ruler.getRules(""),o=r.length,n=e.md.options.maxNesting,i=e.cache;if(typeof i[t]<"u"){e.pos=i[t];return}let a=!1;if(e.level<n){for(let s=0;s<o;s++)if(e.level++,a=r[s](e,!0),e.level--,a){if(t>=e.pos)throw new Error("inline rule didn't increment state.pos");break}}else e.pos=e.posMax;a||e.pos++,i[t]=e.pos};pn.prototype.tokenize=function(e){let t=this.ruler.getRules(""),r=t.length,o=e.posMax,n=e.md.options.maxNesting;for(;e.pos<o;){let i=e.pos,a=!1;if(e.level<n){for(let s=0;s<r;s++)if(a=t[s](e,!1),a){if(i>=e.pos)throw new Error("inline rule didn't increment state.pos");break}}if(a){if(e.pos>=o)break;continue}e.pending+=e.src[e.pos++]}e.pending&&e.pushPending()};pn.prototype.parse=function(e,t,r,o){let n=new this.State(e,t,r,o);this.tokenize(n);let i=this.ruler2.getRules(""),a=i.length;for(let s=0;s<a;s++)i[s](n)};pn.prototype.State=Lc;var qc=pn;function Oc(e){let t={};e=e||{},t.src_Any=Ci.source,t.src_Cc=Ai.source,t.src_Z=Si.source,t.src_P=Mo.source,t.src_ZPCc=[t.src_Z,t.src_P,t.src_Cc].join("|"),t.src_ZCc=[t.src_Z,t.src_Cc].join("|");let r="[><\uFF5C]";return t.src_pseudo_letter="(?:(?!"+r+"|"+t.src_ZPCc+")"+t.src_Any+")",t.src_ip4="(?:(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)",t.src_auth="(?:(?:(?!"+t.src_ZCc+"|[@/\\[\\]()]).)+@)?",t.src_port="(?::(?:6(?:[0-4]\\d{3}|5(?:[0-4]\\d{2}|5(?:[0-2]\\d|3[0-5])))|[1-5]?\\d{1,4}))?",t.src_host_terminator="(?=$|"+r+"|"+t.src_ZPCc+")(?!"+(e["---"]?"-(?!--)|":"-|")+"_|:\\d|\\.-|\\.(?!$|"+t.src_ZPCc+"))",t.src_path="(?:[/?#](?:(?!"+t.src_ZCc+"|"+r+`|[()[\\]{}.,"'?!\\-;]).|\\[(?:(?!`+t.src_ZCc+"|\\]).)*\\]|\\((?:(?!"+t.src_ZCc+"|[)]).)*\\)|\\{(?:(?!"+t.src_ZCc+'|[}]).)*\\}|\\"(?:(?!'+t.src_ZCc+`|["]).)+\\"|\\'(?:(?!`+t.src_ZCc+"|[']).)+\\'|\\'(?="+t.src_pseudo_letter+"|[-])|\\.{2,}[a-zA-Z0-9%/&]|\\.(?!"+t.src_ZCc+"|[.]|$)|"+(e["---"]?"\\-(?!--(?:[^-]|$))(?:-*)|":"\\-+|")+",(?!"+t.src_ZCc+"|$)|;(?!"+t.src_ZCc+"|$)|\\!+(?!"+t.src_ZCc+"|[!]|$)|\\?(?!"+t.src_ZCc+"|[?]|$))+|\\/)?",t.src_email_name='[\\-;:&=\\+\\$,\\.a-zA-Z0-9_][\\-;:&=\\+\\$,\\"\\.a-zA-Z0-9_]*',t.src_xn="xn--[a-z0-9\\-]{1,59}",t.src_domain_root="(?:"+t.src_xn+"|"+t.src_pseudo_letter+"{1,63})",t.src_domain="(?:"+t.src_xn+"|(?:"+t.src_pseudo_letter+")|(?:"+t.src_pseudo_letter+"(?:-|"+t.src_pseudo_letter+"){0,61}"+t.src_pseudo_letter+"))",t.src_host="(?:(?:(?:(?:"+t.src_domain+")\\.)*"+t.src_domain+"))",t.tpl_host_fuzzy="(?:"+t.src_ip4+"|(?:(?:(?:"+t.src_domain+")\\.)+(?:%TLDS%)))",t.tpl_host_no_ip_fuzzy="(?:(?:(?:"+t.src_domain+")\\.)+(?:%TLDS%))",t.src_host_strict=t.src_host+t.src_host_terminator,t.tpl_host_fuzzy_strict=t.tpl_host_fuzzy+t.src_host_terminator,t.src_host_port_strict=t.src_host+t.src_port+t.src_host_terminator,t.tpl_host_port_fuzzy_strict=t.tpl_host_fuzzy+t.src_port+t.src_host_terminator,t.tpl_host_port_no_ip_fuzzy_strict=t.tpl_host_no_ip_fuzzy+t.src_port+t.src_host_terminator,t.tpl_host_fuzzy_test="localhost|www\\.|\\.\\d{1,3}\\.|(?:\\.(?:%TLDS%)(?:"+t.src_ZPCc+"|>|$))",t.tpl_email_fuzzy="(^|"+r+'|"|\\(|'+t.src_ZCc+")("+t.src_email_name+"@"+t.tpl_host_fuzzy_strict+")",t.tpl_link_fuzzy="(^|(?![.:/\\-_@])(?:[$+<=>^`|\uFF5C]|"+t.src_ZPCc+"))((?![$+<=>^`|\uFF5C])"+t.tpl_host_port_fuzzy_strict+t.src_path+")",t.tpl_link_no_ip_fuzzy="(^|(?![.:/\\-_@])(?:[$+<=>^`|\uFF5C]|"+t.src_ZPCc+"))((?![$+<=>^`|\uFF5C])"+t.tpl_host_port_no_ip_fuzzy_strict+t.src_path+")",t}function Vs(e){return Array.prototype.slice.call(arguments,1).forEach(function(r){r&&Object.keys(r).forEach(function(o){e[o]=r[o]})}),e}function Ii(e){return Object.prototype.toString.call(e)}function ym(e){return Ii(e)==="[object String]"}function wm(e){return Ii(e)==="[object Object]"}function km(e){return Ii(e)==="[object RegExp]"}function Bc(e){return Ii(e)==="[object Function]"}function $m(e){return e.replace(/[.?*+^$[\]\\(){}|-]/g,"\\$&")}var Hc={fuzzyLink:!0,fuzzyEmail:!0,fuzzyIP:!1};function Em(e){return Object.keys(e||{}).reduce(function(t,r){return t||Hc.hasOwnProperty(r)},!1)}var Cm={"http:":{validate:function(e,t,r){let o=e.slice(t);return r.re.http||(r.re.http=new RegExp("^\\/\\/"+r.re.src_auth+r.re.src_host_port_strict+r.re.src_path,"i")),r.re.http.test(o)?o.match(r.re.http)[0].length:0}},"https:":"http:","ftp:":"http:","//":{validate:function(e,t,r){let o=e.slice(t);return r.re.no_http||(r.re.no_http=new RegExp("^"+r.re.src_auth+"(?:localhost|(?:(?:"+r.re.src_domain+")\\.)+"+r.re.src_domain_root+")"+r.re.src_port+r.re.src_host_terminator+r.re.src_path,"i")),r.re.no_http.test(o)?t>=3&&e[t-3]===":"||t>=3&&e[t-3]==="/"?0:o.match(r.re.no_http)[0].length:0}},"mailto:":{validate:function(e,t,r){let o=e.slice(t);return r.re.mailto||(r.re.mailto=new RegExp("^"+r.re.src_email_name+"@"+r.re.src_host_strict,"i")),r.re.mailto.test(o)?o.match(r.re.mailto)[0].length:0}}},Am="a[cdefgilmnoqrstuwxz]|b[abdefghijmnorstvwyz]|c[acdfghiklmnoruvwxyz]|d[ejkmoz]|e[cegrstu]|f[ijkmor]|g[abdefghilmnpqrstuwy]|h[kmnrtu]|i[delmnoqrst]|j[emop]|k[eghimnprwyz]|l[abcikrstuvy]|m[acdeghklmnopqrstuvwxyz]|n[acefgilopruz]|om|p[aefghklmnrstwy]|qa|r[eosuw]|s[abcdeghijklmnortuvxyz]|t[cdfghjklmnortvwz]|u[agksyz]|v[aceginu]|w[fs]|y[et]|z[amw]",Dm="biz|com|edu|gov|net|org|pro|web|xxx|aero|asia|coop|info|museum|name|shop|\u0440\u0444".split("|");function Sm(e){return function(t,r){let o=t.slice(r);return e.test(o)?o.match(e)[0].length:0}}function jc(){return function(e,t){t.normalize(e)}}function Pi(e){let t=e.re=Oc(e.__opts__),r=e.__tlds__.slice();e.onCompile(),e.__tlds_replaced__||r.push(Am),r.push(t.src_xn),t.src_tlds=r.join("|");function o(s){return s.replace("%TLDS%",t.src_tlds)}t.email_fuzzy=RegExp(o(t.tpl_email_fuzzy),"i"),t.email_fuzzy_global=RegExp(o(t.tpl_email_fuzzy),"ig"),t.link_fuzzy=RegExp(o(t.tpl_link_fuzzy),"i"),t.link_fuzzy_global=RegExp(o(t.tpl_link_fuzzy),"ig"),t.link_no_ip_fuzzy=RegExp(o(t.tpl_link_no_ip_fuzzy),"i"),t.link_no_ip_fuzzy_global=RegExp(o(t.tpl_link_no_ip_fuzzy),"ig"),t.host_fuzzy_test=RegExp(o(t.tpl_host_fuzzy_test),"i");let n=[];e.__compiled__={};function i(s,u){throw new Error('(LinkifyIt) Invalid schema "'+s+'": '+u)}Object.keys(e.__schemas__).forEach(function(s){let u=e.__schemas__[s];if(u===null)return;let l={validate:null,link:null};if(e.__compiled__[s]=l,wm(u)){km(u.validate)?l.validate=Sm(u.validate):Bc(u.validate)?l.validate=u.validate:i(s,u),Bc(u.normalize)?l.normalize=u.normalize:u.normalize?i(s,u):l.normalize=jc();return}if(ym(u)){n.push(s);return}i(s,u)}),n.forEach(function(s){e.__compiled__[e.__schemas__[s]]&&(e.__compiled__[s].validate=e.__compiled__[e.__schemas__[s]].validate,e.__compiled__[s].normalize=e.__compiled__[e.__schemas__[s]].normalize)}),e.__compiled__[""]={validate:null,normalize:jc()};let a=Object.keys(e.__compiled__).filter(function(s){return s.length>0&&e.__compiled__[s]}).map($m).join("|");e.re.schema_test=RegExp("(^|(?!_)(?:[><\uFF5C]|"+t.src_ZPCc+"))("+a+")","i"),e.re.schema_search=RegExp("(^|(?!_)(?:[><\uFF5C]|"+t.src_ZPCc+"))("+a+")","ig"),e.re.schema_at_start=RegExp("^"+e.re.schema_search.source,"i"),e.re.pretest=RegExp("("+e.re.schema_test.source+")|("+e.re.host_fuzzy_test.source+")|@","i")}function Uc(e,t,r,o){let n=e.slice(r,o);this.schema=t.toLowerCase(),this.index=r,this.lastIndex=o,this.raw=n,this.text=n,this.url=n}function Ft(e,t){if(!(this instanceof Ft))return new Ft(e,t);t||Em(e)&&(t=e,e={}),this.__opts__=Vs({},Hc,t),this.__schemas__=Vs({},Cm,e),this.__compiled__={},this.__tlds__=Dm,this.__tlds_replaced__=!1,this.re={},Pi(this)}Ft.prototype.add=function(t,r){return this.__schemas__[t]=r,Pi(this),this};Ft.prototype.set=function(t){return this.__opts__=Vs(this.__opts__,t),this};Ft.prototype.test=function(t){if(!t.length)return!1;let r,o;if(this.re.schema_test.test(t)){for(o=this.re.schema_search,o.lastIndex=0;(r=o.exec(t))!==null;)if(this.testSchemaAt(t,r[2],o.lastIndex))return!0}return!!(this.__opts__.fuzzyLink&&this.__compiled__["http:"]&&t.search(this.re.host_fuzzy_test)>=0&&t.match(this.__opts__.fuzzyIP?this.re.link_fuzzy:this.re.link_no_ip_fuzzy)!==null||this.__opts__.fuzzyEmail&&this.__compiled__["mailto:"]&&t.indexOf("@")>=0&&t.match(this.re.email_fuzzy)!==null)};Ft.prototype.pretest=function(t){return this.re.pretest.test(t)};Ft.prototype.testSchemaAt=function(t,r,o){return this.__compiled__[r.toLowerCase()]?this.__compiled__[r.toLowerCase()].validate(t,o,this):0};Ft.prototype.match=function(t){let r=[],o=[],n=[],i=[],a,s,u;function l(p,d){return p?d?p.index!==d.index?p.index<d.index?p:d:p.lastIndex>=d.lastIndex?p:d:p:d}if(!t.length)return null;if(this.re.schema_test.test(t))for(u=this.re.schema_search,u.lastIndex=0;(a=u.exec(t))!==null;)s=this.testSchemaAt(t,a[2],u.lastIndex),s&&o.push({schema:a[2],index:a.index+a[1].length,lastIndex:a.index+a[0].length+s});if(this.__opts__.fuzzyLink&&this.__compiled__["http:"])for(u=this.__opts__.fuzzyIP?this.re.link_fuzzy_global:this.re.link_no_ip_fuzzy_global,u.lastIndex=0;(a=u.exec(t))!==null;)n.push({schema:"",index:a.index+a[1].length,lastIndex:a.index+a[0].length});if(this.__opts__.fuzzyEmail&&this.__compiled__["mailto:"])for(u=this.re.email_fuzzy_global,u.lastIndex=0;(a=u.exec(t))!==null;)i.push({schema:"mailto:",index:a.index+a[1].length,lastIndex:a.index+a[0].length});let c=[0,0,0],f=0;for(;;){let p=[o[c[0]],i[c[1]],n[c[2]]],d=l(l(p[0],p[1]),p[2]);if(!d)break;if(d===p[0]?c[0]++:d===p[1]?c[1]++:c[2]++,d.index<f)continue;let h=new Uc(t,d.schema,d.index,d.lastIndex);this.__compiled__[h.schema].normalize(h,this),r.push(h),f=d.lastIndex}return r.length?r:null};Ft.prototype.matchAtStart=function(t){if(!t.length)return null;let r=this.re.schema_at_start.exec(t);if(!r)return null;let o=this.testSchemaAt(t,r[2],r[0].length);if(!o)return null;let n=new Uc(t,r[2],r.index+r[1].length,r.index+r[0].length+o);return this.__compiled__[n.schema].normalize(n,this),n};Ft.prototype.tlds=function(t,r){return t=Array.isArray(t)?t:[t],r?(this.__tlds__=this.__tlds__.concat(t).sort().filter(function(o,n,i){return o!==i[n-1]}).reverse(),Pi(this),this):(this.__tlds__=t.slice(),this.__tlds_replaced__=!0,Pi(this),this)};Ft.prototype.normalize=function(t){t.schema||(t.url="http://"+t.url),t.schema==="mailto:"&&!/^mailto:/i.test(t.url)&&(t.url="mailto:"+t.url)};Ft.prototype.onCompile=function(){};var Vc=Ft;var Tm=/^xn--/,Fm=/[^\0-\x7F]/,Mm=/[\x2E\u3002\uFF0E\uFF61]/g,Rm={overflow:"Overflow: input needs wider integers to process","not-basic":"Illegal input >= 0x80 (not a basic code point)","invalid-input":"Invalid input"},Ys=35,dr=Math.floor,Gs=String.fromCharCode;function Pr(e){throw new RangeError(Rm[e])}function zm(e,t){let r=[],o=e.length;for(;o--;)r[o]=t(e[o]);return r}function Gc(e,t){let r=e.split("@"),o="";r.length>1&&(o=r[0]+"@",e=r[1]),e=e.replace(Mm,".");let n=e.split("."),i=zm(n,t).join(".");return o+i}function Wc(e){let t=[],r=0,o=e.length;for(;r<o;){let n=e.charCodeAt(r++);if(n>=55296&&n<=56319&&r<o){let i=e.charCodeAt(r++);(i&64512)==56320?t.push(((n&1023)<<10)+(i&1023)+65536):(t.push(n),r--)}else t.push(n)}return t}var Lm=e=>String.fromCodePoint(...e),Nm=function(e){return e>=48&&e<58?26+(e-48):e>=65&&e<91?e-65:e>=97&&e<123?e-97:36},Yc=function(e,t){return e+22+75*(e<26)-((t!=0)<<5)},Zc=function(e,t,r){let o=0;for(e=r?dr(e/700):e>>1,e+=dr(e/t);e>Ys*26>>1;o+=36)e=dr(e/Ys);return dr(o+(Ys+1)*e/(e+38))},Xc=function(e){let t=[],r=e.length,o=0,n=128,i=72,a=e.lastIndexOf("-");a<0&&(a=0);for(let s=0;s<a;++s)e.charCodeAt(s)>=128&&Pr("not-basic"),t.push(e.charCodeAt(s));for(let s=a>0?a+1:0;s<r;){let u=o;for(let c=1,f=36;;f+=36){s>=r&&Pr("invalid-input");let p=Nm(e.charCodeAt(s++));p>=36&&Pr("invalid-input"),p>dr((2147483647-o)/c)&&Pr("overflow"),o+=p*c;let d=f<=i?1:f>=i+26?26:f-i;if(p<d)break;let h=36-d;c>dr(2147483647/h)&&Pr("overflow"),c*=h}let l=t.length+1;i=Zc(o-u,l,u==0),dr(o/l)>2147483647-n&&Pr("overflow"),n+=dr(o/l),o%=l,t.splice(o++,0,n)}return String.fromCodePoint(...t)},Kc=function(e){let t=[];e=Wc(e);let r=e.length,o=128,n=0,i=72;for(let u of e)u<128&&t.push(Gs(u));let a=t.length,s=a;for(a&&t.push("-");s<r;){let u=2147483647;for(let c of e)c>=o&&c<u&&(u=c);let l=s+1;u-o>dr((2147483647-n)/l)&&Pr("overflow"),n+=(u-o)*l,o=u;for(let c of e)if(c<o&&++n>2147483647&&Pr("overflow"),c===o){let f=n;for(let p=36;;p+=36){let d=p<=i?1:p>=i+26?26:p-i;if(f<d)break;let h=f-d,b=36-d;t.push(Gs(Yc(d+h%b,0))),f=dr(h/b)}t.push(Gs(Yc(f,0))),i=Zc(n,l,s===a),n=0,++s}++n,++o}return t.join("")},Pm=function(e){return Gc(e,function(t){return Tm.test(t)?Xc(t.slice(4).toLowerCase()):t})},Im=function(e){return Gc(e,function(t){return Fm.test(t)?"xn--"+Kc(t):t})},qm={version:"2.3.1",ucs2:{decode:Wc,encode:Lm},decode:Xc,encode:Kc,toASCII:Im,toUnicode:Pm};var Ws=qm;var Jc={options:{html:!1,xhtmlOut:!1,breaks:!1,langPrefix:"language-",linkify:!1,typographer:!1,quotes:"\u201C\u201D\u2018\u2019",highlight:null,maxNesting:100},components:{core:{},block:{},inline:{}}};var Qc={options:{html:!1,xhtmlOut:!1,breaks:!1,langPrefix:"language-",linkify:!1,typographer:!1,quotes:"\u201C\u201D\u2018\u2019",highlight:null,maxNesting:20},components:{core:{rules:["normalize","block","inline","text_join"]},block:{rules:["paragraph"]},inline:{rules:["text"],rules2:["balance_pairs","fragments_join"]}}};var e0={options:{html:!0,xhtmlOut:!0,breaks:!1,langPrefix:"language-",linkify:!1,typographer:!1,quotes:"\u201C\u201D\u2018\u2019",highlight:null,maxNesting:20},components:{core:{rules:["normalize","block","inline","text_join"]},block:{rules:["blockquote","code","fence","heading","hr","html_block","lheading","list","reference","paragraph"]},inline:{rules:["autolink","backticks","emphasis","entity","escape","html_inline","image","link","newline","text"],rules2:["balance_pairs","emphasis","fragments_join"]}}};var Om={default:Jc,zero:Qc,commonmark:e0},Bm=/^(vbscript|javascript|file|data):/,jm=/^data:image\/(gif|png|jpeg|webp);/;function Hm(e){let t=e.trim().toLowerCase();return Bm.test(t)?jm.test(t):!0}var t0=["http:","https:","mailto:"];function Um(e){let t=cn(e,!0);if(t.hostname&&(!t.protocol||t0.indexOf(t.protocol)>=0))try{t.hostname=Ws.toASCII(t.hostname)}catch{}return ki(Fo(t))}function Vm(e){let t=cn(e,!0);if(t.hostname&&(!t.protocol||t0.indexOf(t.protocol)>=0))try{t.hostname=Ws.toUnicode(t.hostname)}catch{}return ln(Fo(t),ln.defaultChars+"%")}function It(e,t){if(!(this instanceof It))return new It(e,t);t||Mi(e)||(t=e||{},e="default"),this.inline=new qc,this.block=new zc,this.core=new $c,this.renderer=new gc,this.linkify=new Vc,this.validateLink=Hm,this.normalizeLink=Um,this.normalizeLinkText=Vm,this.utils=rs,this.helpers=zo({},as),this.options={},this.configure(e),t&&this.set(t)}It.prototype.set=function(e){return zo(this.options,e),this};It.prototype.configure=function(e){let t=this;if(Mi(e)){let r=e;if(e=Om[r],!e)throw new Error('Wrong `markdown-it` preset "'+r+'", check name')}if(!e)throw new Error("Wrong `markdown-it` preset, can't be empty");return e.options&&t.set(e.options),e.components&&Object.keys(e.components).forEach(function(r){e.components[r].rules&&t[r].ruler.enableOnly(e.components[r].rules),e.components[r].rules2&&t[r].ruler2.enableOnly(e.components[r].rules2)}),this};It.prototype.enable=function(e,t){let r=[];Array.isArray(e)||(e=[e]),["core","block","inline"].forEach(function(n){r=r.concat(this[n].ruler.enable(e,!0))},this),r=r.concat(this.inline.ruler2.enable(e,!0));let o=e.filter(function(n){return r.indexOf(n)<0});if(o.length&&!t)throw new Error("MarkdownIt. Failed to enable unknown rule(s): "+o);return this};It.prototype.disable=function(e,t){let r=[];Array.isArray(e)||(e=[e]),["core","block","inline"].forEach(function(n){r=r.concat(this[n].ruler.disable(e,!0))},this),r=r.concat(this.inline.ruler2.disable(e,!0));let o=e.filter(function(n){return r.indexOf(n)<0});if(o.length&&!t)throw new Error("MarkdownIt. Failed to disable unknown rule(s): "+o);return this};It.prototype.use=function(e){let t=[this].concat(Array.prototype.slice.call(arguments,1));return e.apply(e,t),this};It.prototype.parse=function(e,t){if(typeof e!="string")throw new Error("Input data should be a String");let r=new this.core.State(e,this,t);return this.core.process(r),r.tokens};It.prototype.render=function(e,t){return t=t||{},this.renderer.render(this.parse(e,t),this.options,t)};It.prototype.parseInline=function(e,t){let r=new this.core.State(e,this,t);return r.inlineMode=!0,this.core.process(r),r.tokens};It.prototype.renderInline=function(e,t){return t=t||{},this.renderer.render(this.parseInline(e,t),this.options,t)};var Zs=It;function Xs(e){return Array.isArray(e)?e:e.results}async function r0(e){let t=await Pt("/api/content/course_materials/",{course:e,_expand:"textbook",_sort:"position",_page_size:"200"});return Xs(t)}async function o0(e){let t=await Pt("/api/content/course_material_page_ranges/",{material:e,_sort:"position",_page_size:"200"});return Xs(t)}async function n0(e){let t=await Pt("/api/content/textbook_pages/",{textbook:e,_sort:"position",_page_size:"500"});return Xs(t)}var Ym=new Zs({breaks:!0,html:!1,linkify:!0,typographer:!0});function Gm(e){return e.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;")}function Wm(e){return typeof e=="object"&&e!==null&&"type"in e&&e.type==="source"&&"source"in e}function Zm(e){return Wm(e.content)?e.content.source:""}function Xm(e){let t=e.text_format??"MD",r=Zm(e),o;return t==="HTML"?o=r:t==="TEXT"?o=`<pre>${Gm(r)}</pre>`:o=Ym.render(r),{id:e.id,title:e.name,format:t,html:o}}function Km(e){let t=new Map;for(let n of e){let i=n.parent??null,a=t.get(i)??[];a.push(n),t.set(i,a)}for(let n of t.values())n.sort((i,a)=>i.position-a.position);let r=[],o=n=>{for(let i of t.get(n)??[])r.push(i),o(i.id)};if(o(null),r.length<e.length){let n=new Set(r.map(i=>i.id));for(let i of e)n.has(i.id)||r.push(i)}return r}function Ks(e){return typeof e=="string"?e:e.id}function Jm(e,t){if(t.length===0)return e;let r=new Map(e.map((i,a)=>[i.id,a])),o=[],n=new Set;for(let i of[...t].sort((a,s)=>a.position-s.position)){let a=r.get(Ks(i.start_page)),s=r.get(Ks(i.end_page));if(a===void 0||s===void 0)continue;let u=Math.min(a,s),l=Math.max(a,s);for(let c=u;c<=l;c++){let f=e[c];f&&!n.has(f.id)&&(n.add(f.id),o.push(f))}}return o}function Qm(e){return typeof e.textbook=="string"?"Material":e.textbook.name}async function i0(e){let t=await r0(e);return t.sort((o,n)=>o.position-n.position),(await Promise.all(t.map(async o=>{let n=Ks(o.textbook),[i,a]=await Promise.all([o0(o.id),n0(n)]),s=Km(a),u=Jm(s,i);return{id:o.id,title:Qm(o),pages:u.map(Xm)}}))).filter(o=>o.pages.length>0)}var eh=z('<button type="button" class="toc-link svelte-uyhh09"> </button>'),th=z('<p class="toc-group svelte-uyhh09"> </p> <!>',1),rh=z('<p class="muted svelte-uyhh09">No sections yet.</p>'),oh=z('<p class="muted svelte-uyhh09">Loading course content\u2026</p>'),nh=z('<p class="error svelte-uyhh09"> </p>'),ih=z('<iframe class="html-frame svelte-uyhh09" sandbox=""></iframe>'),ah=z('<div class="prose svelte-uyhh09"></div>'),sh=z('<section class="block svelte-uyhh09"><h2 class="svelte-uyhh09"> </h2> <!></section>'),uh=z(`<section class="block svelte-uyhh09"><p class="placeholder-note svelte-uyhh09">\u{1F4DD} No content has been added to this course yet. Once your teacher publishes course
-                    material in the teacher area, it will appear here.</p> <div class="actions svelte-uyhh09"><button type="button" class="btn btn-ghost">Ask the tutor</button></div></section>`),lh=z('<div class="content-screen svelte-uyhh09"><aside class="toc svelte-uyhh09"><button type="button" class="back svelte-uyhh09">\u2190 Back to chat</button> <p class="toc-label svelte-uyhh09">On this page</p> <nav class="toc-nav svelte-uyhh09" aria-label="Table of contents"><!></nav></aside> <main class="article svelte-uyhh09"><header class="article-head svelte-uyhh09"><p class="eyebrow svelte-uyhh09">Course content</p> <h1 class="article-title svelte-uyhh09"> </h1></header> <!></main></div>'),ch={hash:"svelte-uyhh09",code:`.content-screen.svelte-uyhh09 {flex:1;min-height:0;overflow:hidden;display:grid;grid-template-columns:15rem minmax(0, 1fr);grid-template-rows:minmax(0, 1fr);width:100%;}
+// ../../../node_modules/svelte/src/reactivity/create-subscriber.js
+function createSubscriber(start) {
+  let subscribers = 0;
+  let version = source(0);
+  let stop;
+  if (dev_fallback_default) {
+    tag(version, "createSubscriber version");
+  }
+  return () => {
+    if (effect_tracking()) {
+      get2(version);
+      render_effect(() => {
+        if (subscribers === 0) {
+          stop = untrack(() => start(() => increment(version)));
+        }
+        subscribers += 1;
+        return () => {
+          queue_micro_task(() => {
+            subscribers -= 1;
+            if (subscribers === 0) {
+              stop?.();
+              stop = void 0;
+              increment(version);
+            }
+          });
+        };
+      });
+    }
+  };
+}
 
-    /* Sidebar stays put; it never scrolls. */.toc.svelte-uyhh09 {min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:1rem;padding:1.5rem 1rem;border-right:1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);background:color-mix(in oklab, var(--color-base-100) 60%, transparent);}.back.svelte-uyhh09 {align-self:flex-start;background:none;border:none;cursor:pointer;font-weight:600;color:var(--color-primary);}.back.svelte-uyhh09:focus-visible {outline:2px solid var(--color-primary);outline-offset:2px;}.toc-label.svelte-uyhh09 {font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:color-mix(in oklab, var(--color-base-content) 55%, transparent);}.toc-nav.svelte-uyhh09 {display:flex;flex-direction:column;gap:0.15rem;min-height:0;overflow-y:auto;}.toc-group.svelte-uyhh09 {margin-top:0.6rem;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:color-mix(in oklab, var(--color-base-content) 70%, transparent);}.toc-link.svelte-uyhh09 {text-align:left;padding:0.4rem 0.6rem;border-radius:0.5rem;border:none;background:transparent;color:color-mix(in oklab, var(--color-base-content) 75%, transparent);cursor:pointer;}.toc-link.svelte-uyhh09:hover {background:color-mix(in oklab, var(--color-primary) 14%, transparent);color:var(--color-base-content);}.article.svelte-uyhh09 {min-height:0;overflow-y:auto;padding:2.5rem 0;}
+// ../../../node_modules/svelte/src/internal/client/dom/blocks/boundary.js
+var flags = EFFECT_TRANSPARENT | EFFECT_PRESERVED;
+function boundary(node, props, children, transform_error) {
+  new Boundary(node, props, children, transform_error);
+}
+var Boundary = class {
+  /** @type {Boundary | null} */
+  parent;
+  is_pending = false;
+  /**
+   * API-level transformError transform function. Transforms errors before they reach the `failed` snippet.
+   * Inherited from parent boundary, or defaults to identity.
+   * @type {(error: unknown) => unknown}
+   */
+  transform_error;
+  /** @type {TemplateNode} */
+  #anchor;
+  /** @type {TemplateNode | null} */
+  #hydrate_open = hydrating ? hydrate_node : null;
+  /** @type {BoundaryProps} */
+  #props;
+  /** @type {((anchor: Node) => void)} */
+  #children;
+  /** @type {Effect} */
+  #effect;
+  /** @type {Effect | null} */
+  #main_effect = null;
+  /** @type {Effect | null} */
+  #pending_effect = null;
+  /** @type {Effect | null} */
+  #failed_effect = null;
+  /** @type {DocumentFragment | null} */
+  #offscreen_fragment = null;
+  #local_pending_count = 0;
+  #pending_count = 0;
+  #pending_count_update_queued = false;
+  /** @type {Set<Effect>} */
+  #dirty_effects = /* @__PURE__ */ new Set();
+  /** @type {Set<Effect>} */
+  #maybe_dirty_effects = /* @__PURE__ */ new Set();
+  /**
+   * A source containing the number of pending async deriveds/expressions.
+   * Only created if `$effect.pending()` is used inside the boundary,
+   * otherwise updating the source results in needless `Batch.ensure()`
+   * calls followed by no-op flushes
+   * @type {Source<number> | null}
+   */
+  #effect_pending = null;
+  #effect_pending_subscriber = createSubscriber(() => {
+    this.#effect_pending = source(this.#local_pending_count);
+    if (dev_fallback_default) {
+      tag(this.#effect_pending, "$effect.pending()");
+    }
+    return () => {
+      this.#effect_pending = null;
+    };
+  });
+  /**
+   * @param {TemplateNode} node
+   * @param {BoundaryProps} props
+   * @param {((anchor: Node) => void)} children
+   * @param {((error: unknown) => unknown) | undefined} [transform_error]
+   */
+  constructor(node, props, children, transform_error) {
+    this.#anchor = node;
+    this.#props = props;
+    this.#children = (anchor) => {
+      var effect2 = (
+        /** @type {Effect} */
+        active_effect
+      );
+      effect2.b = this;
+      effect2.f |= BOUNDARY_EFFECT;
+      children(anchor);
+    };
+    this.parent = /** @type {Effect} */
+    active_effect.b;
+    this.transform_error = transform_error ?? this.parent?.transform_error ?? ((e) => e);
+    this.#effect = block(() => {
+      if (hydrating) {
+        const comment3 = (
+          /** @type {Comment} */
+          this.#hydrate_open
+        );
+        hydrate_next();
+        const server_rendered_pending = comment3.data === HYDRATION_START_ELSE;
+        const server_rendered_failed = comment3.data.startsWith(HYDRATION_START_FAILED);
+        if (server_rendered_failed) {
+          const serialized_error = JSON.parse(comment3.data.slice(HYDRATION_START_FAILED.length));
+          this.#hydrate_failed_content(serialized_error);
+        } else if (server_rendered_pending) {
+          this.#hydrate_pending_content();
+        } else {
+          this.#hydrate_resolved_content();
+        }
+      } else {
+        this.#render();
+      }
+    }, flags);
+    if (hydrating) {
+      this.#anchor = hydrate_node;
+    }
+  }
+  #hydrate_resolved_content() {
+    try {
+      this.#main_effect = branch(() => this.#children(this.#anchor));
+    } catch (error2) {
+      this.error(error2);
+    }
+  }
+  /**
+   * @param {unknown} error The deserialized error from the server's hydration comment
+   */
+  #hydrate_failed_content(error2) {
+    const failed = this.#props.failed;
+    if (!failed) return;
+    this.#failed_effect = branch(() => {
+      failed(
+        this.#anchor,
+        () => error2,
+        () => () => {
+        }
+      );
+    });
+  }
+  #hydrate_pending_content() {
+    const pending2 = this.#props.pending;
+    if (!pending2) return;
+    this.is_pending = true;
+    this.#pending_effect = branch(() => pending2(this.#anchor));
+    queue_micro_task(() => {
+      var fragment = this.#offscreen_fragment = document.createDocumentFragment();
+      var anchor = create_text();
+      fragment.append(anchor);
+      this.#main_effect = this.#run(() => {
+        return branch(() => this.#children(anchor));
+      });
+      if (this.#pending_count === 0) {
+        this.#anchor.before(fragment);
+        this.#offscreen_fragment = null;
+        pause_effect(
+          /** @type {Effect} */
+          this.#pending_effect,
+          () => {
+            this.#pending_effect = null;
+          }
+        );
+        this.#resolve(
+          /** @type {Batch} */
+          current_batch
+        );
+      }
+    });
+  }
+  #render() {
+    try {
+      this.is_pending = this.has_pending_snippet();
+      this.#pending_count = 0;
+      this.#local_pending_count = 0;
+      this.#main_effect = branch(() => {
+        this.#children(this.#anchor);
+      });
+      if (this.#pending_count > 0) {
+        var fragment = this.#offscreen_fragment = document.createDocumentFragment();
+        move_effect(this.#main_effect, fragment);
+        const pending2 = (
+          /** @type {(anchor: Node) => void} */
+          this.#props.pending
+        );
+        this.#pending_effect = branch(() => pending2(this.#anchor));
+      } else {
+        this.#resolve(
+          /** @type {Batch} */
+          current_batch
+        );
+      }
+    } catch (error2) {
+      this.error(error2);
+    }
+  }
+  /**
+   * @param {Batch} batch
+   */
+  #resolve(batch) {
+    this.is_pending = false;
+    batch.transfer_effects(this.#dirty_effects, this.#maybe_dirty_effects);
+  }
+  /**
+   * Defer an effect inside a pending boundary until the boundary resolves
+   * @param {Effect} effect
+   */
+  defer_effect(effect2) {
+    defer_effect(effect2, this.#dirty_effects, this.#maybe_dirty_effects);
+  }
+  /**
+   * Returns `false` if the effect exists inside a boundary whose pending snippet is shown
+   * @returns {boolean}
+   */
+  is_rendered() {
+    return !this.is_pending && (!this.parent || this.parent.is_rendered());
+  }
+  has_pending_snippet() {
+    return !!this.#props.pending;
+  }
+  /**
+   * @template T
+   * @param {() => T} fn
+   */
+  #run(fn) {
+    var previous_effect = active_effect;
+    var previous_reaction = active_reaction;
+    var previous_ctx = component_context;
+    set_active_effect(this.#effect);
+    set_active_reaction(this.#effect);
+    set_component_context(this.#effect.ctx);
+    try {
+      Batch.ensure();
+      return fn();
+    } catch (e) {
+      handle_error(e);
+      return null;
+    } finally {
+      set_active_effect(previous_effect);
+      set_active_reaction(previous_reaction);
+      set_component_context(previous_ctx);
+    }
+  }
+  /**
+   * Updates the pending count associated with the currently visible pending snippet,
+   * if any, such that we can replace the snippet with content once work is done
+   * @param {1 | -1} d
+   * @param {Batch} batch
+   */
+  #update_pending_count(d, batch) {
+    if (!this.has_pending_snippet()) {
+      if (this.parent) {
+        this.parent.#update_pending_count(d, batch);
+      }
+      return;
+    }
+    this.#pending_count += d;
+    if (this.#pending_count === 0) {
+      this.#resolve(batch);
+      if (this.#pending_effect) {
+        pause_effect(this.#pending_effect, () => {
+          this.#pending_effect = null;
+        });
+      }
+      if (this.#offscreen_fragment) {
+        this.#anchor.before(this.#offscreen_fragment);
+        this.#offscreen_fragment = null;
+      }
+    }
+  }
+  /**
+   * Update the source that powers `$effect.pending()` inside this boundary,
+   * and controls when the current `pending` snippet (if any) is removed.
+   * Do not call from inside the class
+   * @param {1 | -1} d
+   * @param {Batch} batch
+   */
+  update_pending_count(d, batch) {
+    this.#update_pending_count(d, batch);
+    this.#local_pending_count += d;
+    if (!this.#effect_pending || this.#pending_count_update_queued) return;
+    this.#pending_count_update_queued = true;
+    queue_micro_task(() => {
+      this.#pending_count_update_queued = false;
+      if (this.#effect_pending) {
+        internal_set(this.#effect_pending, this.#local_pending_count);
+      }
+    });
+  }
+  get_effect_pending() {
+    this.#effect_pending_subscriber();
+    return get2(
+      /** @type {Source<number>} */
+      this.#effect_pending
+    );
+  }
+  /** @param {unknown} error */
+  error(error2) {
+    if (!this.#props.onerror && !this.#props.failed) {
+      throw error2;
+    }
+    if (current_batch?.is_fork) {
+      if (this.#main_effect) current_batch.skip_effect(this.#main_effect);
+      if (this.#pending_effect) current_batch.skip_effect(this.#pending_effect);
+      if (this.#failed_effect) current_batch.skip_effect(this.#failed_effect);
+      current_batch.oncommit(() => {
+        this.#handle_error(error2);
+      });
+    } else {
+      this.#handle_error(error2);
+    }
+  }
+  /**
+   * @param {unknown} error
+   */
+  #handle_error(error2) {
+    if (this.#main_effect) {
+      destroy_effect(this.#main_effect);
+      this.#main_effect = null;
+    }
+    if (this.#pending_effect) {
+      destroy_effect(this.#pending_effect);
+      this.#pending_effect = null;
+    }
+    if (this.#failed_effect) {
+      destroy_effect(this.#failed_effect);
+      this.#failed_effect = null;
+    }
+    if (hydrating) {
+      set_hydrate_node(
+        /** @type {TemplateNode} */
+        this.#hydrate_open
+      );
+      next();
+      set_hydrate_node(skip_nodes());
+    }
+    var onerror = this.#props.onerror;
+    let failed = this.#props.failed;
+    var did_reset = false;
+    var calling_on_error = false;
+    const reset2 = () => {
+      if (did_reset) {
+        svelte_boundary_reset_noop();
+        return;
+      }
+      did_reset = true;
+      if (calling_on_error) {
+        svelte_boundary_reset_onerror();
+      }
+      if (this.#failed_effect !== null) {
+        pause_effect(this.#failed_effect, () => {
+          this.#failed_effect = null;
+        });
+      }
+      this.#run(() => {
+        this.#render();
+      });
+    };
+    const handle_error_result = (transformed_error) => {
+      try {
+        calling_on_error = true;
+        onerror?.(transformed_error, reset2);
+        calling_on_error = false;
+      } catch (error3) {
+        invoke_error_boundary(error3, this.#effect && this.#effect.parent);
+      }
+      if (failed) {
+        this.#failed_effect = this.#run(() => {
+          try {
+            return branch(() => {
+              var effect2 = (
+                /** @type {Effect} */
+                active_effect
+              );
+              effect2.b = this;
+              effect2.f |= BOUNDARY_EFFECT;
+              failed(
+                this.#anchor,
+                () => transformed_error,
+                () => reset2
+              );
+            });
+          } catch (error3) {
+            invoke_error_boundary(
+              error3,
+              /** @type {Effect} */
+              this.#effect.parent
+            );
+            return null;
+          }
+        });
+      }
+    };
+    queue_micro_task(() => {
+      var result;
+      try {
+        result = this.transform_error(error2);
+      } catch (e) {
+        invoke_error_boundary(e, this.#effect && this.#effect.parent);
+        return;
+      }
+      if (result !== null && typeof result === "object" && typeof /** @type {any} */
+      result.then === "function") {
+        result.then(
+          handle_error_result,
+          /** @param {unknown} e */
+          (e) => invoke_error_boundary(e, this.#effect && this.#effect.parent)
+        );
+      } else {
+        handle_error_result(result);
+      }
+    });
+  }
+};
 
-    /* Content text spans ~90% of the content view. */.article.svelte-uyhh09 > :where(.svelte-uyhh09) {width:90%;margin-left:auto;margin-right:auto;}.article-head.svelte-uyhh09 {margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);}.eyebrow.svelte-uyhh09 {font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--color-primary);}.article-title.svelte-uyhh09 {font-size:clamp(2rem, 4vw, 2.8rem);font-weight:800;color:var(--color-base-content);text-shadow:0 0 22px color-mix(in oklab, var(--color-primary) 30%, transparent);}.placeholder-note.svelte-uyhh09 {margin-top:0.5rem;font-size:0.85rem;color:color-mix(in oklab, var(--color-base-content) 60%, transparent);}.block.svelte-uyhh09 {margin-bottom:2.25rem;line-height:1.7;color:color-mix(in oklab, var(--color-base-content) 90%, transparent);}.block.svelte-uyhh09 h2:where(.svelte-uyhh09) {font-size:1.5rem;font-weight:700;margin-bottom:0.6rem;color:var(--color-base-content);}.error.svelte-uyhh09 {color:var(--color-error, crimson);}.muted.svelte-uyhh09 {color:color-mix(in oklab, var(--color-base-content) 60%, transparent);font-size:0.9rem;}
+// ../../../node_modules/svelte/src/internal/client/reactivity/async.js
+function flatten(blockers, sync, async2, fn) {
+  const d = is_runes() ? derived : derived_safe_equal;
+  var pending2 = blockers.filter((b) => !b.settled);
+  var deriveds = sync.map(d);
+  if (dev_fallback_default) {
+    deriveds.forEach((d2, i) => {
+      d2.label = sync[i].toString().replace("() => ", "").replaceAll("$.eager(() => ", "$state.eager(").replace(/\$\.get\((.+?)\)/g, (_, id) => id);
+    });
+  }
+  if (async2.length === 0 && pending2.length === 0) {
+    fn(deriveds);
+    return;
+  }
+  var parent = (
+    /** @type {Effect} */
+    active_effect
+  );
+  var restore = capture();
+  var blocker_promise = pending2.length === 1 ? pending2[0].promise : pending2.length > 1 ? Promise.all(pending2.map((b) => b.promise)) : null;
+  function finish(async3) {
+    if ((parent.f & DESTROYED) !== 0) {
+      return;
+    }
+    restore();
+    try {
+      fn([...deriveds, ...async3]);
+    } catch (error2) {
+      invoke_error_boundary(error2, parent);
+    }
+    unset_context();
+  }
+  var decrement_pending = increment_pending();
+  if (async2.length === 0) {
+    blocker_promise.then(() => finish([])).finally(decrement_pending);
+    return;
+  }
+  function run3() {
+    Promise.all(async2.map((expression) => async_derived(expression))).then(finish).catch((error2) => invoke_error_boundary(error2, parent)).finally(decrement_pending);
+  }
+  if (blocker_promise) {
+    blocker_promise.then(() => {
+      restore();
+      run3();
+      unset_context();
+    });
+  } else {
+    run3();
+  }
+}
+function capture() {
+  var previous_effect = (
+    /** @type {Effect} */
+    active_effect
+  );
+  var previous_reaction = active_reaction;
+  var previous_component_context = component_context;
+  var previous_batch2 = (
+    /** @type {Batch} */
+    current_batch
+  );
+  if (dev_fallback_default) {
+    var previous_dev_stack = dev_stack;
+  }
+  return function restore(activate_batch = true) {
+    set_active_effect(previous_effect);
+    set_active_reaction(previous_reaction);
+    set_component_context(previous_component_context);
+    if (activate_batch && (previous_effect.f & DESTROYED) === 0) {
+      previous_batch2?.activate();
+      previous_batch2?.apply();
+    }
+    if (dev_fallback_default) {
+      set_reactivity_loss_tracker(null);
+      set_dev_stack(previous_dev_stack);
+    }
+  };
+}
+function unset_context(deactivate_batch = true) {
+  set_active_effect(null);
+  set_active_reaction(null);
+  set_component_context(null);
+  if (deactivate_batch) current_batch?.deactivate();
+  if (dev_fallback_default) {
+    set_reactivity_loss_tracker(null);
+    set_dev_stack(null);
+  }
+}
+function increment_pending() {
+  var effect2 = (
+    /** @type {Effect} */
+    active_effect
+  );
+  var boundary2 = effect2.b;
+  var batch = (
+    /** @type {Batch} */
+    current_batch
+  );
+  var blocking = !!boundary2?.is_rendered();
+  boundary2?.update_pending_count(1, batch);
+  batch.increment(blocking, effect2);
+  return () => {
+    boundary2?.update_pending_count(-1, batch);
+    batch.decrement(blocking, effect2);
+  };
+}
 
-    /* Rendered Markdown / plain-text content. Styling targets the injected HTML. */.prose.svelte-uyhh09 h1,
-    .prose.svelte-uyhh09 h2,
-    .prose.svelte-uyhh09 h3 {font-weight:700;margin:1rem 0 0.5rem;}.prose.svelte-uyhh09 h1 {font-size:1.6rem;}.prose.svelte-uyhh09 h2 {font-size:1.3rem;}.prose.svelte-uyhh09 h3 {font-size:1.1rem;}.prose.svelte-uyhh09 p {margin:0.5rem 0;}.prose.svelte-uyhh09 ul,
-    .prose.svelte-uyhh09 ol {margin:0.5rem 0 0.5rem 1.5rem;}.prose.svelte-uyhh09 li {margin:0.2rem 0;}.prose.svelte-uyhh09 a {color:var(--color-primary);text-decoration:underline;}.prose.svelte-uyhh09 pre,
-    .prose.svelte-uyhh09 code {font-family:ui-monospace, "SF Mono", Menlo, monospace;font-size:0.9rem;}.prose.svelte-uyhh09 pre {margin-top:0.75rem;padding:1rem 1.25rem;border-radius:0.75rem;overflow-x:auto;background:color-mix(in oklab, var(--color-base-content) 8%, transparent);border:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);}.prose.svelte-uyhh09 blockquote {margin:0.75rem 0;padding:0.5rem 1rem;border-left:3px solid var(--color-primary);background:color-mix(in oklab, var(--color-primary) 8%, transparent);}.html-frame.svelte-uyhh09 {width:100%;min-height:24rem;border:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);border-radius:0.5rem;background:var(--color-base-100);}.actions.svelte-uyhh09 {display:flex;gap:0.75rem;margin-top:1rem;}
+// ../../../node_modules/svelte/src/internal/client/reactivity/deriveds.js
+var reactivity_loss_tracker = null;
+function set_reactivity_loss_tracker(v) {
+  reactivity_loss_tracker = v;
+}
+var recent_async_deriveds = /* @__PURE__ */ new Set();
+// @__NO_SIDE_EFFECTS__
+function derived(fn) {
+  var flags2 = DERIVED | DIRTY;
+  if (active_effect !== null) {
+    active_effect.f |= EFFECT_PRESERVED;
+  }
+  const signal = {
+    ctx: component_context,
+    deps: null,
+    effects: null,
+    equals,
+    f: flags2,
+    fn,
+    reactions: null,
+    rv: 0,
+    v: (
+      /** @type {V} */
+      UNINITIALIZED
+    ),
+    wv: 0,
+    parent: active_effect,
+    ac: null
+  };
+  if (dev_fallback_default && tracing_mode_flag) {
+    signal.created = get_error("created at");
+  }
+  return signal;
+}
+var OBSOLETE = /* @__PURE__ */ Symbol("obsolete");
+// @__NO_SIDE_EFFECTS__
+function async_derived(fn, label, location) {
+  let parent = (
+    /** @type {Effect | null} */
+    active_effect
+  );
+  if (parent === null) {
+    async_derived_orphan();
+  }
+  var promise = (
+    /** @type {Promise<V>} */
+    /** @type {unknown} */
+    void 0
+  );
+  var signal = source(
+    /** @type {V} */
+    UNINITIALIZED
+  );
+  if (dev_fallback_default) signal.label = label ?? fn.toString();
+  var should_suspend = !active_reaction;
+  var deferreds = /* @__PURE__ */ new Set();
+  async_effect(() => {
+    var effect2 = (
+      /** @type {Effect} */
+      active_effect
+    );
+    if (dev_fallback_default) {
+      reactivity_loss_tracker = { effect: effect2, effect_deps: /* @__PURE__ */ new Set(), warned: false };
+    }
+    var d = deferred();
+    promise = d.promise;
+    try {
+      Promise.resolve(fn()).then(d.resolve, (e) => {
+        if (e !== STALE_REACTION) d.reject(e);
+      }).finally(unset_context);
+    } catch (error2) {
+      d.reject(error2);
+      unset_context();
+    }
+    if (dev_fallback_default) {
+      if (reactivity_loss_tracker) {
+        if (effect2.deps !== null) {
+          for (let i = 0; i < skipped_deps; i += 1) {
+            reactivity_loss_tracker.effect_deps.add(effect2.deps[i]);
+          }
+        }
+        if (new_deps !== null) {
+          for (let i = 0; i < new_deps.length; i += 1) {
+            reactivity_loss_tracker.effect_deps.add(new_deps[i]);
+          }
+        }
+      }
+      reactivity_loss_tracker = null;
+    }
+    var batch = (
+      /** @type {Batch} */
+      current_batch
+    );
+    if (should_suspend) {
+      if ((effect2.f & REACTION_RAN) !== 0) {
+        var decrement_pending = increment_pending();
+      }
+      if (
+        // boundary can be null if the async derived is inside an $effect.root not connected to the component render tree
+        parent.b?.is_rendered()
+      ) {
+        batch.async_deriveds.get(effect2)?.reject(OBSOLETE);
+      } else {
+        for (const d2 of deferreds.values()) {
+          d2.reject(OBSOLETE);
+        }
+      }
+      deferreds.add(d);
+      batch.async_deriveds.set(effect2, d);
+    }
+    const handler = (value, error2 = void 0) => {
+      if (dev_fallback_default) {
+        reactivity_loss_tracker = null;
+      }
+      decrement_pending?.();
+      deferreds.delete(d);
+      if (error2 === OBSOLETE) return;
+      batch.activate();
+      if (error2) {
+        signal.f |= ERROR_VALUE;
+        internal_set(signal, error2);
+      } else {
+        if ((signal.f & ERROR_VALUE) !== 0) {
+          signal.f ^= ERROR_VALUE;
+        }
+        if (dev_fallback_default && location !== void 0 && !signal.equals(value)) {
+          recent_async_deriveds.add(signal);
+          setTimeout(() => {
+            if (recent_async_deriveds.has(signal) && (effect2.f & DESTROYED) === 0) {
+              await_waterfall(
+                /** @type {string} */
+                signal.label,
+                location
+              );
+              recent_async_deriveds.delete(signal);
+            }
+          });
+        }
+        internal_set(signal, value);
+      }
+      batch.deactivate();
+    };
+    d.promise.then(handler, (e) => handler(null, e || "unknown"));
+  });
+  teardown(() => {
+    for (const d of deferreds) {
+      d.reject(OBSOLETE);
+    }
+  });
+  if (dev_fallback_default) {
+    signal.f |= ASYNC;
+  }
+  return new Promise((fulfil) => {
+    function next2(p) {
+      function go() {
+        if (p === promise) {
+          fulfil(signal);
+        } else {
+          next2(promise);
+        }
+      }
+      p.then(go, go);
+    }
+    next2(promise);
+  });
+}
+// @__NO_SIDE_EFFECTS__
+function user_derived(fn) {
+  const d = /* @__PURE__ */ derived(fn);
+  if (!async_mode_flag) push_reaction_value(d);
+  return d;
+}
+// @__NO_SIDE_EFFECTS__
+function derived_safe_equal(fn) {
+  const signal = /* @__PURE__ */ derived(fn);
+  signal.equals = safe_equals;
+  return signal;
+}
+function destroy_derived_effects(derived3) {
+  var effects = derived3.effects;
+  if (effects !== null) {
+    derived3.effects = null;
+    for (var i = 0; i < effects.length; i += 1) {
+      destroy_effect(
+        /** @type {Effect} */
+        effects[i]
+      );
+    }
+  }
+}
+var stack = [];
+function execute_derived(derived3) {
+  var value;
+  var prev_active_effect = active_effect;
+  var parent = derived3.parent;
+  if (!is_destroying_effect && parent !== null && derived3.v !== UNINITIALIZED && // if it was never evaluated before, it's guaranteed to fail downstream, so we try to execute instead
+  (parent.f & (DESTROYED | INERT)) !== 0) {
+    derived_inert();
+    return derived3.v;
+  }
+  set_active_effect(parent);
+  if (dev_fallback_default) {
+    let prev_eager_effects = eager_effects;
+    set_eager_effects(/* @__PURE__ */ new Set());
+    try {
+      if (includes.call(stack, derived3)) {
+        derived_references_self();
+      }
+      stack.push(derived3);
+      derived3.f &= ~WAS_MARKED;
+      destroy_derived_effects(derived3);
+      value = update_reaction(derived3);
+    } finally {
+      set_active_effect(prev_active_effect);
+      set_eager_effects(prev_eager_effects);
+      stack.pop();
+    }
+  } else {
+    try {
+      derived3.f &= ~WAS_MARKED;
+      destroy_derived_effects(derived3);
+      value = update_reaction(derived3);
+    } finally {
+      set_active_effect(prev_active_effect);
+    }
+  }
+  return value;
+}
+function update_derived(derived3) {
+  var value = execute_derived(derived3);
+  if (!derived3.equals(value)) {
+    derived3.wv = increment_write_version();
+    if (!current_batch?.is_fork || derived3.deps === null) {
+      if (current_batch !== null) {
+        current_batch.capture(derived3, value, true);
+        previous_batch?.capture(derived3, value, true);
+      } else {
+        derived3.v = value;
+      }
+      if (derived3.deps === null) {
+        set_signal_status(derived3, CLEAN);
+        return;
+      }
+    }
+  }
+  if (is_destroying_effect) {
+    return;
+  }
+  if (batch_values !== null) {
+    if (effect_tracking() || current_batch?.is_fork) {
+      batch_values.set(derived3, value);
+    }
+  } else {
+    update_derived_status(derived3);
+  }
+}
+function freeze_derived_effects(derived3) {
+  if (derived3.effects === null) return;
+  for (const e of derived3.effects) {
+    if (e.teardown || e.ac) {
+      e.teardown?.();
+      e.ac?.abort(STALE_REACTION);
+      if (e.fn !== null) e.teardown = noop;
+      e.ac = null;
+      remove_reactions(e, 0);
+      destroy_effect_children(e);
+    }
+  }
+}
+function unfreeze_derived_effects(derived3) {
+  if (derived3.effects === null) return;
+  for (const e of derived3.effects) {
+    if (e.teardown && e.fn !== null) {
+      update_effect(e);
+    }
+  }
+}
 
-    @media (max-width: 48rem) {.content-screen.svelte-uyhh09 {grid-template-columns:1fr;}.toc.svelte-uyhh09 {display:none;}
-    }`};function qi(e,t){le(t,!0),ve(e,ch);let r=Q(t,"params",7),o=H($e({isLoading:!0,errorMessage:"",user:null,stats:null,skills:[],courses:[]})),n=H($e([])),i=H(!0),a=H("");bt(()=>{let y=it.subscribe(M=>{F(o,M,!0)});return m(o).courses.length===0&&it.refresh(),y}),nr(()=>{let y=r()?.id;if(!y){F(n,[],!0),F(i,!1);return}F(i,!0),F(a,""),i0(y).then(M=>{F(n,M,!0)}).catch(M=>{F(a,M instanceof Error?M.message:String(M),!0)}).finally(()=>{F(i,!1)})});let s=J(()=>m(o).courses.find(y=>y.id===r()?.id)?.name??"Course"),u=J(()=>m(n).some(y=>y.pages.length>0));function l(y){return`page-${y}`}function c(y){document.getElementById(y)?.scrollIntoView({behavior:"smooth",block:"start"})}var f={get params(){return r()},set params(y){r(y),X()}},p=lh(),d=_(p),h=_(d),b=$(h,4),g=_(b);{var D=y=>{var M=Xe(),B=Re(M);Ce(B,17,()=>m(n),Z=>Z.id,(Z,ue)=>{var ne=Xe(),V=Re(ne);{var L=Y=>{var te=th(),ie=Re(te),pe=_(ie,!0);v(ie);var Ee=$(ie,2);Ce(Ee,17,()=>m(ue).pages,me=>me.id,(me,ze)=>{var ae=eh(),Ae=_(ae,!0);v(ae),U(()=>q(Ae,m(ze).title)),se("click",ae,()=>c(l(m(ze).id))),R(me,ae)}),U(()=>q(pe,m(ue).title)),R(Y,te)};ee(V,Y=>{m(ue).pages.length>0&&Y(L)})}R(Z,ne)}),R(y,M)},E=y=>{var M=rh();R(y,M)};ee(g,y=>{m(u)?y(D):y(E,-1)})}v(b),v(d);var C=$(d,2),A=_(C),T=$(_(A),2),k=_(T,!0);v(T),v(A);var S=$(A,2);{var N=y=>{var M=oh();R(y,M)},j=y=>{var M=nh(),B=_(M,!0);v(M),U(()=>q(B,m(a))),R(y,M)},O=y=>{var M=Xe(),B=Re(M);Ce(B,17,()=>m(n),Z=>Z.id,(Z,ue)=>{var ne=Xe(),V=Re(ne);Ce(V,17,()=>m(ue).pages,L=>L.id,(L,Y)=>{var te=sh(),ie=_(te),pe=_(ie,!0);v(ie);var Ee=$(ie,2);{var me=ae=>{var Ae=ih();U(()=>{ge(Ae,"title",m(Y).title),ge(Ae,"srcdoc",m(Y).html)}),R(ae,Ae)},ze=ae=>{var Ae=ah();Ma(Ae,()=>m(Y).html,!0),v(Ae),R(ae,Ae)};ee(Ee,ae=>{m(Y).format==="HTML"?ae(me):ae(ze,-1)})}v(te),U(ae=>{ge(te,"id",ae),q(pe,m(Y).title)},[()=>l(m(Y).id)]),R(L,te)}),R(Z,ne)}),R(y,M)},w=y=>{var M=uh(),B=$(_(M),2),Z=_(B);v(B),v(M),se("click",Z,()=>kt(`/chat/${r()?.id??""}`)),R(y,M)};ee(S,y=>{m(i)?y(N):m(a)?y(j,1):m(u)?y(O,2):y(w,-1)})}return v(C),v(p),U(()=>q(k,m(s))),se("click",h,()=>kt(`/chat/${r()?.id??""}`)),R(e,p),ce(f)}Te(["click"]);fe(qi,{params:{}},[],[],{mode:"open"});var a0={"/":un,"/profile":gi,"/chat/:id":_i,"/quiz/:id":xi,"/content/:id":qi,"*":un};var dh=z('<div><!> <main class="shell-content svelte-1w96du5"><!></main> <footer class="shell-footer svelte-1w96du5"><span>Copyright 2026 | OpenBook</span></footer> <!></div>'),fh={hash:"svelte-1w96du5",code:`
-    /* Lock the shell to the viewport so only inner page areas scroll. */.shell.svelte-1w96du5 {flex:1;height:100vh;min-height:0;overflow:hidden;display:flex;flex-direction:column;transition:padding-right 0.25s ease;}
+// ../../../node_modules/svelte/src/internal/client/reactivity/sources.js
+var eager_effects = /* @__PURE__ */ new Set();
+var old_values = /* @__PURE__ */ new Map();
+function set_eager_effects(v) {
+  eager_effects = v;
+}
+var eager_effects_deferred = false;
+function set_eager_effects_deferred() {
+  eager_effects_deferred = true;
+}
+function source(v, stack2) {
+  var signal = {
+    f: 0,
+    // TODO ideally we could skip this altogether, but it causes type errors
+    v,
+    reactions: null,
+    equals,
+    rv: 0,
+    wv: 0
+  };
+  if (dev_fallback_default && tracing_mode_flag) {
+    signal.created = stack2 ?? get_error("created at");
+    signal.updated = null;
+    signal.set_during_effect = false;
+    signal.trace = null;
+  }
+  return signal;
+}
+// @__NO_SIDE_EFFECTS__
+function state(v, stack2) {
+  const s = source(v, stack2);
+  push_reaction_value(s);
+  return s;
+}
+// @__NO_SIDE_EFFECTS__
+function mutable_source(initial_value, immutable = false, trackable = true) {
+  const s = source(initial_value);
+  if (!immutable) {
+    s.equals = safe_equals;
+  }
+  if (legacy_mode_flag && trackable && component_context !== null && component_context.l !== null) {
+    (component_context.l.s ??= []).push(s);
+  }
+  return s;
+}
+function set(source2, value, should_proxy = false) {
+  if (active_reaction !== null && // since we are untracking the function inside `$inspect.with` we need to add this check
+  // to ensure we error if state is set inside an inspect effect
+  (!untracking || (active_reaction.f & EAGER_EFFECT) !== 0) && is_runes() && (active_reaction.f & (DERIVED | BLOCK_EFFECT | ASYNC | EAGER_EFFECT)) !== 0 && (current_sources === null || !current_sources.has(source2))) {
+    state_unsafe_mutation();
+  }
+  let new_value = should_proxy ? proxy(value) : value;
+  if (dev_fallback_default) {
+    tag_proxy(
+      new_value,
+      /** @type {string} */
+      source2.label
+    );
+  }
+  return internal_set(source2, new_value, legacy_updates);
+}
+function internal_set(source2, value, updated_during_traversal = null) {
+  if (!source2.equals(value)) {
+    old_values.set(source2, is_destroying_effect ? value : source2.v);
+    var batch = Batch.ensure();
+    batch.capture(source2, value);
+    if (dev_fallback_default) {
+      if (tracing_mode_flag || active_effect !== null) {
+        source2.updated ??= /* @__PURE__ */ new Map();
+        const count = (source2.updated.get("")?.count ?? 0) + 1;
+        source2.updated.set("", { error: (
+          /** @type {any} */
+          null
+        ), count });
+        if (tracing_mode_flag || count > 5) {
+          const error2 = get_error("updated at");
+          if (error2 !== null) {
+            let entry = source2.updated.get(error2.stack);
+            if (!entry) {
+              entry = { error: error2, count: 0 };
+              source2.updated.set(error2.stack, entry);
+            }
+            entry.count++;
+          }
+        }
+      }
+      if (active_effect !== null) {
+        source2.set_during_effect = true;
+      }
+    }
+    if ((source2.f & DERIVED) !== 0) {
+      const derived3 = (
+        /** @type {Derived} */
+        source2
+      );
+      if ((source2.f & DIRTY) !== 0) {
+        execute_derived(derived3);
+      }
+      if (batch_values === null) {
+        update_derived_status(derived3);
+      }
+    }
+    source2.wv = increment_write_version();
+    mark_reactions(source2, DIRTY, updated_during_traversal);
+    if (is_runes() && active_effect !== null && (active_effect.f & CLEAN) !== 0 && (active_effect.f & (BRANCH_EFFECT | ROOT_EFFECT)) === 0) {
+      if (untracked_writes === null) {
+        set_untracked_writes([source2]);
+      } else {
+        untracked_writes.push(source2);
+      }
+    }
+    if (!batch.is_fork && eager_effects.size > 0 && !eager_effects_deferred) {
+      flush_eager_effects();
+    }
+  }
+  return value;
+}
+function flush_eager_effects() {
+  eager_effects_deferred = false;
+  for (const effect2 of eager_effects) {
+    if ((effect2.f & CLEAN) !== 0) {
+      set_signal_status(effect2, MAYBE_DIRTY);
+    }
+    let dirty;
+    try {
+      dirty = is_dirty(effect2);
+    } catch {
+      dirty = true;
+    }
+    if (dirty) {
+      update_effect(effect2);
+    }
+  }
+  eager_effects.clear();
+}
+function increment(source2) {
+  set(source2, source2.v + 1);
+}
+function mark_reactions(signal, status, updated_during_traversal) {
+  var reactions = signal.reactions;
+  if (reactions === null) return;
+  var runes = is_runes();
+  var length = reactions.length;
+  for (var i = 0; i < length; i++) {
+    var reaction = reactions[i];
+    var flags2 = reaction.f;
+    if (!runes && reaction === active_effect) continue;
+    var not_dirty = (flags2 & DIRTY) === 0;
+    if (not_dirty) {
+      set_signal_status(reaction, status);
+    }
+    if ((flags2 & EAGER_EFFECT) !== 0) {
+      eager_effects.add(
+        /** @type {Effect} */
+        reaction
+      );
+    } else if ((flags2 & DERIVED) !== 0) {
+      var derived3 = (
+        /** @type {Derived} */
+        reaction
+      );
+      batch_values?.delete(derived3);
+      if ((flags2 & WAS_MARKED) === 0) {
+        if (flags2 & CONNECTED && (active_effect === null || (active_effect.f & REACTION_IS_UPDATING) === 0)) {
+          reaction.f |= WAS_MARKED;
+        }
+        mark_reactions(derived3, MAYBE_DIRTY, updated_during_traversal);
+      }
+    } else if (not_dirty) {
+      var effect2 = (
+        /** @type {Effect} */
+        reaction
+      );
+      if ((flags2 & BLOCK_EFFECT) !== 0 && eager_block_effects !== null) {
+        eager_block_effects.add(effect2);
+      }
+      if (updated_during_traversal !== null) {
+        updated_during_traversal.push(effect2);
+      } else {
+        schedule_effect(effect2);
+      }
+    }
+  }
+}
 
-    /* Make room for the docked chat sidebar so nothing is hidden behind it. */.shell.chat-docked.svelte-1w96du5 {padding-right:min(28rem, 100vw);}.shell-content.svelte-1w96du5 {flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;}.shell-footer.svelte-1w96du5 {margin-top:auto;padding:1rem 1.5rem 1.5rem;text-align:center;font-size:0.75rem;letter-spacing:0.08em;text-transform:uppercase;color:color-mix(in oklab, var(--color-base-content) 60%, transparent);border-top:1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);}`};function Oi(e,t){le(t,!0),ve(e,fh);let r=H($e({isLoading:!0,errorMessage:"",user:null,stats:null,skills:[],courses:[]})),o=H(!1),n=J(()=>(sn.location??"").startsWith("/chat"));bt(()=>it.subscribe(p=>{F(r,p,!0)}));var i=dh();let a;var s=_(i);di(s,{get user(){return m(r).user}});var u=$(s,2),l=_(u);ai(l,{get routes(){return a0}}),v(u);var c=$(u,4);{var f=p=>{pi(p,{onSidebarChange:d=>F(o,d,!0)})};ee(c,p=>{m(n)||p(f)})}v(i),U(()=>a=Ue(i,1,"shell svelte-1w96du5",null,a,{"chat-docked":m(o)&&!m(n)})),R(e,i),ce()}fe(Oi,{},[],[],{mode:"open"});Pl();So(Oi,{target:document.body});
+// ../../../node_modules/svelte/src/internal/client/proxy.js
+var regex_is_valid_identifier = /^[a-zA-Z_$][a-zA-Z_$0-9]*$/;
+function proxy(value) {
+  if (typeof value !== "object" || value === null || STATE_SYMBOL in value) {
+    return value;
+  }
+  const prototype = get_prototype_of(value);
+  if (prototype !== object_prototype && prototype !== array_prototype) {
+    return value;
+  }
+  var sources = /* @__PURE__ */ new Map();
+  var is_proxied_array = is_array(value);
+  var version = state(0);
+  var stack2 = dev_fallback_default && tracing_mode_flag ? get_error("created at") : null;
+  var parent_version = update_version;
+  var with_parent = (fn) => {
+    if (update_version === parent_version) {
+      return fn();
+    }
+    var reaction = active_reaction;
+    var version2 = update_version;
+    set_active_reaction(null);
+    set_update_version(parent_version);
+    var result = fn();
+    set_active_reaction(reaction);
+    set_update_version(version2);
+    return result;
+  };
+  if (is_proxied_array) {
+    sources.set("length", state(
+      /** @type {any[]} */
+      value.length,
+      stack2
+    ));
+    if (dev_fallback_default) {
+      value = /** @type {any} */
+      inspectable_array(
+        /** @type {any[]} */
+        value
+      );
+    }
+  }
+  var path = "";
+  let updating = false;
+  function update_path(new_path) {
+    if (updating) return;
+    updating = true;
+    path = new_path;
+    tag(version, `${path} version`);
+    for (const [prop2, source2] of sources) {
+      tag(source2, get_label(path, prop2));
+    }
+    updating = false;
+  }
+  return new Proxy(
+    /** @type {any} */
+    value,
+    {
+      defineProperty(_, prop2, descriptor) {
+        if (!("value" in descriptor) || descriptor.configurable === false || descriptor.enumerable === false || descriptor.writable === false) {
+          state_descriptors_fixed();
+        }
+        var s = sources.get(prop2);
+        if (s === void 0) {
+          with_parent(() => {
+            var s2 = state(descriptor.value, stack2);
+            sources.set(prop2, s2);
+            if (dev_fallback_default && typeof prop2 === "string") {
+              tag(s2, get_label(path, prop2));
+            }
+            return s2;
+          });
+        } else {
+          set(s, descriptor.value, true);
+        }
+        return true;
+      },
+      deleteProperty(target, prop2) {
+        var s = sources.get(prop2);
+        if (s === void 0) {
+          if (prop2 in target) {
+            const s2 = with_parent(() => state(UNINITIALIZED, stack2));
+            sources.set(prop2, s2);
+            increment(version);
+            if (dev_fallback_default) {
+              tag(s2, get_label(path, prop2));
+            }
+          }
+        } else {
+          set(s, UNINITIALIZED);
+          increment(version);
+        }
+        return true;
+      },
+      get(target, prop2, receiver) {
+        if (prop2 === STATE_SYMBOL) {
+          return value;
+        }
+        if (dev_fallback_default && prop2 === PROXY_PATH_SYMBOL) {
+          return update_path;
+        }
+        var s = sources.get(prop2);
+        var exists = prop2 in target;
+        if (s === void 0 && (!exists || get_descriptor(target, prop2)?.writable)) {
+          s = with_parent(() => {
+            var p = proxy(exists ? target[prop2] : UNINITIALIZED);
+            var s2 = state(p, stack2);
+            if (dev_fallback_default) {
+              tag(s2, get_label(path, prop2));
+            }
+            return s2;
+          });
+          sources.set(prop2, s);
+        }
+        if (s !== void 0) {
+          var v = get2(s);
+          return v === UNINITIALIZED ? void 0 : v;
+        }
+        return Reflect.get(target, prop2, receiver);
+      },
+      getOwnPropertyDescriptor(target, prop2) {
+        var descriptor = Reflect.getOwnPropertyDescriptor(target, prop2);
+        if (descriptor && "value" in descriptor) {
+          var s = sources.get(prop2);
+          if (s) descriptor.value = get2(s);
+        } else if (descriptor === void 0) {
+          var source2 = sources.get(prop2);
+          var value2 = source2?.v;
+          if (source2 !== void 0 && value2 !== UNINITIALIZED) {
+            return {
+              enumerable: true,
+              configurable: true,
+              value: value2,
+              writable: true
+            };
+          }
+        }
+        return descriptor;
+      },
+      has(target, prop2) {
+        if (prop2 === STATE_SYMBOL) {
+          return true;
+        }
+        var s = sources.get(prop2);
+        var has2 = s !== void 0 && s.v !== UNINITIALIZED || Reflect.has(target, prop2);
+        if (s !== void 0 || active_effect !== null && (!has2 || get_descriptor(target, prop2)?.writable)) {
+          if (s === void 0) {
+            s = with_parent(() => {
+              var p = has2 ? proxy(target[prop2]) : UNINITIALIZED;
+              var s2 = state(p, stack2);
+              if (dev_fallback_default) {
+                tag(s2, get_label(path, prop2));
+              }
+              return s2;
+            });
+            sources.set(prop2, s);
+          }
+          var value2 = get2(s);
+          if (value2 === UNINITIALIZED) {
+            return false;
+          }
+        }
+        return has2;
+      },
+      set(target, prop2, value2, receiver) {
+        var s = sources.get(prop2);
+        var has2 = prop2 in target;
+        if (is_proxied_array && prop2 === "length") {
+          for (var i = value2; i < /** @type {Source<number>} */
+          s.v; i += 1) {
+            var other_s = sources.get(i + "");
+            if (other_s !== void 0) {
+              set(other_s, UNINITIALIZED);
+            } else if (i in target) {
+              other_s = with_parent(() => state(UNINITIALIZED, stack2));
+              sources.set(i + "", other_s);
+              if (dev_fallback_default) {
+                tag(other_s, get_label(path, i));
+              }
+            }
+          }
+        }
+        if (s === void 0) {
+          if (!has2 || get_descriptor(target, prop2)?.writable) {
+            s = with_parent(() => state(void 0, stack2));
+            if (dev_fallback_default) {
+              tag(s, get_label(path, prop2));
+            }
+            set(s, proxy(value2));
+            sources.set(prop2, s);
+          }
+        } else {
+          has2 = s.v !== UNINITIALIZED;
+          var p = with_parent(() => proxy(value2));
+          set(s, p);
+        }
+        var descriptor = Reflect.getOwnPropertyDescriptor(target, prop2);
+        if (descriptor?.set) {
+          descriptor.set.call(receiver, value2);
+        }
+        if (!has2) {
+          if (is_proxied_array && typeof prop2 === "string") {
+            var ls = (
+              /** @type {Source<number>} */
+              sources.get("length")
+            );
+            var n = Number(prop2);
+            if (Number.isInteger(n) && n >= ls.v) {
+              set(ls, n + 1);
+            }
+          }
+          increment(version);
+        }
+        return true;
+      },
+      ownKeys(target) {
+        get2(version);
+        var own_keys = Reflect.ownKeys(target).filter((key3) => {
+          var source3 = sources.get(key3);
+          return source3 === void 0 || source3.v !== UNINITIALIZED;
+        });
+        for (var [key2, source2] of sources) {
+          if (source2.v !== UNINITIALIZED && !(key2 in target)) {
+            own_keys.push(key2);
+          }
+        }
+        return own_keys;
+      },
+      setPrototypeOf() {
+        state_prototype_fixed();
+      }
+    }
+  );
+}
+function get_label(path, prop2) {
+  if (typeof prop2 === "symbol") return `${path}[Symbol(${prop2.description ?? ""})]`;
+  if (regex_is_valid_identifier.test(prop2)) return `${path}.${prop2}`;
+  return /^\d+$/.test(prop2) ? `${path}[${prop2}]` : `${path}['${prop2}']`;
+}
+function get_proxied_value(value) {
+  try {
+    if (value !== null && typeof value === "object" && STATE_SYMBOL in value) {
+      return value[STATE_SYMBOL];
+    }
+  } catch {
+  }
+  return value;
+}
+var ARRAY_MUTATING_METHODS = /* @__PURE__ */ new Set([
+  "copyWithin",
+  "fill",
+  "pop",
+  "push",
+  "reverse",
+  "shift",
+  "sort",
+  "splice",
+  "unshift"
+]);
+function inspectable_array(array) {
+  return new Proxy(array, {
+    get(target, prop2, receiver) {
+      var value = Reflect.get(target, prop2, receiver);
+      if (!ARRAY_MUTATING_METHODS.has(
+        /** @type {string} */
+        prop2
+      )) {
+        return value;
+      }
+      return function(...args) {
+        set_eager_effects_deferred();
+        var result = value.apply(this, args);
+        flush_eager_effects();
+        return result;
+      };
+    }
+  });
+}
+
+// ../../../node_modules/svelte/src/internal/client/dev/equality.js
+function init_array_prototype_warnings() {
+  const array_prototype2 = Array.prototype;
+  const cleanup = Array.__svelte_cleanup;
+  if (cleanup) {
+    cleanup();
+  }
+  const { indexOf, lastIndexOf, includes: includes2 } = array_prototype2;
+  array_prototype2.indexOf = function(item, from_index) {
+    const index2 = indexOf.call(this, item, from_index);
+    if (index2 === -1) {
+      for (let i = from_index ?? 0; i < this.length; i += 1) {
+        if (get_proxied_value(this[i]) === item) {
+          state_proxy_equality_mismatch("array.indexOf(...)");
+          break;
+        }
+      }
+    }
+    return index2;
+  };
+  array_prototype2.lastIndexOf = function(item, from_index) {
+    const index2 = lastIndexOf.call(this, item, from_index ?? this.length - 1);
+    if (index2 === -1) {
+      for (let i = 0; i <= (from_index ?? this.length - 1); i += 1) {
+        if (get_proxied_value(this[i]) === item) {
+          state_proxy_equality_mismatch("array.lastIndexOf(...)");
+          break;
+        }
+      }
+    }
+    return index2;
+  };
+  array_prototype2.includes = function(item, from_index) {
+    const has2 = includes2.call(this, item, from_index);
+    if (!has2) {
+      for (let i = 0; i < this.length; i += 1) {
+        if (get_proxied_value(this[i]) === item) {
+          state_proxy_equality_mismatch("array.includes(...)");
+          break;
+        }
+      }
+    }
+    return has2;
+  };
+  Array.__svelte_cleanup = () => {
+    array_prototype2.indexOf = indexOf;
+    array_prototype2.lastIndexOf = lastIndexOf;
+    array_prototype2.includes = includes2;
+  };
+}
+
+// ../../../node_modules/svelte/src/internal/client/dom/operations.js
+var $window;
+var $document;
+var is_firefox;
+var first_child_getter;
+var next_sibling_getter;
+function init_operations() {
+  if ($window !== void 0) {
+    return;
+  }
+  $window = window;
+  $document = document;
+  is_firefox = /Firefox/.test(navigator.userAgent);
+  var element_prototype = Element.prototype;
+  var node_prototype = Node.prototype;
+  var text_prototype = Text.prototype;
+  first_child_getter = get_descriptor(node_prototype, "firstChild").get;
+  next_sibling_getter = get_descriptor(node_prototype, "nextSibling").get;
+  if (is_extensible(element_prototype)) {
+    element_prototype[CLASS_CACHE] = void 0;
+    element_prototype[ATTRIBUTES_CACHE] = null;
+    element_prototype[STYLE_CACHE] = void 0;
+    element_prototype.__e = void 0;
+  }
+  if (is_extensible(text_prototype)) {
+    text_prototype[TEXT_CACHE] = void 0;
+  }
+  if (dev_fallback_default) {
+    element_prototype.__svelte_meta = null;
+    init_array_prototype_warnings();
+  }
+}
+function create_text(value = "") {
+  return document.createTextNode(value);
+}
+// @__NO_SIDE_EFFECTS__
+function get_first_child(node) {
+  return (
+    /** @type {TemplateNode | null} */
+    first_child_getter.call(node)
+  );
+}
+// @__NO_SIDE_EFFECTS__
+function get_next_sibling(node) {
+  return (
+    /** @type {TemplateNode | null} */
+    next_sibling_getter.call(node)
+  );
+}
+function child(node, is_text) {
+  if (!hydrating) {
+    return /* @__PURE__ */ get_first_child(node);
+  }
+  var child2 = /* @__PURE__ */ get_first_child(hydrate_node);
+  if (child2 === null) {
+    child2 = hydrate_node.appendChild(create_text());
+  } else if (is_text && child2.nodeType !== TEXT_NODE) {
+    var text3 = create_text();
+    child2?.before(text3);
+    set_hydrate_node(text3);
+    return text3;
+  }
+  if (is_text) {
+    merge_text_nodes(
+      /** @type {Text} */
+      child2
+    );
+  }
+  set_hydrate_node(child2);
+  return child2;
+}
+function first_child(node, is_text = false) {
+  if (!hydrating) {
+    var first = /* @__PURE__ */ get_first_child(node);
+    if (first instanceof Comment && first.data === "") return /* @__PURE__ */ get_next_sibling(first);
+    return first;
+  }
+  if (is_text) {
+    if (hydrate_node?.nodeType !== TEXT_NODE) {
+      var text3 = create_text();
+      hydrate_node?.before(text3);
+      set_hydrate_node(text3);
+      return text3;
+    }
+    merge_text_nodes(
+      /** @type {Text} */
+      hydrate_node
+    );
+  }
+  return hydrate_node;
+}
+function sibling(node, count = 1, is_text = false) {
+  let next_sibling = hydrating ? hydrate_node : node;
+  var last_sibling;
+  while (count--) {
+    last_sibling = next_sibling;
+    next_sibling = /** @type {TemplateNode} */
+    /* @__PURE__ */ get_next_sibling(next_sibling);
+  }
+  if (!hydrating) {
+    return next_sibling;
+  }
+  if (is_text) {
+    if (next_sibling?.nodeType !== TEXT_NODE) {
+      var text3 = create_text();
+      if (next_sibling === null) {
+        last_sibling?.after(text3);
+      } else {
+        next_sibling.before(text3);
+      }
+      set_hydrate_node(text3);
+      return text3;
+    }
+    merge_text_nodes(
+      /** @type {Text} */
+      next_sibling
+    );
+  }
+  set_hydrate_node(next_sibling);
+  return next_sibling;
+}
+function clear_text_content(node) {
+  node.textContent = "";
+}
+function should_defer_append() {
+  if (!async_mode_flag) return false;
+  if (eager_block_effects !== null) return false;
+  var flags2 = (
+    /** @type {Effect} */
+    active_effect.f
+  );
+  return (flags2 & REACTION_RAN) !== 0;
+}
+function create_element(tag2, namespace, is2) {
+  if (namespace == null || namespace === NAMESPACE_HTML) {
+    return (
+      /** @type {T extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[T] : Element} */
+      is2 ? document.createElement(tag2, { is: is2 }) : document.createElement(tag2)
+    );
+  }
+  return (
+    /** @type {T extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[T] : Element} */
+    is2 ? document.createElementNS(namespace, tag2, { is: is2 }) : document.createElementNS(namespace, tag2)
+  );
+}
+function merge_text_nodes(text3) {
+  if (
+    /** @type {string} */
+    text3.nodeValue.length < 65536
+  ) {
+    return;
+  }
+  let next2 = text3.nextSibling;
+  while (next2 !== null && next2.nodeType === TEXT_NODE) {
+    next2.remove();
+    text3.nodeValue += /** @type {string} */
+    next2.nodeValue;
+    next2 = text3.nextSibling;
+  }
+}
+
+// ../../../node_modules/svelte/src/internal/client/dom/elements/misc.js
+function remove_textarea_child(dom) {
+  if (hydrating && get_first_child(dom) !== null) {
+    clear_text_content(dom);
+  }
+}
+var listening_to_form_reset = false;
+function add_form_reset_listener() {
+  if (!listening_to_form_reset) {
+    listening_to_form_reset = true;
+    document.addEventListener(
+      "reset",
+      (evt) => {
+        Promise.resolve().then(() => {
+          if (!evt.defaultPrevented) {
+            for (
+              const e of
+              /**@type {HTMLFormElement} */
+              evt.target.elements
+            ) {
+              e[FORM_RESET_HANDLER]?.();
+            }
+          }
+        });
+      },
+      // In the capture phase to guarantee we get noticed of it (no possibility of stopPropagation)
+      { capture: true }
+    );
+  }
+}
+
+// ../../../node_modules/svelte/src/internal/client/dom/elements/bindings/shared.js
+function without_reactive_context(fn) {
+  var previous_reaction = active_reaction;
+  var previous_effect = active_effect;
+  set_active_reaction(null);
+  set_active_effect(null);
+  try {
+    return fn();
+  } finally {
+    set_active_reaction(previous_reaction);
+    set_active_effect(previous_effect);
+  }
+}
+function listen_to_event_and_reset_event(element2, event2, handler, on_reset = handler) {
+  element2.addEventListener(event2, () => without_reactive_context(handler));
+  const prev = (
+    /** @type {any} */
+    element2[FORM_RESET_HANDLER]
+  );
+  if (prev) {
+    element2[FORM_RESET_HANDLER] = () => {
+      prev();
+      on_reset(true);
+    };
+  } else {
+    element2[FORM_RESET_HANDLER] = () => on_reset(true);
+  }
+  add_form_reset_listener();
+}
+
+// ../../../node_modules/svelte/src/internal/client/reactivity/effects.js
+function validate_effect(rune) {
+  if (active_effect === null) {
+    if (active_reaction === null) {
+      effect_orphan(rune);
+    }
+    effect_in_unowned_derived();
+  }
+  if (is_destroying_effect) {
+    effect_in_teardown(rune);
+  }
+}
+function push_effect(effect2, parent_effect) {
+  var parent_last = parent_effect.last;
+  if (parent_last === null) {
+    parent_effect.last = parent_effect.first = effect2;
+  } else {
+    parent_last.next = effect2;
+    effect2.prev = parent_last;
+    parent_effect.last = effect2;
+  }
+}
+function create_effect(type, fn) {
+  var parent = active_effect;
+  if (dev_fallback_default) {
+    while (parent !== null && (parent.f & EAGER_EFFECT) !== 0) {
+      parent = parent.parent;
+    }
+  }
+  if (parent !== null && (parent.f & INERT) !== 0) {
+    type |= INERT;
+  }
+  var effect2 = {
+    ctx: component_context,
+    deps: null,
+    nodes: null,
+    f: type | DIRTY | CONNECTED,
+    first: null,
+    fn,
+    last: null,
+    next: null,
+    parent,
+    b: parent && parent.b,
+    prev: null,
+    teardown: null,
+    wv: 0,
+    ac: null
+  };
+  if (dev_fallback_default) {
+    effect2.component_function = dev_current_component_function;
+  }
+  current_batch?.register_created_effect(effect2);
+  var e = effect2;
+  if ((type & EFFECT) !== 0) {
+    if (collected_effects !== null) {
+      collected_effects.push(effect2);
+    } else {
+      Batch.ensure().schedule(effect2);
+    }
+  } else if (fn !== null) {
+    try {
+      update_effect(effect2);
+    } catch (e2) {
+      destroy_effect(effect2);
+      throw e2;
+    }
+    if (e.deps === null && e.teardown === null && e.nodes === null && e.first === e.last && // either `null`, or a singular child
+    (e.f & EFFECT_PRESERVED) === 0) {
+      e = e.first;
+      if ((type & BLOCK_EFFECT) !== 0 && (type & EFFECT_TRANSPARENT) !== 0 && e !== null) {
+        e.f |= EFFECT_TRANSPARENT;
+      }
+    }
+  }
+  if (e !== null) {
+    e.parent = parent;
+    if (parent !== null) {
+      push_effect(e, parent);
+    }
+    if (active_reaction !== null && (active_reaction.f & DERIVED) !== 0 && (type & ROOT_EFFECT) === 0) {
+      var derived3 = (
+        /** @type {Derived} */
+        active_reaction
+      );
+      (derived3.effects ??= []).push(e);
+    }
+  }
+  return effect2;
+}
+function effect_tracking() {
+  return active_reaction !== null && !untracking;
+}
+function teardown(fn) {
+  const effect2 = create_effect(RENDER_EFFECT, null);
+  set_signal_status(effect2, CLEAN);
+  effect2.teardown = fn;
+  return effect2;
+}
+function user_effect(fn) {
+  validate_effect("$effect");
+  if (dev_fallback_default) {
+    define_property(fn, "name", {
+      value: "$effect"
+    });
+  }
+  var flags2 = (
+    /** @type {Effect} */
+    active_effect.f
+  );
+  var defer = !active_reaction && (flags2 & BRANCH_EFFECT) !== 0 && component_context !== null && !component_context.i;
+  if (defer) {
+    var context = (
+      /** @type {ComponentContext} */
+      component_context
+    );
+    (context.e ??= []).push(fn);
+  } else {
+    return create_user_effect(fn);
+  }
+}
+function create_user_effect(fn) {
+  return create_effect(EFFECT | USER_EFFECT, fn);
+}
+function effect_root(fn) {
+  Batch.ensure();
+  const effect2 = create_effect(ROOT_EFFECT | EFFECT_PRESERVED, fn);
+  return () => {
+    destroy_effect(effect2);
+  };
+}
+function component_root(fn) {
+  Batch.ensure();
+  const effect2 = create_effect(ROOT_EFFECT | EFFECT_PRESERVED, fn);
+  return (options = {}) => {
+    return new Promise((fulfil) => {
+      if (options.outro) {
+        pause_effect(effect2, () => {
+          destroy_effect(effect2);
+          fulfil(void 0);
+        });
+      } else {
+        destroy_effect(effect2);
+        fulfil(void 0);
+      }
+    });
+  };
+}
+function effect(fn) {
+  return create_effect(EFFECT, fn);
+}
+function async_effect(fn) {
+  return create_effect(ASYNC | EFFECT_PRESERVED, fn);
+}
+function render_effect(fn, flags2 = 0) {
+  return create_effect(RENDER_EFFECT | flags2, fn);
+}
+function template_effect(fn, sync = [], async2 = [], blockers = []) {
+  flatten(blockers, sync, async2, (values) => {
+    create_effect(RENDER_EFFECT, () => {
+      fn(...values.map(get2));
+    });
+  });
+}
+function block(fn, flags2 = 0) {
+  var effect2 = create_effect(BLOCK_EFFECT | flags2, fn);
+  if (dev_fallback_default) {
+    effect2.dev_stack = dev_stack;
+  }
+  return effect2;
+}
+function branch(fn) {
+  return create_effect(BRANCH_EFFECT | EFFECT_PRESERVED, fn);
+}
+function execute_effect_teardown(effect2) {
+  var teardown2 = effect2.teardown;
+  if (teardown2 !== null) {
+    const previously_destroying_effect = is_destroying_effect;
+    const previous_reaction = active_reaction;
+    set_is_destroying_effect(true);
+    set_active_reaction(null);
+    try {
+      teardown2.call(null);
+    } finally {
+      set_is_destroying_effect(previously_destroying_effect);
+      set_active_reaction(previous_reaction);
+    }
+  }
+}
+function destroy_effect_children(signal, remove_dom = false) {
+  var effect2 = signal.first;
+  signal.first = signal.last = null;
+  while (effect2 !== null) {
+    const controller = effect2.ac;
+    if (controller !== null) {
+      without_reactive_context(() => {
+        controller.abort(STALE_REACTION);
+      });
+    }
+    var next2 = effect2.next;
+    if ((effect2.f & ROOT_EFFECT) !== 0) {
+      effect2.parent = null;
+    } else {
+      destroy_effect(effect2, remove_dom);
+    }
+    effect2 = next2;
+  }
+}
+function destroy_block_effect_children(signal) {
+  var effect2 = signal.first;
+  while (effect2 !== null) {
+    var next2 = effect2.next;
+    if ((effect2.f & BRANCH_EFFECT) === 0) {
+      destroy_effect(effect2);
+    }
+    effect2 = next2;
+  }
+}
+function destroy_effect(effect2, remove_dom = true) {
+  var removed = false;
+  if ((remove_dom || (effect2.f & HEAD_EFFECT) !== 0) && effect2.nodes !== null && effect2.nodes.end !== null) {
+    remove_effect_dom(
+      effect2.nodes.start,
+      /** @type {TemplateNode} */
+      effect2.nodes.end
+    );
+    removed = true;
+  }
+  effect2.f |= DESTROYING;
+  destroy_effect_children(effect2, remove_dom && !removed);
+  remove_reactions(effect2, 0);
+  var transitions = effect2.nodes && effect2.nodes.t;
+  if (transitions !== null) {
+    for (const transition2 of transitions) {
+      transition2.stop();
+    }
+  }
+  execute_effect_teardown(effect2);
+  effect2.f ^= DESTROYING;
+  effect2.f |= DESTROYED;
+  var parent = effect2.parent;
+  if (parent !== null && parent.first !== null) {
+    unlink_effect(effect2);
+  }
+  if (dev_fallback_default) {
+    effect2.component_function = null;
+  }
+  effect2.next = effect2.prev = effect2.teardown = effect2.ctx = effect2.deps = effect2.fn = effect2.nodes = effect2.ac = effect2.b = null;
+}
+function remove_effect_dom(node, end) {
+  while (node !== null) {
+    var next2 = node === end ? null : get_next_sibling(node);
+    node.remove();
+    node = next2;
+  }
+}
+function unlink_effect(effect2) {
+  var parent = effect2.parent;
+  var prev = effect2.prev;
+  var next2 = effect2.next;
+  if (prev !== null) prev.next = next2;
+  if (next2 !== null) next2.prev = prev;
+  if (parent !== null) {
+    if (parent.first === effect2) parent.first = next2;
+    if (parent.last === effect2) parent.last = prev;
+  }
+}
+function pause_effect(effect2, callback, destroy = true) {
+  var transitions = [];
+  pause_children(effect2, transitions, true);
+  var fn = () => {
+    if (destroy) destroy_effect(effect2);
+    if (callback) callback();
+  };
+  var remaining = transitions.length;
+  if (remaining > 0) {
+    var check = () => --remaining || fn();
+    for (var transition2 of transitions) {
+      transition2.out(check);
+    }
+  } else {
+    fn();
+  }
+}
+function pause_children(effect2, transitions, local) {
+  if ((effect2.f & INERT) !== 0) return;
+  effect2.f ^= INERT;
+  var t = effect2.nodes && effect2.nodes.t;
+  if (t !== null) {
+    for (const transition2 of t) {
+      if (transition2.is_global || local) {
+        transitions.push(transition2);
+      }
+    }
+  }
+  var child2 = effect2.first;
+  while (child2 !== null) {
+    var sibling2 = child2.next;
+    if ((child2.f & ROOT_EFFECT) === 0) {
+      var transparent = (child2.f & EFFECT_TRANSPARENT) !== 0 || // If this is a branch effect without a block effect parent,
+      // it means the parent block effect was pruned. In that case,
+      // transparency information was transferred to the branch effect.
+      (child2.f & BRANCH_EFFECT) !== 0 && (effect2.f & BLOCK_EFFECT) !== 0;
+      pause_children(child2, transitions, transparent ? local : false);
+    }
+    child2 = sibling2;
+  }
+}
+function resume_effect(effect2) {
+  resume_children(effect2, true);
+}
+function resume_children(effect2, local) {
+  if ((effect2.f & INERT) === 0) return;
+  effect2.f ^= INERT;
+  if ((effect2.f & CLEAN) === 0) {
+    set_signal_status(effect2, DIRTY);
+    Batch.ensure().schedule(effect2);
+  }
+  var child2 = effect2.first;
+  while (child2 !== null) {
+    var sibling2 = child2.next;
+    var transparent = (child2.f & EFFECT_TRANSPARENT) !== 0 || (child2.f & BRANCH_EFFECT) !== 0;
+    resume_children(child2, transparent ? local : false);
+    child2 = sibling2;
+  }
+  var t = effect2.nodes && effect2.nodes.t;
+  if (t !== null) {
+    for (const transition2 of t) {
+      if (transition2.is_global || local) {
+        transition2.in();
+      }
+    }
+  }
+}
+function move_effect(effect2, fragment) {
+  if (!effect2.nodes) return;
+  var node = effect2.nodes.start;
+  var end = effect2.nodes.end;
+  while (node !== null) {
+    var next2 = node === end ? null : get_next_sibling(node);
+    fragment.append(node);
+    node = next2;
+  }
+}
+
+// ../../../node_modules/svelte/src/internal/client/legacy.js
+var captured_signals = null;
+
+// ../../../node_modules/svelte/src/internal/client/runtime.js
+var is_updating_effect = false;
+var is_destroying_effect = false;
+function set_is_destroying_effect(value) {
+  is_destroying_effect = value;
+}
+var active_reaction = null;
+var untracking = false;
+function set_active_reaction(reaction) {
+  active_reaction = reaction;
+}
+var active_effect = null;
+function set_active_effect(effect2) {
+  active_effect = effect2;
+}
+var current_sources = null;
+function push_reaction_value(value) {
+  if (active_reaction !== null && (!async_mode_flag || (active_reaction.f & DERIVED) !== 0)) {
+    (current_sources ??= /* @__PURE__ */ new Set()).add(value);
+  }
+}
+var new_deps = null;
+var skipped_deps = 0;
+var untracked_writes = null;
+function set_untracked_writes(value) {
+  untracked_writes = value;
+}
+var write_version = 1;
+var read_version = 0;
+var update_version = read_version;
+function set_update_version(value) {
+  update_version = value;
+}
+function increment_write_version() {
+  return ++write_version;
+}
+function is_dirty(reaction) {
+  var flags2 = reaction.f;
+  if ((flags2 & DIRTY) !== 0) {
+    return true;
+  }
+  if (flags2 & DERIVED) {
+    reaction.f &= ~WAS_MARKED;
+  }
+  if ((flags2 & MAYBE_DIRTY) !== 0) {
+    var dependencies = (
+      /** @type {Value[]} */
+      reaction.deps
+    );
+    var length = dependencies.length;
+    for (var i = 0; i < length; i++) {
+      var dependency = dependencies[i];
+      if (is_dirty(
+        /** @type {Derived} */
+        dependency
+      )) {
+        update_derived(
+          /** @type {Derived} */
+          dependency
+        );
+      }
+      if (dependency.wv > reaction.wv) {
+        return true;
+      }
+    }
+    if ((flags2 & CONNECTED) !== 0 && // During time traveling we don't want to reset the status so that
+    // traversal of the graph in the other batches still happens
+    batch_values === null) {
+      set_signal_status(reaction, CLEAN);
+    }
+  }
+  return false;
+}
+function schedule_possible_effect_self_invalidation(signal, effect2, root15 = true) {
+  var reactions = signal.reactions;
+  if (reactions === null) return;
+  if (!async_mode_flag && current_sources !== null && current_sources.has(signal)) {
+    return;
+  }
+  for (var i = 0; i < reactions.length; i++) {
+    var reaction = reactions[i];
+    if ((reaction.f & DERIVED) !== 0) {
+      schedule_possible_effect_self_invalidation(
+        /** @type {Derived} */
+        reaction,
+        effect2,
+        false
+      );
+    } else if (effect2 === reaction) {
+      if (root15) {
+        set_signal_status(reaction, DIRTY);
+      } else if ((reaction.f & CLEAN) !== 0) {
+        set_signal_status(reaction, MAYBE_DIRTY);
+      }
+      schedule_effect(
+        /** @type {Effect} */
+        reaction
+      );
+    }
+  }
+}
+function update_reaction(reaction) {
+  var previous_deps = new_deps;
+  var previous_skipped_deps = skipped_deps;
+  var previous_untracked_writes = untracked_writes;
+  var previous_reaction = active_reaction;
+  var previous_sources = current_sources;
+  var previous_component_context = component_context;
+  var previous_untracking = untracking;
+  var previous_update_version = update_version;
+  var flags2 = reaction.f;
+  new_deps = /** @type {null | Value[]} */
+  null;
+  skipped_deps = 0;
+  untracked_writes = null;
+  active_reaction = (flags2 & (BRANCH_EFFECT | ROOT_EFFECT)) === 0 ? reaction : null;
+  current_sources = null;
+  set_component_context(reaction.ctx);
+  untracking = false;
+  update_version = ++read_version;
+  if (reaction.ac !== null) {
+    without_reactive_context(() => {
+      reaction.ac.abort(STALE_REACTION);
+    });
+    reaction.ac = null;
+  }
+  try {
+    reaction.f |= REACTION_IS_UPDATING;
+    var fn = (
+      /** @type {Function} */
+      reaction.fn
+    );
+    var result = fn();
+    reaction.f |= REACTION_RAN;
+    var deps = reaction.deps;
+    var is_fork = current_batch?.is_fork;
+    if (new_deps !== null) {
+      var i;
+      if (!is_fork) {
+        remove_reactions(reaction, skipped_deps);
+      }
+      if (deps !== null && skipped_deps > 0) {
+        deps.length = skipped_deps + new_deps.length;
+        for (i = 0; i < new_deps.length; i++) {
+          deps[skipped_deps + i] = new_deps[i];
+        }
+      } else {
+        reaction.deps = deps = new_deps;
+      }
+      if (effect_tracking() && (reaction.f & CONNECTED) !== 0) {
+        for (i = skipped_deps; i < deps.length; i++) {
+          (deps[i].reactions ??= []).push(reaction);
+        }
+      }
+    } else if (!is_fork && deps !== null && skipped_deps < deps.length) {
+      remove_reactions(reaction, skipped_deps);
+      deps.length = skipped_deps;
+    }
+    if (is_runes() && untracked_writes !== null && !untracking && deps !== null && (reaction.f & (DERIVED | MAYBE_DIRTY | DIRTY)) === 0) {
+      for (i = 0; i < /** @type {Source[]} */
+      untracked_writes.length; i++) {
+        schedule_possible_effect_self_invalidation(
+          untracked_writes[i],
+          /** @type {Effect} */
+          reaction
+        );
+      }
+    }
+    if (previous_reaction !== null && previous_reaction !== reaction) {
+      read_version++;
+      if (previous_reaction.deps !== null) {
+        for (let i2 = 0; i2 < previous_skipped_deps; i2 += 1) {
+          previous_reaction.deps[i2].rv = read_version;
+        }
+      }
+      if (previous_deps !== null) {
+        for (const dep of previous_deps) {
+          dep.rv = read_version;
+        }
+      }
+      if (untracked_writes !== null) {
+        if (previous_untracked_writes === null) {
+          previous_untracked_writes = untracked_writes;
+        } else {
+          previous_untracked_writes.push(.../** @type {Source[]} */
+          untracked_writes);
+        }
+      }
+    }
+    if ((reaction.f & ERROR_VALUE) !== 0) {
+      reaction.f ^= ERROR_VALUE;
+    }
+    return result;
+  } catch (error2) {
+    return handle_error(error2);
+  } finally {
+    reaction.f ^= REACTION_IS_UPDATING;
+    new_deps = previous_deps;
+    skipped_deps = previous_skipped_deps;
+    untracked_writes = previous_untracked_writes;
+    active_reaction = previous_reaction;
+    current_sources = previous_sources;
+    set_component_context(previous_component_context);
+    untracking = previous_untracking;
+    update_version = previous_update_version;
+  }
+}
+function remove_reaction(signal, dependency) {
+  let reactions = dependency.reactions;
+  if (reactions !== null) {
+    var index2 = index_of.call(reactions, signal);
+    if (index2 !== -1) {
+      var new_length = reactions.length - 1;
+      if (new_length === 0) {
+        reactions = dependency.reactions = null;
+      } else {
+        reactions[index2] = reactions[new_length];
+        reactions.pop();
+      }
+    }
+  }
+  if (reactions === null && (dependency.f & DERIVED) !== 0 && // Destroying a child effect while updating a parent effect can cause a dependency to appear
+  // to be unused, when in fact it is used by the currently-updating parent. Checking `new_deps`
+  // allows us to skip the expensive work of disconnecting and immediately reconnecting it
+  (new_deps === null || !includes.call(new_deps, dependency))) {
+    var derived3 = (
+      /** @type {Derived} */
+      dependency
+    );
+    if ((derived3.f & CONNECTED) !== 0) {
+      derived3.f ^= CONNECTED;
+      derived3.f &= ~WAS_MARKED;
+    }
+    if (derived3.v !== UNINITIALIZED) {
+      update_derived_status(derived3);
+    }
+    freeze_derived_effects(derived3);
+    remove_reactions(derived3, 0);
+  }
+}
+function remove_reactions(signal, start_index) {
+  var dependencies = signal.deps;
+  if (dependencies === null) return;
+  for (var i = start_index; i < dependencies.length; i++) {
+    remove_reaction(signal, dependencies[i]);
+  }
+}
+function update_effect(effect2) {
+  var flags2 = effect2.f;
+  if ((flags2 & DESTROYED) !== 0) {
+    return;
+  }
+  set_signal_status(effect2, CLEAN);
+  var previous_effect = active_effect;
+  var was_updating_effect = is_updating_effect;
+  active_effect = effect2;
+  is_updating_effect = true;
+  if (dev_fallback_default) {
+    var previous_component_fn = dev_current_component_function;
+    set_dev_current_component_function(effect2.component_function);
+    var previous_stack = (
+      /** @type {any} */
+      dev_stack
+    );
+    set_dev_stack(effect2.dev_stack ?? dev_stack);
+  }
+  try {
+    if ((flags2 & (BLOCK_EFFECT | MANAGED_EFFECT)) !== 0) {
+      destroy_block_effect_children(effect2);
+    } else {
+      destroy_effect_children(effect2);
+    }
+    execute_effect_teardown(effect2);
+    var teardown2 = update_reaction(effect2);
+    effect2.teardown = typeof teardown2 === "function" ? teardown2 : null;
+    effect2.wv = write_version;
+    if (dev_fallback_default && tracing_mode_flag && (effect2.f & DIRTY) !== 0 && effect2.deps !== null) {
+      for (var dep of effect2.deps) {
+        if (dep.set_during_effect) {
+          dep.wv = increment_write_version();
+          dep.set_during_effect = false;
+        }
+      }
+    }
+  } finally {
+    is_updating_effect = was_updating_effect;
+    active_effect = previous_effect;
+    if (dev_fallback_default) {
+      set_dev_current_component_function(previous_component_fn);
+      set_dev_stack(previous_stack);
+    }
+  }
+}
+async function tick() {
+  if (async_mode_flag) {
+    return new Promise((f) => {
+      requestAnimationFrame(() => f());
+      setTimeout(() => f());
+    });
+  }
+  await Promise.resolve();
+  flushSync();
+}
+function get2(signal) {
+  var flags2 = signal.f;
+  var is_derived = (flags2 & DERIVED) !== 0;
+  captured_signals?.add(signal);
+  if (active_reaction !== null && !untracking) {
+    var destroyed = active_effect !== null && (active_effect.f & DESTROYED) !== 0;
+    if (!destroyed && (current_sources === null || !current_sources.has(signal))) {
+      var deps = active_reaction.deps;
+      if ((active_reaction.f & REACTION_IS_UPDATING) !== 0) {
+        if (signal.rv < read_version) {
+          signal.rv = read_version;
+          if (new_deps === null && deps !== null && deps[skipped_deps] === signal) {
+            skipped_deps++;
+          } else if (new_deps === null) {
+            new_deps = [signal];
+          } else {
+            new_deps.push(signal);
+          }
+        }
+      } else {
+        active_reaction.deps ??= [];
+        if (!includes.call(active_reaction.deps, signal)) {
+          active_reaction.deps.push(signal);
+        }
+        var reactions = signal.reactions;
+        if (reactions === null) {
+          signal.reactions = [active_reaction];
+        } else if (!includes.call(reactions, active_reaction)) {
+          reactions.push(active_reaction);
+        }
+      }
+    }
+  }
+  if (dev_fallback_default) {
+    if (!untracking && reactivity_loss_tracker && !reactivity_loss_tracker.warned && (reactivity_loss_tracker.effect.f & REACTION_IS_UPDATING) === 0 && !reactivity_loss_tracker.effect_deps.has(signal)) {
+      reactivity_loss_tracker.warned = true;
+      await_reactivity_loss(
+        /** @type {string} */
+        signal.label
+      );
+      var trace2 = get_error("traced at");
+      if (trace2) console.warn(trace2);
+    }
+    recent_async_deriveds.delete(signal);
+    if (tracing_mode_flag && !untracking && tracing_expressions !== null && active_reaction !== null && tracing_expressions.reaction === active_reaction) {
+      if (signal.trace) {
+        signal.trace();
+      } else {
+        trace2 = get_error("traced at");
+        if (trace2) {
+          var entry = tracing_expressions.entries.get(signal);
+          if (entry === void 0) {
+            entry = { traces: [] };
+            tracing_expressions.entries.set(signal, entry);
+          }
+          var last = entry.traces[entry.traces.length - 1];
+          if (trace2.stack !== last?.stack) {
+            entry.traces.push(trace2);
+          }
+        }
+      }
+    }
+  }
+  if (is_destroying_effect && old_values.has(signal)) {
+    return old_values.get(signal);
+  }
+  if (is_derived) {
+    var derived3 = (
+      /** @type {Derived} */
+      signal
+    );
+    if (is_destroying_effect) {
+      var value = derived3.v;
+      if ((derived3.f & CLEAN) === 0 && derived3.reactions !== null || depends_on_old_values(derived3)) {
+        value = execute_derived(derived3);
+      }
+      old_values.set(derived3, value);
+      return value;
+    }
+    var should_connect = (derived3.f & CONNECTED) === 0 && !untracking && active_reaction !== null && (is_updating_effect || (active_reaction.f & CONNECTED) !== 0);
+    var is_new = (derived3.f & REACTION_RAN) === 0;
+    if (is_dirty(derived3)) {
+      if (should_connect) {
+        derived3.f |= CONNECTED;
+      }
+      update_derived(derived3);
+    }
+    if (should_connect && !is_new) {
+      unfreeze_derived_effects(derived3);
+      reconnect(derived3);
+    }
+  }
+  if (batch_values?.has(signal)) {
+    return batch_values.get(signal);
+  }
+  if ((signal.f & ERROR_VALUE) !== 0) {
+    throw signal.v;
+  }
+  return signal.v;
+}
+function reconnect(derived3) {
+  derived3.f |= CONNECTED;
+  if (derived3.deps === null) return;
+  for (const dep of derived3.deps) {
+    (dep.reactions ??= []).push(derived3);
+    if ((dep.f & DERIVED) !== 0 && (dep.f & CONNECTED) === 0) {
+      unfreeze_derived_effects(
+        /** @type {Derived} */
+        dep
+      );
+      reconnect(
+        /** @type {Derived} */
+        dep
+      );
+    }
+  }
+}
+function depends_on_old_values(derived3) {
+  if (derived3.v === UNINITIALIZED) return true;
+  if (derived3.deps === null) return false;
+  for (const dep of derived3.deps) {
+    if (old_values.has(dep)) {
+      return true;
+    }
+    if ((dep.f & DERIVED) !== 0 && depends_on_old_values(
+      /** @type {Derived} */
+      dep
+    )) {
+      return true;
+    }
+  }
+  return false;
+}
+function untrack(fn) {
+  var previous_untracking = untracking;
+  try {
+    untracking = true;
+    return fn();
+  } finally {
+    untracking = previous_untracking;
+  }
+}
+
+// ../../../node_modules/svelte/src/utils.js
+var regex_return_characters = /\r/g;
+function hash(str) {
+  str = str.replace(regex_return_characters, "");
+  let hash2 = 5381;
+  let i = str.length;
+  while (i--) hash2 = (hash2 << 5) - hash2 ^ str.charCodeAt(i);
+  return (hash2 >>> 0).toString(36);
+}
+var DOM_BOOLEAN_ATTRIBUTES = [
+  "allowfullscreen",
+  "async",
+  "autofocus",
+  "autoplay",
+  "checked",
+  "controls",
+  "default",
+  "disabled",
+  "formnovalidate",
+  "indeterminate",
+  "inert",
+  "ismap",
+  "loop",
+  "multiple",
+  "muted",
+  "nomodule",
+  "novalidate",
+  "open",
+  "playsinline",
+  "readonly",
+  "required",
+  "reversed",
+  "seamless",
+  "selected",
+  "webkitdirectory",
+  "defer",
+  "disablepictureinpicture",
+  "disableremoteplayback"
+];
+var DOM_PROPERTIES = [
+  ...DOM_BOOLEAN_ATTRIBUTES,
+  "formNoValidate",
+  "isMap",
+  "noModule",
+  "playsInline",
+  "readOnly",
+  "value",
+  "volume",
+  "defaultValue",
+  "defaultChecked",
+  "srcObject",
+  "noValidate",
+  "allowFullscreen",
+  "disablePictureInPicture",
+  "disableRemotePlayback"
+];
+var PASSIVE_EVENTS = ["touchstart", "touchmove"];
+function is_passive_event(name) {
+  return PASSIVE_EVENTS.includes(name);
+}
+var STATE_CREATION_RUNES = (
+  /** @type {const} */
+  [
+    "$state",
+    "$state.raw",
+    "$derived",
+    "$derived.by"
+  ]
+);
+var RUNES = (
+  /** @type {const} */
+  [
+    ...STATE_CREATION_RUNES,
+    "$state.eager",
+    "$state.snapshot",
+    "$props",
+    "$props.id",
+    "$bindable",
+    "$effect",
+    "$effect.pre",
+    "$effect.tracking",
+    "$effect.root",
+    "$effect.pending",
+    "$inspect",
+    "$inspect().with",
+    "$inspect.trace",
+    "$host"
+  ]
+);
+function sanitize_location(location) {
+  return (
+    /** @type {T} */
+    location?.replace(/\//g, "/\u200B")
+  );
+}
+
+// ../../../node_modules/svelte/src/internal/client/dev/css.js
+var all_styles = /* @__PURE__ */ new Map();
+function register_style(hash2, style) {
+  var styles = all_styles.get(hash2);
+  if (!styles) {
+    styles = /* @__PURE__ */ new Set();
+    all_styles.set(hash2, styles);
+  }
+  styles.add(style);
+}
+
+// ../../../node_modules/svelte/src/internal/client/dom/elements/events.js
+var event_symbol = /* @__PURE__ */ Symbol("events");
+var all_registered_events = /* @__PURE__ */ new Set();
+var root_event_handles = /* @__PURE__ */ new Set();
+function create_event(event_name, dom, handler, options = {}) {
+  function target_handler(event2) {
+    if (!options.capture) {
+      handle_event_propagation.call(dom, event2);
+    }
+    if (!event2.cancelBubble) {
+      return without_reactive_context(() => {
+        return handler?.call(this, event2);
+      });
+    }
+  }
+  if (event_name.startsWith("pointer") || event_name.startsWith("touch") || event_name === "wheel") {
+    queue_micro_task(() => {
+      dom.addEventListener(event_name, target_handler, options);
+    });
+  } else {
+    dom.addEventListener(event_name, target_handler, options);
+  }
+  return target_handler;
+}
+function event(event_name, dom, handler, capture2, passive2) {
+  var options = { capture: capture2, passive: passive2 };
+  var target_handler = create_event(event_name, dom, handler, options);
+  if (dom === document.body || // @ts-ignore
+  dom === window || // @ts-ignore
+  dom === document || // Firefox has quirky behavior, it can happen that we still get "canplay" events when the element is already removed
+  dom instanceof HTMLMediaElement) {
+    teardown(() => {
+      dom.removeEventListener(event_name, target_handler, options);
+    });
+  }
+}
+function delegated(event_name, element2, handler) {
+  (element2[event_symbol] ??= {})[event_name] = handler;
+}
+function delegate(events) {
+  for (var i = 0; i < events.length; i++) {
+    all_registered_events.add(events[i]);
+  }
+  for (var fn of root_event_handles) {
+    fn(events);
+  }
+}
+var last_propagated_event = null;
+function handle_event_propagation(event2) {
+  var handler_element = this;
+  var owner_document = (
+    /** @type {Node} */
+    handler_element.ownerDocument
+  );
+  var event_name = event2.type;
+  var path = event2.composedPath?.() || [];
+  var current_target = (
+    /** @type {null | Element} */
+    path[0] || event2.target
+  );
+  last_propagated_event = event2;
+  var path_idx = 0;
+  var handled_at = last_propagated_event === event2 && event2[event_symbol];
+  if (handled_at) {
+    var at_idx = path.indexOf(handled_at);
+    if (at_idx !== -1 && (handler_element === document || handler_element === /** @type {any} */
+    window)) {
+      event2[event_symbol] = handler_element;
+      return;
+    }
+    var handler_idx = path.indexOf(handler_element);
+    if (handler_idx === -1) {
+      return;
+    }
+    if (at_idx <= handler_idx) {
+      path_idx = at_idx;
+    }
+  }
+  current_target = /** @type {Element} */
+  path[path_idx] || event2.target;
+  if (current_target === handler_element) return;
+  define_property(event2, "currentTarget", {
+    configurable: true,
+    get() {
+      return current_target || owner_document;
+    }
+  });
+  var previous_reaction = active_reaction;
+  var previous_effect = active_effect;
+  set_active_reaction(null);
+  set_active_effect(null);
+  try {
+    var throw_error;
+    var other_errors = [];
+    while (current_target !== null) {
+      if (current_target === handler_element) break;
+      try {
+        var delegated2 = current_target[event_symbol]?.[event_name];
+        if (delegated2 != null && (!/** @type {any} */
+        current_target.disabled || // DOM could've been updated already by the time this is reached, so we check this as well
+        // -> the target could not have been disabled because it emits the event in the first place
+        event2.target === current_target)) {
+          delegated2.call(current_target, event2);
+        }
+      } catch (error2) {
+        if (throw_error) {
+          other_errors.push(error2);
+        } else {
+          throw_error = error2;
+        }
+      }
+      if (event2.cancelBubble) break;
+      path_idx++;
+      current_target = path_idx < path.length ? (
+        /** @type {Element} */
+        path[path_idx]
+      ) : null;
+    }
+    if (throw_error) {
+      for (let error2 of other_errors) {
+        queueMicrotask(() => {
+          throw error2;
+        });
+      }
+      throw throw_error;
+    }
+  } finally {
+    event2[event_symbol] = handler_element;
+    delete event2.currentTarget;
+    set_active_reaction(previous_reaction);
+    set_active_effect(previous_effect);
+  }
+}
+
+// ../../../node_modules/svelte/src/internal/client/dom/reconciler.js
+var policy = (
+  // We gotta write it like this because after downleveling the pure comment may end up in the wrong location
+  globalThis?.window?.trustedTypes && /* @__PURE__ */ globalThis.window.trustedTypes.createPolicy("svelte-trusted-html", {
+    /** @param {string} html */
+    createHTML: (html2) => {
+      return html2;
+    }
+  })
+);
+function create_trusted_html(html2) {
+  return (
+    /** @type {string} */
+    policy?.createHTML(html2) ?? html2
+  );
+}
+function create_fragment_from_html(html2) {
+  var elem = create_element("template");
+  elem.innerHTML = create_trusted_html(html2.replaceAll("<!>", "<!---->"));
+  return elem.content;
+}
+
+// ../../../node_modules/svelte/src/internal/client/dom/template.js
+function assign_nodes(start, end) {
+  var effect2 = (
+    /** @type {Effect} */
+    active_effect
+  );
+  if (effect2.nodes === null) {
+    effect2.nodes = { start, end, a: null, t: null };
+  }
+}
+// @__NO_SIDE_EFFECTS__
+function from_html(content, flags2) {
+  var is_fragment = (flags2 & TEMPLATE_FRAGMENT) !== 0;
+  var use_import_node = (flags2 & TEMPLATE_USE_IMPORT_NODE) !== 0;
+  var node;
+  var has_start = !content.startsWith("<!>");
+  return () => {
+    if (hydrating) {
+      assign_nodes(hydrate_node, null);
+      return hydrate_node;
+    }
+    if (node === void 0) {
+      node = create_fragment_from_html(has_start ? content : "<!>" + content);
+      if (!is_fragment) node = /** @type {TemplateNode} */
+      get_first_child(node);
+    }
+    var clone = (
+      /** @type {TemplateNode} */
+      use_import_node || is_firefox ? document.importNode(node, true) : node.cloneNode(true)
+    );
+    if (is_fragment) {
+      var start = (
+        /** @type {TemplateNode} */
+        get_first_child(clone)
+      );
+      var end = (
+        /** @type {TemplateNode} */
+        clone.lastChild
+      );
+      assign_nodes(start, end);
+    } else {
+      assign_nodes(clone, clone);
+    }
+    return clone;
+  };
+}
+function comment() {
+  if (hydrating) {
+    assign_nodes(hydrate_node, null);
+    return hydrate_node;
+  }
+  var frag = document.createDocumentFragment();
+  var start = document.createComment("");
+  var anchor = create_text();
+  frag.append(start, anchor);
+  assign_nodes(start, anchor);
+  return frag;
+}
+function append(anchor, dom) {
+  if (hydrating) {
+    var effect2 = (
+      /** @type {Effect & { nodes: EffectNodes }} */
+      active_effect
+    );
+    if ((effect2.f & REACTION_RAN) === 0 || effect2.nodes.end === null) {
+      effect2.nodes.end = hydrate_node;
+    }
+    hydrate_next();
+    return;
+  }
+  if (anchor === null) {
+    return;
+  }
+  anchor.before(
+    /** @type {Node} */
+    dom
+  );
+}
+
+// ../../../node_modules/svelte/src/internal/client/render.js
+var should_intro = true;
+function set_text(text3, value) {
+  var str = value == null ? "" : typeof value === "object" ? `${value}` : value;
+  if (str !== /** @type {any} */
+  (text3[TEXT_CACHE] ??= text3.nodeValue)) {
+    text3[TEXT_CACHE] = str;
+    text3.nodeValue = `${str}`;
+  }
+}
+function mount(component2, options) {
+  return _mount(component2, options);
+}
+function hydrate(component2, options) {
+  init_operations();
+  options.intro = options.intro ?? false;
+  const target = options.target;
+  const was_hydrating = hydrating;
+  const previous_hydrate_node = hydrate_node;
+  try {
+    var anchor = get_first_child(target);
+    while (anchor && (anchor.nodeType !== COMMENT_NODE || /** @type {Comment} */
+    anchor.data !== HYDRATION_START)) {
+      anchor = get_next_sibling(anchor);
+    }
+    if (!anchor) {
+      throw HYDRATION_ERROR;
+    }
+    set_hydrating(true);
+    set_hydrate_node(
+      /** @type {Comment} */
+      anchor
+    );
+    const instance = _mount(component2, { ...options, anchor });
+    set_hydrating(false);
+    return (
+      /**  @type {Exports} */
+      instance
+    );
+  } catch (error2) {
+    if (error2 instanceof Error && error2.message.split("\n").some((line) => line.startsWith("https://svelte.dev/e/"))) {
+      throw error2;
+    }
+    if (error2 !== HYDRATION_ERROR) {
+      console.warn("Failed to hydrate: ", error2);
+    }
+    if (options.recover === false) {
+      hydration_failed();
+    }
+    init_operations();
+    clear_text_content(target);
+    set_hydrating(false);
+    return mount(component2, options);
+  } finally {
+    set_hydrating(was_hydrating);
+    set_hydrate_node(previous_hydrate_node);
+  }
+}
+var listeners = /* @__PURE__ */ new Map();
+function _mount(Component, { target, anchor, props = {}, events, context, intro = true, transformError }) {
+  init_operations();
+  var component2 = void 0;
+  var unmount2 = component_root(() => {
+    var anchor_node = anchor ?? target.appendChild(create_text());
+    boundary(
+      /** @type {TemplateNode} */
+      anchor_node,
+      {
+        pending: () => {
+        }
+      },
+      (anchor_node2) => {
+        push({});
+        var ctx = (
+          /** @type {ComponentContext} */
+          component_context
+        );
+        if (context) ctx.c = context;
+        if (events) {
+          props.$$events = events;
+        }
+        if (hydrating) {
+          assign_nodes(
+            /** @type {TemplateNode} */
+            anchor_node2,
+            null
+          );
+        }
+        should_intro = intro;
+        component2 = Component(anchor_node2, props) || {};
+        should_intro = true;
+        if (hydrating) {
+          active_effect.nodes.end = hydrate_node;
+          if (hydrate_node === null || hydrate_node.nodeType !== COMMENT_NODE || /** @type {Comment} */
+          hydrate_node.data !== HYDRATION_END) {
+            hydration_mismatch();
+            throw HYDRATION_ERROR;
+          }
+        }
+        pop();
+      },
+      transformError
+    );
+    var registered_events = /* @__PURE__ */ new Set();
+    var event_handle = (events2) => {
+      for (var i = 0; i < events2.length; i++) {
+        var event_name = events2[i];
+        if (registered_events.has(event_name)) continue;
+        registered_events.add(event_name);
+        var passive2 = is_passive_event(event_name);
+        for (const node of [target, document]) {
+          var counts = listeners.get(node);
+          if (counts === void 0) {
+            counts = /* @__PURE__ */ new Map();
+            listeners.set(node, counts);
+          }
+          var count = counts.get(event_name);
+          if (count === void 0) {
+            node.addEventListener(event_name, handle_event_propagation, { passive: passive2 });
+            counts.set(event_name, 1);
+          } else {
+            counts.set(event_name, count + 1);
+          }
+        }
+      }
+    };
+    event_handle(array_from(all_registered_events));
+    root_event_handles.add(event_handle);
+    return () => {
+      for (var event_name of registered_events) {
+        for (const node of [target, document]) {
+          var counts = (
+            /** @type {Map<string, number>} */
+            listeners.get(node)
+          );
+          var count = (
+            /** @type {number} */
+            counts.get(event_name)
+          );
+          if (--count == 0) {
+            node.removeEventListener(event_name, handle_event_propagation);
+            counts.delete(event_name);
+            if (counts.size === 0) {
+              listeners.delete(node);
+            }
+          } else {
+            counts.set(event_name, count);
+          }
+        }
+      }
+      root_event_handles.delete(event_handle);
+      if (anchor_node !== anchor) {
+        anchor_node.parentNode?.removeChild(anchor_node);
+      }
+    };
+  });
+  mounted_components.set(component2, unmount2);
+  return component2;
+}
+var mounted_components = /* @__PURE__ */ new WeakMap();
+function unmount(component2, options) {
+  const fn = mounted_components.get(component2);
+  if (fn) {
+    mounted_components.delete(component2);
+    return fn(options);
+  }
+  if (dev_fallback_default) {
+    if (STATE_SYMBOL in component2) {
+      state_proxy_unmount();
+    } else {
+      lifecycle_double_unmount();
+    }
+  }
+  return Promise.resolve();
+}
+
+// ../../../node_modules/svelte/src/internal/client/dom/blocks/branches.js
+var BranchManager = class {
+  /** @type {TemplateNode} */
+  anchor;
+  /** @type {Map<Batch, Key>} */
+  #batches = /* @__PURE__ */ new Map();
+  /**
+   * Map of keys to effects that are currently rendered in the DOM.
+   * These effects are visible and actively part of the document tree.
+   * Example:
+   * ```
+   * {#if condition}
+   * 	foo
+   * {:else}
+   * 	bar
+   * {/if}
+   * ```
+   * Can result in the entries `true->Effect` and `false->Effect`
+   * @type {Map<Key, Effect>}
+   */
+  #onscreen = /* @__PURE__ */ new Map();
+  /**
+   * Similar to #onscreen with respect to the keys, but contains branches that are not yet
+   * in the DOM, because their insertion is deferred.
+   * @type {Map<Key, Branch>}
+   */
+  #offscreen = /* @__PURE__ */ new Map();
+  /**
+   * Keys of effects that are currently outroing
+   * @type {Set<Key>}
+   */
+  #outroing = /* @__PURE__ */ new Set();
+  /**
+   * Whether to pause (i.e. outro) on change, or destroy immediately.
+   * This is necessary for `<svelte:element>`
+   */
+  #transition = true;
+  /**
+   * @param {TemplateNode} anchor
+   * @param {boolean} transition
+   */
+  constructor(anchor, transition2 = true) {
+    this.anchor = anchor;
+    this.#transition = transition2;
+  }
+  /**
+   * @param {Batch} batch
+   */
+  #commit = (batch) => {
+    if (!this.#batches.has(batch)) return;
+    var key2 = (
+      /** @type {Key} */
+      this.#batches.get(batch)
+    );
+    var onscreen = this.#onscreen.get(key2);
+    if (onscreen) {
+      resume_effect(onscreen);
+      this.#outroing.delete(key2);
+    } else {
+      var offscreen = this.#offscreen.get(key2);
+      if (offscreen) {
+        resume_effect(offscreen.effect);
+        this.#onscreen.set(key2, offscreen.effect);
+        this.#offscreen.delete(key2);
+        if (dev_fallback_default) {
+          offscreen.fragment.lastChild[HMR_ANCHOR] = this.anchor;
+        }
+        offscreen.fragment.lastChild.remove();
+        this.anchor.before(offscreen.fragment);
+        onscreen = offscreen.effect;
+      }
+    }
+    for (const [b, k] of this.#batches) {
+      this.#batches.delete(b);
+      if (b === batch) {
+        break;
+      }
+      const offscreen2 = this.#offscreen.get(k);
+      if (offscreen2) {
+        destroy_effect(offscreen2.effect);
+        this.#offscreen.delete(k);
+      }
+    }
+    for (const [k, effect2] of this.#onscreen) {
+      if (k === key2 || this.#outroing.has(k)) continue;
+      const on_destroy = () => {
+        const keys = Array.from(this.#batches.values());
+        if (keys.includes(k)) {
+          var fragment = document.createDocumentFragment();
+          move_effect(effect2, fragment);
+          fragment.append(create_text());
+          this.#offscreen.set(k, { effect: effect2, fragment });
+        } else {
+          destroy_effect(effect2);
+        }
+        this.#outroing.delete(k);
+        this.#onscreen.delete(k);
+      };
+      if (this.#transition || !onscreen) {
+        this.#outroing.add(k);
+        pause_effect(effect2, on_destroy, false);
+      } else {
+        on_destroy();
+      }
+    }
+  };
+  /**
+   * @param {Batch} batch
+   */
+  #discard = (batch) => {
+    this.#batches.delete(batch);
+    const keys = Array.from(this.#batches.values());
+    for (const [k, branch2] of this.#offscreen) {
+      if (!keys.includes(k)) {
+        destroy_effect(branch2.effect);
+        this.#offscreen.delete(k);
+      }
+    }
+  };
+  /**
+   *
+   * @param {any} key
+   * @param {null | ((target: TemplateNode) => void)} fn
+   */
+  ensure(key2, fn) {
+    var batch = (
+      /** @type {Batch} */
+      current_batch
+    );
+    var defer = should_defer_append();
+    if (fn && !this.#onscreen.has(key2) && !this.#offscreen.has(key2)) {
+      if (defer) {
+        var fragment = document.createDocumentFragment();
+        var target = create_text();
+        fragment.append(target);
+        this.#offscreen.set(key2, {
+          effect: branch(() => fn(target)),
+          fragment
+        });
+      } else {
+        this.#onscreen.set(
+          key2,
+          branch(() => fn(this.anchor))
+        );
+      }
+    }
+    this.#batches.set(batch, key2);
+    if (defer) {
+      for (const [k, effect2] of this.#onscreen) {
+        if (k === key2) {
+          batch.unskip_effect(effect2);
+        } else {
+          batch.skip_effect(effect2);
+        }
+      }
+      for (const [k, branch2] of this.#offscreen) {
+        if (k === key2) {
+          batch.unskip_effect(branch2.effect);
+        } else {
+          batch.skip_effect(branch2.effect);
+        }
+      }
+      batch.oncommit(this.#commit);
+      batch.ondiscard(this.#discard);
+    } else {
+      if (hydrating) {
+        this.anchor = hydrate_node;
+      }
+      this.#commit(batch);
+    }
+  }
+};
+
+// ../../../node_modules/svelte/src/internal/client/dom/blocks/if.js
+function if_block(node, fn, elseif = false) {
+  var marker;
+  if (hydrating) {
+    marker = hydrate_node;
+    hydrate_next();
+  }
+  var branches = new BranchManager(node);
+  var flags2 = elseif ? EFFECT_TRANSPARENT : 0;
+  function update_branch(key2, fn2) {
+    if (hydrating) {
+      var data = read_hydration_instruction(
+        /** @type {TemplateNode} */
+        marker
+      );
+      if (key2 !== parseInt(data.substring(1))) {
+        var anchor = skip_nodes();
+        set_hydrate_node(anchor);
+        branches.anchor = anchor;
+        set_hydrating(false);
+        branches.ensure(key2, fn2);
+        set_hydrating(true);
+        return;
+      }
+    }
+    branches.ensure(key2, fn2);
+  }
+  block(() => {
+    var has_branch = false;
+    fn((fn2, key2 = 0) => {
+      has_branch = true;
+      update_branch(key2, fn2);
+    });
+    if (!has_branch) {
+      update_branch(-1, null);
+    }
+  }, flags2);
+}
+
+// ../../../node_modules/svelte/src/internal/client/dom/blocks/each.js
+function pause_effects(state3, to_destroy, controlled_anchor) {
+  var transitions = [];
+  var length = to_destroy.length;
+  var group;
+  var remaining = to_destroy.length;
+  for (var i = 0; i < length; i++) {
+    let effect2 = to_destroy[i];
+    pause_effect(
+      effect2,
+      () => {
+        if (group) {
+          group.pending.delete(effect2);
+          group.done.add(effect2);
+          if (group.pending.size === 0) {
+            var groups = (
+              /** @type {Set<EachOutroGroup>} */
+              state3.outrogroups
+            );
+            destroy_effects(state3, array_from(group.done));
+            groups.delete(group);
+            if (groups.size === 0) {
+              state3.outrogroups = null;
+            }
+          }
+        } else {
+          remaining -= 1;
+        }
+      },
+      false
+    );
+  }
+  if (remaining === 0) {
+    var fast_path = transitions.length === 0 && controlled_anchor !== null;
+    if (fast_path) {
+      var anchor = (
+        /** @type {Element} */
+        controlled_anchor
+      );
+      var parent_node = (
+        /** @type {Element} */
+        anchor.parentNode
+      );
+      clear_text_content(parent_node);
+      parent_node.append(anchor);
+      state3.items.clear();
+    }
+    destroy_effects(state3, to_destroy, !fast_path);
+  } else {
+    group = {
+      pending: new Set(to_destroy),
+      done: /* @__PURE__ */ new Set()
+    };
+    (state3.outrogroups ??= /* @__PURE__ */ new Set()).add(group);
+  }
+}
+function destroy_effects(state3, to_destroy, remove_dom = true) {
+  var preserved_effects;
+  if (state3.pending.size > 0) {
+    preserved_effects = /* @__PURE__ */ new Set();
+    for (const keys of state3.pending.values()) {
+      for (const key2 of keys) {
+        preserved_effects.add(
+          /** @type {EachItem} */
+          state3.items.get(key2).e
+        );
+      }
+    }
+  }
+  for (var i = 0; i < to_destroy.length; i++) {
+    var e = to_destroy[i];
+    if (preserved_effects?.has(e)) {
+      e.f |= EFFECT_OFFSCREEN;
+      const fragment = document.createDocumentFragment();
+      move_effect(e, fragment);
+    } else {
+      destroy_effect(to_destroy[i], remove_dom);
+    }
+  }
+}
+var offscreen_anchor;
+function each(node, flags2, get_collection, get_key, render_fn, fallback_fn = null) {
+  var anchor = node;
+  var items = /* @__PURE__ */ new Map();
+  var is_controlled = (flags2 & EACH_IS_CONTROLLED) !== 0;
+  if (is_controlled) {
+    var parent_node = (
+      /** @type {Element} */
+      node
+    );
+    anchor = hydrating ? set_hydrate_node(get_first_child(parent_node)) : parent_node.appendChild(create_text());
+  }
+  if (hydrating) {
+    hydrate_next();
+  }
+  var fallback2 = null;
+  var each_array = derived_safe_equal(() => {
+    var collection = get_collection();
+    return (
+      /** @type {V[]} */
+      is_array(collection) ? collection : collection == null ? [] : array_from(collection)
+    );
+  });
+  if (dev_fallback_default) {
+    tag(each_array, "{#each ...}");
+  }
+  var array;
+  var pending2 = /* @__PURE__ */ new Map();
+  var first_run = true;
+  function commit(batch) {
+    if ((state3.effect.f & DESTROYED) !== 0) {
+      return;
+    }
+    state3.pending.delete(batch);
+    state3.fallback = fallback2;
+    reconcile(state3, array, anchor, flags2, get_key);
+    if (fallback2 !== null) {
+      if (array.length === 0) {
+        if ((fallback2.f & EFFECT_OFFSCREEN) === 0) {
+          resume_effect(fallback2);
+        } else {
+          fallback2.f ^= EFFECT_OFFSCREEN;
+          move(fallback2, null, anchor);
+        }
+      } else {
+        pause_effect(fallback2, () => {
+          fallback2 = null;
+        });
+      }
+    }
+  }
+  function discard(batch) {
+    state3.pending.delete(batch);
+  }
+  var effect2 = block(() => {
+    array = /** @type {V[]} */
+    get2(each_array);
+    var length = array.length;
+    let mismatch = false;
+    if (hydrating) {
+      var is_else = read_hydration_instruction(anchor) === HYDRATION_START_ELSE;
+      if (is_else !== (length === 0)) {
+        anchor = skip_nodes();
+        set_hydrate_node(anchor);
+        set_hydrating(false);
+        mismatch = true;
+      }
+    }
+    var keys = /* @__PURE__ */ new Set();
+    var batch = (
+      /** @type {Batch} */
+      current_batch
+    );
+    var defer = should_defer_append();
+    for (var index2 = 0; index2 < length; index2 += 1) {
+      if (hydrating && hydrate_node.nodeType === COMMENT_NODE && /** @type {Comment} */
+      hydrate_node.data === HYDRATION_END) {
+        anchor = /** @type {Comment} */
+        hydrate_node;
+        mismatch = true;
+        set_hydrating(false);
+      }
+      var value = array[index2];
+      var key2 = get_key(value, index2);
+      if (dev_fallback_default) {
+        var key_again = get_key(value, index2);
+        if (key2 !== key_again) {
+          each_key_volatile(String(index2), String(key2), String(key_again));
+        }
+      }
+      var item = first_run ? null : items.get(key2);
+      if (item) {
+        if (item.v) internal_set(item.v, value);
+        if (item.i) internal_set(item.i, index2);
+        if (defer) {
+          batch.unskip_effect(item.e);
+        }
+      } else {
+        item = create_item(
+          items,
+          first_run ? anchor : offscreen_anchor ??= create_text(),
+          value,
+          key2,
+          index2,
+          render_fn,
+          flags2,
+          get_collection
+        );
+        if (!first_run) {
+          item.e.f |= EFFECT_OFFSCREEN;
+        }
+        items.set(key2, item);
+      }
+      keys.add(key2);
+    }
+    if (length === 0 && fallback_fn && !fallback2) {
+      if (first_run) {
+        fallback2 = branch(() => fallback_fn(anchor));
+      } else {
+        fallback2 = branch(() => fallback_fn(offscreen_anchor ??= create_text()));
+        fallback2.f |= EFFECT_OFFSCREEN;
+      }
+    }
+    if (length > keys.size) {
+      if (dev_fallback_default) {
+        validate_each_keys(array, get_key);
+      } else {
+        each_key_duplicate("", "", "");
+      }
+    }
+    if (hydrating && length > 0) {
+      set_hydrate_node(skip_nodes());
+    }
+    if (!first_run) {
+      pending2.set(batch, keys);
+      if (defer) {
+        for (const [key3, item2] of items) {
+          if (!keys.has(key3)) {
+            batch.skip_effect(item2.e);
+          }
+        }
+        batch.oncommit(commit);
+        batch.ondiscard(discard);
+      } else {
+        commit(batch);
+      }
+    }
+    if (mismatch) {
+      set_hydrating(true);
+    }
+    get2(each_array);
+  });
+  var state3 = { effect: effect2, flags: flags2, items, pending: pending2, outrogroups: null, fallback: fallback2 };
+  first_run = false;
+  if (hydrating) {
+    anchor = hydrate_node;
+  }
+}
+function skip_to_branch(effect2) {
+  while (effect2 !== null && (effect2.f & BRANCH_EFFECT) === 0) {
+    effect2 = effect2.next;
+  }
+  return effect2;
+}
+function reconcile(state3, array, anchor, flags2, get_key) {
+  var is_animated = (flags2 & EACH_IS_ANIMATED) !== 0;
+  var length = array.length;
+  var items = state3.items;
+  var current = skip_to_branch(state3.effect.first);
+  var seen;
+  var prev = null;
+  var to_animate;
+  var matched = [];
+  var stashed = [];
+  var value;
+  var key2;
+  var effect2;
+  var i;
+  if (is_animated) {
+    for (i = 0; i < length; i += 1) {
+      value = array[i];
+      key2 = get_key(value, i);
+      effect2 = /** @type {EachItem} */
+      items.get(key2).e;
+      if ((effect2.f & EFFECT_OFFSCREEN) === 0) {
+        effect2.nodes?.a?.measure();
+        (to_animate ??= /* @__PURE__ */ new Set()).add(effect2);
+      }
+    }
+  }
+  for (i = 0; i < length; i += 1) {
+    value = array[i];
+    key2 = get_key(value, i);
+    effect2 = /** @type {EachItem} */
+    items.get(key2).e;
+    if (state3.outrogroups !== null) {
+      for (const group of state3.outrogroups) {
+        group.pending.delete(effect2);
+        group.done.delete(effect2);
+      }
+    }
+    if ((effect2.f & INERT) !== 0) {
+      resume_effect(effect2);
+      if (is_animated) {
+        effect2.nodes?.a?.unfix();
+        (to_animate ??= /* @__PURE__ */ new Set()).delete(effect2);
+      }
+    }
+    if ((effect2.f & EFFECT_OFFSCREEN) !== 0) {
+      effect2.f ^= EFFECT_OFFSCREEN;
+      if (effect2 === current) {
+        move(effect2, null, anchor);
+      } else {
+        var next2 = prev ? prev.next : current;
+        if (effect2 === state3.effect.last) {
+          state3.effect.last = effect2.prev;
+        }
+        if (effect2.prev) effect2.prev.next = effect2.next;
+        if (effect2.next) effect2.next.prev = effect2.prev;
+        link(state3, prev, effect2);
+        link(state3, effect2, next2);
+        move(effect2, next2, anchor);
+        prev = effect2;
+        matched = [];
+        stashed = [];
+        current = skip_to_branch(prev.next);
+        continue;
+      }
+    }
+    if (effect2 !== current) {
+      if (seen !== void 0 && seen.has(effect2)) {
+        if (matched.length < stashed.length) {
+          var start = stashed[0];
+          var j;
+          prev = start.prev;
+          var a = matched[0];
+          var b = matched[matched.length - 1];
+          for (j = 0; j < matched.length; j += 1) {
+            move(matched[j], start, anchor);
+          }
+          for (j = 0; j < stashed.length; j += 1) {
+            seen.delete(stashed[j]);
+          }
+          link(state3, a.prev, b.next);
+          link(state3, prev, a);
+          link(state3, b, start);
+          current = start;
+          prev = b;
+          i -= 1;
+          matched = [];
+          stashed = [];
+        } else {
+          seen.delete(effect2);
+          move(effect2, current, anchor);
+          link(state3, effect2.prev, effect2.next);
+          link(state3, effect2, prev === null ? state3.effect.first : prev.next);
+          link(state3, prev, effect2);
+          prev = effect2;
+        }
+        continue;
+      }
+      matched = [];
+      stashed = [];
+      while (current !== null && current !== effect2) {
+        (seen ??= /* @__PURE__ */ new Set()).add(current);
+        stashed.push(current);
+        current = skip_to_branch(current.next);
+      }
+      if (current === null) {
+        continue;
+      }
+    }
+    if ((effect2.f & EFFECT_OFFSCREEN) === 0) {
+      matched.push(effect2);
+    }
+    prev = effect2;
+    current = skip_to_branch(effect2.next);
+  }
+  if (state3.outrogroups !== null) {
+    for (const group of state3.outrogroups) {
+      if (group.pending.size === 0) {
+        destroy_effects(state3, array_from(group.done));
+        state3.outrogroups?.delete(group);
+      }
+    }
+    if (state3.outrogroups.size === 0) {
+      state3.outrogroups = null;
+    }
+  }
+  if (current !== null || seen !== void 0) {
+    var to_destroy = [];
+    if (seen !== void 0) {
+      for (effect2 of seen) {
+        if ((effect2.f & INERT) === 0) {
+          to_destroy.push(effect2);
+        }
+      }
+    }
+    while (current !== null) {
+      if ((current.f & INERT) === 0 && current !== state3.fallback) {
+        to_destroy.push(current);
+      }
+      current = skip_to_branch(current.next);
+    }
+    var destroy_length = to_destroy.length;
+    if (destroy_length > 0) {
+      var controlled_anchor = (flags2 & EACH_IS_CONTROLLED) !== 0 && length === 0 ? anchor : null;
+      if (is_animated) {
+        for (i = 0; i < destroy_length; i += 1) {
+          to_destroy[i].nodes?.a?.measure();
+        }
+        for (i = 0; i < destroy_length; i += 1) {
+          to_destroy[i].nodes?.a?.fix();
+        }
+      }
+      pause_effects(state3, to_destroy, controlled_anchor);
+    }
+  }
+  if (is_animated) {
+    queue_micro_task(() => {
+      if (to_animate === void 0) return;
+      for (effect2 of to_animate) {
+        effect2.nodes?.a?.apply();
+      }
+    });
+  }
+}
+function create_item(items, anchor, value, key2, index2, render_fn, flags2, get_collection) {
+  var v = (flags2 & EACH_ITEM_REACTIVE) !== 0 ? (flags2 & EACH_ITEM_IMMUTABLE) === 0 ? mutable_source(value, false, false) : source(value) : null;
+  var i = (flags2 & EACH_INDEX_REACTIVE) !== 0 ? source(index2) : null;
+  if (dev_fallback_default && v) {
+    v.trace = () => {
+      get_collection()[i?.v ?? index2];
+    };
+  }
+  return {
+    v,
+    i,
+    e: branch(() => {
+      render_fn(anchor, v ?? value, i ?? index2, get_collection);
+      return () => {
+        items.delete(key2);
+      };
+    })
+  };
+}
+function move(effect2, next2, anchor) {
+  if (!effect2.nodes) return;
+  var node = effect2.nodes.start;
+  var end = effect2.nodes.end;
+  var dest = next2 && (next2.f & EFFECT_OFFSCREEN) === 0 ? (
+    /** @type {EffectNodes} */
+    next2.nodes.start
+  ) : anchor;
+  while (node !== null) {
+    var next_node = (
+      /** @type {TemplateNode} */
+      get_next_sibling(node)
+    );
+    dest.before(node);
+    if (node === end) {
+      return;
+    }
+    node = next_node;
+  }
+}
+function link(state3, prev, next2) {
+  if (prev === null) {
+    state3.effect.first = next2;
+  } else {
+    prev.next = next2;
+  }
+  if (next2 === null) {
+    state3.effect.last = prev;
+  } else {
+    next2.prev = prev;
+  }
+}
+function validate_each_keys(array, key_fn) {
+  const keys = /* @__PURE__ */ new Map();
+  const length = array.length;
+  for (let i = 0; i < length; i++) {
+    const key2 = key_fn(array[i], i);
+    if (keys.has(key2)) {
+      const a = String(keys.get(key2));
+      const b = String(i);
+      let k = String(key2);
+      if (k.startsWith("[object ")) k = null;
+      each_key_duplicate(a, b, k);
+    }
+    keys.set(key2, i);
+  }
+}
+
+// ../../../node_modules/svelte/src/internal/client/dom/blocks/html.js
+function check_hash(element2, server_hash, value) {
+  if (!server_hash || server_hash === hash(String(value ?? ""))) return;
+  let location;
+  const loc = element2.__svelte_meta?.loc;
+  if (loc) {
+    location = `near ${loc.file}:${loc.line}:${loc.column}`;
+  } else if (dev_current_component_function?.[FILENAME]) {
+    location = `in ${dev_current_component_function[FILENAME]}`;
+  }
+  hydration_html_changed(sanitize_location(location));
+}
+function html(node, get_value, is_controlled = false, svg = false, mathml = false, skip_warning = false) {
+  var anchor = node;
+  var value = "";
+  if (is_controlled) {
+    var parent_node = (
+      /** @type {Element} */
+      node
+    );
+    if (hydrating) {
+      anchor = set_hydrate_node(get_first_child(parent_node));
+    }
+  }
+  template_effect(() => {
+    var effect2 = (
+      /** @type {Effect} */
+      active_effect
+    );
+    if (value === (value = get_value() ?? "")) {
+      if (hydrating) hydrate_next();
+      return;
+    }
+    if (is_controlled && !hydrating) {
+      effect2.nodes = null;
+      parent_node.innerHTML = /** @type {string} */
+      value;
+      if (value !== "") {
+        assign_nodes(
+          /** @type {TemplateNode} */
+          get_first_child(parent_node),
+          /** @type {TemplateNode} */
+          parent_node.lastChild
+        );
+      }
+      return;
+    }
+    if (effect2.nodes !== null) {
+      remove_effect_dom(
+        effect2.nodes.start,
+        /** @type {TemplateNode} */
+        effect2.nodes.end
+      );
+      effect2.nodes = null;
+    }
+    if (value === "") return;
+    if (hydrating) {
+      var hash2 = (
+        /** @type {Comment} */
+        hydrate_node.data
+      );
+      var next2 = hydrate_next();
+      var last = next2;
+      while (next2 !== null && (next2.nodeType !== COMMENT_NODE || /** @type {Comment} */
+      next2.data !== "")) {
+        last = next2;
+        next2 = get_next_sibling(next2);
+      }
+      if (next2 === null) {
+        hydration_mismatch();
+        throw HYDRATION_ERROR;
+      }
+      if (dev_fallback_default && !skip_warning) {
+        check_hash(
+          /** @type {Element} */
+          next2.parentNode,
+          hash2,
+          value
+        );
+      }
+      assign_nodes(hydrate_node, last);
+      anchor = set_hydrate_node(next2);
+      return;
+    }
+    var ns = svg ? NAMESPACE_SVG : mathml ? NAMESPACE_MATHML : void 0;
+    var wrapper = (
+      /** @type {HTMLTemplateElement | SVGElement | MathMLElement} */
+      create_element(svg ? "svg" : mathml ? "math" : "template", ns)
+    );
+    wrapper.innerHTML = /** @type {any} */
+    value;
+    var node2 = svg || mathml ? wrapper : (
+      /** @type {HTMLTemplateElement} */
+      wrapper.content
+    );
+    assign_nodes(
+      /** @type {TemplateNode} */
+      get_first_child(node2),
+      /** @type {TemplateNode} */
+      node2.lastChild
+    );
+    if (svg || mathml) {
+      while (get_first_child(node2)) {
+        anchor.before(
+          /** @type {TemplateNode} */
+          get_first_child(node2)
+        );
+      }
+    } else {
+      anchor.before(node2);
+    }
+  });
+}
+
+// ../../../node_modules/svelte/src/internal/client/dom/blocks/svelte-component.js
+function component(node, get_component, render_fn) {
+  var hydration_start_node;
+  if (hydrating) {
+    hydration_start_node = hydrate_node;
+    hydrate_next();
+  }
+  var branches = new BranchManager(node);
+  block(() => {
+    var component2 = get_component() ?? null;
+    if (hydrating) {
+      var data = read_hydration_instruction(
+        /** @type {TemplateNode} */
+        hydration_start_node
+      );
+      var server_had_component = data === HYDRATION_START;
+      var client_has_component = component2 !== null;
+      if (server_had_component !== client_has_component) {
+        var anchor = skip_nodes();
+        set_hydrate_node(anchor);
+        branches.anchor = anchor;
+        set_hydrating(false);
+        branches.ensure(component2, component2 && ((target) => render_fn(target, component2)));
+        set_hydrating(true);
+        return;
+      }
+    }
+    branches.ensure(component2, component2 && ((target) => render_fn(target, component2)));
+  }, EFFECT_TRANSPARENT);
+}
+
+// ../../../node_modules/svelte/src/internal/client/dom/css.js
+function append_styles(anchor, css) {
+  effect(() => {
+    var root15 = anchor.getRootNode();
+    var target = (
+      /** @type {ShadowRoot} */
+      root15.host ? (
+        /** @type {ShadowRoot} */
+        root15
+      ) : (
+        /** @type {Document} */
+        root15.head ?? /** @type {Document} */
+        root15.ownerDocument.head
+      )
+    );
+    if (!target.querySelector("#" + css.hash)) {
+      const style = create_element("style");
+      style.id = css.hash;
+      style.textContent = css.code;
+      target.appendChild(style);
+      if (dev_fallback_default) {
+        register_style(css.hash, style);
+      }
+    }
+  });
+}
+
+// ../../../node_modules/svelte/src/internal/shared/attributes.js
+var whitespace = [..." 	\n\r\f\xA0\v\uFEFF"];
+function to_class(value, hash2, directives) {
+  var classname = value == null ? "" : "" + value;
+  if (hash2) {
+    classname = classname ? classname + " " + hash2 : hash2;
+  }
+  if (directives) {
+    for (var key2 of Object.keys(directives)) {
+      if (directives[key2]) {
+        classname = classname ? classname + " " + key2 : key2;
+      } else if (classname.length) {
+        var len = key2.length;
+        var a = 0;
+        while ((a = classname.indexOf(key2, a)) >= 0) {
+          var b = a + len;
+          if ((a === 0 || whitespace.includes(classname[a - 1])) && (b === classname.length || whitespace.includes(classname[b]))) {
+            classname = (a === 0 ? "" : classname.substring(0, a)) + classname.substring(b + 1);
+          } else {
+            a = b;
+          }
+        }
+      }
+    }
+  }
+  return classname === "" ? null : classname;
+}
+function append_styles2(styles, important = false) {
+  var separator = important ? " !important;" : ";";
+  var css = "";
+  for (var key2 of Object.keys(styles)) {
+    var value = styles[key2];
+    if (value != null && value !== "") {
+      css += " " + key2 + ": " + value + separator;
+    }
+  }
+  return css;
+}
+function to_css_name(name) {
+  if (name[0] !== "-" || name[1] !== "-") {
+    return name.toLowerCase();
+  }
+  return name;
+}
+function to_style(value, styles) {
+  if (styles) {
+    var new_style = "";
+    var normal_styles;
+    var important_styles;
+    if (Array.isArray(styles)) {
+      normal_styles = styles[0];
+      important_styles = styles[1];
+    } else {
+      normal_styles = styles;
+    }
+    if (value) {
+      value = String(value).replaceAll(/\s*\/\*.*?\*\/\s*/g, "").trim();
+      var in_str = false;
+      var in_apo = 0;
+      var in_comment = false;
+      var reserved_names = [];
+      if (normal_styles) {
+        reserved_names.push(...Object.keys(normal_styles).map(to_css_name));
+      }
+      if (important_styles) {
+        reserved_names.push(...Object.keys(important_styles).map(to_css_name));
+      }
+      var start_index = 0;
+      var name_index = -1;
+      const len = value.length;
+      for (var i = 0; i < len; i++) {
+        var c = value[i];
+        if (in_comment) {
+          if (c === "/" && value[i - 1] === "*") {
+            in_comment = false;
+          }
+        } else if (in_str) {
+          if (in_str === c) {
+            in_str = false;
+          }
+        } else if (c === "/" && value[i + 1] === "*") {
+          in_comment = true;
+        } else if (c === '"' || c === "'") {
+          in_str = c;
+        } else if (c === "(") {
+          in_apo++;
+        } else if (c === ")") {
+          in_apo--;
+        }
+        if (!in_comment && in_str === false && in_apo === 0) {
+          if (c === ":" && name_index === -1) {
+            name_index = i;
+          } else if (c === ";" || i === len - 1) {
+            if (name_index !== -1) {
+              var name = to_css_name(value.substring(start_index, name_index).trim());
+              if (!reserved_names.includes(name)) {
+                if (c !== ";") {
+                  i++;
+                }
+                var property = value.substring(start_index, i).trim();
+                new_style += " " + property + ";";
+              }
+            }
+            start_index = i + 1;
+            name_index = -1;
+          }
+        }
+      }
+    }
+    if (normal_styles) {
+      new_style += append_styles2(normal_styles);
+    }
+    if (important_styles) {
+      new_style += append_styles2(important_styles, true);
+    }
+    new_style = new_style.trim();
+    return new_style === "" ? null : new_style;
+  }
+  return value == null ? null : String(value);
+}
+
+// ../../../node_modules/svelte/src/internal/client/dom/elements/class.js
+function set_class(dom, is_html, value, hash2, prev_classes, next_classes) {
+  var prev = (
+    /** @type {any} */
+    dom[CLASS_CACHE]
+  );
+  if (hydrating || prev !== value || prev === void 0) {
+    var next_class_name = to_class(value, hash2, next_classes);
+    if (!hydrating || next_class_name !== dom.getAttribute("class")) {
+      if (next_class_name == null) {
+        dom.removeAttribute("class");
+      } else if (is_html) {
+        dom.className = next_class_name;
+      } else {
+        dom.setAttribute("class", next_class_name);
+      }
+    }
+    dom[CLASS_CACHE] = value;
+  } else if (next_classes && prev_classes !== next_classes) {
+    for (var key2 in next_classes) {
+      var is_present = !!next_classes[key2];
+      if (prev_classes == null || is_present !== !!prev_classes[key2]) {
+        dom.classList.toggle(key2, is_present);
+      }
+    }
+  }
+  return next_classes;
+}
+
+// ../../../node_modules/svelte/src/internal/client/dom/elements/style.js
+function update_styles(dom, prev = {}, next2, priority) {
+  for (var key2 in next2) {
+    var value = next2[key2];
+    if (prev[key2] !== value) {
+      if (next2[key2] == null) {
+        dom.style.removeProperty(key2);
+      } else {
+        dom.style.setProperty(key2, value, priority);
+      }
+    }
+  }
+}
+function set_style(dom, value, prev_styles, next_styles) {
+  var prev = (
+    /** @type {any} */
+    dom[STYLE_CACHE]
+  );
+  if (hydrating || prev !== value) {
+    var next_style_attr = to_style(value, next_styles);
+    if (!hydrating || next_style_attr !== dom.getAttribute("style")) {
+      if (next_style_attr == null) {
+        dom.removeAttribute("style");
+      } else {
+        dom.style.cssText = next_style_attr;
+      }
+    }
+    dom[STYLE_CACHE] = value;
+  } else if (next_styles) {
+    if (Array.isArray(next_styles)) {
+      update_styles(dom, prev_styles?.[0], next_styles[0]);
+      update_styles(dom, prev_styles?.[1], next_styles[1], "important");
+    } else {
+      update_styles(dom, prev_styles, next_styles);
+    }
+  }
+  return next_styles;
+}
+
+// ../../../node_modules/svelte/src/internal/client/dom/elements/attributes.js
+var IS_CUSTOM_ELEMENT = /* @__PURE__ */ Symbol("is custom element");
+var IS_HTML = /* @__PURE__ */ Symbol("is html");
+var LINK_TAG = IS_XHTML ? "link" : "LINK";
+var PROGRESS_TAG = IS_XHTML ? "progress" : "PROGRESS";
+function remove_input_defaults(input) {
+  if (!hydrating) return;
+  var already_removed = false;
+  var remove_defaults = () => {
+    if (already_removed) return;
+    already_removed = true;
+    if (input.hasAttribute("value")) {
+      var value = input.value;
+      set_attribute2(input, "value", null);
+      input.value = value;
+    }
+    if (input.hasAttribute("checked")) {
+      var checked = input.checked;
+      set_attribute2(input, "checked", null);
+      input.checked = checked;
+    }
+  };
+  input[FORM_RESET_HANDLER] = remove_defaults;
+  queue_micro_task(remove_defaults);
+  add_form_reset_listener();
+}
+function set_value(element2, value) {
+  var attributes = get_attributes(element2);
+  if (attributes.value === (attributes.value = // treat null and undefined the same for the initial value
+  value ?? void 0) || // @ts-expect-error
+  // `progress` elements always need their value set when it's `0`
+  element2.value === value && (value !== 0 || element2.nodeName !== PROGRESS_TAG)) {
+    return;
+  }
+  element2.value = value ?? "";
+}
+function set_attribute2(element2, attribute2, value, skip_warning) {
+  var attributes = get_attributes(element2);
+  if (hydrating) {
+    attributes[attribute2] = element2.getAttribute(attribute2);
+    if (attribute2 === "src" || attribute2 === "srcset" || attribute2 === "href" && element2.nodeName === LINK_TAG) {
+      if (!skip_warning) {
+        check_src_in_dev_hydration(element2, attribute2, value ?? "");
+      }
+      return;
+    }
+  }
+  if (attributes[attribute2] === (attributes[attribute2] = value)) return;
+  if (attribute2 === "loading") {
+    element2[LOADING_ATTR_SYMBOL] = value;
+  }
+  if (value == null) {
+    element2.removeAttribute(attribute2);
+  } else if (typeof value !== "string" && get_setters(element2).includes(attribute2)) {
+    element2[attribute2] = value;
+  } else {
+    element2.setAttribute(attribute2, value);
+  }
+}
+function get_attributes(element2) {
+  return (
+    /** @type {Record<string | symbol, unknown>} **/
+    /** @type {any} */
+    element2[ATTRIBUTES_CACHE] ??= {
+      [IS_CUSTOM_ELEMENT]: element2.nodeName.includes("-"),
+      [IS_HTML]: element2.namespaceURI === NAMESPACE_HTML
+    }
+  );
+}
+var setters_cache = /* @__PURE__ */ new Map();
+function get_setters(element2) {
+  var cache_key = element2.getAttribute("is") || element2.nodeName;
+  var setters = setters_cache.get(cache_key);
+  if (setters) return setters;
+  setters_cache.set(cache_key, setters = []);
+  var descriptors;
+  var proto = element2;
+  var element_proto = Element.prototype;
+  while (element_proto !== proto) {
+    descriptors = get_descriptors(proto);
+    for (var key2 in descriptors) {
+      if (descriptors[key2].set && // better safe than sorry, we don't want spread attributes to mess with HTML content
+      key2 !== "innerHTML" && key2 !== "textContent" && key2 !== "innerText") {
+        setters.push(key2);
+      }
+    }
+    proto = get_prototype_of(proto);
+  }
+  return setters;
+}
+function check_src_in_dev_hydration(element2, attribute2, value) {
+  if (!dev_fallback_default) return;
+  if (attribute2 === "srcset" && srcset_url_equal(element2, value)) return;
+  if (src_url_equal(element2.getAttribute(attribute2) ?? "", value)) return;
+  hydration_attribute_changed(
+    attribute2,
+    element2.outerHTML.replace(element2.innerHTML, element2.innerHTML && "..."),
+    String(value)
+  );
+}
+function src_url_equal(element_src, url) {
+  if (element_src === url) return true;
+  return new URL(element_src, document.baseURI).href === new URL(url, document.baseURI).href;
+}
+function split_srcset(srcset) {
+  return srcset.split(",").map((src) => src.trim().split(" ").filter(Boolean));
+}
+function srcset_url_equal(element2, srcset) {
+  var element_urls = split_srcset(element2.srcset);
+  var urls = split_srcset(srcset);
+  return urls.length === element_urls.length && urls.every(
+    ([url, width], i) => width === element_urls[i][1] && // We need to test both ways because Vite will create an a full URL with
+    // `new URL(asset, import.meta.url).href` for the client when `base: './'`, and the
+    // relative URLs inside srcset are not automatically resolved to absolute URLs by
+    // browsers (in contrast to img.src). This means both SSR and DOM code could
+    // contain relative or absolute URLs.
+    (src_url_equal(element_urls[i][0], url) || src_url_equal(url, element_urls[i][0]))
+  );
+}
+
+// ../../../node_modules/svelte/src/internal/client/dom/elements/bindings/input.js
+function bind_value(input, get3, set3 = get3) {
+  var batches = /* @__PURE__ */ new WeakSet();
+  listen_to_event_and_reset_event(input, "input", async (is_reset) => {
+    if (dev_fallback_default && input.type === "checkbox") {
+      bind_invalid_checkbox_value();
+    }
+    var value = is_reset ? input.defaultValue : input.value;
+    value = is_numberlike_input(input) ? to_number(value) : value;
+    set3(value);
+    if (current_batch !== null) {
+      batches.add(current_batch);
+    }
+    await tick();
+    if (value !== (value = get3())) {
+      var start = input.selectionStart;
+      var end = input.selectionEnd;
+      var length = input.value.length;
+      input.value = value ?? "";
+      if (end !== null) {
+        var new_length = input.value.length;
+        if (start === end && end === length && new_length > length) {
+          input.selectionStart = new_length;
+          input.selectionEnd = new_length;
+        } else {
+          input.selectionStart = start;
+          input.selectionEnd = Math.min(end, new_length);
+        }
+      }
+    }
+  });
+  if (
+    // If we are hydrating and the value has since changed,
+    // then use the updated value from the input instead.
+    hydrating && input.defaultValue !== input.value || // If defaultValue is set, then value == defaultValue
+    // TODO Svelte 6: remove input.value check and set to empty string?
+    untrack(get3) == null && input.value
+  ) {
+    set3(is_numberlike_input(input) ? to_number(input.value) : input.value);
+    if (current_batch !== null) {
+      batches.add(current_batch);
+    }
+  }
+  render_effect(() => {
+    if (dev_fallback_default && input.type === "checkbox") {
+      bind_invalid_checkbox_value();
+    }
+    var value = get3();
+    if (input === document.activeElement) {
+      var batch = (
+        /** @type {Batch} */
+        async_mode_flag ? previous_batch : current_batch
+      );
+      if (batches.has(batch)) {
+        return;
+      }
+    }
+    if (is_numberlike_input(input) && value === to_number(input.value)) {
+      return;
+    }
+    if (input.type === "date" && !value && !input.value) {
+      return;
+    }
+    if (value !== input.value) {
+      input.value = value ?? "";
+    }
+  });
+}
+function is_numberlike_input(input) {
+  var type = input.type;
+  return type === "number" || type === "range";
+}
+function to_number(value) {
+  return value === "" ? null : +value;
+}
+
+// ../../../node_modules/svelte/src/internal/client/reactivity/props.js
+var spread_props_handler = {
+  get(target, key2) {
+    let i = target.props.length;
+    while (i--) {
+      let p = target.props[i];
+      if (is_function(p)) p = p();
+      if (typeof p === "object" && p !== null && key2 in p) return p[key2];
+    }
+  },
+  set(target, key2, value) {
+    let i = target.props.length;
+    while (i--) {
+      let p = target.props[i];
+      if (is_function(p)) p = p();
+      const desc = get_descriptor(p, key2);
+      if (desc && desc.set) {
+        desc.set(value);
+        return true;
+      }
+    }
+    return false;
+  },
+  getOwnPropertyDescriptor(target, key2) {
+    let i = target.props.length;
+    while (i--) {
+      let p = target.props[i];
+      if (is_function(p)) p = p();
+      if (typeof p === "object" && p !== null && key2 in p) {
+        const descriptor = get_descriptor(p, key2);
+        if (descriptor && !descriptor.configurable) {
+          descriptor.configurable = true;
+        }
+        return descriptor;
+      }
+    }
+  },
+  has(target, key2) {
+    if (key2 === STATE_SYMBOL || key2 === LEGACY_PROPS) return false;
+    for (let p of target.props) {
+      if (is_function(p)) p = p();
+      if (p != null && key2 in p) return true;
+    }
+    return false;
+  },
+  ownKeys(target) {
+    const keys = [];
+    for (let p of target.props) {
+      if (is_function(p)) p = p();
+      if (!p) continue;
+      for (const key2 in p) {
+        if (!keys.includes(key2)) keys.push(key2);
+      }
+      for (const key2 of Object.getOwnPropertySymbols(p)) {
+        if (!keys.includes(key2)) keys.push(key2);
+      }
+    }
+    return keys;
+  }
+};
+function spread_props(...props) {
+  return new Proxy({ props }, spread_props_handler);
+}
+function prop(props, key2, flags2, fallback2) {
+  var runes = !legacy_mode_flag || (flags2 & PROPS_IS_RUNES) !== 0;
+  var bindable = (flags2 & PROPS_IS_BINDABLE) !== 0;
+  var lazy = (flags2 & PROPS_IS_LAZY_INITIAL) !== 0;
+  var fallback_value = (
+    /** @type {V} */
+    fallback2
+  );
+  var fallback_dirty = true;
+  var fallback_signal = (
+    /** @type {Derived<V> | undefined} */
+    void 0
+  );
+  var get_fallback = () => {
+    if (lazy && runes) {
+      fallback_signal ??= derived(
+        /** @type {() => V} */
+        fallback2
+      );
+      return get2(fallback_signal);
+    }
+    if (fallback_dirty) {
+      fallback_dirty = false;
+      fallback_value = lazy ? untrack(
+        /** @type {() => V} */
+        fallback2
+      ) : (
+        /** @type {V} */
+        fallback2
+      );
+    }
+    return fallback_value;
+  };
+  let setter;
+  if (bindable) {
+    var is_entry_props = STATE_SYMBOL in props || LEGACY_PROPS in props;
+    setter = get_descriptor(props, key2)?.set ?? (is_entry_props && key2 in props ? (v) => props[key2] = v : void 0);
+  }
+  var initial_value;
+  var is_store_sub = false;
+  if (bindable) {
+    [initial_value, is_store_sub] = capture_store_binding(() => (
+      /** @type {V} */
+      props[key2]
+    ));
+  } else {
+    initial_value = /** @type {V} */
+    props[key2];
+  }
+  if (initial_value === void 0 && fallback2 !== void 0) {
+    initial_value = get_fallback();
+    if (setter) {
+      if (runes) props_invalid_value(key2);
+      setter(initial_value);
+    }
+  }
+  var getter;
+  if (runes) {
+    getter = () => {
+      var value = (
+        /** @type {V} */
+        props[key2]
+      );
+      if (value === void 0) return get_fallback();
+      fallback_dirty = true;
+      return value;
+    };
+  } else {
+    getter = () => {
+      var value = (
+        /** @type {V} */
+        props[key2]
+      );
+      if (value !== void 0) {
+        fallback_value = /** @type {V} */
+        void 0;
+      }
+      return value === void 0 ? fallback_value : value;
+    };
+  }
+  if (runes && (flags2 & PROPS_IS_UPDATED) === 0) {
+    return getter;
+  }
+  if (setter) {
+    var legacy_parent = props.$$legacy;
+    return (
+      /** @type {() => V} */
+      (function(value, mutation) {
+        if (arguments.length > 0) {
+          if (!runes || !mutation || legacy_parent || is_store_sub) {
+            setter(mutation ? getter() : value);
+          }
+          return value;
+        }
+        return getter();
+      })
+    );
+  }
+  var overridden = false;
+  var d = ((flags2 & PROPS_IS_IMMUTABLE) !== 0 ? derived : derived_safe_equal)(() => {
+    overridden = false;
+    return getter();
+  });
+  if (dev_fallback_default) {
+    d.label = key2;
+  }
+  if (bindable) get2(d);
+  var parent_effect = (
+    /** @type {Effect} */
+    active_effect
+  );
+  return (
+    /** @type {() => V} */
+    (function(value, mutation) {
+      if (arguments.length > 0) {
+        const new_value = mutation ? get2(d) : runes && bindable ? proxy(value) : value;
+        set(d, new_value);
+        overridden = true;
+        if (fallback_value !== void 0) {
+          fallback_value = new_value;
+        }
+        return value;
+      }
+      if (is_destroying_effect && overridden || (parent_effect.f & DESTROYED) !== 0) {
+        return d.v;
+      }
+      return get2(d);
+    })
+  );
+}
+
+// ../../../node_modules/svelte/src/legacy/legacy-client.js
+function createClassComponent(options) {
+  return new Svelte4Component(options);
+}
+var Svelte4Component = class {
+  /** @type {any} */
+  #events;
+  /** @type {Record<string, any>} */
+  #instance;
+  /**
+   * @param {ComponentConstructorOptions & {
+   *  component: any;
+   * }} options
+   */
+  constructor(options) {
+    var sources = /* @__PURE__ */ new Map();
+    var add_source = (key2, value) => {
+      var s = mutable_source(value, false, false);
+      sources.set(key2, s);
+      return s;
+    };
+    const props = new Proxy(
+      { ...options.props || {}, $$events: {} },
+      {
+        get(target, prop2) {
+          return get2(sources.get(prop2) ?? add_source(prop2, Reflect.get(target, prop2)));
+        },
+        has(target, prop2) {
+          if (prop2 === LEGACY_PROPS) return true;
+          get2(sources.get(prop2) ?? add_source(prop2, Reflect.get(target, prop2)));
+          return Reflect.has(target, prop2);
+        },
+        set(target, prop2, value) {
+          set(sources.get(prop2) ?? add_source(prop2, value), value);
+          return Reflect.set(target, prop2, value);
+        }
+      }
+    );
+    this.#instance = (options.hydrate ? hydrate : mount)(options.component, {
+      target: options.target,
+      anchor: options.anchor,
+      props,
+      context: options.context,
+      intro: options.intro ?? false,
+      recover: options.recover,
+      transformError: options.transformError
+    });
+    if (!async_mode_flag && (!options?.props?.$$host || options.sync === false)) {
+      flushSync();
+    }
+    this.#events = props.$$events;
+    for (const key2 of Object.keys(this.#instance)) {
+      if (key2 === "$set" || key2 === "$destroy" || key2 === "$on") continue;
+      define_property(this, key2, {
+        get() {
+          return this.#instance[key2];
+        },
+        /** @param {any} value */
+        set(value) {
+          this.#instance[key2] = value;
+        },
+        enumerable: true
+      });
+    }
+    this.#instance.$set = /** @param {Record<string, any>} next */
+    (next2) => {
+      Object.assign(props, next2);
+    };
+    this.#instance.$destroy = () => {
+      unmount(this.#instance);
+    };
+  }
+  /** @param {Record<string, any>} props */
+  $set(props) {
+    this.#instance.$set(props);
+  }
+  /**
+   * @param {string} event
+   * @param {(...args: any[]) => any} callback
+   * @returns {any}
+   */
+  $on(event2, callback) {
+    this.#events[event2] = this.#events[event2] || [];
+    const cb = (...args) => callback.call(this, ...args);
+    this.#events[event2].push(cb);
+    return () => {
+      this.#events[event2] = this.#events[event2].filter(
+        /** @param {any} fn */
+        (fn) => fn !== cb
+      );
+    };
+  }
+  $destroy() {
+    this.#instance.$destroy();
+  }
+};
+
+// ../../../node_modules/svelte/src/internal/client/dom/elements/custom-element.js
+var SvelteElement;
+if (typeof HTMLElement === "function") {
+  SvelteElement = class extends HTMLElement {
+    /** The Svelte component constructor */
+    $$ctor;
+    /** Slots */
+    $$s;
+    /** @type {any} The Svelte component instance */
+    $$c;
+    /** Whether or not the custom element is connected */
+    $$cn = false;
+    /** @type {Record<string, any>} Component props data */
+    $$d = {};
+    /** `true` if currently in the process of reflecting component props back to attributes */
+    $$r = false;
+    /** @type {Record<string, CustomElementPropDefinition>} Props definition (name, reflected, type etc) */
+    $$p_d = {};
+    /** @type {Record<string, EventListenerOrEventListenerObject[]>} Event listeners */
+    $$l = {};
+    /** @type {Map<EventListenerOrEventListenerObject, Function>} Event listener unsubscribe functions */
+    $$l_u = /* @__PURE__ */ new Map();
+    /** @type {any} The managed render effect for reflecting attributes */
+    $$me;
+    /** @type {ShadowRoot | null} The ShadowRoot of the custom element */
+    $$shadowRoot = null;
+    /**
+     * @param {*} $$componentCtor
+     * @param {*} $$slots
+     * @param {ShadowRootInit | undefined} shadow_root_init
+     */
+    constructor($$componentCtor, $$slots, shadow_root_init) {
+      super();
+      this.$$ctor = $$componentCtor;
+      this.$$s = $$slots;
+      if (shadow_root_init) {
+        this.$$shadowRoot = this.attachShadow(shadow_root_init);
+      }
+    }
+    /**
+     * @param {string} type
+     * @param {EventListenerOrEventListenerObject} listener
+     * @param {boolean | AddEventListenerOptions} [options]
+     */
+    addEventListener(type, listener, options) {
+      this.$$l[type] = this.$$l[type] || [];
+      this.$$l[type].push(listener);
+      if (this.$$c) {
+        const unsub = this.$$c.$on(type, listener);
+        this.$$l_u.set(listener, unsub);
+      }
+      super.addEventListener(type, listener, options);
+    }
+    /**
+     * @param {string} type
+     * @param {EventListenerOrEventListenerObject} listener
+     * @param {boolean | AddEventListenerOptions} [options]
+     */
+    removeEventListener(type, listener, options) {
+      super.removeEventListener(type, listener, options);
+      if (this.$$c) {
+        const unsub = this.$$l_u.get(listener);
+        if (unsub) {
+          unsub();
+          this.$$l_u.delete(listener);
+        }
+      }
+    }
+    async connectedCallback() {
+      this.$$cn = true;
+      if (!this.$$c) {
+        let create_slot = function(name) {
+          return (anchor) => {
+            const slot2 = create_element("slot");
+            if (name !== "default") slot2.name = name;
+            append(anchor, slot2);
+          };
+        };
+        await Promise.resolve();
+        if (!this.$$cn || this.$$c) {
+          return;
+        }
+        const $$slots = {};
+        const existing_slots = get_custom_elements_slots(this);
+        for (const name of this.$$s) {
+          if (name in existing_slots) {
+            if (name === "default" && !this.$$d.children) {
+              this.$$d.children = create_slot(name);
+              $$slots.default = true;
+            } else {
+              $$slots[name] = create_slot(name);
+            }
+          }
+        }
+        for (const attribute2 of this.attributes) {
+          const name = this.$$g_p(attribute2.name);
+          if (!(name in this.$$d)) {
+            this.$$d[name] = get_custom_element_value(name, attribute2.value, this.$$p_d, "toProp");
+          }
+        }
+        for (const key2 in this.$$p_d) {
+          if (!(key2 in this.$$d) && this[key2] !== void 0) {
+            this.$$d[key2] = this[key2];
+            delete this[key2];
+          }
+        }
+        this.$$c = createClassComponent({
+          component: this.$$ctor,
+          target: this.$$shadowRoot || this,
+          props: {
+            ...this.$$d,
+            $$slots,
+            $$host: this
+          }
+        });
+        this.$$me = effect_root(() => {
+          render_effect(() => {
+            this.$$r = true;
+            for (const key2 of object_keys(this.$$c)) {
+              if (!this.$$p_d[key2]?.reflect) continue;
+              this.$$d[key2] = this.$$c[key2];
+              const attribute_value = get_custom_element_value(
+                key2,
+                this.$$d[key2],
+                this.$$p_d,
+                "toAttribute"
+              );
+              if (attribute_value == null) {
+                this.removeAttribute(this.$$p_d[key2].attribute || key2);
+              } else {
+                this.setAttribute(this.$$p_d[key2].attribute || key2, attribute_value);
+              }
+            }
+            this.$$r = false;
+          });
+        });
+        for (const type in this.$$l) {
+          for (const listener of this.$$l[type]) {
+            const unsub = this.$$c.$on(type, listener);
+            this.$$l_u.set(listener, unsub);
+          }
+        }
+        this.$$l = {};
+      }
+    }
+    // We don't need this when working within Svelte code, but for compatibility of people using this outside of Svelte
+    // and setting attributes through setAttribute etc, this is helpful
+    /**
+     * @param {string} attr
+     * @param {string} _oldValue
+     * @param {string} newValue
+     */
+    attributeChangedCallback(attr2, _oldValue, newValue) {
+      if (this.$$r) return;
+      attr2 = this.$$g_p(attr2);
+      this.$$d[attr2] = get_custom_element_value(attr2, newValue, this.$$p_d, "toProp");
+      this.$$c?.$set({ [attr2]: this.$$d[attr2] });
+    }
+    disconnectedCallback() {
+      this.$$cn = false;
+      Promise.resolve().then(() => {
+        if (!this.$$cn && this.$$c) {
+          this.$$c.$destroy();
+          this.$$me();
+          this.$$c = void 0;
+        }
+      });
+    }
+    /**
+     * @param {string} attribute_name
+     */
+    $$g_p(attribute_name) {
+      return object_keys(this.$$p_d).find(
+        (key2) => this.$$p_d[key2].attribute === attribute_name || !this.$$p_d[key2].attribute && key2.toLowerCase() === attribute_name
+      ) || attribute_name;
+    }
+  };
+}
+function get_custom_element_value(prop2, value, props_definition, transform) {
+  const type = props_definition[prop2]?.type;
+  value = type === "Boolean" && typeof value !== "boolean" ? value != null : value;
+  if (!transform || !props_definition[prop2]) {
+    return value;
+  } else if (transform === "toAttribute") {
+    switch (type) {
+      case "Object":
+      case "Array":
+        return value == null ? null : JSON.stringify(value);
+      case "Boolean":
+        return value ? "" : null;
+      case "Number":
+        return value == null ? null : value;
+      default:
+        return value;
+    }
+  } else {
+    switch (type) {
+      case "Object":
+      case "Array":
+        return value && JSON.parse(value);
+      case "Boolean":
+        return value;
+      // conversion already handled above
+      case "Number":
+        return value != null ? +value : value;
+      default:
+        return value;
+    }
+  }
+}
+function get_custom_elements_slots(element2) {
+  const result = {};
+  element2.childNodes.forEach((node) => {
+    result[
+      /** @type {Element} node */
+      node.slot || "default"
+    ] = true;
+  });
+  return result;
+}
+function create_custom_element(Component, props_definition, slots, exports, shadow_root_init, extend) {
+  let Class = class extends SvelteElement {
+    constructor() {
+      super(Component, slots, shadow_root_init);
+      this.$$p_d = props_definition;
+    }
+    static get observedAttributes() {
+      return object_keys(props_definition).map(
+        (key2) => (props_definition[key2].attribute || key2).toLowerCase()
+      );
+    }
+  };
+  object_keys(props_definition).forEach((prop2) => {
+    define_property(Class.prototype, prop2, {
+      get() {
+        return this.$$c && prop2 in this.$$c ? this.$$c[prop2] : this.$$d[prop2];
+      },
+      set(value) {
+        value = get_custom_element_value(prop2, value, props_definition);
+        this.$$d[prop2] = value;
+        var component2 = this.$$c;
+        if (component2) {
+          var setter = get_descriptor(component2, prop2)?.get;
+          if (setter) {
+            component2[prop2] = value;
+          } else {
+            component2.$set({ [prop2]: value });
+          }
+        }
+      }
+    });
+  });
+  exports.forEach((property) => {
+    define_property(Class.prototype, property, {
+      get() {
+        return this.$$c?.[property];
+      }
+    });
+  });
+  if (extend) {
+    Class = extend(Class);
+  }
+  Component.element = /** @type {any} */
+  Class;
+  return Class;
+}
+
+// ../../../node_modules/svelte/src/index-client.js
+if (dev_fallback_default) {
+  let throw_rune_error = function(rune) {
+    if (!(rune in globalThis)) {
+      let value;
+      Object.defineProperty(globalThis, rune, {
+        configurable: true,
+        // eslint-disable-next-line getter-return
+        get: () => {
+          if (value !== void 0) {
+            return value;
+          }
+          rune_outside_svelte(rune);
+        },
+        set: (v) => {
+          value = v;
+        }
+      });
+    }
+  };
+  throw_rune_error("$state");
+  throw_rune_error("$effect");
+  throw_rune_error("$derived");
+  throw_rune_error("$inspect");
+  throw_rune_error("$props");
+  throw_rune_error("$bindable");
+}
+function onMount(fn) {
+  if (component_context === null) {
+    lifecycle_outside_component("onMount");
+  }
+  if (legacy_mode_flag && component_context.l !== null) {
+    init_update_callbacks(component_context).m.push(fn);
+  } else {
+    user_effect(() => {
+      const cleanup = untrack(fn);
+      if (typeof cleanup === "function") return (
+        /** @type {() => void} */
+        cleanup
+      );
+    });
+  }
+}
+function onDestroy(fn) {
+  if (component_context === null) {
+    lifecycle_outside_component("onDestroy");
+  }
+  onMount(() => () => untrack(fn));
+}
+function init_update_callbacks(context) {
+  var l = (
+    /** @type {ComponentContextLegacy} */
+    context.l
+  );
+  return l.u ??= { a: [], b: [], m: [] };
+}
+
+// src/theme.ts
+var STORAGE_KEY = "openbook-dashboard-theme";
+var DARK_QUERY = "(prefers-color-scheme: dark)";
+function systemTheme() {
+  return window.matchMedia(DARK_QUERY).matches ? "dark" : "light";
+}
+function storedTheme() {
+  const value = localStorage.getItem(STORAGE_KEY);
+  return value === "light" || value === "dark" ? value : null;
+}
+function applyTheme(value) {
+  document.documentElement.setAttribute("data-theme", value);
+}
+var theme = writable(storedTheme() ?? systemTheme());
+function setTheme(value) {
+  localStorage.setItem(STORAGE_KEY, value);
+  applyTheme(value);
+  theme.set(value);
+}
+function toggleTheme() {
+  setTheme(get(theme) === "dark" ? "light" : "dark");
+}
+function initTheme() {
+  applyTheme(get(theme));
+  window.matchMedia(DARK_QUERY).addEventListener("change", (event2) => {
+    if (!storedTheme()) {
+      const next2 = event2.matches ? "dark" : "light";
+      applyTheme(next2);
+      theme.set(next2);
+    }
+  });
+}
+
+// ../../../node_modules/svelte/src/version.js
+var PUBLIC_VERSION = "5";
+
+// ../../../node_modules/svelte/src/internal/disclose-version.js
+if (typeof window !== "undefined") {
+  ((window.__svelte ??= {}).v ??= /* @__PURE__ */ new Set()).add(PUBLIC_VERSION);
+}
+
+// ../../../node_modules/svelte/src/internal/flags/async.js
+enable_async_mode_flag();
+
+// ../../../node_modules/regexparam/dist/index.mjs
+function parse(str, loose) {
+  if (str instanceof RegExp) return { keys: false, pattern: str };
+  var c, o, tmp, ext, keys = [], pattern = "", arr = str.split("/");
+  arr[0] || arr.shift();
+  while (tmp = arr.shift()) {
+    c = tmp[0];
+    if (c === "*") {
+      keys.push("wild");
+      pattern += "/(.*)";
+    } else if (c === ":") {
+      o = tmp.indexOf("?", 1);
+      ext = tmp.indexOf(".", 1);
+      keys.push(tmp.substring(1, !!~o ? o : !!~ext ? ext : tmp.length));
+      pattern += !!~o && !~ext ? "(?:/([^/]+?))?" : "/([^/]+?)";
+      if (!!~ext) pattern += (!!~o ? "?" : "") + "\\" + tmp.substring(ext);
+    } else {
+      pattern += "/" + tmp;
+    }
+  }
+  return {
+    keys,
+    pattern: new RegExp("^" + pattern + (loose ? "(?=$|/)" : "/?$"), "i")
+  };
+}
+
+// ../../../node_modules/svelte-spa-router/dist/Router.svelte
+var RouterStateImpl = class {
+  #_loc = (
+    /** The current full location (incl. querystring) */
+    state(getLocation())
+  );
+  get _loc() {
+    return get2(this.#_loc);
+  }
+  set _loc(value) {
+    set(this.#_loc, value);
+  }
+  #_location = user_derived(() => this._loc.location);
+  get _location() {
+    return get2(this.#_location);
+  }
+  set _location(value) {
+    set(this.#_location, value);
+  }
+  #_querystring = user_derived(() => this._loc.querystring);
+  get _querystring() {
+    return get2(this.#_querystring);
+  }
+  set _querystring(value) {
+    set(this.#_querystring, value);
+  }
+  #_params = state(void 0);
+  get _params() {
+    return get2(this.#_params);
+  }
+  set _params(value) {
+    set(this.#_params, value);
+  }
+  get loc() {
+    return this._loc;
+  }
+  /** The current location (excluding querystring) */
+  get location() {
+    return this._location;
+  }
+  /** The current querystring */
+  get querystring() {
+    return this._querystring;
+  }
+  get params() {
+    return this._params;
+  }
+  constructor() {
+    window.addEventListener("hashchange", () => {
+      this._loc = getLocation();
+    });
+  }
+};
+var router = new RouterStateImpl();
+function getLocation() {
+  const hashPosition = window.location.href.indexOf("#/");
+  let location = hashPosition > -1 ? window.location.href.substr(hashPosition + 1) : "/";
+  const qsPosition = location.indexOf("?");
+  let querystring = "";
+  if (qsPosition > -1) {
+    querystring = location.substr(qsPosition + 1);
+    location = location.substr(0, qsPosition);
+  }
+  return { location, querystring };
+}
+async function push2(location) {
+  if (!location || location.length < 1 || location.charAt(0) != "/" && location.indexOf("#/") !== 0) {
+    throw Error("Invalid parameter location");
+  }
+  await tick();
+  history.replaceState(
+    {
+      ...history.state,
+      __svelte_spa_router_scrollX: window.scrollX,
+      __svelte_spa_router_scrollY: window.scrollY
+    },
+    ""
+  );
+  window.location.hash = (location.charAt(0) == "#" ? "" : "#") + location;
+}
+function restoreScroll(state3) {
+  if (state3) {
+    window.scrollTo(state3.__svelte_spa_router_scrollX || 0, state3.__svelte_spa_router_scrollY || 0);
+  } else {
+    window.scrollTo(0, 0);
+  }
+}
+function Router($$anchor, $$props) {
+  push($$props, true);
+  const routes = prop($$props, "routes", 23, () => ({})), prefix = prop($$props, "prefix", 7, ""), restoreScrollState = prop($$props, "restoreScrollState", 7, false), onConditionsFailed = prop($$props, "onConditionsFailed", 7, () => {
+  }), onRouteLoaded = prop($$props, "onRouteLoaded", 7, () => {
+  }), onRouteLoading = prop($$props, "onRouteLoading", 7, () => {
+  }), onRouteEvent = prop($$props, "onRouteEvent", 7, () => {
+  });
+  class RouteItem {
+    path;
+    component;
+    conditions;
+    userData;
+    props;
+    _pattern;
+    _keys;
+    constructor(path, component3) {
+      const isWrapped = (c) => typeof c == "object" && c !== null && c._sveltesparouter === true;
+      if (!component3 || typeof component3 != "function" && !isWrapped(component3)) {
+        throw Error("Invalid component object");
+      }
+      if (!path || typeof path == "string" && (path.length < 1 || path.charAt(0) != "/" && path.charAt(0) != "*") || typeof path == "object" && !(path instanceof RegExp)) {
+        throw Error('Invalid value for "path" argument - strings must start with / or *');
+      }
+      const parsed = typeof path == "string" ? parse(path) : parse(path);
+      this.path = path;
+      if (isWrapped(component3)) {
+        const wrapped = component3;
+        this.component = wrapped.component;
+        this.conditions = wrapped.conditions || [];
+        this.userData = wrapped.userData;
+        this.props = wrapped.props || {};
+      } else {
+        const sync = component3;
+        this.component = () => Promise.resolve(sync);
+        this.conditions = [];
+        this.props = {};
+      }
+      this._pattern = parsed.pattern;
+      this._keys = parsed.keys;
+    }
+    /**
+     * Checks if `path` matches the current route.
+     * Returns the list of parameters from the URL, or `null` if no match.
+     */
+    match(path) {
+      if (prefix()) {
+        if (typeof prefix() == "string") {
+          if (path.startsWith(prefix())) {
+            path = path.substr(prefix().length) || "/";
+          } else {
+            return null;
+          }
+        } else if (prefix() instanceof RegExp) {
+          const m = path.match(prefix());
+          if (m && m[0]) {
+            path = path.substr(m[0].length) || "/";
+          } else {
+            return null;
+          }
+        }
+      }
+      const matches = this._pattern.exec(path);
+      if (matches === null) {
+        return null;
+      }
+      if (this._keys === false) {
+        return matches;
+      }
+      const out = {};
+      let i = 0;
+      while (i < this._keys.length) {
+        try {
+          out[this._keys[i]] = decodeURIComponent(matches[i + 1] || "") || null;
+        } catch {
+          out[this._keys[i]] = null;
+        }
+        i++;
+      }
+      return out;
+    }
+    /** Executes all conditions in order; returns false at the first failure. */
+    async checkConditions(detail) {
+      for (let i = 0; i < this.conditions.length; i++) {
+        if (!await this.conditions[i](detail)) {
+          return false;
+        }
+      }
+      return true;
+    }
+  }
+  const routesList = [];
+  if (routes() instanceof Map) {
+    routes().forEach((route, path) => {
+      routesList.push(new RouteItem(path, route));
+    });
+  } else {
+    Object.keys(routes()).forEach((path) => {
+      const map2 = routes();
+      routesList.push(new RouteItem(path, map2[path]));
+    });
+  }
+  let component2 = state(null);
+  let componentParams = state(null);
+  let routeProps = state({});
+  let previousScrollState = null;
+  let componentObj = null;
+  user_effect(() => {
+    history.scrollRestoration = restoreScrollState() ? "manual" : "auto";
+  });
+  user_effect(() => {
+    if (!restoreScrollState()) {
+      return;
+    }
+    const popStateChanged = (event2) => {
+      if (event2.state && (event2.state.__svelte_spa_router_scrollY || event2.state.__svelte_spa_router_scrollX)) {
+        previousScrollState = event2.state;
+      } else {
+        previousScrollState = null;
+      }
+    };
+    window.addEventListener("popstate", popStateChanged);
+    return () => window.removeEventListener("popstate", popStateChanged);
+  });
+  async function dispatchNextTick(event2, detail) {
+    await tick();
+    event2(detail);
+  }
+  user_effect(() => {
+    const newLoc = router.loc;
+    let cancelled = false;
+    untrack(async () => {
+      let i = 0;
+      while (i < routesList.length) {
+        const match2 = routesList[i].match(newLoc.location);
+        if (!match2) {
+          i++;
+          continue;
+        }
+        const matchParams = matchToParams(match2);
+        const detail = {
+          route: routesList[i].path,
+          location: newLoc.location,
+          querystring: newLoc.querystring || "",
+          userData: routesList[i].userData,
+          params: matchParams
+        };
+        if (!await routesList[i].checkConditions(detail)) {
+          if (cancelled) {
+            return;
+          }
+          set(component2, null);
+          componentObj = null;
+          dispatchNextTick(onConditionsFailed(), detail);
+          return;
+        }
+        if (cancelled) {
+          return;
+        }
+        dispatchNextTick(onRouteLoading(), { ...detail });
+        const obj = routesList[i].component;
+        if (componentObj != obj) {
+          if (obj.loading) {
+            set(component2, obj.loading);
+            componentObj = obj;
+            set(componentParams, obj.loadingParams || null);
+            set(routeProps, {});
+            const comp2 = obj.loading;
+            dispatchNextTick(onRouteLoaded(), {
+              ...detail,
+              component: comp2,
+              name: comp2.name,
+              params: obj.loadingParams || null
+            });
+          } else {
+            set(component2, null);
+            componentObj = null;
+          }
+          const loaded = await obj();
+          if (cancelled) {
+            return;
+          }
+          set(component2, loaded && typeof loaded == "object" && "default" in loaded ? loaded.default : loaded);
+          componentObj = obj;
+        }
+        set(componentParams, matchParams);
+        set(routeProps, routesList[i].props);
+        const comp = get2(component2);
+        if (comp) {
+          dispatchNextTick(onRouteLoaded(), {
+            ...detail,
+            component: comp,
+            name: comp.name,
+            params: matchParams
+          });
+        }
+        router._params = matchParams;
+        if (restoreScrollState()) {
+          restoreScroll(previousScrollState);
+          previousScrollState = null;
+        }
+        return;
+      }
+      set(component2, null);
+      componentObj = null;
+      router._params = void 0;
+      if (restoreScrollState()) {
+        restoreScroll(previousScrollState);
+        previousScrollState = null;
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  });
+  function matchToParams(match2) {
+    return match2 && typeof match2 == "object" && Object.keys(match2).length ? match2 : null;
+  }
+  var $$exports = {
+    get routes() {
+      return routes();
+    },
+    set routes($$value = {}) {
+      routes($$value);
+      flushSync();
+    },
+    get prefix() {
+      return prefix();
+    },
+    set prefix($$value = "") {
+      prefix($$value);
+      flushSync();
+    },
+    get restoreScrollState() {
+      return restoreScrollState();
+    },
+    set restoreScrollState($$value = false) {
+      restoreScrollState($$value);
+      flushSync();
+    },
+    get onConditionsFailed() {
+      return onConditionsFailed();
+    },
+    set onConditionsFailed($$value = () => {
+    }) {
+      onConditionsFailed($$value);
+      flushSync();
+    },
+    get onRouteLoaded() {
+      return onRouteLoaded();
+    },
+    set onRouteLoaded($$value = () => {
+    }) {
+      onRouteLoaded($$value);
+      flushSync();
+    },
+    get onRouteLoading() {
+      return onRouteLoading();
+    },
+    set onRouteLoading($$value = () => {
+    }) {
+      onRouteLoading($$value);
+      flushSync();
+    },
+    get onRouteEvent() {
+      return onRouteEvent();
+    },
+    set onRouteEvent($$value = () => {
+    }) {
+      onRouteEvent($$value);
+      flushSync();
+    }
+  };
+  var fragment = comment();
+  var node_1 = first_child(fragment);
+  {
+    var consequent_1 = ($$anchor2) => {
+      const Component = user_derived(() => get2(component2));
+      var fragment_1 = comment();
+      var node_2 = first_child(fragment_1);
+      {
+        var consequent = ($$anchor3) => {
+          var fragment_2 = comment();
+          var node_3 = first_child(fragment_2);
+          component(node_3, () => get2(Component), ($$anchor4, Component_1) => {
+            Component_1($$anchor4, spread_props(
+              {
+                get params() {
+                  return get2(componentParams);
+                },
+                get onRouteEvent() {
+                  return onRouteEvent();
+                }
+              },
+              () => get2(routeProps)
+            ));
+          });
+          append($$anchor3, fragment_2);
+        };
+        var alternate = ($$anchor3) => {
+          var fragment_3 = comment();
+          var node_4 = first_child(fragment_3);
+          component(node_4, () => get2(Component), ($$anchor4, Component_2) => {
+            Component_2($$anchor4, spread_props(
+              {
+                get onRouteEvent() {
+                  return onRouteEvent();
+                }
+              },
+              () => get2(routeProps)
+            ));
+          });
+          append($$anchor3, fragment_3);
+        };
+        if_block(node_2, ($$render) => {
+          if (get2(componentParams)) $$render(consequent);
+          else $$render(alternate, -1);
+        });
+      }
+      append($$anchor2, fragment_1);
+    };
+    if_block(node_1, ($$render) => {
+      if (get2(component2)) $$render(consequent_1);
+    });
+  }
+  append($$anchor, fragment);
+  return pop($$exports);
+}
+create_custom_element(
+  Router,
+  {
+    routes: {},
+    prefix: {},
+    restoreScrollState: {},
+    onConditionsFailed: {},
+    onRouteLoaded: {},
+    onRouteLoading: {},
+    onRouteEvent: {}
+  },
+  [],
+  [],
+  { mode: "open" }
+);
+
+// src/api/websocket.ts
+var MAX_ATTEMPTS = 5;
+var BASE_DELAY_MS = 250;
+var STABLE_CONNECTION_MS = 4e3;
+var MAX_UNSTABLE_RETRIES = 4;
+var WebSocketServerError = class extends Error {
+  payload;
+  constructor(message, payload = [], cause) {
+    super(message, { cause });
+    this.name = "WebSocketServerError";
+    this.payload = payload;
+  }
+};
+function isWebSocketServerErrorMessage(message) {
+  return typeof message === "object" && message !== null && "action" in message && message.action === "error";
+}
+function formatServerError(payload) {
+  if (!Array.isArray(payload) || payload.length === 0) {
+    return "Unknown WebSocket error.";
+  }
+  return payload.map(({ type, msg, loc }) => {
+    const reason = msg || "Unknown WebSocket error.";
+    const suffix = Array.isArray(loc) && loc.length ? ` (${loc.map(String).join(".")})` : "";
+    return type ? `${reason} [${type}]${suffix}` : `${reason}${suffix}`;
+  }).join("\n");
+}
+var WebSocketClient = class {
+  #url;
+  #socket;
+  #status = "disconnected";
+  #statusListener;
+  #errorHandler;
+  #messageHandlers = /* @__PURE__ */ new Map();
+  #messageQueue = [];
+  #openedAt = 0;
+  #unstableRetries = 0;
+  constructor(url) {
+    this.#url = url;
+  }
+  /** Register a listener for connection status changes (replaces the previous one). */
+  setConnectionStatusListener(listener) {
+    this.#statusListener = listener;
+  }
+  /** Register a handler for generic WebSocket errors (replaces the previous one). */
+  setErrorHandler(handler) {
+    this.#errorHandler = handler;
+  }
+  /** Register a handler for a given received message `action` (replaces the previous one). */
+  setMessageHandler(action2, handler) {
+    this.#messageHandlers.set(action2, handler);
+  }
+  async #setConnectionStatus(status, reconnectInSec = 0) {
+    this.#status = status;
+    if (this.#statusListener) {
+      await this.#statusListener(status, reconnectInSec);
+    }
+  }
+  /**
+   * Connect to the server, retrying up to `MAX_ATTEMPTS` times with increasing
+   * delays. Throws if the connection cannot be established.
+   */
+  async connect() {
+    if (this.#status !== "disconnected") {
+      return;
+    }
+    let lastError = null;
+    let delayMs = BASE_DELAY_MS;
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      lastError = null;
+      try {
+        await this.#setConnectionStatus("connecting");
+        await new Promise((resolve, reject) => {
+          this.#socket = new WebSocket(this.#url);
+          this.#socket.addEventListener("open", async () => {
+            this.#openedAt = Date.now();
+            await this.#setConnectionStatus("connected");
+            for (const message of this.#messageQueue) {
+              await this.#send(message);
+            }
+            this.#messageQueue = [];
+            resolve(void 0);
+          });
+          this.#socket.addEventListener("close", () => {
+            this.#socket = void 0;
+            if (this.#status === "connecting") {
+              reject(new Error("WebSocket connection failed."));
+              return;
+            }
+            if (this.#status === "disconnected") {
+              return;
+            }
+            const uptime = Date.now() - this.#openedAt;
+            window.setTimeout(async () => {
+              await this.#setConnectionStatus("disconnected");
+              if (uptime < STABLE_CONNECTION_MS) {
+                this.#unstableRetries++;
+                if (this.#unstableRetries > MAX_UNSTABLE_RETRIES) {
+                  if (this.#errorHandler) {
+                    await this.#errorHandler(
+                      new Error("The assistant keeps dropping the connection. Please try again later.")
+                    );
+                  }
+                  return;
+                }
+                await new Promise((r) => setTimeout(r, BASE_DELAY_MS * 2 ** this.#unstableRetries));
+              } else {
+                this.#unstableRetries = 0;
+              }
+              try {
+                await this.connect();
+              } catch (error2) {
+                console.error(error2);
+                if (this.#errorHandler) {
+                  await this.#errorHandler(error2);
+                }
+              }
+            }, 0);
+          });
+          this.#socket.addEventListener("error", async (error2) => {
+            console.error(error2);
+            if (this.#errorHandler) {
+              await this.#errorHandler(error2);
+            }
+          });
+          this.#socket.addEventListener("message", async (event2) => {
+            try {
+              const message = JSON.parse(event2.data);
+              if (!message.action) {
+                throw new Error("Received a WebSocket message without an `action`.");
+              }
+              if (isWebSocketServerErrorMessage(message)) {
+                const error2 = new WebSocketServerError(
+                  formatServerError(message.payload),
+                  message.payload ?? [],
+                  message
+                );
+                console.error(error2);
+                if (this.#errorHandler) {
+                  await this.#errorHandler(error2);
+                }
+                return;
+              }
+              const handler = this.#messageHandlers.get(message.action);
+              if (!handler) {
+                console.warn('No handler for WebSocket action "%s".', message.action, message);
+                return;
+              }
+              await handler(message);
+            } catch (error2) {
+              console.error(error2);
+              if (this.#errorHandler) {
+                await this.#errorHandler(error2);
+              }
+            }
+          });
+        });
+      } catch (error2) {
+        lastError = error2;
+      }
+      if (this.#status === "connected") {
+        return;
+      }
+      await this.#setConnectionStatus("wait_before_retry", delayMs / 1e3);
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+      delayMs *= 2;
+      console.warn(`WebSocket retry ${attempt}/${MAX_ATTEMPTS} for ${this.#url}.`);
+    }
+    await this.#setConnectionStatus("disconnected");
+    if (lastError instanceof Error) {
+      throw lastError;
+    }
+    throw new Error("WebSocket connection failed.");
+  }
+  /** Disconnect and stop reconnecting until `connect()` is called again. */
+  async disconnect() {
+    if (!this.#socket) {
+      return;
+    }
+    await this.#setConnectionStatus("disconnected");
+    this.#socket.close();
+  }
+  /** Reset the unstable-connection counter and try connecting again. */
+  async retry() {
+    this.#unstableRetries = 0;
+    await this.connect();
+  }
+  /** Send a message, or queue it until the connection is (re)established. */
+  async send(message) {
+    if (this.#status === "connected" && this.#socket) {
+      await this.#send(message);
+    } else {
+      this.#messageQueue.push(message);
+    }
+  }
+  async #send(message) {
+    if (!this.#socket) {
+      return;
+    }
+    this.#socket.send(JSON.stringify(message));
+  }
+};
+
+// src/api/client.ts
+var baseUrlPromise = null;
+function isLoopbackHost(hostname) {
+  return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
+}
+function normalizeBaseUrl(value) {
+  let configuredUrl = new URL(value || window.location.origin, window.location.origin);
+  const currentUrl = new URL(window.location.origin);
+  if (isLoopbackHost(configuredUrl.hostname) && isLoopbackHost(currentUrl.hostname) && configuredUrl.protocol === currentUrl.protocol && configuredUrl.port === currentUrl.port) {
+    configuredUrl = currentUrl;
+  }
+  let url = configuredUrl.toString();
+  while (url.endsWith("/")) {
+    url = url.slice(0, url.length - 1);
+  }
+  return url;
+}
+async function resolveBaseUrl() {
+  const response = await fetch("server.url");
+  if (!response.ok) {
+    throw new Error(`Could not load backend URL (HTTP ${response.status}).`);
+  }
+  return normalizeBaseUrl((await response.text()).trim());
+}
+function getBaseUrl() {
+  if (!baseUrlPromise) {
+    baseUrlPromise = resolveBaseUrl();
+  }
+  return baseUrlPromise;
+}
+async function ws(suffix) {
+  const path = suffix.startsWith("/") ? suffix : `/${suffix}`;
+  const wsUrl = new URL(`/ws${path}`, `${await getBaseUrl()}/`);
+  if (wsUrl.protocol === "http:") {
+    wsUrl.protocol = "ws:";
+  } else if (wsUrl.protocol === "https:") {
+    wsUrl.protocol = "wss:";
+  }
+  return new WebSocketClient(wsUrl.toString());
+}
+async function apiGet(path, query = {}) {
+  const base2 = await getBaseUrl();
+  const url = new URL(`${base2}${path}`);
+  for (const [key2, value] of Object.entries(query)) {
+    url.searchParams.set(key2, value);
+  }
+  const response = await fetch(url.toString(), {
+    credentials: "include",
+    headers: { Accept: "application/json" }
+  });
+  if (response.status === 401 || response.status === 403) {
+    throw new Error("You are not signed in. Please log in to view your dashboard.");
+  }
+  if (!response.ok) {
+    throw new Error(`Request to ${path} failed (HTTP ${response.status}).`);
+  }
+  return await response.json();
+}
+function readCookie(name) {
+  const match2 = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+  const value = match2?.[1];
+  return value ? decodeURIComponent(value) : "";
+}
+function extractError(data) {
+  if (typeof data === "string") {
+    return data;
+  }
+  if (data && typeof data === "object") {
+    const record = data;
+    if (typeof record.detail === "string") {
+      return record.detail;
+    }
+    if (Array.isArray(record.errors)) {
+      const messages = record.errors.map((entry) => entry && typeof entry === "object" ? String(entry.message ?? "") : "").filter(Boolean);
+      if (messages.length > 0) {
+        return messages.join(" ");
+      }
+    }
+    const fieldMessages = Object.values(record).flatMap((value) => Array.isArray(value) ? value : [value]).filter((value) => typeof value === "string");
+    if (fieldMessages.length > 0) {
+      return fieldMessages.join(" ");
+    }
+  }
+  return "";
+}
+async function apiSend(method, path, body, options = {}) {
+  const base2 = await getBaseUrl();
+  const headers = {
+    Accept: "application/json",
+    "X-CSRFToken": readCookie("csrftoken")
+  };
+  let payload;
+  if (options.formData && body instanceof FormData) {
+    payload = body;
+  } else if (body !== void 0) {
+    headers["Content-Type"] = "application/json";
+    payload = JSON.stringify(body);
+  }
+  const response = await fetch(`${base2}${path}`, {
+    method,
+    credentials: "include",
+    headers,
+    body: payload
+  });
+  if (!response.ok) {
+    const data = await response.json().catch(() => null);
+    throw new Error(extractError(data) || `Request to ${path} failed (HTTP ${response.status}).`);
+  }
+  if (response.status === 204) {
+    return void 0;
+  }
+  return await response.json().catch(() => void 0);
+}
+
+// src/api/gamification.ts
+function toList(data) {
+  return Array.isArray(data) ? data : data.results;
+}
+function fetchAccountProgress() {
+  return apiGet("/api/gamification/account_progress/me/");
+}
+async function fetchStreak() {
+  const data = await apiGet("/api/gamification/streak/");
+  if (Array.isArray(data)) {
+    return data[0] ?? null;
+  }
+  if ("results" in data) {
+    return data.results[0] ?? null;
+  }
+  return data;
+}
+async function fetchSkillProgress(username) {
+  const query = { _expand: "skill", _page_size: "100", _sort: "skill__name" };
+  if (username) {
+    query.account = username;
+  }
+  const data = await apiGet(
+    "/api/gamification/skill_progress/",
+    query
+  );
+  return toList(data);
+}
+async function fetchCourseProgress(username) {
+  const query = { _expand: "course", _page_size: "100", _sort: "course__name" };
+  if (username) {
+    query.account = username;
+  }
+  const data = await apiGet(
+    "/api/gamification/course_progress/",
+    query
+  );
+  return toList(data);
+}
+async function fetchCurrentUser() {
+  const data = await apiGet(
+    "/api/auth/current_user/"
+  );
+  if (Array.isArray(data)) {
+    return data[0] ?? null;
+  }
+  if ("results" in data) {
+    return data.results[0] ?? null;
+  }
+  return data;
+}
+
+// src/data/dashboard.ts
+function toNumber(value, fallback2 = 0) {
+  const numeric = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(numeric) ? numeric : fallback2;
+}
+function clampPercent(value) {
+  return Math.min(100, Math.max(0, value));
+}
+function mapUser(user) {
+  if (!user) {
+    return null;
+  }
+  return {
+    username: user.username,
+    fullName: user.full_name || user.username,
+    avatarUrl: user.picture ?? null,
+    isAuthenticated: Boolean(user.is_authenticated)
+  };
+}
+function levelProgress(points, progress) {
+  const currentMin = toNumber(progress?.current_level_min_points);
+  const nextMin = progress?.next_level_min_points;
+  if (nextMin === null || nextMin === void 0) {
+    return 100;
+  }
+  const span = nextMin - currentMin;
+  return span > 0 ? clampPercent((points - currentMin) / span * 100) : 0;
+}
+function mapStats(progress, streak) {
+  if (!progress && !streak) {
+    return null;
+  }
+  const points = toNumber(progress?.point_total);
+  return {
+    points,
+    level: toNumber(progress?.level, 1),
+    levelProgress: levelProgress(points, progress),
+    nextLevelPoints: progress?.next_level_min_points ?? null,
+    currentStreak: toNumber(streak?.current_streak),
+    longestStreak: toNumber(streak?.longest_streak),
+    streakFreezes: toNumber(streak?.streak_freezes),
+    lastActiveDate: streak?.last_active_date ? new Date(streak.last_active_date) : null
+  };
+}
+function skillName(skill) {
+  if (typeof skill === "string") {
+    return { name: skill, iconPath: "" };
+  }
+  return { name: skill.name, iconPath: skill.icon_path ?? "" };
+}
+function mapSkills(records) {
+  return records.map((record) => {
+    const { name, iconPath } = skillName(record.skill);
+    return {
+      id: record.id,
+      name,
+      iconPath,
+      level: toNumber(record.level, 1),
+      progress: clampPercent(toNumber(record.progress))
+    };
+  });
+}
+function courseName(course) {
+  return typeof course === "string" ? course : course.name;
+}
+function courseId(course) {
+  return typeof course === "string" ? course : course.id;
+}
+function mapCourses(records) {
+  return records.map((record) => ({
+    id: courseId(record.course),
+    name: courseName(record.course),
+    level: toNumber(record.course_level, 1),
+    points: toNumber(record.course_points),
+    progress: clampPercent(toNumber(record.course_progress))
+  }));
+}
+async function loadDashboardData() {
+  const user = await fetchCurrentUser();
+  const username = user?.username ?? null;
+  const [progress, streak, skills, courses] = await Promise.all([
+    fetchAccountProgress(),
+    fetchStreak(),
+    fetchSkillProgress(username),
+    fetchCourseProgress(username)
+  ]);
+  const ownSkills = username ? skills.filter((record) => record.account === username) : skills;
+  const ownCourses = username ? courses.filter((record) => record.account === username) : courses;
+  return {
+    user: mapUser(user),
+    stats: mapStats(progress, streak),
+    skills: mapSkills(ownSkills),
+    courses: mapCourses(ownCourses)
+  };
+}
+
+// src/stores/dashboard.store.ts
+var initialState = {
+  isLoading: true,
+  errorMessage: "",
+  user: null,
+  stats: null,
+  skills: [],
+  courses: []
+};
+var state2 = writable(initialState);
+function toMessage(error2) {
+  return error2 instanceof Error ? error2.message : String(error2);
+}
+async function refresh() {
+  state2.update((current) => ({ ...current, isLoading: true, errorMessage: "" }));
+  try {
+    const data = await loadDashboardData();
+    state2.set({ isLoading: false, errorMessage: "", ...data });
+  } catch (error2) {
+    state2.update((current) => ({ ...current, isLoading: false, errorMessage: toMessage(error2) }));
+  }
+}
+var dashboardStore = {
+  subscribe: state2.subscribe,
+  refresh
+};
+
+// src/components/app-frame/DashboardHeader.svelte
+var root = from_html(`<img alt="" class="svelte-1xhay2l"/>`);
+var root_1 = from_html(`<header class="app-header svelte-1xhay2l"><div class="header-left svelte-1xhay2l"><img class="brand-logo svelte-1xhay2l"/> <span class="brand-text svelte-1xhay2l"> </span></div> <div class="header-right svelte-1xhay2l"><button type="button" class="theme-toggle svelte-1xhay2l"> </button> <span class="avatar-mark svelte-1xhay2l" aria-hidden="true"><!></span> <span class="page-label svelte-1xhay2l"> </span> <span class="status-pill svelte-1xhay2l"><span class="status-dot svelte-1xhay2l" aria-hidden="true"></span> </span></div></header>`);
+var $$css = {
+  hash: "svelte-1xhay2l",
+  code: ".app-header.svelte-1xhay2l {position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0.75rem 1.5rem;background:var(--color-base-100);border-bottom:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);}.header-left.svelte-1xhay2l {display:flex;align-items:center;gap:0.75rem;font-weight:700;letter-spacing:0.05em;}.brand-logo.svelte-1xhay2l {width:2.4rem;height:2.4rem;border-radius:0.6rem;object-fit:contain;}.brand-text.svelte-1xhay2l {font-size:1.05rem;text-transform:uppercase;color:var(--color-base-content);}.header-right.svelte-1xhay2l {display:flex;align-items:center;gap:0.85rem;}.theme-toggle.svelte-1xhay2l {display:grid;place-items:center;width:2rem;height:2rem;border-radius:999px;font-size:1rem;cursor:pointer;background:color-mix(in oklab, var(--color-base-200) 70%, transparent);border:1px solid color-mix(in oklab, var(--color-base-content) 18%, transparent);}.theme-toggle.svelte-1xhay2l:hover {border-color:color-mix(in oklab, var(--color-primary) 50%, transparent);}.theme-toggle.svelte-1xhay2l:focus-visible {outline:2px solid var(--color-primary);outline-offset:2px;}.avatar-mark.svelte-1xhay2l {width:1.9rem;height:1.9rem;border-radius:999px;overflow:hidden;background:color-mix(in oklab, var(--color-base-content) 18%, transparent);}.avatar-mark.svelte-1xhay2l img:where(.svelte-1xhay2l) {width:100%;height:100%;object-fit:cover;}.page-label.svelte-1xhay2l {font-size:0.9rem;color:var(--color-primary);}.status-pill.svelte-1xhay2l {display:inline-flex;align-items:center;gap:0.5rem;padding:0.35rem 0.75rem;border-radius:999px;border:1px solid color-mix(in oklab, var(--color-base-content) 18%, transparent);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;background:color-mix(in oklab, var(--color-base-200) 70%, transparent);color:color-mix(in oklab, var(--color-base-content) 80%, transparent);}.status-dot.svelte-1xhay2l {width:0.5rem;height:0.5rem;border-radius:999px;background:var(--color-success);box-shadow:0 0 12px color-mix(in oklab, var(--color-success) 70%, transparent);}\r\n\r\n    @media (max-width: 40rem) {.app-header.svelte-1xhay2l {flex-direction:column;gap:0.75rem;text-align:center;}\r\n    }"
+};
+function DashboardHeader($$anchor, $$props) {
+  push($$props, true);
+  append_styles($$anchor, $$css);
+  const $theme = () => store_get(theme, "$theme", $$stores);
+  const [$$stores, $$cleanup] = setup_stores();
+  let user = prop($$props, "user", 7, null), brand = prop($$props, "brand", 7, "ElisaAI"), logoSrc = prop($$props, "logoSrc", 7, "logo.png"), pageLabel = prop($$props, "pageLabel", 7, "Dashboard"), statusLabel = prop($$props, "statusLabel", 7, "System online"), statusDetail = prop($$props, "statusDetail", 7, "v2.0.2.5");
+  var $$exports = {
+    get user() {
+      return user();
+    },
+    set user($$value = null) {
+      user($$value);
+      flushSync();
+    },
+    get brand() {
+      return brand();
+    },
+    set brand($$value = "ElisaAI") {
+      brand($$value);
+      flushSync();
+    },
+    get logoSrc() {
+      return logoSrc();
+    },
+    set logoSrc($$value = "logo.png") {
+      logoSrc($$value);
+      flushSync();
+    },
+    get pageLabel() {
+      return pageLabel();
+    },
+    set pageLabel($$value = "Dashboard") {
+      pageLabel($$value);
+      flushSync();
+    },
+    get statusLabel() {
+      return statusLabel();
+    },
+    set statusLabel($$value = "System online") {
+      statusLabel($$value);
+      flushSync();
+    },
+    get statusDetail() {
+      return statusDetail();
+    },
+    set statusDetail($$value = "v2.0.2.5") {
+      statusDetail($$value);
+      flushSync();
+    }
+  };
+  var header = root_1();
+  var div = child(header);
+  var img = child(div);
+  var span = sibling(img, 2);
+  var text3 = child(span, true);
+  reset(span);
+  reset(div);
+  var div_1 = sibling(div, 2);
+  var button = child(div_1);
+  var text_1 = child(button, true);
+  reset(button);
+  var span_1 = sibling(button, 2);
+  var node = child(span_1);
+  {
+    var consequent = ($$anchor2) => {
+      var img_1 = root();
+      template_effect(() => set_attribute2(img_1, "src", user().avatarUrl));
+      append($$anchor2, img_1);
+    };
+    if_block(node, ($$render) => {
+      if (user()?.avatarUrl) $$render(consequent);
+    });
+  }
+  reset(span_1);
+  var span_2 = sibling(span_1, 2);
+  var text_2 = child(span_2, true);
+  reset(span_2);
+  var span_3 = sibling(span_2, 2);
+  var text_3 = sibling(child(span_3));
+  reset(span_3);
+  reset(div_1);
+  reset(header);
+  template_effect(() => {
+    set_attribute2(img, "src", logoSrc());
+    set_attribute2(img, "alt", `${brand()} logo`);
+    set_text(text3, brand());
+    set_attribute2(button, "aria-label", $theme() === "dark" ? "Switch to light mode" : "Switch to dark mode");
+    set_text(text_1, $theme() === "dark" ? "\u2600\uFE0F" : "\u{1F319}");
+    set_text(text_2, pageLabel());
+    set_text(text_3, ` ${statusLabel() ?? ""} // ${statusDetail() ?? ""}`);
+  });
+  delegated("click", button, function(...$$args) {
+    toggleTheme?.apply(this, $$args);
+  });
+  append($$anchor, header);
+  var $$pop = pop($$exports);
+  $$cleanup();
+  return $$pop;
+}
+delegate(["click"]);
+create_custom_element(
+  DashboardHeader,
+  {
+    user: {},
+    brand: {},
+    logoSrc: {},
+    pageLabel: {},
+    statusLabel: {},
+    statusDetail: {}
+  },
+  [],
+  [],
+  { mode: "open" }
+);
+
+// src/stores/ai-chat.store.ts
+function createAiChatStore(courseId2) {
+  const { subscribe, update: update2 } = writable({
+    connection: "disconnected",
+    errorMessage: "",
+    messages: []
+  });
+  let socket;
+  async function getChatHistory() {
+    await socket?.send({ action: "get_chat_history", payload: null });
+  }
+  async function connect() {
+    if (!socket) {
+      const resolvedCourseId = typeof courseId2 === "function" ? courseId2() : courseId2;
+      const channel = resolvedCourseId ? `/ai/courses/${encodeURIComponent(resolvedCourseId)}/chat` : "/ai/chat";
+      socket = await ws(channel);
+      socket.setConnectionStatusListener((status) => {
+        update2((state3) => ({
+          ...state3,
+          connection: status,
+          errorMessage: status === "connected" ? "" : state3.errorMessage
+        }));
+        if (status === "connected") {
+          void getChatHistory();
+        }
+      });
+      socket.setErrorHandler((error2) => {
+        const message = error2 instanceof Error ? error2.message : "WebSocket error.";
+        update2((state3) => ({ ...state3, errorMessage: message }));
+      });
+      socket.setMessageHandler("chat_history", (message) => {
+        update2((state3) => ({ ...state3, messages: message.payload.messages }));
+      });
+      socket.setMessageHandler("chat_message", (message) => {
+        update2((state3) => {
+          const index2 = state3.messages.findIndex((m) => m.id === message.payload.id);
+          const messages = index2 === -1 ? [...state3.messages, message.payload] : state3.messages.map((m, i) => i === index2 ? message.payload : m);
+          return { ...state3, messages };
+        });
+      });
+      socket.setMessageHandler("learning_event_status", (message) => {
+        update2((state3) => ({
+          ...state3,
+          errorMessage: message.payload.success ? state3.errorMessage : message.payload.message
+        }));
+      });
+    }
+    await socket.connect();
+  }
+  async function disconnect() {
+    await socket?.disconnect();
+  }
+  async function retry() {
+    update2((state3) => ({ ...state3, errorMessage: "" }));
+    if (socket) {
+      await socket.retry();
+    } else {
+      await connect();
+    }
+  }
+  async function sendChatInput(format2, content) {
+    await socket?.send({ action: "chat_input", payload: { format: format2, content } });
+  }
+  async function recordPageOpened(pageId) {
+    await socket?.send({ action: "learning_page_opened", payload: { page_id: pageId } });
+  }
+  async function markPageCompleted(pageId) {
+    await socket?.send({ action: "learning_page_completed", payload: { page_id: pageId } });
+  }
+  async function recordQuizResult(pageId, score, attempts) {
+    await socket?.send({
+      action: "learning_quiz_result",
+      payload: { page_id: pageId, score, attempts: attempts ?? null }
+    });
+  }
+  return {
+    subscribe,
+    connect,
+    disconnect,
+    retry,
+    getChatHistory,
+    sendChatInput,
+    recordPageOpened,
+    markPageCompleted,
+    recordQuizResult
+  };
+}
+
+// src/components/app-frame/ChatWidget.svelte
+var root2 = from_html(`<img class="avatar svelte-13e87sq" src="logo.png" alt="ElisaAI"/>`);
+var root_12 = from_html(`<div><!> <div> </div></div>`);
+var root_2 = from_html(`<span class="coming-soon svelte-13e87sq"> </span>`);
+var root_3 = from_html(`<section><header class="panel-header svelte-13e87sq" role="toolbar" tabindex="-1" aria-label="Chat window controls"><span class="panel-title svelte-13e87sq"> </span> <div class="panel-actions svelte-13e87sq"><button type="button" class="icon-btn svelte-13e87sq"> </button> <button type="button" class="icon-btn svelte-13e87sq" aria-label="Close chat">\u2715</button></div></header> <div class="panel-body svelte-13e87sq"><div class="message svelte-13e87sq"><img class="avatar svelte-13e87sq" src="logo.png" alt="ElisaAI"/> <div class="bubble svelte-13e87sq">System online. I am <strong>ElisaAI</strong>. Ready to process your queries.
+                    What topic shall we analyse today?</div></div> <!></div> <div class="composer svelte-13e87sq"><!> <form class="composer-row svelte-13e87sq"><button type="button" class="composer-add svelte-13e87sq" aria-label="Add" disabled="">+</button> <input class="composer-input svelte-13e87sq" type="text" placeholder="Message"/> <button type="submit" class="composer-send svelte-13e87sq" aria-label="Send">\u2192</button></form> <p class="disclaimer svelte-13e87sq">ElisaAI may generate misinformation. Please verify all information.</p></div></section>`);
+var root_4 = from_html(`<!> <button type="button" aria-label="Open Quick Chat"><img src="logo.png" alt="" class="svelte-13e87sq"/></button>`, 1);
+var $$css2 = {
+  hash: "svelte-13e87sq",
+  code: ".fab.svelte-13e87sq {position:fixed;right:1.5rem;bottom:1.5rem;z-index:60;width:3.75rem;height:3.75rem;border-radius:999px;padding:0;border:2px solid color-mix(in oklab, var(--color-primary) 60%, transparent);background:var(--color-base-100);cursor:pointer;overflow:hidden;box-shadow:0 0 22px color-mix(in oklab, var(--color-primary) 45%, transparent);transition:transform 0.15s ease;}.fab.svelte-13e87sq:hover {transform:scale(1.06);}.fab.hidden.svelte-13e87sq {display:none;}.fab.svelte-13e87sq img:where(.svelte-13e87sq) {width:100%;height:100%;object-fit:cover;}.panel.svelte-13e87sq {position:fixed;z-index:61;display:flex;flex-direction:column;background:var(--color-base-100);border:1px solid color-mix(in oklab, var(--color-primary) 30%, transparent);box-shadow:0 0 32px color-mix(in oklab, var(--color-primary) 30%, transparent);overflow:hidden;}.panel.floating.svelte-13e87sq {right:1.5rem;bottom:1.5rem;width:22.5rem;height:32rem;max-width:calc(100vw - 2rem);max-height:calc(100vh - 2rem);border-radius:1.25rem;}\r\n\r\n    /* Docked, full-height sidebar (expand). */.panel.sidebar.svelte-13e87sq {top:0;right:0;bottom:0;width:min(28rem, 100vw);height:100vh;border-radius:0;border:none;border-left:1px solid color-mix(in oklab, var(--color-primary) 30%, transparent);}.panel-header.svelte-13e87sq {flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:0.75rem 1rem;border-bottom:1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);}.panel.floating.svelte-13e87sq .panel-header:where(.svelte-13e87sq) {cursor:grab;}.panel.floating.svelte-13e87sq .panel-header:where(.svelte-13e87sq):active {cursor:grabbing;}.panel-title.svelte-13e87sq {font-weight:700;letter-spacing:0.03em;color:var(--color-base-content);}.panel-actions.svelte-13e87sq {display:flex;gap:0.35rem;}.icon-btn.svelte-13e87sq {display:grid;place-items:center;width:1.75rem;height:1.75rem;border-radius:0.5rem;border:none;background:transparent;color:color-mix(in oklab, var(--color-base-content) 70%, transparent);cursor:pointer;}.icon-btn.svelte-13e87sq:hover {background:color-mix(in oklab, var(--color-base-content) 10%, transparent);color:var(--color-base-content);}.panel-body.svelte-13e87sq {flex:1;min-height:0;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.75rem;}.message.svelte-13e87sq {display:flex;align-items:flex-start;gap:0.6rem;}.message.user.svelte-13e87sq {justify-content:flex-end;}.avatar.svelte-13e87sq {width:2.25rem;height:2.25rem;flex:0 0 auto;border-radius:999px;object-fit:cover;}.bubble.svelte-13e87sq {padding:0.75rem 0.9rem;border-radius:0.9rem;border-top-left-radius:0.25rem;line-height:1.5;color:var(--color-base-content);background:color-mix(in oklab, var(--color-primary) 12%, transparent);border:1px solid color-mix(in oklab, var(--color-primary) 28%, transparent);}.composer.svelte-13e87sq {flex:0 0 auto;display:flex;flex-direction:column;gap:0.4rem;padding:0.75rem;border-top:1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);}.coming-soon.svelte-13e87sq {align-self:center;font-size:0.7rem;color:var(--color-warning);}.composer-row.svelte-13e87sq {display:flex;align-items:center;gap:0.5rem;padding:0.35rem 0.5rem;border-radius:999px;background:color-mix(in oklab, var(--color-base-200) 80%, transparent);border:1px solid color-mix(in oklab, var(--color-primary) 30%, transparent);}.composer-add.svelte-13e87sq,\r\n    .composer-send.svelte-13e87sq {display:grid;place-items:center;width:1.9rem;height:1.9rem;flex:0 0 auto;border-radius:999px;border:none;cursor:not-allowed;color:var(--color-primary-content);background:color-mix(in oklab, var(--color-primary) 70%, transparent);}.composer-input.svelte-13e87sq {flex:1 1 auto;background:transparent;border:none;color:var(--color-base-content);padding:0.25rem;}.composer-input.svelte-13e87sq:focus {outline:none;}.disclaimer.svelte-13e87sq {text-align:center;font-size:0.65rem;color:color-mix(in oklab, var(--color-base-content) 55%, transparent);}"
+};
+function ChatWidget($$anchor, $$props) {
+  push($$props, true);
+  append_styles($$anchor, $$css2);
+  let onSidebarChange = prop($$props, "onSidebarChange", 7);
+  let open = state(false);
+  let mode = state("floating");
+  let pos = state(null);
+  let dragOffset = null;
+  const chat = createAiChatStore();
+  let chatState = state(proxy({ connection: "disconnected", errorMessage: "", messages: [] }));
+  let draft = state("");
+  let connectStarted = false;
+  const connected = user_derived(() => get2(chatState).connection === "connected");
+  function ensureConnected() {
+    if (!connectStarted) {
+      connectStarted = true;
+      void chat.connect();
+    }
+  }
+  async function send() {
+    const text3 = get2(draft).trim();
+    if (!text3 || !get2(connected)) {
+      return;
+    }
+    set(draft, "");
+    await chat.sendChatInput("markdown", text3);
+  }
+  function notify() {
+    onSidebarChange()?.(get2(open) && get2(mode) === "sidebar");
+  }
+  onMount(() => {
+    notify();
+    const unsubscribe = chat.subscribe((value) => {
+      set(chatState, value, true);
+    });
+    return () => {
+      unsubscribe();
+      void chat.disconnect();
+    };
+  });
+  function toggle() {
+    set(open, !get2(open));
+    if (get2(open)) {
+      ensureConnected();
+    }
+    notify();
+  }
+  function close() {
+    set(open, false);
+    notify();
+  }
+  function toggleMode() {
+    set(mode, get2(mode) === "floating" ? "sidebar" : "floating", true);
+    set(pos, null);
+    notify();
+  }
+  function onPointerMove(event2) {
+    if (!dragOffset) {
+      return;
+    }
+    const maxX = Math.max(0, window.innerWidth - 360);
+    const maxY = Math.max(0, window.innerHeight - 120);
+    set(
+      pos,
+      {
+        x: Math.min(Math.max(0, event2.clientX - dragOffset.x), maxX),
+        y: Math.min(Math.max(0, event2.clientY - dragOffset.y), maxY)
+      },
+      true
+    );
+  }
+  function onPointerUp() {
+    dragOffset = null;
+    window.removeEventListener("pointermove", onPointerMove);
+    window.removeEventListener("pointerup", onPointerUp);
+  }
+  function startDrag(event2) {
+    if (get2(mode) !== "floating") {
+      return;
+    }
+    const panel = event2.currentTarget.parentElement;
+    if (!panel) {
+      return;
+    }
+    const rect = panel.getBoundingClientRect();
+    dragOffset = { x: event2.clientX - rect.left, y: event2.clientY - rect.top };
+    set(pos, { x: rect.left, y: rect.top }, true);
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("pointerup", onPointerUp);
+  }
+  var $$exports = {
+    get onSidebarChange() {
+      return onSidebarChange();
+    },
+    set onSidebarChange($$value) {
+      onSidebarChange($$value);
+      flushSync();
+    }
+  };
+  var fragment = root_4();
+  var node = first_child(fragment);
+  {
+    var consequent_2 = ($$anchor2) => {
+      var section = root_3();
+      let classes;
+      var header = child(section);
+      var span = child(header);
+      var text_1 = child(span, true);
+      reset(span);
+      var div = sibling(span, 2);
+      var button = child(div);
+      var text_2 = child(button, true);
+      reset(button);
+      var button_1 = sibling(button, 2);
+      reset(div);
+      reset(header);
+      var div_1 = sibling(header, 2);
+      var node_1 = sibling(child(div_1), 2);
+      each(node_1, 17, () => get2(chatState).messages, (message) => message.id, ($$anchor3, message) => {
+        var div_2 = root_12();
+        let classes_1;
+        var node_2 = child(div_2);
+        {
+          var consequent = ($$anchor4) => {
+            var img = root2();
+            append($$anchor4, img);
+          };
+          if_block(node_2, ($$render) => {
+            if (get2(message).sender === "assistant") $$render(consequent);
+          });
+        }
+        var div_3 = sibling(node_2, 2);
+        let classes_2;
+        var text_3 = child(div_3, true);
+        reset(div_3);
+        reset(div_2);
+        template_effect(() => {
+          classes_1 = set_class(div_2, 1, "message svelte-13e87sq", null, classes_1, { user: get2(message).sender === "user" });
+          classes_2 = set_class(div_3, 1, "bubble svelte-13e87sq", null, classes_2, { user: get2(message).sender === "user" });
+          set_text(text_3, get2(message).content);
+        });
+        append($$anchor3, div_2);
+      });
+      reset(div_1);
+      var div_4 = sibling(div_1, 2);
+      var node_3 = child(div_4);
+      {
+        var consequent_1 = ($$anchor3) => {
+          var span_1 = root_2();
+          var text_4 = child(span_1, true);
+          reset(span_1);
+          template_effect(() => set_text(text_4, get2(chatState).connection === "connecting" ? "Connecting\u2026" : "Offline \u2014 reconnecting\u2026"));
+          append($$anchor3, span_1);
+        };
+        if_block(node_3, ($$render) => {
+          if (!get2(connected)) $$render(consequent_1);
+        });
+      }
+      var form = sibling(node_3, 2);
+      var input = sibling(child(form), 2);
+      remove_input_defaults(input);
+      var button_2 = sibling(input, 2);
+      reset(form);
+      next(2);
+      reset(div_4);
+      reset(section);
+      template_effect(
+        ($0) => {
+          classes = set_class(section, 1, "panel svelte-13e87sq", null, classes, {
+            floating: get2(mode) === "floating",
+            sidebar: get2(mode) === "sidebar"
+          });
+          set_style(section, get2(mode) === "floating" && get2(pos) ? `left:${get2(pos).x}px; top:${get2(pos).y}px; right:auto; bottom:auto;` : "");
+          set_text(text_1, get2(mode) === "sidebar" ? "Quiz Chat" : "Quick Chat");
+          set_attribute2(button, "aria-label", get2(mode) === "sidebar" ? "Float chat" : "Dock chat to sidebar");
+          set_text(text_2, get2(mode) === "sidebar" ? "\u2199" : "\u2197");
+          input.disabled = !get2(connected);
+          button_2.disabled = $0;
+        },
+        [() => !get2(connected) || get2(draft).trim().length === 0]
+      );
+      delegated("pointerdown", header, startDrag);
+      delegated("click", button, toggleMode);
+      delegated("click", button_1, close);
+      event("submit", form, (event2) => {
+        event2.preventDefault();
+        send();
+      });
+      bind_value(input, () => get2(draft), ($$value) => set(draft, $$value));
+      append($$anchor2, section);
+    };
+    if_block(node, ($$render) => {
+      if (get2(open)) $$render(consequent_2);
+    });
+  }
+  var button_3 = sibling(node, 2);
+  let classes_3;
+  template_effect(() => classes_3 = set_class(button_3, 1, "fab svelte-13e87sq", null, classes_3, { hidden: get2(open) }));
+  delegated("click", button_3, toggle);
+  append($$anchor, fragment);
+  return pop($$exports);
+}
+delegate(["pointerdown", "click"]);
+create_custom_element(ChatWidget, { onSidebarChange: {} }, [], [], { mode: "open" });
+
+// src/components/basic/ProgressBar.svelte
+var root3 = from_html(`<div class="progress-track svelte-sbeapt" role="progressbar"><div class="progress-fill svelte-sbeapt"></div></div>`);
+var $$css3 = {
+  hash: "svelte-sbeapt",
+  code: ".progress-track.svelte-sbeapt {height:0.9rem;border-radius:999px;overflow:hidden;background:color-mix(in oklab, var(--color-base-content) 12%, transparent);}.progress-fill.svelte-sbeapt {height:100%;border-radius:999px;background:linear-gradient(90deg, var(--color-warning), var(--color-success));box-shadow:0 0 12px color-mix(in oklab, var(--color-success) 45%, transparent);transition:width 0.3s ease;}"
+};
+function ProgressBar($$anchor, $$props) {
+  push($$props, true);
+  append_styles($$anchor, $$css3);
+  "use strict";
+  let value = prop($$props, "value", 7), label = prop($$props, "label", 7, "");
+  const percent = user_derived(() => Math.min(100, Math.max(0, value())));
+  var $$exports = {
+    get value() {
+      return value();
+    },
+    set value($$value) {
+      value($$value);
+      flushSync();
+    },
+    get label() {
+      return label();
+    },
+    set label($$value = "") {
+      label($$value);
+      flushSync();
+    }
+  };
+  var div = root3();
+  set_attribute2(div, "aria-valuemin", 0);
+  set_attribute2(div, "aria-valuemax", 100);
+  var div_1 = child(div);
+  reset(div);
+  template_effect(
+    ($0) => {
+      set_attribute2(div, "aria-valuenow", $0);
+      set_attribute2(div, "aria-label", label());
+      set_style(div_1, `width: ${get2(percent) ?? ""}%`);
+    },
+    [() => Math.round(get2(percent))]
+  );
+  append($$anchor, div);
+  return pop($$exports);
+}
+create_custom_element(ProgressBar, { value: {}, label: {} }, [], [], { mode: "open" });
+
+// src/components/basic/SegmentedTabs.svelte
+var root4 = from_html(`<button type="button" role="tab"> </button>`);
+var root_13 = from_html(`<div role="tablist" class="seg-tabs svelte-1rwwumd" aria-label="Learning views"></div>`);
+var $$css4 = {
+  hash: "svelte-1rwwumd",
+  code: ".seg-tabs.svelte-1rwwumd {display:inline-flex;gap:0.25rem;}.seg-tab.svelte-1rwwumd {padding:0.25rem 0.75rem;border-radius:0.5rem;font-size:0.85rem;font-weight:600;letter-spacing:0.04em;color:color-mix(in oklab, var(--color-base-content) 65%, transparent);background:transparent;cursor:pointer;}.seg-tab.svelte-1rwwumd:hover:not(:disabled) {color:var(--color-base-content);}.seg-tab.active.svelte-1rwwumd {color:var(--color-primary);background:color-mix(in oklab, var(--color-primary) 16%, transparent);}.seg-tab.svelte-1rwwumd:disabled {cursor:not-allowed;opacity:0.45;}.seg-tab.svelte-1rwwumd:focus-visible {outline:2px solid var(--color-primary);outline-offset:2px;}"
+};
+function SegmentedTabs($$anchor, $$props) {
+  push($$props, true);
+  append_styles($$anchor, $$css4);
+  "use strict";
+  let tabs = prop($$props, "tabs", 7), active = prop($$props, "active", 7), disabledTabs = prop($$props, "disabledTabs", 23, () => []), onSelect = prop($$props, "onSelect", 7);
+  var $$exports = {
+    get tabs() {
+      return tabs();
+    },
+    set tabs($$value) {
+      tabs($$value);
+      flushSync();
+    },
+    get active() {
+      return active();
+    },
+    set active($$value) {
+      active($$value);
+      flushSync();
+    },
+    get disabledTabs() {
+      return disabledTabs();
+    },
+    set disabledTabs($$value = []) {
+      disabledTabs($$value);
+      flushSync();
+    },
+    get onSelect() {
+      return onSelect();
+    },
+    set onSelect($$value) {
+      onSelect($$value);
+      flushSync();
+    }
+  };
+  var div = root_13();
+  each(div, 20, tabs, (tab) => tab, ($$anchor2, tab) => {
+    var button = root4();
+    let classes;
+    var text3 = child(button, true);
+    reset(button);
+    template_effect(
+      ($0) => {
+        classes = set_class(button, 1, "seg-tab svelte-1rwwumd", null, classes, { active: tab === active() });
+        set_attribute2(button, "aria-selected", tab === active());
+        button.disabled = $0;
+        set_text(text3, tab);
+      },
+      [() => disabledTabs().includes(tab)]
+    );
+    delegated("click", button, () => onSelect()?.(tab));
+    append($$anchor2, button);
+  });
+  reset(div);
+  append($$anchor, div);
+  return pop($$exports);
+}
+delegate(["click"]);
+create_custom_element(SegmentedTabs, { tabs: {}, active: {}, disabledTabs: {}, onSelect: {} }, [], [], { mode: "open" });
+
+// src/components/panels/MyLearningPanel.svelte
+var root5 = from_html(`<p class="empty svelte-q1lzti">No courses in progress yet. Enrol in a course to see it here.</p>`);
+var root_14 = from_html(`<span class="tag svelte-q1lzti"> </span>`);
+var root_22 = from_html(`<button type="button" class="course-card svelte-q1lzti"><div class="course-head svelte-q1lzti"><span class="course-name svelte-q1lzti"> </span> <span class="course-bar svelte-q1lzti"><!></span> <span class="course-percent svelte-q1lzti"> </span> <span class="course-go svelte-q1lzti" aria-hidden="true">\u203A</span></div> <div class="course-tags svelte-q1lzti"></div></button>`);
+var root_32 = from_html(`<div class="path-step svelte-q1lzti"><span class="step-num svelte-q1lzti"> </span> <span class="step-title svelte-q1lzti"> </span> <span class="step-status svelte-q1lzti"> </span></div>`);
+var root_42 = from_html(`<div class="repeat-item svelte-q1lzti"><span class="repeat-title svelte-q1lzti"> </span> <span class="repeat-due svelte-q1lzti"> </span></div>`);
+var root_5 = from_html(`<div class="locked svelte-q1lzti"><div class="locked-content svelte-q1lzti" aria-hidden="true"><!></div> <div class="locked-overlay svelte-q1lzti" role="status"><span class="overlay-badge svelte-q1lzti">\u{1F6A7} Coming soon</span> <span class="overlay-note svelte-q1lzti"> </span></div></div>`);
+var root_6 = from_html(`<section class="card panel svelte-q1lzti"><header class="panel-head svelte-q1lzti"><h2 class="panel-title svelte-q1lzti">My Learning</h2> <!></header> <div class="panel-body svelte-q1lzti"><!></div></section>`);
+var $$css5 = {
+  hash: "svelte-q1lzti",
+  code: '\r\n    /* Fill the grid cell at a fixed height; the body scrolls instead of growing. */.panel.svelte-q1lzti {flex:1;min-height:0;display:flex;flex-direction:column;background:var(--color-base-100);border-radius:1.25rem;padding:1.75rem;box-shadow:0 0 24px color-mix(in oklab, var(--color-primary) 10%, transparent);}.panel-head.svelte-q1lzti {flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding-bottom:1rem;margin-bottom:0.5rem;border-bottom:1px solid color-mix(in oklab, var(--color-base-content) 8%, transparent);}.panel-title.svelte-q1lzti {font-size:1.5rem;font-weight:700;letter-spacing:0.02em;color:var(--color-base-content);}\r\n\r\n    /* Scroll area: keeps the card a fixed size regardless of how many courses. */.panel-body.svelte-q1lzti {flex:1;min-height:0;overflow-y:auto;padding-right:0.5rem;display:flex;flex-direction:column;gap:0.75rem;}.panel-body.svelte-q1lzti::-webkit-scrollbar {width:0.5rem;}.panel-body.svelte-q1lzti::-webkit-scrollbar-thumb {border-radius:999px;background:color-mix(in oklab, var(--color-base-content) 20%, transparent);}\r\n\r\n    /* A whole course is one clickable card. */.course-card.svelte-q1lzti {display:block;width:100%;text-align:left;cursor:pointer;background:color-mix(in oklab, var(--color-base-200) 50%, transparent);border:1px solid color-mix(in oklab, var(--color-base-content) 8%, transparent);border-radius:1rem;padding:1rem 1.25rem;transition:border-color 0.2s ease, background 0.2s ease;}.course-card.svelte-q1lzti:hover {background:color-mix(in oklab, var(--color-primary) 12%, transparent);border-color:color-mix(in oklab, var(--color-primary) 45%, transparent);}.course-card.svelte-q1lzti:focus-visible {outline:2px solid var(--color-primary);outline-offset:2px;}\r\n\r\n    /* Fixed name + percent columns => the 1fr bar column is identical on every row. */.course-head.svelte-q1lzti {display:grid;grid-template-columns:14rem 1fr 3.5rem auto;align-items:center;gap:1rem;}.course-name.svelte-q1lzti {font-size:1.6rem;font-weight:700;color:var(--color-base-content);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}.course-bar.svelte-q1lzti {min-width:0;}.course-percent.svelte-q1lzti {font-weight:700;text-align:right;color:var(--color-base-content);}.course-go.svelte-q1lzti {display:grid;place-items:center;width:2rem;height:2rem;border-radius:999px;font-size:1.2rem;line-height:1;color:var(--color-primary-content);background:var(--color-primary);box-shadow:0 0 12px color-mix(in oklab, var(--color-primary) 45%, transparent);}.course-tags.svelte-q1lzti {display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.75rem;}.tag.svelte-q1lzti {font-size:0.75rem;padding:0.15rem 0.6rem;border-radius:999px;color:color-mix(in oklab, var(--color-base-content) 75%, transparent);background:color-mix(in oklab, var(--color-base-content) 10%, transparent);border:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);}.empty.svelte-q1lzti {color:color-mix(in oklab, var(--color-base-content) 60%, transparent);padding:1.5rem 0;}\r\n\r\n    /* Mock content for Path/Repeat, blurred behind a "Coming soon" overlay. */.locked.svelte-q1lzti {position:relative;flex:1;min-height:0;}.locked-content.svelte-q1lzti {display:flex;flex-direction:column;gap:0.75rem;filter:blur(5px);opacity:0.5;pointer-events:none;user-select:none;}.locked-overlay.svelte-q1lzti {position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;text-align:center;}.overlay-badge.svelte-q1lzti {padding:0.4rem 1rem;border-radius:999px;font-weight:700;letter-spacing:0.04em;color:var(--color-warning);background:color-mix(in oklab, var(--color-warning) 16%, transparent);border:1px solid color-mix(in oklab, var(--color-warning) 40%, transparent);}.overlay-note.svelte-q1lzti {font-size:0.85rem;color:color-mix(in oklab, var(--color-base-content) 70%, transparent);}.path-step.svelte-q1lzti,\r\n    .repeat-item.svelte-q1lzti {display:flex;align-items:center;gap:1rem;padding:0.9rem 1.1rem;border-radius:1rem;background:color-mix(in oklab, var(--color-base-200) 50%, transparent);border:1px solid color-mix(in oklab, var(--color-base-content) 8%, transparent);}.repeat-item.svelte-q1lzti {justify-content:space-between;}.step-num.svelte-q1lzti {display:grid;place-items:center;width:2rem;height:2rem;flex:0 0 auto;border-radius:999px;font-weight:700;color:var(--color-primary-content);background:var(--color-primary);}.step-title.svelte-q1lzti,\r\n    .repeat-title.svelte-q1lzti {flex:1 1 auto;font-weight:600;color:var(--color-base-content);}.step-status.svelte-q1lzti {font-size:0.8rem;color:color-mix(in oklab, var(--color-base-content) 65%, transparent);}.repeat-due.svelte-q1lzti {flex:0 0 auto;font-size:0.8rem;padding:0.15rem 0.6rem;border-radius:999px;color:var(--color-primary);background:color-mix(in oklab, var(--color-primary) 14%, transparent);}'
+};
+function MyLearningPanel($$anchor, $$props) {
+  push($$props, true);
+  append_styles($$anchor, $$css5);
+  let courses = prop($$props, "courses", 7), skills = prop($$props, "skills", 7), onCourseOpen = prop($$props, "onCourseOpen", 7);
+  const tabs = ["Current", "Path", "Repeat"];
+  let activeTab = state("Current");
+  const isEmpty2 = user_derived(() => courses().length === 0);
+  const pathSteps = [
+    { step: 1, title: "Foundations", status: "Completed" },
+    { step: 2, title: "Core concepts", status: "In progress" },
+    { step: 3, title: "Hands-on practice", status: "Locked" },
+    { step: 4, title: "Mastery project", status: "Locked" }
+  ];
+  const repeatItems = [
+    { title: "HTML structure", due: "Due today" },
+    { title: "CSS selectors", due: "Due in 2 days" },
+    { title: "JS functions", due: "New" }
+  ];
+  const fallbackPool = [
+    "Grundlagen",
+    "HTML",
+    "CSS",
+    "JavaScript",
+    "SQL",
+    "Datenmodellierung"
+  ];
+  const tagPool = user_derived(() => skills().length > 0 ? skills().map((skill) => skill.name) : fallbackPool);
+  function courseTags(index2) {
+    const pool = get2(tagPool);
+    if (pool.length === 0) {
+      return [];
+    }
+    const count = Math.min(3, pool.length);
+    return Array.from({ length: count }, (_, offset) => pool[(index2 + offset) % pool.length]);
+  }
+  var $$exports = {
+    get courses() {
+      return courses();
+    },
+    set courses($$value) {
+      courses($$value);
+      flushSync();
+    },
+    get skills() {
+      return skills();
+    },
+    set skills($$value) {
+      skills($$value);
+      flushSync();
+    },
+    get onCourseOpen() {
+      return onCourseOpen();
+    },
+    set onCourseOpen($$value) {
+      onCourseOpen($$value);
+      flushSync();
+    }
+  };
+  var section = root_6();
+  var header = child(section);
+  var node = sibling(child(header), 2);
+  SegmentedTabs(node, {
+    get tabs() {
+      return tabs;
+    },
+    get active() {
+      return get2(activeTab);
+    },
+    onSelect: (tab) => set(activeTab, tab, true)
+  });
+  reset(header);
+  var div = sibling(header, 2);
+  var node_1 = child(div);
+  {
+    var consequent_1 = ($$anchor2) => {
+      var fragment = comment();
+      var node_2 = first_child(fragment);
+      {
+        var consequent = ($$anchor3) => {
+          var p = root5();
+          append($$anchor3, p);
+        };
+        var alternate = ($$anchor3) => {
+          var fragment_1 = comment();
+          var node_3 = first_child(fragment_1);
+          each(node_3, 19, courses, (course) => course.id, ($$anchor4, course, index2) => {
+            var button = root_22();
+            var div_1 = child(button);
+            var span = child(div_1);
+            var text3 = child(span, true);
+            reset(span);
+            var span_1 = sibling(span, 2);
+            var node_4 = child(span_1);
+            {
+              let $0 = user_derived(() => `${get2(course).name} progress`);
+              ProgressBar(node_4, {
+                get value() {
+                  return get2(course).progress;
+                },
+                get label() {
+                  return get2($0);
+                }
+              });
+            }
+            reset(span_1);
+            var span_2 = sibling(span_1, 2);
+            var text_1 = child(span_2);
+            reset(span_2);
+            next(2);
+            reset(div_1);
+            var div_2 = sibling(div_1, 2);
+            each(div_2, 20, () => courseTags(get2(index2)), (tag2) => tag2, ($$anchor5, tag2) => {
+              var span_3 = root_14();
+              var text_2 = child(span_3, true);
+              reset(span_3);
+              template_effect(() => set_text(text_2, tag2));
+              append($$anchor5, span_3);
+            });
+            reset(div_2);
+            reset(button);
+            template_effect(
+              ($0) => {
+                set_text(text3, get2(course).name);
+                set_text(text_1, `${$0 ?? ""}%`);
+              },
+              [() => Math.round(get2(course).progress)]
+            );
+            delegated("click", button, () => onCourseOpen()?.(get2(course)));
+            append($$anchor4, button);
+          });
+          append($$anchor3, fragment_1);
+        };
+        if_block(node_2, ($$render) => {
+          if (get2(isEmpty2)) $$render(consequent);
+          else $$render(alternate, -1);
+        });
+      }
+      append($$anchor2, fragment);
+    };
+    var alternate_2 = ($$anchor2) => {
+      var div_3 = root_5();
+      var div_4 = child(div_3);
+      var node_5 = child(div_4);
+      {
+        var consequent_2 = ($$anchor3) => {
+          var fragment_2 = comment();
+          var node_6 = first_child(fragment_2);
+          each(node_6, 17, () => pathSteps, (item) => item.step, ($$anchor4, item) => {
+            var div_5 = root_32();
+            var span_4 = child(div_5);
+            var text_3 = child(span_4, true);
+            reset(span_4);
+            var span_5 = sibling(span_4, 2);
+            var text_4 = child(span_5, true);
+            reset(span_5);
+            var span_6 = sibling(span_5, 2);
+            var text_5 = child(span_6, true);
+            reset(span_6);
+            reset(div_5);
+            template_effect(() => {
+              set_text(text_3, get2(item).step);
+              set_text(text_4, get2(item).title);
+              set_text(text_5, get2(item).status);
+            });
+            append($$anchor4, div_5);
+          });
+          append($$anchor3, fragment_2);
+        };
+        var alternate_1 = ($$anchor3) => {
+          var fragment_3 = comment();
+          var node_7 = first_child(fragment_3);
+          each(node_7, 17, () => repeatItems, (item) => item.title, ($$anchor4, item) => {
+            var div_6 = root_42();
+            var span_7 = child(div_6);
+            var text_6 = child(span_7, true);
+            reset(span_7);
+            var span_8 = sibling(span_7, 2);
+            var text_7 = child(span_8, true);
+            reset(span_8);
+            reset(div_6);
+            template_effect(() => {
+              set_text(text_6, get2(item).title);
+              set_text(text_7, get2(item).due);
+            });
+            append($$anchor4, div_6);
+          });
+          append($$anchor3, fragment_3);
+        };
+        if_block(node_5, ($$render) => {
+          if (get2(activeTab) === "Path") $$render(consequent_2);
+          else $$render(alternate_1, -1);
+        });
+      }
+      reset(div_4);
+      var div_7 = sibling(div_4, 2);
+      var span_9 = sibling(child(div_7), 2);
+      var text_8 = child(span_9);
+      reset(span_9);
+      reset(div_7);
+      reset(div_3);
+      template_effect(() => set_text(text_8, `${get2(activeTab) ?? ""} mode is in the works.`));
+      append($$anchor2, div_3);
+    };
+    if_block(node_1, ($$render) => {
+      if (get2(activeTab) === "Current") $$render(consequent_1);
+      else $$render(alternate_2, -1);
+    });
+  }
+  reset(div);
+  reset(section);
+  append($$anchor, section);
+  return pop($$exports);
+}
+delegate(["click"]);
+create_custom_element(MyLearningPanel, { courses: {}, skills: {}, onCourseOpen: {} }, [], [], { mode: "open" });
+
+// src/components/basic/StatTile.svelte
+var root6 = from_html(`<div class="stat-tile svelte-de708j"><span class="stat-icon svelte-de708j" aria-hidden="true"> </span> <span class="stat-value svelte-de708j"> </span> <span class="sr-only svelte-de708j"> </span></div>`);
+var $$css6 = {
+  hash: "svelte-de708j",
+  code: ".stat-tile.svelte-de708j {display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.35rem;text-align:center;}.stat-icon.svelte-de708j {display:block;width:100%;text-align:center;font-size:1.5rem;line-height:1;}.stat-value.svelte-de708j {display:block;width:100%;text-align:center;font-weight:700;font-size:1.1rem;color:var(--color-base-content);}.sr-only.svelte-de708j {position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0, 0, 0, 0);white-space:nowrap;border:0;}"
+};
+function StatTile($$anchor, $$props) {
+  push($$props, true);
+  append_styles($$anchor, $$css6);
+  "use strict";
+  let icon = prop($$props, "icon", 7), value = prop($$props, "value", 7), label = prop($$props, "label", 7);
+  var $$exports = {
+    get icon() {
+      return icon();
+    },
+    set icon($$value) {
+      icon($$value);
+      flushSync();
+    },
+    get value() {
+      return value();
+    },
+    set value($$value) {
+      value($$value);
+      flushSync();
+    },
+    get label() {
+      return label();
+    },
+    set label($$value) {
+      label($$value);
+      flushSync();
+    }
+  };
+  var div = root6();
+  var span = child(div);
+  var text3 = child(span, true);
+  reset(span);
+  var span_1 = sibling(span, 2);
+  var text_1 = child(span_1, true);
+  reset(span_1);
+  var span_2 = sibling(span_1, 2);
+  var text_2 = child(span_2, true);
+  reset(span_2);
+  reset(div);
+  template_effect(() => {
+    set_attribute2(div, "title", label());
+    set_text(text3, icon());
+    set_text(text_1, value());
+    set_text(text_2, label());
+  });
+  append($$anchor, div);
+  return pop($$exports);
+}
+create_custom_element(StatTile, { icon: {}, value: {}, label: {} }, [], [], { mode: "open" });
+
+// src/components/panels/StatsPanel.svelte
+var root7 = from_html(`<img alt="" class="svelte-1tag4vz"/>`);
+var root_15 = from_html(`<section class="card panel svelte-1tag4vz"><header class="panel-head svelte-1tag4vz"><h2 class="panel-title svelte-1tag4vz">My Stats</h2> <button type="button" class="btn btn-outline btn-sm">Go to Profile</button></header> <div class="identity svelte-1tag4vz"><span class="avatar-mark svelte-1tag4vz" aria-hidden="true"><!></span> <div class="identity-text svelte-1tag4vz"><span class="username svelte-1tag4vz"> </span> <div class="level-row svelte-1tag4vz"><span class="level-label svelte-1tag4vz"> </span> <div class="level-bar svelte-1tag4vz"><!></div> <span class="level-points svelte-1tag4vz"> </span></div></div></div> <div class="stat-grid svelte-1tag4vz"><!> <!> <!> <!></div></section>`);
+var $$css7 = {
+  hash: "svelte-1tag4vz",
+  code: ".panel.svelte-1tag4vz {background:var(--color-base-100);border-radius:1rem;padding:1.5rem;box-shadow:0 0 24px color-mix(in oklab, var(--color-primary) 10%, transparent);}.panel-head.svelte-1tag4vz {display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.25rem;}.panel-title.svelte-1tag4vz {font-size:1.3rem;font-weight:700;color:var(--color-base-content);}.identity.svelte-1tag4vz {display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;}.avatar-mark.svelte-1tag4vz {width:3.5rem;height:3.5rem;flex:0 0 auto;border-radius:999px;overflow:hidden;background:color-mix(in oklab, var(--color-base-content) 18%, transparent);box-shadow:0 0 16px color-mix(in oklab, var(--color-primary) 35%, transparent);}.avatar-mark.svelte-1tag4vz img:where(.svelte-1tag4vz) {width:100%;height:100%;object-fit:cover;}.identity-text.svelte-1tag4vz {flex:1 1 auto;min-width:0;}.username.svelte-1tag4vz {display:block;font-size:1.1rem;font-weight:600;color:var(--color-base-content);}.level-row.svelte-1tag4vz {display:flex;align-items:center;gap:0.6rem;margin-top:0.35rem;}.level-label.svelte-1tag4vz {font-size:0.8rem;white-space:nowrap;color:color-mix(in oklab, var(--color-base-content) 70%, transparent);}.level-bar.svelte-1tag4vz {flex:1 1 auto;}.level-points.svelte-1tag4vz {font-weight:700;color:var(--color-base-content);}.stat-grid.svelte-1tag4vz {display:grid;grid-template-columns:repeat(4, 1fr);gap:0.75rem;}"
+};
+function StatsPanel($$anchor, $$props) {
+  push($$props, true);
+  append_styles($$anchor, $$css7);
+  let user = prop($$props, "user", 7), stats = prop($$props, "stats", 7), onProfile = prop($$props, "onProfile", 7);
+  const numberFormat = new Intl.NumberFormat();
+  const username = user_derived(() => user()?.username ?? "user");
+  const points = user_derived(() => stats()?.points ?? 0);
+  const level = user_derived(() => stats()?.level ?? 1);
+  const levelProgress2 = user_derived(() => stats()?.levelProgress ?? 0);
+  const nextLevelPoints = user_derived(() => stats()?.nextLevelPoints ?? get2(points));
+  function format2(value) {
+    return numberFormat.format(value);
+  }
+  var $$exports = {
+    get user() {
+      return user();
+    },
+    set user($$value) {
+      user($$value);
+      flushSync();
+    },
+    get stats() {
+      return stats();
+    },
+    set stats($$value) {
+      stats($$value);
+      flushSync();
+    },
+    get onProfile() {
+      return onProfile();
+    },
+    set onProfile($$value) {
+      onProfile($$value);
+      flushSync();
+    }
+  };
+  var section = root_15();
+  var header = child(section);
+  var button = sibling(child(header), 2);
+  reset(header);
+  var div = sibling(header, 2);
+  var span = child(div);
+  var node = child(span);
+  {
+    var consequent = ($$anchor2) => {
+      var img = root7();
+      template_effect(() => set_attribute2(img, "src", user().avatarUrl));
+      append($$anchor2, img);
+    };
+    if_block(node, ($$render) => {
+      if (user()?.avatarUrl) $$render(consequent);
+    });
+  }
+  reset(span);
+  var div_1 = sibling(span, 2);
+  var span_1 = child(div_1);
+  var text3 = child(span_1, true);
+  reset(span_1);
+  var div_2 = sibling(span_1, 2);
+  var span_2 = child(div_2);
+  var text_1 = child(span_2);
+  reset(span_2);
+  var div_3 = sibling(span_2, 2);
+  var node_1 = child(div_3);
+  {
+    let $0 = user_derived(() => `Level ${get2(level)} progress`);
+    ProgressBar(node_1, {
+      get value() {
+        return get2(levelProgress2);
+      },
+      get label() {
+        return get2($0);
+      }
+    });
+  }
+  reset(div_3);
+  var span_3 = sibling(div_3, 2);
+  var text_2 = child(span_3, true);
+  reset(span_3);
+  reset(div_2);
+  reset(div_1);
+  reset(div);
+  var div_4 = sibling(div, 2);
+  var node_2 = child(div_4);
+  {
+    let $0 = user_derived(() => format2(stats()?.currentStreak ?? 0));
+    StatTile(node_2, {
+      icon: "\u{1F525}",
+      get value() {
+        return get2($0);
+      },
+      label: "Current streak"
+    });
+  }
+  var node_3 = sibling(node_2, 2);
+  {
+    let $0 = user_derived(() => format2(stats()?.longestStreak ?? 0));
+    StatTile(node_3, {
+      icon: "\u{1F3C6}",
+      get value() {
+        return get2($0);
+      },
+      label: "Longest streak"
+    });
+  }
+  var node_4 = sibling(node_3, 2);
+  {
+    let $0 = user_derived(() => format2(get2(points)));
+    StatTile(node_4, {
+      icon: "\u{1F3AF}",
+      get value() {
+        return get2($0);
+      },
+      label: "Total points"
+    });
+  }
+  var node_5 = sibling(node_4, 2);
+  {
+    let $0 = user_derived(() => format2(get2(level)));
+    StatTile(node_5, {
+      icon: "\u{1F3C5}",
+      get value() {
+        return get2($0);
+      },
+      label: "Level"
+    });
+  }
+  reset(div_4);
+  reset(section);
+  template_effect(
+    ($0) => {
+      set_text(text3, get2(username));
+      set_text(text_1, `Level ${get2(level) ?? ""}`);
+      set_text(text_2, $0);
+    },
+    [() => format2(get2(nextLevelPoints))]
+  );
+  delegated("click", button, () => onProfile()?.());
+  append($$anchor, section);
+  return pop($$exports);
+}
+delegate(["click"]);
+create_custom_element(StatsPanel, { user: {}, stats: {}, onProfile: {} }, [], [], { mode: "open" });
+
+// src/components/panels/SkillMatrixPanel.svelte
+var root8 = from_html(`<p class="empty svelte-168eojm">No skills yet. Complete tasks and quizzes in your courses to earn skills.</p>`);
+var root_16 = from_html(`<div class="skill-row svelte-168eojm"><div class="skill-head svelte-168eojm"><span class="skill-name svelte-168eojm"> </span> <span class="skill-level svelte-168eojm"> </span></div> <div class="skill-bar svelte-168eojm"><!> <span class="skill-percent svelte-168eojm"> </span></div></div>`);
+var root_23 = from_html(`<section class="card panel svelte-168eojm"><h2 class="panel-title svelte-168eojm">Skills</h2> <div class="panel-body svelte-168eojm"><!></div></section>`);
+var $$css8 = {
+  hash: "svelte-168eojm",
+  code: '\n    /* Fill the remaining height of the right column; the body scrolls if needed. */.panel.svelte-168eojm {flex:1;min-height:0;display:flex;flex-direction:column;background:var(--color-base-100);border-radius:1.25rem;padding:1.75rem;box-shadow:0 0 24px color-mix(in oklab, var(--color-primary) 10%, transparent);}.panel-title.svelte-168eojm {flex:0 0 auto;font-size:1.5rem;font-weight:700;margin-bottom:1rem;color:var(--color-base-content);}.panel-body.svelte-168eojm {flex:1;min-height:0;overflow-y:auto;padding-right:0.5rem;display:flex;flex-direction:column;gap:0.75rem;}.panel-body.svelte-168eojm::-webkit-scrollbar {width:0.5rem;}.panel-body.svelte-168eojm::-webkit-scrollbar-thumb {border-radius:999px;background:color-mix(in oklab, var(--color-base-content) 20%, transparent);}\n\n    /* One skill per card, mirroring the course cards in "My Learning". */.skill-row.svelte-168eojm {background:color-mix(in oklab, var(--color-base-200) 50%, transparent);border:1px solid color-mix(in oklab, var(--color-base-content) 8%, transparent);border-radius:1rem;padding:0.9rem 1.1rem;}.skill-head.svelte-168eojm {display:flex;align-items:center;justify-content:space-between;gap:0.75rem;margin-bottom:0.6rem;}.skill-name.svelte-168eojm {font-size:1.05rem;font-weight:700;color:var(--color-base-content);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}.skill-level.svelte-168eojm {flex:0 0 auto;font-size:0.75rem;font-weight:700;letter-spacing:0.03em;padding:0.15rem 0.6rem;border-radius:999px;color:var(--color-primary-content);background:var(--color-primary);box-shadow:0 0 12px color-mix(in oklab, var(--color-primary) 40%, transparent);}.skill-bar.svelte-168eojm {display:grid;grid-template-columns:1fr 3rem;align-items:center;gap:0.75rem;}.skill-percent.svelte-168eojm {font-weight:700;text-align:right;color:var(--color-base-content);}.empty.svelte-168eojm {color:color-mix(in oklab, var(--color-base-content) 60%, transparent);padding:1.5rem 0;}'
+};
+function SkillMatrixPanel($$anchor, $$props) {
+  push($$props, true);
+  append_styles($$anchor, $$css8);
+  let skills = prop($$props, "skills", 7);
+  const isEmpty2 = user_derived(() => skills().length === 0);
+  var $$exports = {
+    get skills() {
+      return skills();
+    },
+    set skills($$value) {
+      skills($$value);
+      flushSync();
+    }
+  };
+  var section = root_23();
+  var div = sibling(child(section), 2);
+  var node = child(div);
+  {
+    var consequent = ($$anchor2) => {
+      var p = root8();
+      append($$anchor2, p);
+    };
+    var alternate = ($$anchor2) => {
+      var fragment = comment();
+      var node_1 = first_child(fragment);
+      each(node_1, 17, skills, (skill) => skill.id, ($$anchor3, skill) => {
+        var div_1 = root_16();
+        var div_2 = child(div_1);
+        var span = child(div_2);
+        var text3 = child(span, true);
+        reset(span);
+        var span_1 = sibling(span, 2);
+        var text_1 = child(span_1);
+        reset(span_1);
+        reset(div_2);
+        var div_3 = sibling(div_2, 2);
+        var node_2 = child(div_3);
+        {
+          let $0 = user_derived(() => `${get2(skill).name} progress`);
+          ProgressBar(node_2, {
+            get value() {
+              return get2(skill).progress;
+            },
+            get label() {
+              return get2($0);
+            }
+          });
+        }
+        var span_2 = sibling(node_2, 2);
+        var text_2 = child(span_2);
+        reset(span_2);
+        reset(div_3);
+        reset(div_1);
+        template_effect(
+          ($0) => {
+            set_text(text3, get2(skill).name);
+            set_text(text_1, `Lv ${get2(skill).level ?? ""}`);
+            set_text(text_2, `${$0 ?? ""}%`);
+          },
+          [() => Math.round(get2(skill).progress)]
+        );
+        append($$anchor3, div_1);
+      });
+      append($$anchor2, fragment);
+    };
+    if_block(node, ($$render) => {
+      if (get2(isEmpty2)) $$render(consequent);
+      else $$render(alternate, -1);
+    });
+  }
+  reset(div);
+  reset(section);
+  append($$anchor, section);
+  return pop($$exports);
+}
+create_custom_element(SkillMatrixPanel, { skills: {} }, [], [], { mode: "open" });
+
+// src/components/pages/DashboardPage.svelte
+var root9 = from_html(`<div class="status svelte-wafcro" role="status" aria-live="polite"><span class="loading loading-spinner loading-lg"></span> <p>Loading your dashboard\u2026</p></div>`);
+var root_17 = from_html(`<div class="status svelte-wafcro" role="alert"><p class="error svelte-wafcro"> </p> <button type="button" class="btn btn-primary btn-sm">Retry</button></div>`);
+var root_24 = from_html(`<div class="grid svelte-wafcro"><div class="grid-main svelte-wafcro"><!></div> <div class="grid-side svelte-wafcro"><!> <!></div></div>`);
+var root_33 = from_html(`<div class="dashboard svelte-wafcro"><header class="top svelte-wafcro"><h1 class="title svelte-wafcro"> </h1></header> <!></div>`);
+var $$css9 = {
+  hash: "svelte-wafcro",
+  code: "\r\n    /* Fill ~90% of the viewport with little margin around the edges. */.dashboard.svelte-wafcro {flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:1.25rem;width:90%;max-width:110rem;margin:0 auto;padding:1.25rem 0 0.5rem;}.top.svelte-wafcro {flex:0 0 auto;text-align:center;}.title.svelte-wafcro {font-size:clamp(1.6rem, 3.5vw, 2.6rem);font-weight:800;letter-spacing:0.04em;color:var(--color-base-content);text-shadow:0 0 24px color-mix(in oklab, var(--color-primary) 45%, transparent);}\r\n\r\n    /* Stretch so both columns share the available height. */.grid.svelte-wafcro {flex:1;min-height:0;display:grid;grid-template-columns:2fr 1fr;gap:1.25rem;align-items:stretch;}.grid-main.svelte-wafcro {display:flex;min-height:0;}.grid-side.svelte-wafcro {display:flex;flex-direction:column;gap:1.25rem;min-height:0;}.status.svelte-wafcro {display:flex;flex-direction:column;align-items:center;gap:1rem;padding:4rem 0;color:color-mix(in oklab, var(--color-base-content) 70%, transparent);}.error.svelte-wafcro {color:var(--color-error);font-weight:600;text-align:center;}\r\n\r\n    @media (max-width: 60rem) {.grid.svelte-wafcro {grid-template-columns:1fr;}\r\n    }"
+};
+function DashboardPage($$anchor, $$props) {
+  push($$props, true);
+  append_styles($$anchor, $$css9);
+  let state3 = state(proxy({
+    isLoading: true,
+    errorMessage: "",
+    user: null,
+    stats: null,
+    skills: [],
+    courses: []
+  }));
+  onMount(() => {
+    const unsubscribe = dashboardStore.subscribe((value) => {
+      set(state3, value, true);
+    });
+    dashboardStore.refresh();
+    return unsubscribe;
+  });
+  const handle = user_derived(() => get2(state3).user?.username ? `@${get2(state3).user.username}` : "@user");
+  var div = root_33();
+  var header = child(div);
+  var h1 = child(header);
+  var text3 = child(h1);
+  reset(h1);
+  reset(header);
+  var node = sibling(header, 2);
+  {
+    var consequent = ($$anchor2) => {
+      var div_1 = root9();
+      append($$anchor2, div_1);
+    };
+    var consequent_1 = ($$anchor2) => {
+      var div_2 = root_17();
+      var p = child(div_2);
+      var text_1 = child(p, true);
+      reset(p);
+      var button = sibling(p, 2);
+      reset(div_2);
+      template_effect(() => set_text(text_1, get2(state3).errorMessage));
+      delegated("click", button, () => dashboardStore.refresh());
+      append($$anchor2, div_2);
+    };
+    var alternate = ($$anchor2) => {
+      var div_3 = root_24();
+      var div_4 = child(div_3);
+      var node_1 = child(div_4);
+      MyLearningPanel(node_1, {
+        get courses() {
+          return get2(state3).courses;
+        },
+        get skills() {
+          return get2(state3).skills;
+        },
+        onCourseOpen: (course) => push2(`/chat/${course.id}`)
+      });
+      reset(div_4);
+      var div_5 = sibling(div_4, 2);
+      var node_2 = child(div_5);
+      StatsPanel(node_2, {
+        get user() {
+          return get2(state3).user;
+        },
+        get stats() {
+          return get2(state3).stats;
+        },
+        onProfile: () => push2("/profile")
+      });
+      var node_3 = sibling(node_2, 2);
+      SkillMatrixPanel(node_3, {
+        get skills() {
+          return get2(state3).skills;
+        }
+      });
+      reset(div_5);
+      reset(div_3);
+      append($$anchor2, div_3);
+    };
+    if_block(node, ($$render) => {
+      if (get2(state3).isLoading) $$render(consequent);
+      else if (get2(state3).errorMessage) $$render(consequent_1, 1);
+      else $$render(alternate, -1);
+    });
+  }
+  reset(div);
+  template_effect(() => set_text(text3, `${get2(handle) ?? ""} Dashboard`));
+  append($$anchor, div);
+  pop();
+}
+delegate(["click"]);
+create_custom_element(DashboardPage, {}, [], [], { mode: "open" });
+
+// src/api/profile.ts
+async function saveProfile(username, fields, picture) {
+  const path = `/api/auth/users/${encodeURIComponent(username)}/`;
+  if (picture) {
+    const form = new FormData();
+    form.set("first_name", fields.firstName);
+    form.set("last_name", fields.lastName);
+    form.set("description", fields.description);
+    form.set("picture", picture);
+    await apiSend("PATCH", path, form, { formData: true });
+    return;
+  }
+  await apiSend("PATCH", path, {
+    first_name: fields.firstName,
+    last_name: fields.lastName,
+    description: fields.description
+  });
+}
+async function fetchEmailAddresses() {
+  const response = await apiGet("/auth-api/browser/v1/account/email");
+  return response.data ?? [];
+}
+async function requestEmailChange(email) {
+  await apiSend("POST", "/auth-api/browser/v1/account/email", { email });
+}
+
+// src/components/pages/ProfileEditPage.svelte
+var root10 = from_html(`<div class="status svelte-1u1012d" role="status" aria-live="polite"><span class="loading loading-spinner loading-lg"></span> <p>Loading your profile\u2026</p></div>`);
+var root_18 = from_html(`<div class="status svelte-1u1012d" role="alert"><p class="error svelte-1u1012d"> </p></div>`);
+var root_25 = from_html(`<img alt="" class="svelte-1u1012d"/>`);
+var root_34 = from_html(`<span class="badge badge-sm badge-primary">primary</span>`);
+var root_43 = from_html(`<li class="svelte-1u1012d"> <span> </span> <!></li>`);
+var root_52 = from_html(`<ul class="email-list svelte-1u1012d"></ul>`);
+var root_62 = from_html(`<p class="error svelte-1u1012d" role="alert"> </p>`);
+var root_7 = from_html(`<p class="success svelte-1u1012d" role="status"> </p>`);
+var root_8 = from_html(`<span class="loading loading-spinner loading-sm"></span>`);
+var root_9 = from_html(`<form class="card form svelte-1u1012d"><div class="avatar-row svelte-1u1012d"><span class="avatar-mark svelte-1u1012d" aria-hidden="true"><!></span> <div class="avatar-actions svelte-1u1012d"><label class="field-label svelte-1u1012d" for="picture">Profile picture</label> <input id="picture" class="file-input file-input-bordered file-input-sm" type="file" accept="image/*"/></div></div> <label class="field svelte-1u1012d"><span class="field-label svelte-1u1012d">Username</span> <input class="input input-bordered" type="text" readonly=""/> <span class="hint svelte-1u1012d">Username cannot be changed.</span></label> <div class="two-col svelte-1u1012d"><label class="field svelte-1u1012d"><span class="field-label svelte-1u1012d">First name</span> <input class="input input-bordered" type="text" autocomplete="given-name"/></label> <label class="field svelte-1u1012d"><span class="field-label svelte-1u1012d">Last name</span> <input class="input input-bordered" type="text" autocomplete="family-name"/></label></div> <label class="field svelte-1u1012d"><span class="field-label svelte-1u1012d">Description</span> <textarea class="textarea textarea-bordered" rows="4"></textarea></label> <label class="field svelte-1u1012d"><span class="field-label svelte-1u1012d">E-mail</span> <input class="input input-bordered" type="email" autocomplete="email"/> <span class="hint svelte-1u1012d">Changing your e-mail sends a verification link; it activates after you confirm.</span></label> <!> <!> <!> <div class="actions svelte-1u1012d"><button type="submit" class="btn btn-primary"><!> Save changes</button></div></form>`);
+var root_10 = from_html(`<div class="profile svelte-1u1012d"><header class="head svelte-1u1012d"><h1 class="title svelte-1u1012d">Edit Profile</h1> <button type="button" class="btn btn-ghost btn-sm">\u2190 Back to Dashboard</button></header> <!></div>`);
+var $$css10 = {
+  hash: "svelte-1u1012d",
+  code: ".profile.svelte-1u1012d {flex:1;min-height:0;overflow-y:auto;max-width:42rem;width:100%;margin:0 auto;padding:2rem 1.5rem 1rem;display:flex;flex-direction:column;gap:1.5rem;}.head.svelte-1u1012d {display:flex;align-items:center;justify-content:space-between;gap:1rem;}.title.svelte-1u1012d {font-size:1.6rem;font-weight:800;color:var(--color-base-content);}.form.svelte-1u1012d {background:var(--color-base-100);border-radius:1rem;padding:1.5rem;display:flex;flex-direction:column;gap:1.1rem;box-shadow:0 0 24px color-mix(in oklab, var(--color-primary) 10%, transparent);}.avatar-row.svelte-1u1012d {display:flex;align-items:center;gap:1rem;}.avatar-mark.svelte-1u1012d {width:4rem;height:4rem;flex:0 0 auto;border-radius:999px;overflow:hidden;background:color-mix(in oklab, var(--color-base-content) 18%, transparent);box-shadow:0 0 16px color-mix(in oklab, var(--color-primary) 30%, transparent);}.avatar-mark.svelte-1u1012d img:where(.svelte-1u1012d) {width:100%;height:100%;object-fit:cover;}.avatar-actions.svelte-1u1012d {display:flex;flex-direction:column;gap:0.35rem;}.field.svelte-1u1012d {display:flex;flex-direction:column;gap:0.35rem;}.field-label.svelte-1u1012d {font-size:0.85rem;font-weight:600;color:color-mix(in oklab, var(--color-base-content) 80%, transparent);}.two-col.svelte-1u1012d {display:grid;grid-template-columns:1fr 1fr;gap:1rem;}.hint.svelte-1u1012d {font-size:0.75rem;color:color-mix(in oklab, var(--color-base-content) 60%, transparent);}.email-list.svelte-1u1012d {list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0.35rem;font-size:0.85rem;color:var(--color-base-content);}.email-list.svelte-1u1012d li:where(.svelte-1u1012d) {display:flex;align-items:center;gap:0.5rem;}.error.svelte-1u1012d {color:var(--color-error);font-weight:600;}.success.svelte-1u1012d {color:var(--color-success);font-weight:600;}.status.svelte-1u1012d {display:flex;flex-direction:column;align-items:center;gap:1rem;padding:4rem 0;color:color-mix(in oklab, var(--color-base-content) 70%, transparent);}.actions.svelte-1u1012d {display:flex;justify-content:flex-end;}\r\n\r\n    @media (max-width: 40rem) {.two-col.svelte-1u1012d {grid-template-columns:1fr;}\r\n    }"
+};
+function ProfileEditPage($$anchor, $$props) {
+  push($$props, true);
+  append_styles($$anchor, $$css10);
+  let isLoading = state(true);
+  let isSaving = state(false);
+  let errorMessage = state("");
+  let successMessage = state("");
+  let username = state("");
+  let firstName = state("");
+  let lastName = state("");
+  let description = state("");
+  let email = state("");
+  let originalEmail = state("");
+  let currentPictureUrl = state(null);
+  let previewUrl = state(null);
+  let pictureFile = state(null);
+  let emails = state(proxy([]));
+  const previewSrc = user_derived(() => get2(previewUrl) ?? get2(currentPictureUrl));
+  async function load() {
+    const user = await fetchCurrentUser();
+    if (!user || !user.is_authenticated) {
+      throw new Error("You are not signed in. Please log in to edit your profile.");
+    }
+    set(username, user.username, true);
+    set(firstName, user.first_name ?? "", true);
+    set(lastName, user.last_name ?? "", true);
+    set(description, user.description ?? "", true);
+    set(email, user.email ?? "", true);
+    set(originalEmail, user.email ?? "", true);
+    set(currentPictureUrl, user.picture ?? null, true);
+    set(emails, await fetchEmailAddresses().catch(() => []), true);
+  }
+  onMount(() => {
+    load().catch((error2) => {
+      set(errorMessage, error2 instanceof Error ? error2.message : String(error2), true);
+    }).finally(() => {
+      set(isLoading, false);
+    });
+  });
+  onDestroy(() => {
+    if (get2(previewUrl)) {
+      URL.revokeObjectURL(get2(previewUrl));
+    }
+  });
+  function onPickFile(event2) {
+    const input = event2.currentTarget;
+    const file = input.files?.[0] ?? null;
+    if (get2(previewUrl)) {
+      URL.revokeObjectURL(get2(previewUrl));
+    }
+    set(pictureFile, file, true);
+    set(previewUrl, file ? URL.createObjectURL(file) : null, true);
+  }
+  async function save2() {
+    if (!get2(username) || get2(isSaving)) {
+      return;
+    }
+    set(isSaving, true);
+    set(errorMessage, "");
+    set(successMessage, "");
+    try {
+      await saveProfile(
+        get2(username),
+        {
+          firstName: get2(firstName),
+          lastName: get2(lastName),
+          description: get2(description)
+        },
+        get2(pictureFile)
+      );
+      let message = "Profile saved.";
+      if (get2(email) && get2(email) !== get2(originalEmail)) {
+        await requestEmailChange(get2(email));
+        message += " A verification link was sent to the new e-mail address.";
+      }
+      if (get2(previewUrl)) {
+        URL.revokeObjectURL(get2(previewUrl));
+      }
+      set(pictureFile, null);
+      set(previewUrl, null);
+      await dashboardStore.refresh();
+      await load();
+      set(successMessage, message, true);
+    } catch (error2) {
+      set(errorMessage, error2 instanceof Error ? error2.message : String(error2), true);
+    } finally {
+      set(isSaving, false);
+    }
+  }
+  var div = root_10();
+  var header = child(div);
+  var button = sibling(child(header), 2);
+  reset(header);
+  var node = sibling(header, 2);
+  {
+    var consequent = ($$anchor2) => {
+      var div_1 = root10();
+      append($$anchor2, div_1);
+    };
+    var consequent_1 = ($$anchor2) => {
+      var div_2 = root_18();
+      var p = child(div_2);
+      var text3 = child(p, true);
+      reset(p);
+      reset(div_2);
+      template_effect(() => set_text(text3, get2(errorMessage)));
+      append($$anchor2, div_2);
+    };
+    var alternate = ($$anchor2) => {
+      var form = root_9();
+      var div_3 = child(form);
+      var span = child(div_3);
+      var node_1 = child(span);
+      {
+        var consequent_2 = ($$anchor3) => {
+          var img = root_25();
+          template_effect(() => set_attribute2(img, "src", get2(previewSrc)));
+          append($$anchor3, img);
+        };
+        if_block(node_1, ($$render) => {
+          if (get2(previewSrc)) $$render(consequent_2);
+        });
+      }
+      reset(span);
+      var div_4 = sibling(span, 2);
+      var input_1 = sibling(child(div_4), 2);
+      reset(div_4);
+      reset(div_3);
+      var label = sibling(div_3, 2);
+      var input_2 = sibling(child(label), 2);
+      remove_input_defaults(input_2);
+      next(2);
+      reset(label);
+      var div_5 = sibling(label, 2);
+      var label_1 = child(div_5);
+      var input_3 = sibling(child(label_1), 2);
+      remove_input_defaults(input_3);
+      reset(label_1);
+      var label_2 = sibling(label_1, 2);
+      var input_4 = sibling(child(label_2), 2);
+      remove_input_defaults(input_4);
+      reset(label_2);
+      reset(div_5);
+      var label_3 = sibling(div_5, 2);
+      var textarea = sibling(child(label_3), 2);
+      remove_textarea_child(textarea);
+      reset(label_3);
+      var label_4 = sibling(label_3, 2);
+      var input_5 = sibling(child(label_4), 2);
+      remove_input_defaults(input_5);
+      next(2);
+      reset(label_4);
+      var node_2 = sibling(label_4, 2);
+      {
+        var consequent_4 = ($$anchor3) => {
+          var ul = root_52();
+          each(ul, 21, () => get2(emails), (entry) => entry.email, ($$anchor4, entry) => {
+            var li = root_43();
+            var text_1 = child(li);
+            var span_1 = sibling(text_1);
+            var text_2 = child(span_1, true);
+            reset(span_1);
+            var node_3 = sibling(span_1, 2);
+            {
+              var consequent_3 = ($$anchor5) => {
+                var span_2 = root_34();
+                append($$anchor5, span_2);
+              };
+              if_block(node_3, ($$render) => {
+                if (get2(entry).primary) $$render(consequent_3);
+              });
+            }
+            reset(li);
+            template_effect(() => {
+              set_text(text_1, `${get2(entry).email ?? ""} `);
+              set_class(span_1, 1, `badge badge-sm ${get2(entry).verified ? "badge-success" : "badge-warning"}`);
+              set_text(text_2, get2(entry).verified ? "verified" : "unverified");
+            });
+            append($$anchor4, li);
+          });
+          reset(ul);
+          append($$anchor3, ul);
+        };
+        if_block(node_2, ($$render) => {
+          if (get2(emails).length > 0) $$render(consequent_4);
+        });
+      }
+      var node_4 = sibling(node_2, 2);
+      {
+        var consequent_5 = ($$anchor3) => {
+          var p_1 = root_62();
+          var text_3 = child(p_1, true);
+          reset(p_1);
+          template_effect(() => set_text(text_3, get2(errorMessage)));
+          append($$anchor3, p_1);
+        };
+        if_block(node_4, ($$render) => {
+          if (get2(errorMessage)) $$render(consequent_5);
+        });
+      }
+      var node_5 = sibling(node_4, 2);
+      {
+        var consequent_6 = ($$anchor3) => {
+          var p_2 = root_7();
+          var text_4 = child(p_2, true);
+          reset(p_2);
+          template_effect(() => set_text(text_4, get2(successMessage)));
+          append($$anchor3, p_2);
+        };
+        if_block(node_5, ($$render) => {
+          if (get2(successMessage)) $$render(consequent_6);
+        });
+      }
+      var div_6 = sibling(node_5, 2);
+      var button_1 = child(div_6);
+      var node_6 = child(button_1);
+      {
+        var consequent_7 = ($$anchor3) => {
+          var span_3 = root_8();
+          append($$anchor3, span_3);
+        };
+        if_block(node_6, ($$render) => {
+          if (get2(isSaving)) $$render(consequent_7);
+        });
+      }
+      next();
+      reset(button_1);
+      reset(div_6);
+      reset(form);
+      template_effect(() => {
+        set_value(input_2, get2(username));
+        button_1.disabled = get2(isSaving);
+      });
+      event("submit", form, (event2) => {
+        event2.preventDefault();
+        save2();
+      });
+      delegated("change", input_1, onPickFile);
+      bind_value(input_3, () => get2(firstName), ($$value) => set(firstName, $$value));
+      bind_value(input_4, () => get2(lastName), ($$value) => set(lastName, $$value));
+      bind_value(textarea, () => get2(description), ($$value) => set(description, $$value));
+      bind_value(input_5, () => get2(email), ($$value) => set(email, $$value));
+      append($$anchor2, form);
+    };
+    if_block(node, ($$render) => {
+      if (get2(isLoading)) $$render(consequent);
+      else if (get2(errorMessage) && !get2(username)) $$render(consequent_1, 1);
+      else $$render(alternate, -1);
+    });
+  }
+  reset(div);
+  delegated("click", button, () => push2("/"));
+  append($$anchor, div);
+  pop();
+}
+delegate(["click", "change"]);
+create_custom_element(ProfileEditPage, {}, [], [], { mode: "open" });
+
+// src/components/pages/CourseChatPage.svelte
+var root11 = from_html(`<span class="soon svelte-nqv0rv">soon</span>`);
+var root_19 = from_html(`<button type="button" class="nav-item svelte-nqv0rv"><span class="nav-icon svelte-nqv0rv" aria-hidden="true"> </span> <span class="nav-label svelte-nqv0rv"> </span> <!></button>`);
+var root_26 = from_html(`<img class="avatar svelte-nqv0rv" src="logo.png" alt="ElisaAI assistant"/>`);
+var root_35 = from_html(`<div><!> <div> </div></div>`);
+var root_44 = from_html(`<div class="error-overlay svelte-nqv0rv" role="alert"><div class="error-card svelte-nqv0rv"><span class="error-icon svelte-nqv0rv" aria-hidden="true">\u{1F50C}</span> <h2 class="error-title svelte-nqv0rv">Assistant unavailable</h2> <p class="error-text svelte-nqv0rv"> </p> <button type="button" class="btn btn-primary">Retry</button></div></div>`);
+var root_53 = from_html(`<div class="chat-screen svelte-nqv0rv"><aside class="sidebar svelte-nqv0rv"><button type="button" class="back svelte-nqv0rv">\u2190 Dashboard</button> <button type="button" class="content-cta svelte-nqv0rv"><span aria-hidden="true">\u{1F4D6}</span> <span>Content</span></button> <nav class="nav svelte-nqv0rv" aria-label="Sections"></nav></aside> <main class="conversation svelte-nqv0rv"><div class="messages svelte-nqv0rv"><div class="message svelte-nqv0rv"><img class="avatar svelte-nqv0rv" src="logo.png" alt="ElisaAI assistant"/> <div class="bubble svelte-nqv0rv">System online. I am <strong>ElisaAI</strong>. Ready to help you with <strong> </strong> \u2014 what topic shall we analyse today?</div></div> <!></div> <div class="composer svelte-nqv0rv"><span><span class="status-dot svelte-nqv0rv" aria-hidden="true"></span> </span> <form class="composer-row svelte-nqv0rv"><button type="button" class="composer-add svelte-nqv0rv" aria-label="Add attachment" disabled="">+</button> <input class="composer-input svelte-nqv0rv" type="text"/> <button type="submit" class="composer-send svelte-nqv0rv" aria-label="Send message">\u2192</button></form> <p class="disclaimer svelte-nqv0rv">ElisaAI 2026 // ElisaAI may generate misinformation. Please verify all information.</p></div> <!></main></div>`);
+var $$css11 = {
+  hash: "svelte-nqv0rv",
+  code: ".chat-screen.svelte-nqv0rv {flex:1;min-height:0;overflow:hidden;display:grid;grid-template-columns:16rem 1fr;grid-template-rows:minmax(0, 1fr);width:100%;}\r\n\r\n    /* Sidebar stays put; only the conversation scrolls. */.sidebar.svelte-nqv0rv {min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:1.5rem;padding:1.5rem 1rem;border-right:1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);background:color-mix(in oklab, var(--color-base-100) 60%, transparent);}.back.svelte-nqv0rv {align-self:flex-start;background:none;border:none;cursor:pointer;font-weight:600;color:var(--color-primary);}.back.svelte-nqv0rv:focus-visible {outline:2px solid var(--color-primary);outline-offset:2px;}.content-cta.svelte-nqv0rv {display:flex;align-items:center;justify-content:center;gap:0.5rem;padding:0.85rem 1rem;border-radius:0.85rem;border:1px solid color-mix(in oklab, var(--color-primary) 55%, transparent);font-size:1.05rem;font-weight:700;cursor:pointer;color:var(--color-primary-content);background:var(--color-primary);box-shadow:0 0 18px color-mix(in oklab, var(--color-primary) 45%, transparent);transition:transform 0.12s ease;}.content-cta.svelte-nqv0rv:hover {transform:translateY(-2px);}.content-cta.svelte-nqv0rv:focus-visible {outline:2px solid var(--color-base-content);outline-offset:2px;}.nav.svelte-nqv0rv {display:flex;flex-direction:column;gap:0.35rem;}.nav-item.svelte-nqv0rv {display:flex;align-items:center;gap:0.75rem;padding:0.65rem 0.75rem;border-radius:0.75rem;background:transparent;border:none;color:var(--color-base-content);cursor:pointer;}.nav-item.svelte-nqv0rv:hover:not(:disabled) {background:color-mix(in oklab, var(--color-primary) 14%, transparent);}.nav-item.svelte-nqv0rv:focus-visible {outline:2px solid var(--color-primary);outline-offset:2px;}.nav-item.svelte-nqv0rv:disabled {cursor:not-allowed;opacity:0.6;}.nav-icon.svelte-nqv0rv {font-size:1.1rem;}.nav-label.svelte-nqv0rv {flex:1 1 auto;text-align:left;font-weight:600;}.soon.svelte-nqv0rv {font-size:0.65rem;text-transform:uppercase;letter-spacing:0.06em;color:color-mix(in oklab, var(--color-base-content) 50%, transparent);}.conversation.svelte-nqv0rv {position:relative;display:flex;flex-direction:column;min-height:0;background:var(--color-base-200);}.messages.svelte-nqv0rv {flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:1.25rem;padding:2rem clamp(1rem, 6vw, 6rem);}.message.svelte-nqv0rv {display:flex;align-items:flex-start;gap:0.85rem;max-width:56rem;}.message.user.svelte-nqv0rv {margin-left:auto;justify-content:flex-end;}.avatar.svelte-nqv0rv {width:2.75rem;height:2.75rem;flex:0 0 auto;border-radius:999px;object-fit:cover;}.bubble.svelte-nqv0rv {padding:1rem 1.25rem;border-radius:1rem;border-top-left-radius:0.25rem;line-height:1.55;color:var(--color-base-content);background:color-mix(in oklab, var(--color-base-100) 85%, transparent);border:1px solid color-mix(in oklab, var(--color-primary) 30%, transparent);box-shadow:0 0 18px color-mix(in oklab, var(--color-primary) 12%, transparent);white-space:pre-wrap;}.bubble.user.svelte-nqv0rv {color:var(--color-primary-content);background:var(--color-primary);border-color:transparent;border-top-left-radius:1rem;border-bottom-right-radius:0.25rem;}.composer.svelte-nqv0rv {flex:0 0 auto;display:flex;flex-direction:column;gap:0.5rem;padding:1rem clamp(1rem, 6vw, 6rem) 1.25rem;}.status.svelte-nqv0rv {align-self:center;display:inline-flex;align-items:center;gap:0.4rem;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.06em;color:color-mix(in oklab, var(--color-base-content) 60%, transparent);}.status-dot.svelte-nqv0rv {width:0.5rem;height:0.5rem;border-radius:999px;background:color-mix(in oklab, var(--color-base-content) 40%, transparent);}.status.online.svelte-nqv0rv {color:var(--color-success);}\r\n\r\n    /* Centered overlay shown when the assistant connection gives up. */.error-overlay.svelte-nqv0rv {position:absolute;inset:0;z-index:5;display:grid;place-items:center;padding:1.5rem;background:color-mix(in oklab, var(--color-base-300) 55%, transparent);backdrop-filter:blur(4px);}.error-card.svelte-nqv0rv {display:flex;flex-direction:column;align-items:center;gap:0.85rem;max-width:26rem;width:100%;text-align:center;padding:2rem;border-radius:1.25rem;background:var(--color-base-100);border:1px solid color-mix(in oklab, var(--color-warning) 35%, transparent);box-shadow:0 0 40px color-mix(in oklab, var(--color-warning) 18%, transparent);}.error-icon.svelte-nqv0rv {font-size:2.5rem;line-height:1;}.error-title.svelte-nqv0rv {font-size:1.3rem;font-weight:700;color:var(--color-base-content);}.error-text.svelte-nqv0rv {line-height:1.5;color:color-mix(in oklab, var(--color-base-content) 75%, transparent);}.status.online.svelte-nqv0rv .status-dot:where(.svelte-nqv0rv) {background:var(--color-success);box-shadow:0 0 10px color-mix(in oklab, var(--color-success) 70%, transparent);}.composer-row.svelte-nqv0rv {display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0.75rem;border-radius:999px;background:color-mix(in oklab, var(--color-base-100) 80%, transparent);border:1px solid color-mix(in oklab, var(--color-primary) 35%, transparent);box-shadow:0 0 18px color-mix(in oklab, var(--color-primary) 12%, transparent);}.composer-add.svelte-nqv0rv,\r\n    .composer-send.svelte-nqv0rv {display:grid;place-items:center;width:2.25rem;height:2.25rem;flex:0 0 auto;border-radius:999px;border:none;font-size:1.2rem;cursor:pointer;color:var(--color-primary-content);background:color-mix(in oklab, var(--color-primary) 70%, transparent);}.composer-add.svelte-nqv0rv:disabled,\r\n    .composer-send.svelte-nqv0rv:disabled {cursor:not-allowed;opacity:0.6;}.composer-input.svelte-nqv0rv {flex:1 1 auto;background:transparent;border:none;color:var(--color-base-content);font-size:1rem;padding:0.5rem 0.25rem;}.composer-input.svelte-nqv0rv:focus {outline:none;}.disclaimer.svelte-nqv0rv {text-align:center;font-size:0.7rem;letter-spacing:0.04em;color:color-mix(in oklab, var(--color-base-content) 55%, transparent);}\r\n\r\n    @media (max-width: 48rem) {.chat-screen.svelte-nqv0rv {grid-template-columns:1fr;}.sidebar.svelte-nqv0rv {display:none;}\r\n    }"
+};
+function CourseChatPage($$anchor, $$props) {
+  push($$props, true);
+  append_styles($$anchor, $$css11);
+  let params = prop($$props, "params", 7);
+  let state3 = state(proxy({
+    isLoading: true,
+    errorMessage: "",
+    user: null,
+    stats: null,
+    skills: [],
+    courses: []
+  }));
+  const chat = createAiChatStore(() => params()?.id);
+  let chatState = state(proxy({ connection: "disconnected", errorMessage: "", messages: [] }));
+  let draft = state("");
+  onMount(() => {
+    const unsubscribeDashboard = dashboardStore.subscribe((value) => {
+      set(state3, value, true);
+    });
+    if (get2(state3).courses.length === 0) {
+      dashboardStore.refresh();
+    }
+    const unsubscribeChat = chat.subscribe((value) => {
+      set(chatState, value, true);
+    });
+    void chat.connect();
+    return () => {
+      unsubscribeDashboard();
+      unsubscribeChat();
+      void chat.disconnect();
+    };
+  });
+  const courseName2 = user_derived(() => get2(state3).courses.find((course) => course.id === params()?.id)?.name ?? "this course");
+  const navItems = user_derived(() => [
+    { icon: "\u{1F3AE}", label: "Games" },
+    {
+      icon: "\u{1F9E0}",
+      label: "Quizzes",
+      to: `/quiz/${params()?.id ?? ""}`
+    },
+    { icon: "\u{1F393}", label: "Exams" },
+    { icon: "\u{1F4AC}", label: "Chats" }
+  ]);
+  const connected = user_derived(() => get2(chatState).connection === "connected");
+  const statusLabel = user_derived(() => get2(chatState).connection === "connected" ? "Online" : get2(chatState).connection === "connecting" ? "Connecting\u2026" : get2(chatState).connection === "wait_before_retry" ? "Reconnecting\u2026" : "Offline");
+  async function send() {
+    const text3 = get2(draft).trim();
+    if (!text3 || !get2(connected)) {
+      return;
+    }
+    set(draft, "");
+    await chat.sendChatInput("markdown", text3);
+  }
+  var $$exports = {
+    get params() {
+      return params();
+    },
+    set params($$value) {
+      params($$value);
+      flushSync();
+    }
+  };
+  var div = root_53();
+  var aside = child(div);
+  var button = child(aside);
+  var button_1 = sibling(button, 2);
+  var nav = sibling(button_1, 2);
+  each(nav, 21, () => get2(navItems), (item) => item.label, ($$anchor2, item) => {
+    var button_2 = root_19();
+    var span = child(button_2);
+    var text_1 = child(span, true);
+    reset(span);
+    var span_1 = sibling(span, 2);
+    var text_2 = child(span_1, true);
+    reset(span_1);
+    var node = sibling(span_1, 2);
+    {
+      var consequent = ($$anchor3) => {
+        var span_2 = root11();
+        append($$anchor3, span_2);
+      };
+      if_block(node, ($$render) => {
+        if (!get2(item).to) $$render(consequent);
+      });
+    }
+    reset(button_2);
+    template_effect(() => {
+      button_2.disabled = !get2(item).to;
+      set_text(text_1, get2(item).icon);
+      set_text(text_2, get2(item).label);
+    });
+    delegated("click", button_2, () => get2(item).to && push2(get2(item).to));
+    append($$anchor2, button_2);
+  });
+  reset(nav);
+  reset(aside);
+  var main = sibling(aside, 2);
+  var div_1 = child(main);
+  var div_2 = child(div_1);
+  var div_3 = sibling(child(div_2), 2);
+  var strong = sibling(child(div_3), 3);
+  var text_3 = child(strong, true);
+  reset(strong);
+  next();
+  reset(div_3);
+  reset(div_2);
+  var node_1 = sibling(div_2, 2);
+  each(node_1, 17, () => get2(chatState).messages, (message) => message.id, ($$anchor2, message) => {
+    var div_4 = root_35();
+    let classes;
+    var node_2 = child(div_4);
+    {
+      var consequent_1 = ($$anchor3) => {
+        var img = root_26();
+        append($$anchor3, img);
+      };
+      if_block(node_2, ($$render) => {
+        if (get2(message).sender === "assistant") $$render(consequent_1);
+      });
+    }
+    var div_5 = sibling(node_2, 2);
+    let classes_1;
+    var text_4 = child(div_5, true);
+    reset(div_5);
+    reset(div_4);
+    template_effect(() => {
+      classes = set_class(div_4, 1, "message svelte-nqv0rv", null, classes, { user: get2(message).sender === "user" });
+      classes_1 = set_class(div_5, 1, "bubble svelte-nqv0rv", null, classes_1, { user: get2(message).sender === "user" });
+      set_text(text_4, get2(message).content);
+    });
+    append($$anchor2, div_4);
+  });
+  reset(div_1);
+  var div_6 = sibling(div_1, 2);
+  var span_3 = child(div_6);
+  let classes_2;
+  var text_5 = sibling(child(span_3));
+  reset(span_3);
+  var form = sibling(span_3, 2);
+  var input = sibling(child(form), 2);
+  remove_input_defaults(input);
+  var button_3 = sibling(input, 2);
+  reset(form);
+  next(2);
+  reset(div_6);
+  var node_3 = sibling(div_6, 2);
+  {
+    var consequent_2 = ($$anchor2) => {
+      var div_7 = root_44();
+      var div_8 = child(div_7);
+      var p = sibling(child(div_8), 4);
+      var text_6 = child(p, true);
+      reset(p);
+      var button_4 = sibling(p, 2);
+      reset(div_8);
+      reset(div_7);
+      template_effect(() => set_text(text_6, get2(chatState).errorMessage));
+      delegated("click", button_4, () => chat.retry());
+      append($$anchor2, div_7);
+    };
+    if_block(node_3, ($$render) => {
+      if (get2(chatState).errorMessage) $$render(consequent_2);
+    });
+  }
+  reset(main);
+  reset(div);
+  template_effect(
+    ($0) => {
+      set_text(text_3, get2(courseName2));
+      classes_2 = set_class(span_3, 1, "status svelte-nqv0rv", null, classes_2, { online: get2(connected) });
+      set_text(text_5, ` ${get2(statusLabel) ?? ""}`);
+      set_attribute2(input, "placeholder", get2(connected) ? "Message" : "Connecting\u2026");
+      input.disabled = !get2(connected);
+      button_3.disabled = $0;
+    },
+    [() => !get2(connected) || get2(draft).trim().length === 0]
+  );
+  delegated("click", button, () => push2("/"));
+  delegated("click", button_1, () => push2(`/content/${params()?.id ?? ""}`));
+  event("submit", form, (event2) => {
+    event2.preventDefault();
+    send();
+  });
+  bind_value(input, () => get2(draft), ($$value) => set(draft, $$value));
+  append($$anchor, div);
+  return pop($$exports);
+}
+delegate(["click"]);
+create_custom_element(CourseChatPage, { params: {} }, [], [], { mode: "open" });
+
+// src/components/pages/QuizPage.svelte
+var root12 = from_html(`<div class="progress-track svelte-10mivl5" aria-hidden="true"><div class="progress-fill svelte-10mivl5"></div></div>`);
+var root_110 = from_html(`<section class="stage result svelte-10mivl5"><h1 class="course svelte-10mivl5"> </h1> <div class="score-ring svelte-10mivl5"> </div> <p class="result-text svelte-10mivl5"> </p> <div class="result-actions svelte-10mivl5"><button type="button" class="btn btn-primary">Try again</button> <button type="button" class="btn btn-ghost">Back to Dashboard</button></div></section>`);
+var root_27 = from_html(`<button type="button"><span class="letter svelte-10mivl5"> </span> <span class="text svelte-10mivl5"> </span></button>`);
+var root_36 = from_html(`<section class="stage svelte-10mivl5"><h1 class="course svelte-10mivl5"> </h1> <span class="progress-pill svelte-10mivl5"> </span> <h2 class="prompt svelte-10mivl5"> </h2> <div class="answers svelte-10mivl5"></div></section>`);
+var root_45 = from_html(`<div class="quiz svelte-10mivl5"><header class="quiz-top svelte-10mivl5"><button type="button" class="content-btn svelte-10mivl5">\u2190 Back</button> <!></header> <!></div>`);
+var $$css12 = {
+  hash: "svelte-10mivl5",
+  code: '.quiz.svelte-10mivl5 {flex:1;min-height:0;display:flex;flex-direction:column;width:100%;background:radial-gradient(120% 70% at 50% 0%, color-mix(in oklab, var(--color-primary) 8%, transparent), transparent 55%),\r\n            var(--color-base-200);}.quiz-top.svelte-10mivl5 {flex:0 0 auto;display:flex;align-items:center;gap:1.5rem;padding:1.25rem 1.5rem;}.content-btn.svelte-10mivl5 {flex:0 0 auto;padding:0.5rem 1.25rem;border-radius:0.75rem;font-weight:600;color:color-mix(in oklab, var(--color-base-content) 80%, transparent);background:color-mix(in oklab, var(--color-base-100) 70%, transparent);border:1px solid color-mix(in oklab, var(--color-base-content) 14%, transparent);cursor:pointer;}.content-btn.svelte-10mivl5:hover {border-color:color-mix(in oklab, var(--color-primary) 45%, transparent);}.progress-track.svelte-10mivl5 {flex:1 1 auto;height:0.5rem;border-radius:999px;overflow:hidden;background:color-mix(in oklab, var(--color-base-content) 12%, transparent);}.progress-fill.svelte-10mivl5 {height:100%;border-radius:999px;background:linear-gradient(90deg, var(--color-primary), var(--color-success));transition:width 0.3s ease;}.stage.svelte-10mivl5 {flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.25rem;width:90%;max-width:64rem;margin:0 auto;padding:1rem 0 2.5rem;}.course.svelte-10mivl5 {font-size:clamp(1.3rem, 2.4vw, 1.9rem);font-weight:700;text-align:center;color:var(--color-base-content);text-shadow:0 0 20px color-mix(in oklab, var(--color-primary) 40%, transparent);}.progress-pill.svelte-10mivl5 {padding:0.3rem 1rem;border-radius:999px;font-weight:700;color:var(--color-primary);background:color-mix(in oklab, var(--color-primary) 16%, transparent);border:1px solid color-mix(in oklab, var(--color-primary) 35%, transparent);}.prompt.svelte-10mivl5 {font-size:clamp(1.7rem, 3.6vw, 2.8rem);font-weight:800;text-align:center;color:var(--color-base-content);text-shadow:0 0 22px color-mix(in oklab, var(--color-primary) 35%, transparent);margin:0.5rem 0 1rem;}.answers.svelte-10mivl5 {width:100%;display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;}\r\n\r\n    /* Answer colours map to DaisyUI semantic tokens (no hardcoded hex). */.answer.svelte-10mivl5 {display:flex;align-items:center;gap:1rem;padding:1.4rem 1.5rem;border-radius:1rem;border:none;font-family:ui-monospace, "SF Mono", Menlo, monospace;font-size:1.2rem;font-weight:700;cursor:pointer;transition:transform 0.12s ease, opacity 0.2s ease, box-shadow 0.2s ease;box-shadow:0 6px 18px color-mix(in oklab, var(--color-base-content) 14%, transparent);}.answer.svelte-10mivl5:hover:not(:disabled) {transform:translateY(-3px);}.answer.svelte-10mivl5:focus-visible {outline:3px solid var(--color-base-content);outline-offset:3px;}.letter.svelte-10mivl5 {display:grid;place-items:center;width:2.1rem;height:2.1rem;flex:0 0 auto;border-radius:0.6rem;font-family:inherit;background:color-mix(in oklab, currentColor 18%, transparent);}.text.svelte-10mivl5 {flex:1 1 auto;text-align:center;}.answer.c0.svelte-10mivl5 {background:var(--color-error);color:var(--color-error-content);}.answer.c1.svelte-10mivl5 {background:var(--color-info);color:var(--color-info-content);}.answer.c2.svelte-10mivl5 {background:var(--color-warning);color:var(--color-warning-content);}.answer.c3.svelte-10mivl5 {background:var(--color-success);color:var(--color-success-content);}.answer.dim.svelte-10mivl5 {opacity:0.35;}.answer.correct.svelte-10mivl5 {outline:4px solid var(--color-base-content);outline-offset:3px;transform:translateY(-3px);}.answer.wrong.svelte-10mivl5 {opacity:0.65;text-decoration:line-through;}.result.svelte-10mivl5 {justify-content:center;}.score-ring.svelte-10mivl5 {display:grid;place-items:center;width:9rem;height:9rem;border-radius:999px;font-size:2rem;font-weight:800;color:var(--color-base-content);background:color-mix(in oklab, var(--color-primary) 14%, transparent);border:4px solid color-mix(in oklab, var(--color-primary) 55%, transparent);box-shadow:0 0 28px color-mix(in oklab, var(--color-primary) 35%, transparent);}.result-text.svelte-10mivl5 {font-size:1.2rem;font-weight:600;color:color-mix(in oklab, var(--color-base-content) 80%, transparent);}.result-actions.svelte-10mivl5 {display:flex;gap:1rem;}\r\n\r\n    @media (max-width: 40rem) {.answers.svelte-10mivl5 {grid-template-columns:1fr;}\r\n    }'
+};
+function QuizPage($$anchor, $$props) {
+  push($$props, true);
+  append_styles($$anchor, $$css12);
+  let params = prop($$props, "params", 7);
+  let state3 = state(proxy({
+    isLoading: true,
+    errorMessage: "",
+    user: null,
+    stats: null,
+    skills: [],
+    courses: []
+  }));
+  onMount(() => {
+    const unsubscribe = dashboardStore.subscribe((value) => {
+      set(state3, value, true);
+    });
+    if (get2(state3).courses.length === 0) {
+      dashboardStore.refresh();
+    }
+    return unsubscribe;
+  });
+  const courseTitle = user_derived(() => get2(state3).courses.find((course) => course.id === params()?.id)?.name ?? "HTML, beginners");
+  const questions = [
+    {
+      prompt: "How do you start a HTML file?",
+      options: [
+        { text: "<html>", correct: true },
+        { text: "<htm>", correct: false },
+        { text: "<hml>", correct: false },
+        { text: "<hm>", correct: false }
+      ]
+    },
+    {
+      prompt: "Which tag holds the page title?",
+      options: [
+        { text: "<title>", correct: true },
+        { text: "<head>", correct: false },
+        { text: "<h1>", correct: false },
+        { text: "<meta>", correct: false }
+      ]
+    },
+    {
+      prompt: "Which tag creates a hyperlink?",
+      options: [
+        { text: "<a>", correct: true },
+        { text: "<link>", correct: false },
+        { text: "<href>", correct: false },
+        { text: "<nav>", correct: false }
+      ]
+    },
+    {
+      prompt: "Which tag inserts an image?",
+      options: [
+        { text: "<img>", correct: true },
+        { text: "<image>", correct: false },
+        { text: "<src>", correct: false },
+        { text: "<pic>", correct: false }
+      ]
+    },
+    {
+      prompt: "Which tag defines a list item?",
+      options: [
+        { text: "<li>", correct: true },
+        { text: "<ul>", correct: false },
+        { text: "<ol>", correct: false },
+        { text: "<item>", correct: false }
+      ]
+    }
+  ];
+  const letters = ["A", "B", "C", "D"];
+  let index2 = state(0);
+  let selected = state(null);
+  let score = state(0);
+  let finished = state(false);
+  let timer = null;
+  const current = user_derived(() => questions[get2(index2)]);
+  const answered = user_derived(() => get2(selected) !== null);
+  const progressPct = user_derived(() => (get2(index2) + (get2(selected) !== null ? 1 : 0)) / questions.length * 100);
+  function advance() {
+    timer = null;
+    if (get2(index2) === questions.length - 1) {
+      set(finished, true);
+    } else {
+      set(index2, get2(index2) + 1);
+      set(selected, null);
+    }
+  }
+  function choose(optionIndex) {
+    if (get2(selected) !== null) {
+      return;
+    }
+    set(selected, optionIndex, true);
+    if (get2(current).options[optionIndex].correct) {
+      set(score, get2(score) + 1);
+    }
+    timer = setTimeout(advance, 950);
+  }
+  function restart() {
+    set(index2, 0);
+    set(selected, null);
+    set(score, 0);
+    set(finished, false);
+  }
+  onDestroy(() => {
+    if (timer) {
+      clearTimeout(timer);
+    }
+  });
+  var $$exports = {
+    get params() {
+      return params();
+    },
+    set params($$value) {
+      params($$value);
+      flushSync();
+    }
+  };
+  var div = root_45();
+  var header = child(div);
+  var button = child(header);
+  var node = sibling(button, 2);
+  {
+    var consequent = ($$anchor2) => {
+      var div_1 = root12();
+      var div_2 = child(div_1);
+      reset(div_1);
+      template_effect(() => set_style(div_2, `width: ${get2(progressPct) ?? ""}%`));
+      append($$anchor2, div_1);
+    };
+    if_block(node, ($$render) => {
+      if (!get2(finished)) $$render(consequent);
+    });
+  }
+  reset(header);
+  var node_1 = sibling(header, 2);
+  {
+    var consequent_1 = ($$anchor2) => {
+      var section = root_110();
+      var h1 = child(section);
+      var text3 = child(h1, true);
+      reset(h1);
+      var div_3 = sibling(h1, 2);
+      var text_1 = child(div_3);
+      reset(div_3);
+      var p = sibling(div_3, 2);
+      var text_2 = child(p, true);
+      reset(p);
+      var div_4 = sibling(p, 2);
+      var button_1 = child(div_4);
+      var button_2 = sibling(button_1, 2);
+      reset(div_4);
+      reset(section);
+      template_effect(() => {
+        set_text(text3, get2(courseTitle));
+        set_text(text_1, `${get2(score) ?? ""}/${questions.length ?? ""}`);
+        set_text(text_2, get2(score) === questions.length ? "Perfect! \u{1F389}" : "Nice work \u2014 keep practising!");
+      });
+      delegated("click", button_1, restart);
+      delegated("click", button_2, () => push2("/"));
+      append($$anchor2, section);
+    };
+    var alternate = ($$anchor2) => {
+      var section_1 = root_36();
+      var h1_1 = child(section_1);
+      var text_3 = child(h1_1, true);
+      reset(h1_1);
+      var span = sibling(h1_1, 2);
+      var text_4 = child(span);
+      reset(span);
+      var h2 = sibling(span, 2);
+      var text_5 = child(h2, true);
+      reset(h2);
+      var div_5 = sibling(h2, 2);
+      each(div_5, 23, () => get2(current).options, (option) => option.text, ($$anchor3, option, optionIndex) => {
+        var button_3 = root_27();
+        let classes;
+        var span_1 = child(button_3);
+        var text_6 = child(span_1, true);
+        reset(span_1);
+        var span_2 = sibling(span_1, 2);
+        var text_7 = child(span_2, true);
+        reset(span_2);
+        reset(button_3);
+        template_effect(() => {
+          classes = set_class(button_3, 1, `answer c${get2(optionIndex) ?? ""}`, "svelte-10mivl5", classes, {
+            correct: get2(answered) && get2(option).correct,
+            wrong: get2(answered) && get2(optionIndex) === get2(selected) && !get2(option).correct,
+            dim: get2(answered) && !get2(option).correct && get2(optionIndex) !== get2(selected)
+          });
+          button_3.disabled = get2(answered);
+          set_text(text_6, letters[get2(optionIndex)]);
+          set_text(text_7, get2(option).text);
+        });
+        delegated("click", button_3, () => choose(get2(optionIndex)));
+        append($$anchor3, button_3);
+      });
+      reset(div_5);
+      reset(section_1);
+      template_effect(() => {
+        set_text(text_3, get2(courseTitle));
+        set_text(text_4, `Question ${get2(index2) + 1} / ${questions.length ?? ""}`);
+        set_text(text_5, get2(current).prompt);
+      });
+      append($$anchor2, section_1);
+    };
+    if_block(node_1, ($$render) => {
+      if (get2(finished)) $$render(consequent_1);
+      else $$render(alternate, -1);
+    });
+  }
+  reset(div);
+  delegated("click", button, () => window.history.back());
+  append($$anchor, div);
+  return pop($$exports);
+}
+delegate(["click"]);
+create_custom_element(QuizPage, { params: {} }, [], [], { mode: "open" });
+
+// ../../../node_modules/markdown-it/lib/common/utils.mjs
+var utils_exports = {};
+__export(utils_exports, {
+  arrayReplaceAt: () => arrayReplaceAt,
+  asciiTrim: () => asciiTrim,
+  assign: () => assign2,
+  escapeHtml: () => escapeHtml,
+  escapeRE: () => escapeRE,
+  fromCodePoint: () => fromCodePoint2,
+  has: () => has,
+  isMdAsciiPunct: () => isMdAsciiPunct,
+  isPunctChar: () => isPunctChar,
+  isPunctCharCode: () => isPunctCharCode,
+  isSpace: () => isSpace,
+  isString: () => isString,
+  isValidEntityCode: () => isValidEntityCode,
+  isWhiteSpace: () => isWhiteSpace,
+  lib: () => lib,
+  normalizeReference: () => normalizeReference,
+  unescapeAll: () => unescapeAll,
+  unescapeMd: () => unescapeMd
+});
+
+// ../../../node_modules/mdurl/index.mjs
+var mdurl_exports = {};
+__export(mdurl_exports, {
+  decode: () => decode_default,
+  encode: () => encode_default,
+  format: () => format,
+  parse: () => parse_default
+});
+
+// ../../../node_modules/mdurl/lib/decode.mjs
+var decodeCache = {};
+function getDecodeCache(exclude) {
+  let cache = decodeCache[exclude];
+  if (cache) {
+    return cache;
+  }
+  cache = decodeCache[exclude] = [];
+  for (let i = 0; i < 128; i++) {
+    const ch = String.fromCharCode(i);
+    cache.push(ch);
+  }
+  for (let i = 0; i < exclude.length; i++) {
+    const ch = exclude.charCodeAt(i);
+    cache[ch] = "%" + ("0" + ch.toString(16).toUpperCase()).slice(-2);
+  }
+  return cache;
+}
+function decode(string, exclude) {
+  if (typeof exclude !== "string") {
+    exclude = decode.defaultChars;
+  }
+  const cache = getDecodeCache(exclude);
+  return string.replace(/(%[a-f0-9]{2})+/gi, function(seq) {
+    let result = "";
+    for (let i = 0, l = seq.length; i < l; i += 3) {
+      const b1 = parseInt(seq.slice(i + 1, i + 3), 16);
+      if (b1 < 128) {
+        result += cache[b1];
+        continue;
+      }
+      if ((b1 & 224) === 192 && i + 3 < l) {
+        const b2 = parseInt(seq.slice(i + 4, i + 6), 16);
+        if ((b2 & 192) === 128) {
+          const chr = b1 << 6 & 1984 | b2 & 63;
+          if (chr < 128) {
+            result += "\uFFFD\uFFFD";
+          } else {
+            result += String.fromCharCode(chr);
+          }
+          i += 3;
+          continue;
+        }
+      }
+      if ((b1 & 240) === 224 && i + 6 < l) {
+        const b2 = parseInt(seq.slice(i + 4, i + 6), 16);
+        const b3 = parseInt(seq.slice(i + 7, i + 9), 16);
+        if ((b2 & 192) === 128 && (b3 & 192) === 128) {
+          const chr = b1 << 12 & 61440 | b2 << 6 & 4032 | b3 & 63;
+          if (chr < 2048 || chr >= 55296 && chr <= 57343) {
+            result += "\uFFFD\uFFFD\uFFFD";
+          } else {
+            result += String.fromCharCode(chr);
+          }
+          i += 6;
+          continue;
+        }
+      }
+      if ((b1 & 248) === 240 && i + 9 < l) {
+        const b2 = parseInt(seq.slice(i + 4, i + 6), 16);
+        const b3 = parseInt(seq.slice(i + 7, i + 9), 16);
+        const b4 = parseInt(seq.slice(i + 10, i + 12), 16);
+        if ((b2 & 192) === 128 && (b3 & 192) === 128 && (b4 & 192) === 128) {
+          let chr = b1 << 18 & 1835008 | b2 << 12 & 258048 | b3 << 6 & 4032 | b4 & 63;
+          if (chr < 65536 || chr > 1114111) {
+            result += "\uFFFD\uFFFD\uFFFD\uFFFD";
+          } else {
+            chr -= 65536;
+            result += String.fromCharCode(55296 + (chr >> 10), 56320 + (chr & 1023));
+          }
+          i += 9;
+          continue;
+        }
+      }
+      result += "\uFFFD";
+    }
+    return result;
+  });
+}
+decode.defaultChars = ";/?:@&=+$,#";
+decode.componentChars = "";
+var decode_default = decode;
+
+// ../../../node_modules/mdurl/lib/encode.mjs
+var encodeCache = {};
+function getEncodeCache(exclude) {
+  let cache = encodeCache[exclude];
+  if (cache) {
+    return cache;
+  }
+  cache = encodeCache[exclude] = [];
+  for (let i = 0; i < 128; i++) {
+    const ch = String.fromCharCode(i);
+    if (/^[0-9a-z]$/i.test(ch)) {
+      cache.push(ch);
+    } else {
+      cache.push("%" + ("0" + i.toString(16).toUpperCase()).slice(-2));
+    }
+  }
+  for (let i = 0; i < exclude.length; i++) {
+    cache[exclude.charCodeAt(i)] = exclude[i];
+  }
+  return cache;
+}
+function encode(string, exclude, keepEscaped) {
+  if (typeof exclude !== "string") {
+    keepEscaped = exclude;
+    exclude = encode.defaultChars;
+  }
+  if (typeof keepEscaped === "undefined") {
+    keepEscaped = true;
+  }
+  const cache = getEncodeCache(exclude);
+  let result = "";
+  for (let i = 0, l = string.length; i < l; i++) {
+    const code2 = string.charCodeAt(i);
+    if (keepEscaped && code2 === 37 && i + 2 < l) {
+      if (/^[0-9a-f]{2}$/i.test(string.slice(i + 1, i + 3))) {
+        result += string.slice(i, i + 3);
+        i += 2;
+        continue;
+      }
+    }
+    if (code2 < 128) {
+      result += cache[code2];
+      continue;
+    }
+    if (code2 >= 55296 && code2 <= 57343) {
+      if (code2 >= 55296 && code2 <= 56319 && i + 1 < l) {
+        const nextCode = string.charCodeAt(i + 1);
+        if (nextCode >= 56320 && nextCode <= 57343) {
+          result += encodeURIComponent(string[i] + string[i + 1]);
+          i++;
+          continue;
+        }
+      }
+      result += "%EF%BF%BD";
+      continue;
+    }
+    result += encodeURIComponent(string[i]);
+  }
+  return result;
+}
+encode.defaultChars = ";/?:@&=+$,-_.!~*'()#";
+encode.componentChars = "-_.!~*'()";
+var encode_default = encode;
+
+// ../../../node_modules/mdurl/lib/format.mjs
+function format(url) {
+  let result = "";
+  result += url.protocol || "";
+  result += url.slashes ? "//" : "";
+  result += url.auth ? url.auth + "@" : "";
+  if (url.hostname && url.hostname.indexOf(":") !== -1) {
+    result += "[" + url.hostname + "]";
+  } else {
+    result += url.hostname || "";
+  }
+  result += url.port ? ":" + url.port : "";
+  result += url.pathname || "";
+  result += url.search || "";
+  result += url.hash || "";
+  return result;
+}
+
+// ../../../node_modules/mdurl/lib/parse.mjs
+function Url() {
+  this.protocol = null;
+  this.slashes = null;
+  this.auth = null;
+  this.port = null;
+  this.hostname = null;
+  this.hash = null;
+  this.search = null;
+  this.pathname = null;
+}
+var protocolPattern = /^([a-z0-9.+-]+:)/i;
+var portPattern = /:[0-9]*$/;
+var simplePathPattern = /^(\/\/?(?!\/)[^\?\s]*)(\?[^\s]*)?$/;
+var delims = ["<", ">", '"', "`", " ", "\r", "\n", "	"];
+var unwise = ["{", "}", "|", "\\", "^", "`"].concat(delims);
+var autoEscape = ["'"].concat(unwise);
+var nonHostChars = ["%", "/", "?", ";", "#"].concat(autoEscape);
+var hostEndingChars = ["/", "?", "#"];
+var hostnameMaxLen = 255;
+var hostnamePartPattern = /^[+a-z0-9A-Z_-]{0,63}$/;
+var hostnamePartStart = /^([+a-z0-9A-Z_-]{0,63})(.*)$/;
+var hostlessProtocol = {
+  javascript: true,
+  "javascript:": true
+};
+var slashedProtocol = {
+  http: true,
+  https: true,
+  ftp: true,
+  gopher: true,
+  file: true,
+  "http:": true,
+  "https:": true,
+  "ftp:": true,
+  "gopher:": true,
+  "file:": true
+};
+function urlParse(url, slashesDenoteHost) {
+  if (url && url instanceof Url) return url;
+  const u = new Url();
+  u.parse(url, slashesDenoteHost);
+  return u;
+}
+Url.prototype.parse = function(url, slashesDenoteHost) {
+  let lowerProto, hec, slashes;
+  let rest = url;
+  rest = rest.trim();
+  if (!slashesDenoteHost && url.split("#").length === 1) {
+    const simplePath = simplePathPattern.exec(rest);
+    if (simplePath) {
+      this.pathname = simplePath[1];
+      if (simplePath[2]) {
+        this.search = simplePath[2];
+      }
+      return this;
+    }
+  }
+  let proto = protocolPattern.exec(rest);
+  if (proto) {
+    proto = proto[0];
+    lowerProto = proto.toLowerCase();
+    this.protocol = proto;
+    rest = rest.substr(proto.length);
+  }
+  if (slashesDenoteHost || proto || rest.match(/^\/\/[^@\/]+@[^@\/]+/)) {
+    slashes = rest.substr(0, 2) === "//";
+    if (slashes && !(proto && hostlessProtocol[proto])) {
+      rest = rest.substr(2);
+      this.slashes = true;
+    }
+  }
+  if (!hostlessProtocol[proto] && (slashes || proto && !slashedProtocol[proto])) {
+    let hostEnd = -1;
+    for (let i = 0; i < hostEndingChars.length; i++) {
+      hec = rest.indexOf(hostEndingChars[i]);
+      if (hec !== -1 && (hostEnd === -1 || hec < hostEnd)) {
+        hostEnd = hec;
+      }
+    }
+    let auth, atSign;
+    if (hostEnd === -1) {
+      atSign = rest.lastIndexOf("@");
+    } else {
+      atSign = rest.lastIndexOf("@", hostEnd);
+    }
+    if (atSign !== -1) {
+      auth = rest.slice(0, atSign);
+      rest = rest.slice(atSign + 1);
+      this.auth = auth;
+    }
+    hostEnd = -1;
+    for (let i = 0; i < nonHostChars.length; i++) {
+      hec = rest.indexOf(nonHostChars[i]);
+      if (hec !== -1 && (hostEnd === -1 || hec < hostEnd)) {
+        hostEnd = hec;
+      }
+    }
+    if (hostEnd === -1) {
+      hostEnd = rest.length;
+    }
+    if (rest[hostEnd - 1] === ":") {
+      hostEnd--;
+    }
+    const host = rest.slice(0, hostEnd);
+    rest = rest.slice(hostEnd);
+    this.parseHost(host);
+    this.hostname = this.hostname || "";
+    const ipv6Hostname = this.hostname[0] === "[" && this.hostname[this.hostname.length - 1] === "]";
+    if (!ipv6Hostname) {
+      const hostparts = this.hostname.split(/\./);
+      for (let i = 0, l = hostparts.length; i < l; i++) {
+        const part = hostparts[i];
+        if (!part) {
+          continue;
+        }
+        if (!part.match(hostnamePartPattern)) {
+          let newpart = "";
+          for (let j = 0, k = part.length; j < k; j++) {
+            if (part.charCodeAt(j) > 127) {
+              newpart += "x";
+            } else {
+              newpart += part[j];
+            }
+          }
+          if (!newpart.match(hostnamePartPattern)) {
+            const validParts = hostparts.slice(0, i);
+            const notHost = hostparts.slice(i + 1);
+            const bit = part.match(hostnamePartStart);
+            if (bit) {
+              validParts.push(bit[1]);
+              notHost.unshift(bit[2]);
+            }
+            if (notHost.length) {
+              rest = notHost.join(".") + rest;
+            }
+            this.hostname = validParts.join(".");
+            break;
+          }
+        }
+      }
+    }
+    if (this.hostname.length > hostnameMaxLen) {
+      this.hostname = "";
+    }
+    if (ipv6Hostname) {
+      this.hostname = this.hostname.substr(1, this.hostname.length - 2);
+    }
+  }
+  const hash2 = rest.indexOf("#");
+  if (hash2 !== -1) {
+    this.hash = rest.substr(hash2);
+    rest = rest.slice(0, hash2);
+  }
+  const qm = rest.indexOf("?");
+  if (qm !== -1) {
+    this.search = rest.substr(qm);
+    rest = rest.slice(0, qm);
+  }
+  if (rest) {
+    this.pathname = rest;
+  }
+  if (slashedProtocol[lowerProto] && this.hostname && !this.pathname) {
+    this.pathname = "";
+  }
+  return this;
+};
+Url.prototype.parseHost = function(host) {
+  let port = portPattern.exec(host);
+  if (port) {
+    port = port[0];
+    if (port !== ":") {
+      this.port = port.substr(1);
+    }
+    host = host.substr(0, host.length - port.length);
+  }
+  if (host) {
+    this.hostname = host;
+  }
+};
+var parse_default = urlParse;
+
+// ../../../node_modules/uc.micro/index.mjs
+var uc_exports = {};
+__export(uc_exports, {
+  Any: () => regex_default,
+  Cc: () => regex_default2,
+  Cf: () => regex_default3,
+  P: () => regex_default4,
+  S: () => regex_default5,
+  Z: () => regex_default6
+});
+
+// ../../../node_modules/uc.micro/properties/Any/regex.mjs
+var regex_default = /[\0-\uD7FF\uE000-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]/;
+
+// ../../../node_modules/uc.micro/categories/Cc/regex.mjs
+var regex_default2 = /[\0-\x1F\x7F-\x9F]/;
+
+// ../../../node_modules/uc.micro/categories/Cf/regex.mjs
+var regex_default3 = /[\xAD\u0600-\u0605\u061C\u06DD\u070F\u0890\u0891\u08E2\u180E\u200B-\u200F\u202A-\u202E\u2060-\u2064\u2066-\u206F\uFEFF\uFFF9-\uFFFB]|\uD804[\uDCBD\uDCCD]|\uD80D[\uDC30-\uDC3F]|\uD82F[\uDCA0-\uDCA3]|\uD834[\uDD73-\uDD7A]|\uDB40[\uDC01\uDC20-\uDC7F]/;
+
+// ../../../node_modules/uc.micro/categories/P/regex.mjs
+var regex_default4 = /[!-#%-\*,-\/:;\?@\[-\]_\{\}\xA1\xA7\xAB\xB6\xB7\xBB\xBF\u037E\u0387\u055A-\u055F\u0589\u058A\u05BE\u05C0\u05C3\u05C6\u05F3\u05F4\u0609\u060A\u060C\u060D\u061B\u061D-\u061F\u066A-\u066D\u06D4\u0700-\u070D\u07F7-\u07F9\u0830-\u083E\u085E\u0964\u0965\u0970\u09FD\u0A76\u0AF0\u0C77\u0C84\u0DF4\u0E4F\u0E5A\u0E5B\u0F04-\u0F12\u0F14\u0F3A-\u0F3D\u0F85\u0FD0-\u0FD4\u0FD9\u0FDA\u104A-\u104F\u10FB\u1360-\u1368\u1400\u166E\u169B\u169C\u16EB-\u16ED\u1735\u1736\u17D4-\u17D6\u17D8-\u17DA\u1800-\u180A\u1944\u1945\u1A1E\u1A1F\u1AA0-\u1AA6\u1AA8-\u1AAD\u1B5A-\u1B60\u1B7D\u1B7E\u1BFC-\u1BFF\u1C3B-\u1C3F\u1C7E\u1C7F\u1CC0-\u1CC7\u1CD3\u2010-\u2027\u2030-\u2043\u2045-\u2051\u2053-\u205E\u207D\u207E\u208D\u208E\u2308-\u230B\u2329\u232A\u2768-\u2775\u27C5\u27C6\u27E6-\u27EF\u2983-\u2998\u29D8-\u29DB\u29FC\u29FD\u2CF9-\u2CFC\u2CFE\u2CFF\u2D70\u2E00-\u2E2E\u2E30-\u2E4F\u2E52-\u2E5D\u3001-\u3003\u3008-\u3011\u3014-\u301F\u3030\u303D\u30A0\u30FB\uA4FE\uA4FF\uA60D-\uA60F\uA673\uA67E\uA6F2-\uA6F7\uA874-\uA877\uA8CE\uA8CF\uA8F8-\uA8FA\uA8FC\uA92E\uA92F\uA95F\uA9C1-\uA9CD\uA9DE\uA9DF\uAA5C-\uAA5F\uAADE\uAADF\uAAF0\uAAF1\uABEB\uFD3E\uFD3F\uFE10-\uFE19\uFE30-\uFE52\uFE54-\uFE61\uFE63\uFE68\uFE6A\uFE6B\uFF01-\uFF03\uFF05-\uFF0A\uFF0C-\uFF0F\uFF1A\uFF1B\uFF1F\uFF20\uFF3B-\uFF3D\uFF3F\uFF5B\uFF5D\uFF5F-\uFF65]|\uD800[\uDD00-\uDD02\uDF9F\uDFD0]|\uD801\uDD6F|\uD802[\uDC57\uDD1F\uDD3F\uDE50-\uDE58\uDE7F\uDEF0-\uDEF6\uDF39-\uDF3F\uDF99-\uDF9C]|\uD803[\uDEAD\uDF55-\uDF59\uDF86-\uDF89]|\uD804[\uDC47-\uDC4D\uDCBB\uDCBC\uDCBE-\uDCC1\uDD40-\uDD43\uDD74\uDD75\uDDC5-\uDDC8\uDDCD\uDDDB\uDDDD-\uDDDF\uDE38-\uDE3D\uDEA9]|\uD805[\uDC4B-\uDC4F\uDC5A\uDC5B\uDC5D\uDCC6\uDDC1-\uDDD7\uDE41-\uDE43\uDE60-\uDE6C\uDEB9\uDF3C-\uDF3E]|\uD806[\uDC3B\uDD44-\uDD46\uDDE2\uDE3F-\uDE46\uDE9A-\uDE9C\uDE9E-\uDEA2\uDF00-\uDF09]|\uD807[\uDC41-\uDC45\uDC70\uDC71\uDEF7\uDEF8\uDF43-\uDF4F\uDFFF]|\uD809[\uDC70-\uDC74]|\uD80B[\uDFF1\uDFF2]|\uD81A[\uDE6E\uDE6F\uDEF5\uDF37-\uDF3B\uDF44]|\uD81B[\uDE97-\uDE9A\uDFE2]|\uD82F\uDC9F|\uD836[\uDE87-\uDE8B]|\uD83A[\uDD5E\uDD5F]/;
+
+// ../../../node_modules/uc.micro/categories/S/regex.mjs
+var regex_default5 = /[\$\+<->\^`\|~\xA2-\xA6\xA8\xA9\xAC\xAE-\xB1\xB4\xB8\xD7\xF7\u02C2-\u02C5\u02D2-\u02DF\u02E5-\u02EB\u02ED\u02EF-\u02FF\u0375\u0384\u0385\u03F6\u0482\u058D-\u058F\u0606-\u0608\u060B\u060E\u060F\u06DE\u06E9\u06FD\u06FE\u07F6\u07FE\u07FF\u0888\u09F2\u09F3\u09FA\u09FB\u0AF1\u0B70\u0BF3-\u0BFA\u0C7F\u0D4F\u0D79\u0E3F\u0F01-\u0F03\u0F13\u0F15-\u0F17\u0F1A-\u0F1F\u0F34\u0F36\u0F38\u0FBE-\u0FC5\u0FC7-\u0FCC\u0FCE\u0FCF\u0FD5-\u0FD8\u109E\u109F\u1390-\u1399\u166D\u17DB\u1940\u19DE-\u19FF\u1B61-\u1B6A\u1B74-\u1B7C\u1FBD\u1FBF-\u1FC1\u1FCD-\u1FCF\u1FDD-\u1FDF\u1FED-\u1FEF\u1FFD\u1FFE\u2044\u2052\u207A-\u207C\u208A-\u208C\u20A0-\u20C0\u2100\u2101\u2103-\u2106\u2108\u2109\u2114\u2116-\u2118\u211E-\u2123\u2125\u2127\u2129\u212E\u213A\u213B\u2140-\u2144\u214A-\u214D\u214F\u218A\u218B\u2190-\u2307\u230C-\u2328\u232B-\u2426\u2440-\u244A\u249C-\u24E9\u2500-\u2767\u2794-\u27C4\u27C7-\u27E5\u27F0-\u2982\u2999-\u29D7\u29DC-\u29FB\u29FE-\u2B73\u2B76-\u2B95\u2B97-\u2BFF\u2CE5-\u2CEA\u2E50\u2E51\u2E80-\u2E99\u2E9B-\u2EF3\u2F00-\u2FD5\u2FF0-\u2FFF\u3004\u3012\u3013\u3020\u3036\u3037\u303E\u303F\u309B\u309C\u3190\u3191\u3196-\u319F\u31C0-\u31E3\u31EF\u3200-\u321E\u322A-\u3247\u3250\u3260-\u327F\u328A-\u32B0\u32C0-\u33FF\u4DC0-\u4DFF\uA490-\uA4C6\uA700-\uA716\uA720\uA721\uA789\uA78A\uA828-\uA82B\uA836-\uA839\uAA77-\uAA79\uAB5B\uAB6A\uAB6B\uFB29\uFBB2-\uFBC2\uFD40-\uFD4F\uFDCF\uFDFC-\uFDFF\uFE62\uFE64-\uFE66\uFE69\uFF04\uFF0B\uFF1C-\uFF1E\uFF3E\uFF40\uFF5C\uFF5E\uFFE0-\uFFE6\uFFE8-\uFFEE\uFFFC\uFFFD]|\uD800[\uDD37-\uDD3F\uDD79-\uDD89\uDD8C-\uDD8E\uDD90-\uDD9C\uDDA0\uDDD0-\uDDFC]|\uD802[\uDC77\uDC78\uDEC8]|\uD805\uDF3F|\uD807[\uDFD5-\uDFF1]|\uD81A[\uDF3C-\uDF3F\uDF45]|\uD82F\uDC9C|\uD833[\uDF50-\uDFC3]|\uD834[\uDC00-\uDCF5\uDD00-\uDD26\uDD29-\uDD64\uDD6A-\uDD6C\uDD83\uDD84\uDD8C-\uDDA9\uDDAE-\uDDEA\uDE00-\uDE41\uDE45\uDF00-\uDF56]|\uD835[\uDEC1\uDEDB\uDEFB\uDF15\uDF35\uDF4F\uDF6F\uDF89\uDFA9\uDFC3]|\uD836[\uDC00-\uDDFF\uDE37-\uDE3A\uDE6D-\uDE74\uDE76-\uDE83\uDE85\uDE86]|\uD838[\uDD4F\uDEFF]|\uD83B[\uDCAC\uDCB0\uDD2E\uDEF0\uDEF1]|\uD83C[\uDC00-\uDC2B\uDC30-\uDC93\uDCA0-\uDCAE\uDCB1-\uDCBF\uDCC1-\uDCCF\uDCD1-\uDCF5\uDD0D-\uDDAD\uDDE6-\uDE02\uDE10-\uDE3B\uDE40-\uDE48\uDE50\uDE51\uDE60-\uDE65\uDF00-\uDFFF]|\uD83D[\uDC00-\uDED7\uDEDC-\uDEEC\uDEF0-\uDEFC\uDF00-\uDF76\uDF7B-\uDFD9\uDFE0-\uDFEB\uDFF0]|\uD83E[\uDC00-\uDC0B\uDC10-\uDC47\uDC50-\uDC59\uDC60-\uDC87\uDC90-\uDCAD\uDCB0\uDCB1\uDD00-\uDE53\uDE60-\uDE6D\uDE70-\uDE7C\uDE80-\uDE88\uDE90-\uDEBD\uDEBF-\uDEC5\uDECE-\uDEDB\uDEE0-\uDEE8\uDEF0-\uDEF8\uDF00-\uDF92\uDF94-\uDFCA]/;
+
+// ../../../node_modules/uc.micro/categories/Z/regex.mjs
+var regex_default6 = /[ \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000]/;
+
+// ../../../node_modules/markdown-it/node_modules/entities/lib/esm/generated/decode-data-html.js
+var decode_data_html_default = new Uint16Array(
+  // prettier-ignore
+  '\u1D41<\xD5\u0131\u028A\u049D\u057B\u05D0\u0675\u06DE\u07A2\u07D6\u080F\u0A4A\u0A91\u0DA1\u0E6D\u0F09\u0F26\u10CA\u1228\u12E1\u1415\u149D\u14C3\u14DF\u1525\0\0\0\0\0\0\u156B\u16CD\u198D\u1C12\u1DDD\u1F7E\u2060\u21B0\u228D\u23C0\u23FB\u2442\u2824\u2912\u2D08\u2E48\u2FCE\u3016\u32BA\u3639\u37AC\u38FE\u3A28\u3A71\u3AE0\u3B2E\u0800EMabcfglmnoprstu\\bfms\x7F\x84\x8B\x90\x95\x98\xA6\xB3\xB9\xC8\xCFlig\u803B\xC6\u40C6P\u803B&\u4026cute\u803B\xC1\u40C1reve;\u4102\u0100iyx}rc\u803B\xC2\u40C2;\u4410r;\uC000\u{1D504}rave\u803B\xC0\u40C0pha;\u4391acr;\u4100d;\u6A53\u0100gp\x9D\xA1on;\u4104f;\uC000\u{1D538}plyFunction;\u6061ing\u803B\xC5\u40C5\u0100cs\xBE\xC3r;\uC000\u{1D49C}ign;\u6254ilde\u803B\xC3\u40C3ml\u803B\xC4\u40C4\u0400aceforsu\xE5\xFB\xFE\u0117\u011C\u0122\u0127\u012A\u0100cr\xEA\xF2kslash;\u6216\u0176\xF6\xF8;\u6AE7ed;\u6306y;\u4411\u0180crt\u0105\u010B\u0114ause;\u6235noullis;\u612Ca;\u4392r;\uC000\u{1D505}pf;\uC000\u{1D539}eve;\u42D8c\xF2\u0113mpeq;\u624E\u0700HOacdefhilorsu\u014D\u0151\u0156\u0180\u019E\u01A2\u01B5\u01B7\u01BA\u01DC\u0215\u0273\u0278\u027Ecy;\u4427PY\u803B\xA9\u40A9\u0180cpy\u015D\u0162\u017Aute;\u4106\u0100;i\u0167\u0168\u62D2talDifferentialD;\u6145leys;\u612D\u0200aeio\u0189\u018E\u0194\u0198ron;\u410Cdil\u803B\xC7\u40C7rc;\u4108nint;\u6230ot;\u410A\u0100dn\u01A7\u01ADilla;\u40B8terDot;\u40B7\xF2\u017Fi;\u43A7rcle\u0200DMPT\u01C7\u01CB\u01D1\u01D6ot;\u6299inus;\u6296lus;\u6295imes;\u6297o\u0100cs\u01E2\u01F8kwiseContourIntegral;\u6232eCurly\u0100DQ\u0203\u020FoubleQuote;\u601Duote;\u6019\u0200lnpu\u021E\u0228\u0247\u0255on\u0100;e\u0225\u0226\u6237;\u6A74\u0180git\u022F\u0236\u023Aruent;\u6261nt;\u622FourIntegral;\u622E\u0100fr\u024C\u024E;\u6102oduct;\u6210nterClockwiseContourIntegral;\u6233oss;\u6A2Fcr;\uC000\u{1D49E}p\u0100;C\u0284\u0285\u62D3ap;\u624D\u0580DJSZacefios\u02A0\u02AC\u02B0\u02B4\u02B8\u02CB\u02D7\u02E1\u02E6\u0333\u048D\u0100;o\u0179\u02A5trahd;\u6911cy;\u4402cy;\u4405cy;\u440F\u0180grs\u02BF\u02C4\u02C7ger;\u6021r;\u61A1hv;\u6AE4\u0100ay\u02D0\u02D5ron;\u410E;\u4414l\u0100;t\u02DD\u02DE\u6207a;\u4394r;\uC000\u{1D507}\u0100af\u02EB\u0327\u0100cm\u02F0\u0322ritical\u0200ADGT\u0300\u0306\u0316\u031Ccute;\u40B4o\u0174\u030B\u030D;\u42D9bleAcute;\u42DDrave;\u4060ilde;\u42DCond;\u62C4ferentialD;\u6146\u0470\u033D\0\0\0\u0342\u0354\0\u0405f;\uC000\u{1D53B}\u0180;DE\u0348\u0349\u034D\u40A8ot;\u60DCqual;\u6250ble\u0300CDLRUV\u0363\u0372\u0382\u03CF\u03E2\u03F8ontourIntegra\xEC\u0239o\u0274\u0379\0\0\u037B\xBB\u0349nArrow;\u61D3\u0100eo\u0387\u03A4ft\u0180ART\u0390\u0396\u03A1rrow;\u61D0ightArrow;\u61D4e\xE5\u02CAng\u0100LR\u03AB\u03C4eft\u0100AR\u03B3\u03B9rrow;\u67F8ightArrow;\u67FAightArrow;\u67F9ight\u0100AT\u03D8\u03DErrow;\u61D2ee;\u62A8p\u0241\u03E9\0\0\u03EFrrow;\u61D1ownArrow;\u61D5erticalBar;\u6225n\u0300ABLRTa\u0412\u042A\u0430\u045E\u047F\u037Crrow\u0180;BU\u041D\u041E\u0422\u6193ar;\u6913pArrow;\u61F5reve;\u4311eft\u02D2\u043A\0\u0446\0\u0450ightVector;\u6950eeVector;\u695Eector\u0100;B\u0459\u045A\u61BDar;\u6956ight\u01D4\u0467\0\u0471eeVector;\u695Fector\u0100;B\u047A\u047B\u61C1ar;\u6957ee\u0100;A\u0486\u0487\u62A4rrow;\u61A7\u0100ct\u0492\u0497r;\uC000\u{1D49F}rok;\u4110\u0800NTacdfglmopqstux\u04BD\u04C0\u04C4\u04CB\u04DE\u04E2\u04E7\u04EE\u04F5\u0521\u052F\u0536\u0552\u055D\u0560\u0565G;\u414AH\u803B\xD0\u40D0cute\u803B\xC9\u40C9\u0180aiy\u04D2\u04D7\u04DCron;\u411Arc\u803B\xCA\u40CA;\u442Dot;\u4116r;\uC000\u{1D508}rave\u803B\xC8\u40C8ement;\u6208\u0100ap\u04FA\u04FEcr;\u4112ty\u0253\u0506\0\0\u0512mallSquare;\u65FBerySmallSquare;\u65AB\u0100gp\u0526\u052Aon;\u4118f;\uC000\u{1D53C}silon;\u4395u\u0100ai\u053C\u0549l\u0100;T\u0542\u0543\u6A75ilde;\u6242librium;\u61CC\u0100ci\u0557\u055Ar;\u6130m;\u6A73a;\u4397ml\u803B\xCB\u40CB\u0100ip\u056A\u056Fsts;\u6203onentialE;\u6147\u0280cfios\u0585\u0588\u058D\u05B2\u05CCy;\u4424r;\uC000\u{1D509}lled\u0253\u0597\0\0\u05A3mallSquare;\u65FCerySmallSquare;\u65AA\u0370\u05BA\0\u05BF\0\0\u05C4f;\uC000\u{1D53D}All;\u6200riertrf;\u6131c\xF2\u05CB\u0600JTabcdfgorst\u05E8\u05EC\u05EF\u05FA\u0600\u0612\u0616\u061B\u061D\u0623\u066C\u0672cy;\u4403\u803B>\u403Emma\u0100;d\u05F7\u05F8\u4393;\u43DCreve;\u411E\u0180eiy\u0607\u060C\u0610dil;\u4122rc;\u411C;\u4413ot;\u4120r;\uC000\u{1D50A};\u62D9pf;\uC000\u{1D53E}eater\u0300EFGLST\u0635\u0644\u064E\u0656\u065B\u0666qual\u0100;L\u063E\u063F\u6265ess;\u62DBullEqual;\u6267reater;\u6AA2ess;\u6277lantEqual;\u6A7Eilde;\u6273cr;\uC000\u{1D4A2};\u626B\u0400Aacfiosu\u0685\u068B\u0696\u069B\u069E\u06AA\u06BE\u06CARDcy;\u442A\u0100ct\u0690\u0694ek;\u42C7;\u405Eirc;\u4124r;\u610ClbertSpace;\u610B\u01F0\u06AF\0\u06B2f;\u610DizontalLine;\u6500\u0100ct\u06C3\u06C5\xF2\u06A9rok;\u4126mp\u0144\u06D0\u06D8ownHum\xF0\u012Fqual;\u624F\u0700EJOacdfgmnostu\u06FA\u06FE\u0703\u0707\u070E\u071A\u071E\u0721\u0728\u0744\u0778\u078B\u078F\u0795cy;\u4415lig;\u4132cy;\u4401cute\u803B\xCD\u40CD\u0100iy\u0713\u0718rc\u803B\xCE\u40CE;\u4418ot;\u4130r;\u6111rave\u803B\xCC\u40CC\u0180;ap\u0720\u072F\u073F\u0100cg\u0734\u0737r;\u412AinaryI;\u6148lie\xF3\u03DD\u01F4\u0749\0\u0762\u0100;e\u074D\u074E\u622C\u0100gr\u0753\u0758ral;\u622Bsection;\u62C2isible\u0100CT\u076C\u0772omma;\u6063imes;\u6062\u0180gpt\u077F\u0783\u0788on;\u412Ef;\uC000\u{1D540}a;\u4399cr;\u6110ilde;\u4128\u01EB\u079A\0\u079Ecy;\u4406l\u803B\xCF\u40CF\u0280cfosu\u07AC\u07B7\u07BC\u07C2\u07D0\u0100iy\u07B1\u07B5rc;\u4134;\u4419r;\uC000\u{1D50D}pf;\uC000\u{1D541}\u01E3\u07C7\0\u07CCr;\uC000\u{1D4A5}rcy;\u4408kcy;\u4404\u0380HJacfos\u07E4\u07E8\u07EC\u07F1\u07FD\u0802\u0808cy;\u4425cy;\u440Cppa;\u439A\u0100ey\u07F6\u07FBdil;\u4136;\u441Ar;\uC000\u{1D50E}pf;\uC000\u{1D542}cr;\uC000\u{1D4A6}\u0580JTaceflmost\u0825\u0829\u082C\u0850\u0863\u09B3\u09B8\u09C7\u09CD\u0A37\u0A47cy;\u4409\u803B<\u403C\u0280cmnpr\u0837\u083C\u0841\u0844\u084Dute;\u4139bda;\u439Bg;\u67EAlacetrf;\u6112r;\u619E\u0180aey\u0857\u085C\u0861ron;\u413Ddil;\u413B;\u441B\u0100fs\u0868\u0970t\u0500ACDFRTUVar\u087E\u08A9\u08B1\u08E0\u08E6\u08FC\u092F\u095B\u0390\u096A\u0100nr\u0883\u088FgleBracket;\u67E8row\u0180;BR\u0899\u089A\u089E\u6190ar;\u61E4ightArrow;\u61C6eiling;\u6308o\u01F5\u08B7\0\u08C3bleBracket;\u67E6n\u01D4\u08C8\0\u08D2eeVector;\u6961ector\u0100;B\u08DB\u08DC\u61C3ar;\u6959loor;\u630Aight\u0100AV\u08EF\u08F5rrow;\u6194ector;\u694E\u0100er\u0901\u0917e\u0180;AV\u0909\u090A\u0910\u62A3rrow;\u61A4ector;\u695Aiangle\u0180;BE\u0924\u0925\u0929\u62B2ar;\u69CFqual;\u62B4p\u0180DTV\u0937\u0942\u094CownVector;\u6951eeVector;\u6960ector\u0100;B\u0956\u0957\u61BFar;\u6958ector\u0100;B\u0965\u0966\u61BCar;\u6952ight\xE1\u039Cs\u0300EFGLST\u097E\u098B\u0995\u099D\u09A2\u09ADqualGreater;\u62DAullEqual;\u6266reater;\u6276ess;\u6AA1lantEqual;\u6A7Dilde;\u6272r;\uC000\u{1D50F}\u0100;e\u09BD\u09BE\u62D8ftarrow;\u61DAidot;\u413F\u0180npw\u09D4\u0A16\u0A1Bg\u0200LRlr\u09DE\u09F7\u0A02\u0A10eft\u0100AR\u09E6\u09ECrrow;\u67F5ightArrow;\u67F7ightArrow;\u67F6eft\u0100ar\u03B3\u0A0Aight\xE1\u03BFight\xE1\u03CAf;\uC000\u{1D543}er\u0100LR\u0A22\u0A2CeftArrow;\u6199ightArrow;\u6198\u0180cht\u0A3E\u0A40\u0A42\xF2\u084C;\u61B0rok;\u4141;\u626A\u0400acefiosu\u0A5A\u0A5D\u0A60\u0A77\u0A7C\u0A85\u0A8B\u0A8Ep;\u6905y;\u441C\u0100dl\u0A65\u0A6FiumSpace;\u605Flintrf;\u6133r;\uC000\u{1D510}nusPlus;\u6213pf;\uC000\u{1D544}c\xF2\u0A76;\u439C\u0480Jacefostu\u0AA3\u0AA7\u0AAD\u0AC0\u0B14\u0B19\u0D91\u0D97\u0D9Ecy;\u440Acute;\u4143\u0180aey\u0AB4\u0AB9\u0ABEron;\u4147dil;\u4145;\u441D\u0180gsw\u0AC7\u0AF0\u0B0Eative\u0180MTV\u0AD3\u0ADF\u0AE8ediumSpace;\u600Bhi\u0100cn\u0AE6\u0AD8\xEB\u0AD9eryThi\xEE\u0AD9ted\u0100GL\u0AF8\u0B06reaterGreate\xF2\u0673essLes\xF3\u0A48Line;\u400Ar;\uC000\u{1D511}\u0200Bnpt\u0B22\u0B28\u0B37\u0B3Areak;\u6060BreakingSpace;\u40A0f;\u6115\u0680;CDEGHLNPRSTV\u0B55\u0B56\u0B6A\u0B7C\u0BA1\u0BEB\u0C04\u0C5E\u0C84\u0CA6\u0CD8\u0D61\u0D85\u6AEC\u0100ou\u0B5B\u0B64ngruent;\u6262pCap;\u626DoubleVerticalBar;\u6226\u0180lqx\u0B83\u0B8A\u0B9Bement;\u6209ual\u0100;T\u0B92\u0B93\u6260ilde;\uC000\u2242\u0338ists;\u6204reater\u0380;EFGLST\u0BB6\u0BB7\u0BBD\u0BC9\u0BD3\u0BD8\u0BE5\u626Fqual;\u6271ullEqual;\uC000\u2267\u0338reater;\uC000\u226B\u0338ess;\u6279lantEqual;\uC000\u2A7E\u0338ilde;\u6275ump\u0144\u0BF2\u0BFDownHump;\uC000\u224E\u0338qual;\uC000\u224F\u0338e\u0100fs\u0C0A\u0C27tTriangle\u0180;BE\u0C1A\u0C1B\u0C21\u62EAar;\uC000\u29CF\u0338qual;\u62ECs\u0300;EGLST\u0C35\u0C36\u0C3C\u0C44\u0C4B\u0C58\u626Equal;\u6270reater;\u6278ess;\uC000\u226A\u0338lantEqual;\uC000\u2A7D\u0338ilde;\u6274ested\u0100GL\u0C68\u0C79reaterGreater;\uC000\u2AA2\u0338essLess;\uC000\u2AA1\u0338recedes\u0180;ES\u0C92\u0C93\u0C9B\u6280qual;\uC000\u2AAF\u0338lantEqual;\u62E0\u0100ei\u0CAB\u0CB9verseElement;\u620CghtTriangle\u0180;BE\u0CCB\u0CCC\u0CD2\u62EBar;\uC000\u29D0\u0338qual;\u62ED\u0100qu\u0CDD\u0D0CuareSu\u0100bp\u0CE8\u0CF9set\u0100;E\u0CF0\u0CF3\uC000\u228F\u0338qual;\u62E2erset\u0100;E\u0D03\u0D06\uC000\u2290\u0338qual;\u62E3\u0180bcp\u0D13\u0D24\u0D4Eset\u0100;E\u0D1B\u0D1E\uC000\u2282\u20D2qual;\u6288ceeds\u0200;EST\u0D32\u0D33\u0D3B\u0D46\u6281qual;\uC000\u2AB0\u0338lantEqual;\u62E1ilde;\uC000\u227F\u0338erset\u0100;E\u0D58\u0D5B\uC000\u2283\u20D2qual;\u6289ilde\u0200;EFT\u0D6E\u0D6F\u0D75\u0D7F\u6241qual;\u6244ullEqual;\u6247ilde;\u6249erticalBar;\u6224cr;\uC000\u{1D4A9}ilde\u803B\xD1\u40D1;\u439D\u0700Eacdfgmoprstuv\u0DBD\u0DC2\u0DC9\u0DD5\u0DDB\u0DE0\u0DE7\u0DFC\u0E02\u0E20\u0E22\u0E32\u0E3F\u0E44lig;\u4152cute\u803B\xD3\u40D3\u0100iy\u0DCE\u0DD3rc\u803B\xD4\u40D4;\u441Eblac;\u4150r;\uC000\u{1D512}rave\u803B\xD2\u40D2\u0180aei\u0DEE\u0DF2\u0DF6cr;\u414Cga;\u43A9cron;\u439Fpf;\uC000\u{1D546}enCurly\u0100DQ\u0E0E\u0E1AoubleQuote;\u601Cuote;\u6018;\u6A54\u0100cl\u0E27\u0E2Cr;\uC000\u{1D4AA}ash\u803B\xD8\u40D8i\u016C\u0E37\u0E3Cde\u803B\xD5\u40D5es;\u6A37ml\u803B\xD6\u40D6er\u0100BP\u0E4B\u0E60\u0100ar\u0E50\u0E53r;\u603Eac\u0100ek\u0E5A\u0E5C;\u63DEet;\u63B4arenthesis;\u63DC\u0480acfhilors\u0E7F\u0E87\u0E8A\u0E8F\u0E92\u0E94\u0E9D\u0EB0\u0EFCrtialD;\u6202y;\u441Fr;\uC000\u{1D513}i;\u43A6;\u43A0usMinus;\u40B1\u0100ip\u0EA2\u0EADncareplan\xE5\u069Df;\u6119\u0200;eio\u0EB9\u0EBA\u0EE0\u0EE4\u6ABBcedes\u0200;EST\u0EC8\u0EC9\u0ECF\u0EDA\u627Aqual;\u6AAFlantEqual;\u627Cilde;\u627Eme;\u6033\u0100dp\u0EE9\u0EEEuct;\u620Fortion\u0100;a\u0225\u0EF9l;\u621D\u0100ci\u0F01\u0F06r;\uC000\u{1D4AB};\u43A8\u0200Ufos\u0F11\u0F16\u0F1B\u0F1FOT\u803B"\u4022r;\uC000\u{1D514}pf;\u611Acr;\uC000\u{1D4AC}\u0600BEacefhiorsu\u0F3E\u0F43\u0F47\u0F60\u0F73\u0FA7\u0FAA\u0FAD\u1096\u10A9\u10B4\u10BEarr;\u6910G\u803B\xAE\u40AE\u0180cnr\u0F4E\u0F53\u0F56ute;\u4154g;\u67EBr\u0100;t\u0F5C\u0F5D\u61A0l;\u6916\u0180aey\u0F67\u0F6C\u0F71ron;\u4158dil;\u4156;\u4420\u0100;v\u0F78\u0F79\u611Cerse\u0100EU\u0F82\u0F99\u0100lq\u0F87\u0F8Eement;\u620Builibrium;\u61CBpEquilibrium;\u696Fr\xBB\u0F79o;\u43A1ght\u0400ACDFTUVa\u0FC1\u0FEB\u0FF3\u1022\u1028\u105B\u1087\u03D8\u0100nr\u0FC6\u0FD2gleBracket;\u67E9row\u0180;BL\u0FDC\u0FDD\u0FE1\u6192ar;\u61E5eftArrow;\u61C4eiling;\u6309o\u01F5\u0FF9\0\u1005bleBracket;\u67E7n\u01D4\u100A\0\u1014eeVector;\u695Dector\u0100;B\u101D\u101E\u61C2ar;\u6955loor;\u630B\u0100er\u102D\u1043e\u0180;AV\u1035\u1036\u103C\u62A2rrow;\u61A6ector;\u695Biangle\u0180;BE\u1050\u1051\u1055\u62B3ar;\u69D0qual;\u62B5p\u0180DTV\u1063\u106E\u1078ownVector;\u694FeeVector;\u695Cector\u0100;B\u1082\u1083\u61BEar;\u6954ector\u0100;B\u1091\u1092\u61C0ar;\u6953\u0100pu\u109B\u109Ef;\u611DndImplies;\u6970ightarrow;\u61DB\u0100ch\u10B9\u10BCr;\u611B;\u61B1leDelayed;\u69F4\u0680HOacfhimoqstu\u10E4\u10F1\u10F7\u10FD\u1119\u111E\u1151\u1156\u1161\u1167\u11B5\u11BB\u11BF\u0100Cc\u10E9\u10EEHcy;\u4429y;\u4428FTcy;\u442Ccute;\u415A\u0280;aeiy\u1108\u1109\u110E\u1113\u1117\u6ABCron;\u4160dil;\u415Erc;\u415C;\u4421r;\uC000\u{1D516}ort\u0200DLRU\u112A\u1134\u113E\u1149ownArrow\xBB\u041EeftArrow\xBB\u089AightArrow\xBB\u0FDDpArrow;\u6191gma;\u43A3allCircle;\u6218pf;\uC000\u{1D54A}\u0272\u116D\0\0\u1170t;\u621Aare\u0200;ISU\u117B\u117C\u1189\u11AF\u65A1ntersection;\u6293u\u0100bp\u118F\u119Eset\u0100;E\u1197\u1198\u628Fqual;\u6291erset\u0100;E\u11A8\u11A9\u6290qual;\u6292nion;\u6294cr;\uC000\u{1D4AE}ar;\u62C6\u0200bcmp\u11C8\u11DB\u1209\u120B\u0100;s\u11CD\u11CE\u62D0et\u0100;E\u11CD\u11D5qual;\u6286\u0100ch\u11E0\u1205eeds\u0200;EST\u11ED\u11EE\u11F4\u11FF\u627Bqual;\u6AB0lantEqual;\u627Dilde;\u627FTh\xE1\u0F8C;\u6211\u0180;es\u1212\u1213\u1223\u62D1rset\u0100;E\u121C\u121D\u6283qual;\u6287et\xBB\u1213\u0580HRSacfhiors\u123E\u1244\u1249\u1255\u125E\u1271\u1276\u129F\u12C2\u12C8\u12D1ORN\u803B\xDE\u40DEADE;\u6122\u0100Hc\u124E\u1252cy;\u440By;\u4426\u0100bu\u125A\u125C;\u4009;\u43A4\u0180aey\u1265\u126A\u126Fron;\u4164dil;\u4162;\u4422r;\uC000\u{1D517}\u0100ei\u127B\u1289\u01F2\u1280\0\u1287efore;\u6234a;\u4398\u0100cn\u128E\u1298kSpace;\uC000\u205F\u200ASpace;\u6009lde\u0200;EFT\u12AB\u12AC\u12B2\u12BC\u623Cqual;\u6243ullEqual;\u6245ilde;\u6248pf;\uC000\u{1D54B}ipleDot;\u60DB\u0100ct\u12D6\u12DBr;\uC000\u{1D4AF}rok;\u4166\u0AE1\u12F7\u130E\u131A\u1326\0\u132C\u1331\0\0\0\0\0\u1338\u133D\u1377\u1385\0\u13FF\u1404\u140A\u1410\u0100cr\u12FB\u1301ute\u803B\xDA\u40DAr\u0100;o\u1307\u1308\u619Fcir;\u6949r\u01E3\u1313\0\u1316y;\u440Eve;\u416C\u0100iy\u131E\u1323rc\u803B\xDB\u40DB;\u4423blac;\u4170r;\uC000\u{1D518}rave\u803B\xD9\u40D9acr;\u416A\u0100di\u1341\u1369er\u0100BP\u1348\u135D\u0100ar\u134D\u1350r;\u405Fac\u0100ek\u1357\u1359;\u63DFet;\u63B5arenthesis;\u63DDon\u0100;P\u1370\u1371\u62C3lus;\u628E\u0100gp\u137B\u137Fon;\u4172f;\uC000\u{1D54C}\u0400ADETadps\u1395\u13AE\u13B8\u13C4\u03E8\u13D2\u13D7\u13F3rrow\u0180;BD\u1150\u13A0\u13A4ar;\u6912ownArrow;\u61C5ownArrow;\u6195quilibrium;\u696Eee\u0100;A\u13CB\u13CC\u62A5rrow;\u61A5own\xE1\u03F3er\u0100LR\u13DE\u13E8eftArrow;\u6196ightArrow;\u6197i\u0100;l\u13F9\u13FA\u43D2on;\u43A5ing;\u416Ecr;\uC000\u{1D4B0}ilde;\u4168ml\u803B\xDC\u40DC\u0480Dbcdefosv\u1427\u142C\u1430\u1433\u143E\u1485\u148A\u1490\u1496ash;\u62ABar;\u6AEBy;\u4412ash\u0100;l\u143B\u143C\u62A9;\u6AE6\u0100er\u1443\u1445;\u62C1\u0180bty\u144C\u1450\u147Aar;\u6016\u0100;i\u144F\u1455cal\u0200BLST\u1461\u1465\u146A\u1474ar;\u6223ine;\u407Ceparator;\u6758ilde;\u6240ThinSpace;\u600Ar;\uC000\u{1D519}pf;\uC000\u{1D54D}cr;\uC000\u{1D4B1}dash;\u62AA\u0280cefos\u14A7\u14AC\u14B1\u14B6\u14BCirc;\u4174dge;\u62C0r;\uC000\u{1D51A}pf;\uC000\u{1D54E}cr;\uC000\u{1D4B2}\u0200fios\u14CB\u14D0\u14D2\u14D8r;\uC000\u{1D51B};\u439Epf;\uC000\u{1D54F}cr;\uC000\u{1D4B3}\u0480AIUacfosu\u14F1\u14F5\u14F9\u14FD\u1504\u150F\u1514\u151A\u1520cy;\u442Fcy;\u4407cy;\u442Ecute\u803B\xDD\u40DD\u0100iy\u1509\u150Drc;\u4176;\u442Br;\uC000\u{1D51C}pf;\uC000\u{1D550}cr;\uC000\u{1D4B4}ml;\u4178\u0400Hacdefos\u1535\u1539\u153F\u154B\u154F\u155D\u1560\u1564cy;\u4416cute;\u4179\u0100ay\u1544\u1549ron;\u417D;\u4417ot;\u417B\u01F2\u1554\0\u155BoWidt\xE8\u0AD9a;\u4396r;\u6128pf;\u6124cr;\uC000\u{1D4B5}\u0BE1\u1583\u158A\u1590\0\u15B0\u15B6\u15BF\0\0\0\0\u15C6\u15DB\u15EB\u165F\u166D\0\u1695\u169B\u16B2\u16B9\0\u16BEcute\u803B\xE1\u40E1reve;\u4103\u0300;Ediuy\u159C\u159D\u15A1\u15A3\u15A8\u15AD\u623E;\uC000\u223E\u0333;\u623Frc\u803B\xE2\u40E2te\u80BB\xB4\u0306;\u4430lig\u803B\xE6\u40E6\u0100;r\xB2\u15BA;\uC000\u{1D51E}rave\u803B\xE0\u40E0\u0100ep\u15CA\u15D6\u0100fp\u15CF\u15D4sym;\u6135\xE8\u15D3ha;\u43B1\u0100ap\u15DFc\u0100cl\u15E4\u15E7r;\u4101g;\u6A3F\u0264\u15F0\0\0\u160A\u0280;adsv\u15FA\u15FB\u15FF\u1601\u1607\u6227nd;\u6A55;\u6A5Clope;\u6A58;\u6A5A\u0380;elmrsz\u1618\u1619\u161B\u161E\u163F\u164F\u1659\u6220;\u69A4e\xBB\u1619sd\u0100;a\u1625\u1626\u6221\u0461\u1630\u1632\u1634\u1636\u1638\u163A\u163C\u163E;\u69A8;\u69A9;\u69AA;\u69AB;\u69AC;\u69AD;\u69AE;\u69AFt\u0100;v\u1645\u1646\u621Fb\u0100;d\u164C\u164D\u62BE;\u699D\u0100pt\u1654\u1657h;\u6222\xBB\xB9arr;\u637C\u0100gp\u1663\u1667on;\u4105f;\uC000\u{1D552}\u0380;Eaeiop\u12C1\u167B\u167D\u1682\u1684\u1687\u168A;\u6A70cir;\u6A6F;\u624Ad;\u624Bs;\u4027rox\u0100;e\u12C1\u1692\xF1\u1683ing\u803B\xE5\u40E5\u0180cty\u16A1\u16A6\u16A8r;\uC000\u{1D4B6};\u402Amp\u0100;e\u12C1\u16AF\xF1\u0288ilde\u803B\xE3\u40E3ml\u803B\xE4\u40E4\u0100ci\u16C2\u16C8onin\xF4\u0272nt;\u6A11\u0800Nabcdefiklnoprsu\u16ED\u16F1\u1730\u173C\u1743\u1748\u1778\u177D\u17E0\u17E6\u1839\u1850\u170D\u193D\u1948\u1970ot;\u6AED\u0100cr\u16F6\u171Ek\u0200ceps\u1700\u1705\u170D\u1713ong;\u624Cpsilon;\u43F6rime;\u6035im\u0100;e\u171A\u171B\u623Dq;\u62CD\u0176\u1722\u1726ee;\u62BDed\u0100;g\u172C\u172D\u6305e\xBB\u172Drk\u0100;t\u135C\u1737brk;\u63B6\u0100oy\u1701\u1741;\u4431quo;\u601E\u0280cmprt\u1753\u175B\u1761\u1764\u1768aus\u0100;e\u010A\u0109ptyv;\u69B0s\xE9\u170Cno\xF5\u0113\u0180ahw\u176F\u1771\u1773;\u43B2;\u6136een;\u626Cr;\uC000\u{1D51F}g\u0380costuvw\u178D\u179D\u17B3\u17C1\u17D5\u17DB\u17DE\u0180aiu\u1794\u1796\u179A\xF0\u0760rc;\u65EFp\xBB\u1371\u0180dpt\u17A4\u17A8\u17ADot;\u6A00lus;\u6A01imes;\u6A02\u0271\u17B9\0\0\u17BEcup;\u6A06ar;\u6605riangle\u0100du\u17CD\u17D2own;\u65BDp;\u65B3plus;\u6A04e\xE5\u1444\xE5\u14ADarow;\u690D\u0180ako\u17ED\u1826\u1835\u0100cn\u17F2\u1823k\u0180lst\u17FA\u05AB\u1802ozenge;\u69EBriangle\u0200;dlr\u1812\u1813\u1818\u181D\u65B4own;\u65BEeft;\u65C2ight;\u65B8k;\u6423\u01B1\u182B\0\u1833\u01B2\u182F\0\u1831;\u6592;\u65914;\u6593ck;\u6588\u0100eo\u183E\u184D\u0100;q\u1843\u1846\uC000=\u20E5uiv;\uC000\u2261\u20E5t;\u6310\u0200ptwx\u1859\u185E\u1867\u186Cf;\uC000\u{1D553}\u0100;t\u13CB\u1863om\xBB\u13CCtie;\u62C8\u0600DHUVbdhmptuv\u1885\u1896\u18AA\u18BB\u18D7\u18DB\u18EC\u18FF\u1905\u190A\u1910\u1921\u0200LRlr\u188E\u1890\u1892\u1894;\u6557;\u6554;\u6556;\u6553\u0280;DUdu\u18A1\u18A2\u18A4\u18A6\u18A8\u6550;\u6566;\u6569;\u6564;\u6567\u0200LRlr\u18B3\u18B5\u18B7\u18B9;\u655D;\u655A;\u655C;\u6559\u0380;HLRhlr\u18CA\u18CB\u18CD\u18CF\u18D1\u18D3\u18D5\u6551;\u656C;\u6563;\u6560;\u656B;\u6562;\u655Fox;\u69C9\u0200LRlr\u18E4\u18E6\u18E8\u18EA;\u6555;\u6552;\u6510;\u650C\u0280;DUdu\u06BD\u18F7\u18F9\u18FB\u18FD;\u6565;\u6568;\u652C;\u6534inus;\u629Flus;\u629Eimes;\u62A0\u0200LRlr\u1919\u191B\u191D\u191F;\u655B;\u6558;\u6518;\u6514\u0380;HLRhlr\u1930\u1931\u1933\u1935\u1937\u1939\u193B\u6502;\u656A;\u6561;\u655E;\u653C;\u6524;\u651C\u0100ev\u0123\u1942bar\u803B\xA6\u40A6\u0200ceio\u1951\u1956\u195A\u1960r;\uC000\u{1D4B7}mi;\u604Fm\u0100;e\u171A\u171Cl\u0180;bh\u1968\u1969\u196B\u405C;\u69C5sub;\u67C8\u016C\u1974\u197El\u0100;e\u1979\u197A\u6022t\xBB\u197Ap\u0180;Ee\u012F\u1985\u1987;\u6AAE\u0100;q\u06DC\u06DB\u0CE1\u19A7\0\u19E8\u1A11\u1A15\u1A32\0\u1A37\u1A50\0\0\u1AB4\0\0\u1AC1\0\0\u1B21\u1B2E\u1B4D\u1B52\0\u1BFD\0\u1C0C\u0180cpr\u19AD\u19B2\u19DDute;\u4107\u0300;abcds\u19BF\u19C0\u19C4\u19CA\u19D5\u19D9\u6229nd;\u6A44rcup;\u6A49\u0100au\u19CF\u19D2p;\u6A4Bp;\u6A47ot;\u6A40;\uC000\u2229\uFE00\u0100eo\u19E2\u19E5t;\u6041\xEE\u0693\u0200aeiu\u19F0\u19FB\u1A01\u1A05\u01F0\u19F5\0\u19F8s;\u6A4Don;\u410Ddil\u803B\xE7\u40E7rc;\u4109ps\u0100;s\u1A0C\u1A0D\u6A4Cm;\u6A50ot;\u410B\u0180dmn\u1A1B\u1A20\u1A26il\u80BB\xB8\u01ADptyv;\u69B2t\u8100\xA2;e\u1A2D\u1A2E\u40A2r\xE4\u01B2r;\uC000\u{1D520}\u0180cei\u1A3D\u1A40\u1A4Dy;\u4447ck\u0100;m\u1A47\u1A48\u6713ark\xBB\u1A48;\u43C7r\u0380;Ecefms\u1A5F\u1A60\u1A62\u1A6B\u1AA4\u1AAA\u1AAE\u65CB;\u69C3\u0180;el\u1A69\u1A6A\u1A6D\u42C6q;\u6257e\u0261\u1A74\0\0\u1A88rrow\u0100lr\u1A7C\u1A81eft;\u61BAight;\u61BB\u0280RSacd\u1A92\u1A94\u1A96\u1A9A\u1A9F\xBB\u0F47;\u64C8st;\u629Birc;\u629Aash;\u629Dnint;\u6A10id;\u6AEFcir;\u69C2ubs\u0100;u\u1ABB\u1ABC\u6663it\xBB\u1ABC\u02EC\u1AC7\u1AD4\u1AFA\0\u1B0Aon\u0100;e\u1ACD\u1ACE\u403A\u0100;q\xC7\xC6\u026D\u1AD9\0\0\u1AE2a\u0100;t\u1ADE\u1ADF\u402C;\u4040\u0180;fl\u1AE8\u1AE9\u1AEB\u6201\xEE\u1160e\u0100mx\u1AF1\u1AF6ent\xBB\u1AE9e\xF3\u024D\u01E7\u1AFE\0\u1B07\u0100;d\u12BB\u1B02ot;\u6A6Dn\xF4\u0246\u0180fry\u1B10\u1B14\u1B17;\uC000\u{1D554}o\xE4\u0254\u8100\xA9;s\u0155\u1B1Dr;\u6117\u0100ao\u1B25\u1B29rr;\u61B5ss;\u6717\u0100cu\u1B32\u1B37r;\uC000\u{1D4B8}\u0100bp\u1B3C\u1B44\u0100;e\u1B41\u1B42\u6ACF;\u6AD1\u0100;e\u1B49\u1B4A\u6AD0;\u6AD2dot;\u62EF\u0380delprvw\u1B60\u1B6C\u1B77\u1B82\u1BAC\u1BD4\u1BF9arr\u0100lr\u1B68\u1B6A;\u6938;\u6935\u0270\u1B72\0\0\u1B75r;\u62DEc;\u62DFarr\u0100;p\u1B7F\u1B80\u61B6;\u693D\u0300;bcdos\u1B8F\u1B90\u1B96\u1BA1\u1BA5\u1BA8\u622Arcap;\u6A48\u0100au\u1B9B\u1B9Ep;\u6A46p;\u6A4Aot;\u628Dr;\u6A45;\uC000\u222A\uFE00\u0200alrv\u1BB5\u1BBF\u1BDE\u1BE3rr\u0100;m\u1BBC\u1BBD\u61B7;\u693Cy\u0180evw\u1BC7\u1BD4\u1BD8q\u0270\u1BCE\0\0\u1BD2re\xE3\u1B73u\xE3\u1B75ee;\u62CEedge;\u62CFen\u803B\xA4\u40A4earrow\u0100lr\u1BEE\u1BF3eft\xBB\u1B80ight\xBB\u1BBDe\xE4\u1BDD\u0100ci\u1C01\u1C07onin\xF4\u01F7nt;\u6231lcty;\u632D\u0980AHabcdefhijlorstuwz\u1C38\u1C3B\u1C3F\u1C5D\u1C69\u1C75\u1C8A\u1C9E\u1CAC\u1CB7\u1CFB\u1CFF\u1D0D\u1D7B\u1D91\u1DAB\u1DBB\u1DC6\u1DCDr\xF2\u0381ar;\u6965\u0200glrs\u1C48\u1C4D\u1C52\u1C54ger;\u6020eth;\u6138\xF2\u1133h\u0100;v\u1C5A\u1C5B\u6010\xBB\u090A\u016B\u1C61\u1C67arow;\u690Fa\xE3\u0315\u0100ay\u1C6E\u1C73ron;\u410F;\u4434\u0180;ao\u0332\u1C7C\u1C84\u0100gr\u02BF\u1C81r;\u61CAtseq;\u6A77\u0180glm\u1C91\u1C94\u1C98\u803B\xB0\u40B0ta;\u43B4ptyv;\u69B1\u0100ir\u1CA3\u1CA8sht;\u697F;\uC000\u{1D521}ar\u0100lr\u1CB3\u1CB5\xBB\u08DC\xBB\u101E\u0280aegsv\u1CC2\u0378\u1CD6\u1CDC\u1CE0m\u0180;os\u0326\u1CCA\u1CD4nd\u0100;s\u0326\u1CD1uit;\u6666amma;\u43DDin;\u62F2\u0180;io\u1CE7\u1CE8\u1CF8\u40F7de\u8100\xF7;o\u1CE7\u1CF0ntimes;\u62C7n\xF8\u1CF7cy;\u4452c\u026F\u1D06\0\0\u1D0Arn;\u631Eop;\u630D\u0280lptuw\u1D18\u1D1D\u1D22\u1D49\u1D55lar;\u4024f;\uC000\u{1D555}\u0280;emps\u030B\u1D2D\u1D37\u1D3D\u1D42q\u0100;d\u0352\u1D33ot;\u6251inus;\u6238lus;\u6214quare;\u62A1blebarwedg\xE5\xFAn\u0180adh\u112E\u1D5D\u1D67ownarrow\xF3\u1C83arpoon\u0100lr\u1D72\u1D76ef\xF4\u1CB4igh\xF4\u1CB6\u0162\u1D7F\u1D85karo\xF7\u0F42\u026F\u1D8A\0\0\u1D8Ern;\u631Fop;\u630C\u0180cot\u1D98\u1DA3\u1DA6\u0100ry\u1D9D\u1DA1;\uC000\u{1D4B9};\u4455l;\u69F6rok;\u4111\u0100dr\u1DB0\u1DB4ot;\u62F1i\u0100;f\u1DBA\u1816\u65BF\u0100ah\u1DC0\u1DC3r\xF2\u0429a\xF2\u0FA6angle;\u69A6\u0100ci\u1DD2\u1DD5y;\u445Fgrarr;\u67FF\u0900Dacdefglmnopqrstux\u1E01\u1E09\u1E19\u1E38\u0578\u1E3C\u1E49\u1E61\u1E7E\u1EA5\u1EAF\u1EBD\u1EE1\u1F2A\u1F37\u1F44\u1F4E\u1F5A\u0100Do\u1E06\u1D34o\xF4\u1C89\u0100cs\u1E0E\u1E14ute\u803B\xE9\u40E9ter;\u6A6E\u0200aioy\u1E22\u1E27\u1E31\u1E36ron;\u411Br\u0100;c\u1E2D\u1E2E\u6256\u803B\xEA\u40EAlon;\u6255;\u444Dot;\u4117\u0100Dr\u1E41\u1E45ot;\u6252;\uC000\u{1D522}\u0180;rs\u1E50\u1E51\u1E57\u6A9Aave\u803B\xE8\u40E8\u0100;d\u1E5C\u1E5D\u6A96ot;\u6A98\u0200;ils\u1E6A\u1E6B\u1E72\u1E74\u6A99nters;\u63E7;\u6113\u0100;d\u1E79\u1E7A\u6A95ot;\u6A97\u0180aps\u1E85\u1E89\u1E97cr;\u4113ty\u0180;sv\u1E92\u1E93\u1E95\u6205et\xBB\u1E93p\u01001;\u1E9D\u1EA4\u0133\u1EA1\u1EA3;\u6004;\u6005\u6003\u0100gs\u1EAA\u1EAC;\u414Bp;\u6002\u0100gp\u1EB4\u1EB8on;\u4119f;\uC000\u{1D556}\u0180als\u1EC4\u1ECE\u1ED2r\u0100;s\u1ECA\u1ECB\u62D5l;\u69E3us;\u6A71i\u0180;lv\u1EDA\u1EDB\u1EDF\u43B5on\xBB\u1EDB;\u43F5\u0200csuv\u1EEA\u1EF3\u1F0B\u1F23\u0100io\u1EEF\u1E31rc\xBB\u1E2E\u0269\u1EF9\0\0\u1EFB\xED\u0548ant\u0100gl\u1F02\u1F06tr\xBB\u1E5Dess\xBB\u1E7A\u0180aei\u1F12\u1F16\u1F1Als;\u403Dst;\u625Fv\u0100;D\u0235\u1F20D;\u6A78parsl;\u69E5\u0100Da\u1F2F\u1F33ot;\u6253rr;\u6971\u0180cdi\u1F3E\u1F41\u1EF8r;\u612Fo\xF4\u0352\u0100ah\u1F49\u1F4B;\u43B7\u803B\xF0\u40F0\u0100mr\u1F53\u1F57l\u803B\xEB\u40EBo;\u60AC\u0180cip\u1F61\u1F64\u1F67l;\u4021s\xF4\u056E\u0100eo\u1F6C\u1F74ctatio\xEE\u0559nential\xE5\u0579\u09E1\u1F92\0\u1F9E\0\u1FA1\u1FA7\0\0\u1FC6\u1FCC\0\u1FD3\0\u1FE6\u1FEA\u2000\0\u2008\u205Allingdotse\xF1\u1E44y;\u4444male;\u6640\u0180ilr\u1FAD\u1FB3\u1FC1lig;\u8000\uFB03\u0269\u1FB9\0\0\u1FBDg;\u8000\uFB00ig;\u8000\uFB04;\uC000\u{1D523}lig;\u8000\uFB01lig;\uC000fj\u0180alt\u1FD9\u1FDC\u1FE1t;\u666Dig;\u8000\uFB02ns;\u65B1of;\u4192\u01F0\u1FEE\0\u1FF3f;\uC000\u{1D557}\u0100ak\u05BF\u1FF7\u0100;v\u1FFC\u1FFD\u62D4;\u6AD9artint;\u6A0D\u0100ao\u200C\u2055\u0100cs\u2011\u2052\u03B1\u201A\u2030\u2038\u2045\u2048\0\u2050\u03B2\u2022\u2025\u2027\u202A\u202C\0\u202E\u803B\xBD\u40BD;\u6153\u803B\xBC\u40BC;\u6155;\u6159;\u615B\u01B3\u2034\0\u2036;\u6154;\u6156\u02B4\u203E\u2041\0\0\u2043\u803B\xBE\u40BE;\u6157;\u615C5;\u6158\u01B6\u204C\0\u204E;\u615A;\u615D8;\u615El;\u6044wn;\u6322cr;\uC000\u{1D4BB}\u0880Eabcdefgijlnorstv\u2082\u2089\u209F\u20A5\u20B0\u20B4\u20F0\u20F5\u20FA\u20FF\u2103\u2112\u2138\u0317\u213E\u2152\u219E\u0100;l\u064D\u2087;\u6A8C\u0180cmp\u2090\u2095\u209Dute;\u41F5ma\u0100;d\u209C\u1CDA\u43B3;\u6A86reve;\u411F\u0100iy\u20AA\u20AErc;\u411D;\u4433ot;\u4121\u0200;lqs\u063E\u0642\u20BD\u20C9\u0180;qs\u063E\u064C\u20C4lan\xF4\u0665\u0200;cdl\u0665\u20D2\u20D5\u20E5c;\u6AA9ot\u0100;o\u20DC\u20DD\u6A80\u0100;l\u20E2\u20E3\u6A82;\u6A84\u0100;e\u20EA\u20ED\uC000\u22DB\uFE00s;\u6A94r;\uC000\u{1D524}\u0100;g\u0673\u061Bmel;\u6137cy;\u4453\u0200;Eaj\u065A\u210C\u210E\u2110;\u6A92;\u6AA5;\u6AA4\u0200Eaes\u211B\u211D\u2129\u2134;\u6269p\u0100;p\u2123\u2124\u6A8Arox\xBB\u2124\u0100;q\u212E\u212F\u6A88\u0100;q\u212E\u211Bim;\u62E7pf;\uC000\u{1D558}\u0100ci\u2143\u2146r;\u610Am\u0180;el\u066B\u214E\u2150;\u6A8E;\u6A90\u8300>;cdlqr\u05EE\u2160\u216A\u216E\u2173\u2179\u0100ci\u2165\u2167;\u6AA7r;\u6A7Aot;\u62D7Par;\u6995uest;\u6A7C\u0280adels\u2184\u216A\u2190\u0656\u219B\u01F0\u2189\0\u218Epro\xF8\u209Er;\u6978q\u0100lq\u063F\u2196les\xF3\u2088i\xED\u066B\u0100en\u21A3\u21ADrtneqq;\uC000\u2269\uFE00\xC5\u21AA\u0500Aabcefkosy\u21C4\u21C7\u21F1\u21F5\u21FA\u2218\u221D\u222F\u2268\u227Dr\xF2\u03A0\u0200ilmr\u21D0\u21D4\u21D7\u21DBrs\xF0\u1484f\xBB\u2024il\xF4\u06A9\u0100dr\u21E0\u21E4cy;\u444A\u0180;cw\u08F4\u21EB\u21EFir;\u6948;\u61ADar;\u610Firc;\u4125\u0180alr\u2201\u220E\u2213rts\u0100;u\u2209\u220A\u6665it\xBB\u220Alip;\u6026con;\u62B9r;\uC000\u{1D525}s\u0100ew\u2223\u2229arow;\u6925arow;\u6926\u0280amopr\u223A\u223E\u2243\u225E\u2263rr;\u61FFtht;\u623Bk\u0100lr\u2249\u2253eftarrow;\u61A9ightarrow;\u61AAf;\uC000\u{1D559}bar;\u6015\u0180clt\u226F\u2274\u2278r;\uC000\u{1D4BD}as\xE8\u21F4rok;\u4127\u0100bp\u2282\u2287ull;\u6043hen\xBB\u1C5B\u0AE1\u22A3\0\u22AA\0\u22B8\u22C5\u22CE\0\u22D5\u22F3\0\0\u22F8\u2322\u2367\u2362\u237F\0\u2386\u23AA\u23B4cute\u803B\xED\u40ED\u0180;iy\u0771\u22B0\u22B5rc\u803B\xEE\u40EE;\u4438\u0100cx\u22BC\u22BFy;\u4435cl\u803B\xA1\u40A1\u0100fr\u039F\u22C9;\uC000\u{1D526}rave\u803B\xEC\u40EC\u0200;ino\u073E\u22DD\u22E9\u22EE\u0100in\u22E2\u22E6nt;\u6A0Ct;\u622Dfin;\u69DCta;\u6129lig;\u4133\u0180aop\u22FE\u231A\u231D\u0180cgt\u2305\u2308\u2317r;\u412B\u0180elp\u071F\u230F\u2313in\xE5\u078Ear\xF4\u0720h;\u4131f;\u62B7ed;\u41B5\u0280;cfot\u04F4\u232C\u2331\u233D\u2341are;\u6105in\u0100;t\u2338\u2339\u621Eie;\u69DDdo\xF4\u2319\u0280;celp\u0757\u234C\u2350\u235B\u2361al;\u62BA\u0100gr\u2355\u2359er\xF3\u1563\xE3\u234Darhk;\u6A17rod;\u6A3C\u0200cgpt\u236F\u2372\u2376\u237By;\u4451on;\u412Ff;\uC000\u{1D55A}a;\u43B9uest\u803B\xBF\u40BF\u0100ci\u238A\u238Fr;\uC000\u{1D4BE}n\u0280;Edsv\u04F4\u239B\u239D\u23A1\u04F3;\u62F9ot;\u62F5\u0100;v\u23A6\u23A7\u62F4;\u62F3\u0100;i\u0777\u23AElde;\u4129\u01EB\u23B8\0\u23BCcy;\u4456l\u803B\xEF\u40EF\u0300cfmosu\u23CC\u23D7\u23DC\u23E1\u23E7\u23F5\u0100iy\u23D1\u23D5rc;\u4135;\u4439r;\uC000\u{1D527}ath;\u4237pf;\uC000\u{1D55B}\u01E3\u23EC\0\u23F1r;\uC000\u{1D4BF}rcy;\u4458kcy;\u4454\u0400acfghjos\u240B\u2416\u2422\u2427\u242D\u2431\u2435\u243Bppa\u0100;v\u2413\u2414\u43BA;\u43F0\u0100ey\u241B\u2420dil;\u4137;\u443Ar;\uC000\u{1D528}reen;\u4138cy;\u4445cy;\u445Cpf;\uC000\u{1D55C}cr;\uC000\u{1D4C0}\u0B80ABEHabcdefghjlmnoprstuv\u2470\u2481\u2486\u248D\u2491\u250E\u253D\u255A\u2580\u264E\u265E\u2665\u2679\u267D\u269A\u26B2\u26D8\u275D\u2768\u278B\u27C0\u2801\u2812\u0180art\u2477\u247A\u247Cr\xF2\u09C6\xF2\u0395ail;\u691Barr;\u690E\u0100;g\u0994\u248B;\u6A8Bar;\u6962\u0963\u24A5\0\u24AA\0\u24B1\0\0\0\0\0\u24B5\u24BA\0\u24C6\u24C8\u24CD\0\u24F9ute;\u413Amptyv;\u69B4ra\xEE\u084Cbda;\u43BBg\u0180;dl\u088E\u24C1\u24C3;\u6991\xE5\u088E;\u6A85uo\u803B\xAB\u40ABr\u0400;bfhlpst\u0899\u24DE\u24E6\u24E9\u24EB\u24EE\u24F1\u24F5\u0100;f\u089D\u24E3s;\u691Fs;\u691D\xEB\u2252p;\u61ABl;\u6939im;\u6973l;\u61A2\u0180;ae\u24FF\u2500\u2504\u6AABil;\u6919\u0100;s\u2509\u250A\u6AAD;\uC000\u2AAD\uFE00\u0180abr\u2515\u2519\u251Drr;\u690Crk;\u6772\u0100ak\u2522\u252Cc\u0100ek\u2528\u252A;\u407B;\u405B\u0100es\u2531\u2533;\u698Bl\u0100du\u2539\u253B;\u698F;\u698D\u0200aeuy\u2546\u254B\u2556\u2558ron;\u413E\u0100di\u2550\u2554il;\u413C\xEC\u08B0\xE2\u2529;\u443B\u0200cqrs\u2563\u2566\u256D\u257Da;\u6936uo\u0100;r\u0E19\u1746\u0100du\u2572\u2577har;\u6967shar;\u694Bh;\u61B2\u0280;fgqs\u258B\u258C\u0989\u25F3\u25FF\u6264t\u0280ahlrt\u2598\u25A4\u25B7\u25C2\u25E8rrow\u0100;t\u0899\u25A1a\xE9\u24F6arpoon\u0100du\u25AF\u25B4own\xBB\u045Ap\xBB\u0966eftarrows;\u61C7ight\u0180ahs\u25CD\u25D6\u25DErrow\u0100;s\u08F4\u08A7arpoon\xF3\u0F98quigarro\xF7\u21F0hreetimes;\u62CB\u0180;qs\u258B\u0993\u25FAlan\xF4\u09AC\u0280;cdgs\u09AC\u260A\u260D\u261D\u2628c;\u6AA8ot\u0100;o\u2614\u2615\u6A7F\u0100;r\u261A\u261B\u6A81;\u6A83\u0100;e\u2622\u2625\uC000\u22DA\uFE00s;\u6A93\u0280adegs\u2633\u2639\u263D\u2649\u264Bppro\xF8\u24C6ot;\u62D6q\u0100gq\u2643\u2645\xF4\u0989gt\xF2\u248C\xF4\u099Bi\xED\u09B2\u0180ilr\u2655\u08E1\u265Asht;\u697C;\uC000\u{1D529}\u0100;E\u099C\u2663;\u6A91\u0161\u2669\u2676r\u0100du\u25B2\u266E\u0100;l\u0965\u2673;\u696Alk;\u6584cy;\u4459\u0280;acht\u0A48\u2688\u268B\u2691\u2696r\xF2\u25C1orne\xF2\u1D08ard;\u696Bri;\u65FA\u0100io\u269F\u26A4dot;\u4140ust\u0100;a\u26AC\u26AD\u63B0che\xBB\u26AD\u0200Eaes\u26BB\u26BD\u26C9\u26D4;\u6268p\u0100;p\u26C3\u26C4\u6A89rox\xBB\u26C4\u0100;q\u26CE\u26CF\u6A87\u0100;q\u26CE\u26BBim;\u62E6\u0400abnoptwz\u26E9\u26F4\u26F7\u271A\u272F\u2741\u2747\u2750\u0100nr\u26EE\u26F1g;\u67ECr;\u61FDr\xEB\u08C1g\u0180lmr\u26FF\u270D\u2714eft\u0100ar\u09E6\u2707ight\xE1\u09F2apsto;\u67FCight\xE1\u09FDparrow\u0100lr\u2725\u2729ef\xF4\u24EDight;\u61AC\u0180afl\u2736\u2739\u273Dr;\u6985;\uC000\u{1D55D}us;\u6A2Dimes;\u6A34\u0161\u274B\u274Fst;\u6217\xE1\u134E\u0180;ef\u2757\u2758\u1800\u65CAnge\xBB\u2758ar\u0100;l\u2764\u2765\u4028t;\u6993\u0280achmt\u2773\u2776\u277C\u2785\u2787r\xF2\u08A8orne\xF2\u1D8Car\u0100;d\u0F98\u2783;\u696D;\u600Eri;\u62BF\u0300achiqt\u2798\u279D\u0A40\u27A2\u27AE\u27BBquo;\u6039r;\uC000\u{1D4C1}m\u0180;eg\u09B2\u27AA\u27AC;\u6A8D;\u6A8F\u0100bu\u252A\u27B3o\u0100;r\u0E1F\u27B9;\u601Arok;\u4142\u8400<;cdhilqr\u082B\u27D2\u2639\u27DC\u27E0\u27E5\u27EA\u27F0\u0100ci\u27D7\u27D9;\u6AA6r;\u6A79re\xE5\u25F2mes;\u62C9arr;\u6976uest;\u6A7B\u0100Pi\u27F5\u27F9ar;\u6996\u0180;ef\u2800\u092D\u181B\u65C3r\u0100du\u2807\u280Dshar;\u694Ahar;\u6966\u0100en\u2817\u2821rtneqq;\uC000\u2268\uFE00\xC5\u281E\u0700Dacdefhilnopsu\u2840\u2845\u2882\u288E\u2893\u28A0\u28A5\u28A8\u28DA\u28E2\u28E4\u0A83\u28F3\u2902Dot;\u623A\u0200clpr\u284E\u2852\u2863\u287Dr\u803B\xAF\u40AF\u0100et\u2857\u2859;\u6642\u0100;e\u285E\u285F\u6720se\xBB\u285F\u0100;s\u103B\u2868to\u0200;dlu\u103B\u2873\u2877\u287Bow\xEE\u048Cef\xF4\u090F\xF0\u13D1ker;\u65AE\u0100oy\u2887\u288Cmma;\u6A29;\u443Cash;\u6014asuredangle\xBB\u1626r;\uC000\u{1D52A}o;\u6127\u0180cdn\u28AF\u28B4\u28C9ro\u803B\xB5\u40B5\u0200;acd\u1464\u28BD\u28C0\u28C4s\xF4\u16A7ir;\u6AF0ot\u80BB\xB7\u01B5us\u0180;bd\u28D2\u1903\u28D3\u6212\u0100;u\u1D3C\u28D8;\u6A2A\u0163\u28DE\u28E1p;\u6ADB\xF2\u2212\xF0\u0A81\u0100dp\u28E9\u28EEels;\u62A7f;\uC000\u{1D55E}\u0100ct\u28F8\u28FDr;\uC000\u{1D4C2}pos\xBB\u159D\u0180;lm\u2909\u290A\u290D\u43BCtimap;\u62B8\u0C00GLRVabcdefghijlmoprstuvw\u2942\u2953\u297E\u2989\u2998\u29DA\u29E9\u2A15\u2A1A\u2A58\u2A5D\u2A83\u2A95\u2AA4\u2AA8\u2B04\u2B07\u2B44\u2B7F\u2BAE\u2C34\u2C67\u2C7C\u2CE9\u0100gt\u2947\u294B;\uC000\u22D9\u0338\u0100;v\u2950\u0BCF\uC000\u226B\u20D2\u0180elt\u295A\u2972\u2976ft\u0100ar\u2961\u2967rrow;\u61CDightarrow;\u61CE;\uC000\u22D8\u0338\u0100;v\u297B\u0C47\uC000\u226A\u20D2ightarrow;\u61CF\u0100Dd\u298E\u2993ash;\u62AFash;\u62AE\u0280bcnpt\u29A3\u29A7\u29AC\u29B1\u29CCla\xBB\u02DEute;\u4144g;\uC000\u2220\u20D2\u0280;Eiop\u0D84\u29BC\u29C0\u29C5\u29C8;\uC000\u2A70\u0338d;\uC000\u224B\u0338s;\u4149ro\xF8\u0D84ur\u0100;a\u29D3\u29D4\u666El\u0100;s\u29D3\u0B38\u01F3\u29DF\0\u29E3p\u80BB\xA0\u0B37mp\u0100;e\u0BF9\u0C00\u0280aeouy\u29F4\u29FE\u2A03\u2A10\u2A13\u01F0\u29F9\0\u29FB;\u6A43on;\u4148dil;\u4146ng\u0100;d\u0D7E\u2A0Aot;\uC000\u2A6D\u0338p;\u6A42;\u443Dash;\u6013\u0380;Aadqsx\u0B92\u2A29\u2A2D\u2A3B\u2A41\u2A45\u2A50rr;\u61D7r\u0100hr\u2A33\u2A36k;\u6924\u0100;o\u13F2\u13F0ot;\uC000\u2250\u0338ui\xF6\u0B63\u0100ei\u2A4A\u2A4Ear;\u6928\xED\u0B98ist\u0100;s\u0BA0\u0B9Fr;\uC000\u{1D52B}\u0200Eest\u0BC5\u2A66\u2A79\u2A7C\u0180;qs\u0BBC\u2A6D\u0BE1\u0180;qs\u0BBC\u0BC5\u2A74lan\xF4\u0BE2i\xED\u0BEA\u0100;r\u0BB6\u2A81\xBB\u0BB7\u0180Aap\u2A8A\u2A8D\u2A91r\xF2\u2971rr;\u61AEar;\u6AF2\u0180;sv\u0F8D\u2A9C\u0F8C\u0100;d\u2AA1\u2AA2\u62FC;\u62FAcy;\u445A\u0380AEadest\u2AB7\u2ABA\u2ABE\u2AC2\u2AC5\u2AF6\u2AF9r\xF2\u2966;\uC000\u2266\u0338rr;\u619Ar;\u6025\u0200;fqs\u0C3B\u2ACE\u2AE3\u2AEFt\u0100ar\u2AD4\u2AD9rro\xF7\u2AC1ightarro\xF7\u2A90\u0180;qs\u0C3B\u2ABA\u2AEAlan\xF4\u0C55\u0100;s\u0C55\u2AF4\xBB\u0C36i\xED\u0C5D\u0100;r\u0C35\u2AFEi\u0100;e\u0C1A\u0C25i\xE4\u0D90\u0100pt\u2B0C\u2B11f;\uC000\u{1D55F}\u8180\xAC;in\u2B19\u2B1A\u2B36\u40ACn\u0200;Edv\u0B89\u2B24\u2B28\u2B2E;\uC000\u22F9\u0338ot;\uC000\u22F5\u0338\u01E1\u0B89\u2B33\u2B35;\u62F7;\u62F6i\u0100;v\u0CB8\u2B3C\u01E1\u0CB8\u2B41\u2B43;\u62FE;\u62FD\u0180aor\u2B4B\u2B63\u2B69r\u0200;ast\u0B7B\u2B55\u2B5A\u2B5Flle\xEC\u0B7Bl;\uC000\u2AFD\u20E5;\uC000\u2202\u0338lint;\u6A14\u0180;ce\u0C92\u2B70\u2B73u\xE5\u0CA5\u0100;c\u0C98\u2B78\u0100;e\u0C92\u2B7D\xF1\u0C98\u0200Aait\u2B88\u2B8B\u2B9D\u2BA7r\xF2\u2988rr\u0180;cw\u2B94\u2B95\u2B99\u619B;\uC000\u2933\u0338;\uC000\u219D\u0338ghtarrow\xBB\u2B95ri\u0100;e\u0CCB\u0CD6\u0380chimpqu\u2BBD\u2BCD\u2BD9\u2B04\u0B78\u2BE4\u2BEF\u0200;cer\u0D32\u2BC6\u0D37\u2BC9u\xE5\u0D45;\uC000\u{1D4C3}ort\u026D\u2B05\0\0\u2BD6ar\xE1\u2B56m\u0100;e\u0D6E\u2BDF\u0100;q\u0D74\u0D73su\u0100bp\u2BEB\u2BED\xE5\u0CF8\xE5\u0D0B\u0180bcp\u2BF6\u2C11\u2C19\u0200;Ees\u2BFF\u2C00\u0D22\u2C04\u6284;\uC000\u2AC5\u0338et\u0100;e\u0D1B\u2C0Bq\u0100;q\u0D23\u2C00c\u0100;e\u0D32\u2C17\xF1\u0D38\u0200;Ees\u2C22\u2C23\u0D5F\u2C27\u6285;\uC000\u2AC6\u0338et\u0100;e\u0D58\u2C2Eq\u0100;q\u0D60\u2C23\u0200gilr\u2C3D\u2C3F\u2C45\u2C47\xEC\u0BD7lde\u803B\xF1\u40F1\xE7\u0C43iangle\u0100lr\u2C52\u2C5Ceft\u0100;e\u0C1A\u2C5A\xF1\u0C26ight\u0100;e\u0CCB\u2C65\xF1\u0CD7\u0100;m\u2C6C\u2C6D\u43BD\u0180;es\u2C74\u2C75\u2C79\u4023ro;\u6116p;\u6007\u0480DHadgilrs\u2C8F\u2C94\u2C99\u2C9E\u2CA3\u2CB0\u2CB6\u2CD3\u2CE3ash;\u62ADarr;\u6904p;\uC000\u224D\u20D2ash;\u62AC\u0100et\u2CA8\u2CAC;\uC000\u2265\u20D2;\uC000>\u20D2nfin;\u69DE\u0180Aet\u2CBD\u2CC1\u2CC5rr;\u6902;\uC000\u2264\u20D2\u0100;r\u2CCA\u2CCD\uC000<\u20D2ie;\uC000\u22B4\u20D2\u0100At\u2CD8\u2CDCrr;\u6903rie;\uC000\u22B5\u20D2im;\uC000\u223C\u20D2\u0180Aan\u2CF0\u2CF4\u2D02rr;\u61D6r\u0100hr\u2CFA\u2CFDk;\u6923\u0100;o\u13E7\u13E5ear;\u6927\u1253\u1A95\0\0\0\0\0\0\0\0\0\0\0\0\0\u2D2D\0\u2D38\u2D48\u2D60\u2D65\u2D72\u2D84\u1B07\0\0\u2D8D\u2DAB\0\u2DC8\u2DCE\0\u2DDC\u2E19\u2E2B\u2E3E\u2E43\u0100cs\u2D31\u1A97ute\u803B\xF3\u40F3\u0100iy\u2D3C\u2D45r\u0100;c\u1A9E\u2D42\u803B\xF4\u40F4;\u443E\u0280abios\u1AA0\u2D52\u2D57\u01C8\u2D5Alac;\u4151v;\u6A38old;\u69BClig;\u4153\u0100cr\u2D69\u2D6Dir;\u69BF;\uC000\u{1D52C}\u036F\u2D79\0\0\u2D7C\0\u2D82n;\u42DBave\u803B\xF2\u40F2;\u69C1\u0100bm\u2D88\u0DF4ar;\u69B5\u0200acit\u2D95\u2D98\u2DA5\u2DA8r\xF2\u1A80\u0100ir\u2D9D\u2DA0r;\u69BEoss;\u69BBn\xE5\u0E52;\u69C0\u0180aei\u2DB1\u2DB5\u2DB9cr;\u414Dga;\u43C9\u0180cdn\u2DC0\u2DC5\u01CDron;\u43BF;\u69B6pf;\uC000\u{1D560}\u0180ael\u2DD4\u2DD7\u01D2r;\u69B7rp;\u69B9\u0380;adiosv\u2DEA\u2DEB\u2DEE\u2E08\u2E0D\u2E10\u2E16\u6228r\xF2\u1A86\u0200;efm\u2DF7\u2DF8\u2E02\u2E05\u6A5Dr\u0100;o\u2DFE\u2DFF\u6134f\xBB\u2DFF\u803B\xAA\u40AA\u803B\xBA\u40BAgof;\u62B6r;\u6A56lope;\u6A57;\u6A5B\u0180clo\u2E1F\u2E21\u2E27\xF2\u2E01ash\u803B\xF8\u40F8l;\u6298i\u016C\u2E2F\u2E34de\u803B\xF5\u40F5es\u0100;a\u01DB\u2E3As;\u6A36ml\u803B\xF6\u40F6bar;\u633D\u0AE1\u2E5E\0\u2E7D\0\u2E80\u2E9D\0\u2EA2\u2EB9\0\0\u2ECB\u0E9C\0\u2F13\0\0\u2F2B\u2FBC\0\u2FC8r\u0200;ast\u0403\u2E67\u2E72\u0E85\u8100\xB6;l\u2E6D\u2E6E\u40B6le\xEC\u0403\u0269\u2E78\0\0\u2E7Bm;\u6AF3;\u6AFDy;\u443Fr\u0280cimpt\u2E8B\u2E8F\u2E93\u1865\u2E97nt;\u4025od;\u402Eil;\u6030enk;\u6031r;\uC000\u{1D52D}\u0180imo\u2EA8\u2EB0\u2EB4\u0100;v\u2EAD\u2EAE\u43C6;\u43D5ma\xF4\u0A76ne;\u660E\u0180;tv\u2EBF\u2EC0\u2EC8\u43C0chfork\xBB\u1FFD;\u43D6\u0100au\u2ECF\u2EDFn\u0100ck\u2ED5\u2EDDk\u0100;h\u21F4\u2EDB;\u610E\xF6\u21F4s\u0480;abcdemst\u2EF3\u2EF4\u1908\u2EF9\u2EFD\u2F04\u2F06\u2F0A\u2F0E\u402Bcir;\u6A23ir;\u6A22\u0100ou\u1D40\u2F02;\u6A25;\u6A72n\u80BB\xB1\u0E9Dim;\u6A26wo;\u6A27\u0180ipu\u2F19\u2F20\u2F25ntint;\u6A15f;\uC000\u{1D561}nd\u803B\xA3\u40A3\u0500;Eaceinosu\u0EC8\u2F3F\u2F41\u2F44\u2F47\u2F81\u2F89\u2F92\u2F7E\u2FB6;\u6AB3p;\u6AB7u\xE5\u0ED9\u0100;c\u0ECE\u2F4C\u0300;acens\u0EC8\u2F59\u2F5F\u2F66\u2F68\u2F7Eppro\xF8\u2F43urlye\xF1\u0ED9\xF1\u0ECE\u0180aes\u2F6F\u2F76\u2F7Approx;\u6AB9qq;\u6AB5im;\u62E8i\xED\u0EDFme\u0100;s\u2F88\u0EAE\u6032\u0180Eas\u2F78\u2F90\u2F7A\xF0\u2F75\u0180dfp\u0EEC\u2F99\u2FAF\u0180als\u2FA0\u2FA5\u2FAAlar;\u632Eine;\u6312urf;\u6313\u0100;t\u0EFB\u2FB4\xEF\u0EFBrel;\u62B0\u0100ci\u2FC0\u2FC5r;\uC000\u{1D4C5};\u43C8ncsp;\u6008\u0300fiopsu\u2FDA\u22E2\u2FDF\u2FE5\u2FEB\u2FF1r;\uC000\u{1D52E}pf;\uC000\u{1D562}rime;\u6057cr;\uC000\u{1D4C6}\u0180aeo\u2FF8\u3009\u3013t\u0100ei\u2FFE\u3005rnion\xF3\u06B0nt;\u6A16st\u0100;e\u3010\u3011\u403F\xF1\u1F19\xF4\u0F14\u0A80ABHabcdefhilmnoprstux\u3040\u3051\u3055\u3059\u30E0\u310E\u312B\u3147\u3162\u3172\u318E\u3206\u3215\u3224\u3229\u3258\u326E\u3272\u3290\u32B0\u32B7\u0180art\u3047\u304A\u304Cr\xF2\u10B3\xF2\u03DDail;\u691Car\xF2\u1C65ar;\u6964\u0380cdenqrt\u3068\u3075\u3078\u307F\u308F\u3094\u30CC\u0100eu\u306D\u3071;\uC000\u223D\u0331te;\u4155i\xE3\u116Emptyv;\u69B3g\u0200;del\u0FD1\u3089\u308B\u308D;\u6992;\u69A5\xE5\u0FD1uo\u803B\xBB\u40BBr\u0580;abcfhlpstw\u0FDC\u30AC\u30AF\u30B7\u30B9\u30BC\u30BE\u30C0\u30C3\u30C7\u30CAp;\u6975\u0100;f\u0FE0\u30B4s;\u6920;\u6933s;\u691E\xEB\u225D\xF0\u272El;\u6945im;\u6974l;\u61A3;\u619D\u0100ai\u30D1\u30D5il;\u691Ao\u0100;n\u30DB\u30DC\u6236al\xF3\u0F1E\u0180abr\u30E7\u30EA\u30EEr\xF2\u17E5rk;\u6773\u0100ak\u30F3\u30FDc\u0100ek\u30F9\u30FB;\u407D;\u405D\u0100es\u3102\u3104;\u698Cl\u0100du\u310A\u310C;\u698E;\u6990\u0200aeuy\u3117\u311C\u3127\u3129ron;\u4159\u0100di\u3121\u3125il;\u4157\xEC\u0FF2\xE2\u30FA;\u4440\u0200clqs\u3134\u3137\u313D\u3144a;\u6937dhar;\u6969uo\u0100;r\u020E\u020Dh;\u61B3\u0180acg\u314E\u315F\u0F44l\u0200;ips\u0F78\u3158\u315B\u109Cn\xE5\u10BBar\xF4\u0FA9t;\u65AD\u0180ilr\u3169\u1023\u316Esht;\u697D;\uC000\u{1D52F}\u0100ao\u3177\u3186r\u0100du\u317D\u317F\xBB\u047B\u0100;l\u1091\u3184;\u696C\u0100;v\u318B\u318C\u43C1;\u43F1\u0180gns\u3195\u31F9\u31FCht\u0300ahlrst\u31A4\u31B0\u31C2\u31D8\u31E4\u31EErrow\u0100;t\u0FDC\u31ADa\xE9\u30C8arpoon\u0100du\u31BB\u31BFow\xEE\u317Ep\xBB\u1092eft\u0100ah\u31CA\u31D0rrow\xF3\u0FEAarpoon\xF3\u0551ightarrows;\u61C9quigarro\xF7\u30CBhreetimes;\u62CCg;\u42DAingdotse\xF1\u1F32\u0180ahm\u320D\u3210\u3213r\xF2\u0FEAa\xF2\u0551;\u600Foust\u0100;a\u321E\u321F\u63B1che\xBB\u321Fmid;\u6AEE\u0200abpt\u3232\u323D\u3240\u3252\u0100nr\u3237\u323Ag;\u67EDr;\u61FEr\xEB\u1003\u0180afl\u3247\u324A\u324Er;\u6986;\uC000\u{1D563}us;\u6A2Eimes;\u6A35\u0100ap\u325D\u3267r\u0100;g\u3263\u3264\u4029t;\u6994olint;\u6A12ar\xF2\u31E3\u0200achq\u327B\u3280\u10BC\u3285quo;\u603Ar;\uC000\u{1D4C7}\u0100bu\u30FB\u328Ao\u0100;r\u0214\u0213\u0180hir\u3297\u329B\u32A0re\xE5\u31F8mes;\u62CAi\u0200;efl\u32AA\u1059\u1821\u32AB\u65B9tri;\u69CEluhar;\u6968;\u611E\u0D61\u32D5\u32DB\u32DF\u332C\u3338\u3371\0\u337A\u33A4\0\0\u33EC\u33F0\0\u3428\u3448\u345A\u34AD\u34B1\u34CA\u34F1\0\u3616\0\0\u3633cute;\u415Bqu\xEF\u27BA\u0500;Eaceinpsy\u11ED\u32F3\u32F5\u32FF\u3302\u330B\u330F\u331F\u3326\u3329;\u6AB4\u01F0\u32FA\0\u32FC;\u6AB8on;\u4161u\xE5\u11FE\u0100;d\u11F3\u3307il;\u415Frc;\u415D\u0180Eas\u3316\u3318\u331B;\u6AB6p;\u6ABAim;\u62E9olint;\u6A13i\xED\u1204;\u4441ot\u0180;be\u3334\u1D47\u3335\u62C5;\u6A66\u0380Aacmstx\u3346\u334A\u3357\u335B\u335E\u3363\u336Drr;\u61D8r\u0100hr\u3350\u3352\xEB\u2228\u0100;o\u0A36\u0A34t\u803B\xA7\u40A7i;\u403Bwar;\u6929m\u0100in\u3369\xF0nu\xF3\xF1t;\u6736r\u0100;o\u3376\u2055\uC000\u{1D530}\u0200acoy\u3382\u3386\u3391\u33A0rp;\u666F\u0100hy\u338B\u338Fcy;\u4449;\u4448rt\u026D\u3399\0\0\u339Ci\xE4\u1464ara\xEC\u2E6F\u803B\xAD\u40AD\u0100gm\u33A8\u33B4ma\u0180;fv\u33B1\u33B2\u33B2\u43C3;\u43C2\u0400;deglnpr\u12AB\u33C5\u33C9\u33CE\u33D6\u33DE\u33E1\u33E6ot;\u6A6A\u0100;q\u12B1\u12B0\u0100;E\u33D3\u33D4\u6A9E;\u6AA0\u0100;E\u33DB\u33DC\u6A9D;\u6A9Fe;\u6246lus;\u6A24arr;\u6972ar\xF2\u113D\u0200aeit\u33F8\u3408\u340F\u3417\u0100ls\u33FD\u3404lsetm\xE9\u336Ahp;\u6A33parsl;\u69E4\u0100dl\u1463\u3414e;\u6323\u0100;e\u341C\u341D\u6AAA\u0100;s\u3422\u3423\u6AAC;\uC000\u2AAC\uFE00\u0180flp\u342E\u3433\u3442tcy;\u444C\u0100;b\u3438\u3439\u402F\u0100;a\u343E\u343F\u69C4r;\u633Ff;\uC000\u{1D564}a\u0100dr\u344D\u0402es\u0100;u\u3454\u3455\u6660it\xBB\u3455\u0180csu\u3460\u3479\u349F\u0100au\u3465\u346Fp\u0100;s\u1188\u346B;\uC000\u2293\uFE00p\u0100;s\u11B4\u3475;\uC000\u2294\uFE00u\u0100bp\u347F\u348F\u0180;es\u1197\u119C\u3486et\u0100;e\u1197\u348D\xF1\u119D\u0180;es\u11A8\u11AD\u3496et\u0100;e\u11A8\u349D\xF1\u11AE\u0180;af\u117B\u34A6\u05B0r\u0165\u34AB\u05B1\xBB\u117Car\xF2\u1148\u0200cemt\u34B9\u34BE\u34C2\u34C5r;\uC000\u{1D4C8}tm\xEE\xF1i\xEC\u3415ar\xE6\u11BE\u0100ar\u34CE\u34D5r\u0100;f\u34D4\u17BF\u6606\u0100an\u34DA\u34EDight\u0100ep\u34E3\u34EApsilo\xEE\u1EE0h\xE9\u2EAFs\xBB\u2852\u0280bcmnp\u34FB\u355E\u1209\u358B\u358E\u0480;Edemnprs\u350E\u350F\u3511\u3515\u351E\u3523\u352C\u3531\u3536\u6282;\u6AC5ot;\u6ABD\u0100;d\u11DA\u351Aot;\u6AC3ult;\u6AC1\u0100Ee\u3528\u352A;\u6ACB;\u628Alus;\u6ABFarr;\u6979\u0180eiu\u353D\u3552\u3555t\u0180;en\u350E\u3545\u354Bq\u0100;q\u11DA\u350Feq\u0100;q\u352B\u3528m;\u6AC7\u0100bp\u355A\u355C;\u6AD5;\u6AD3c\u0300;acens\u11ED\u356C\u3572\u3579\u357B\u3326ppro\xF8\u32FAurlye\xF1\u11FE\xF1\u11F3\u0180aes\u3582\u3588\u331Bppro\xF8\u331Aq\xF1\u3317g;\u666A\u0680123;Edehlmnps\u35A9\u35AC\u35AF\u121C\u35B2\u35B4\u35C0\u35C9\u35D5\u35DA\u35DF\u35E8\u35ED\u803B\xB9\u40B9\u803B\xB2\u40B2\u803B\xB3\u40B3;\u6AC6\u0100os\u35B9\u35BCt;\u6ABEub;\u6AD8\u0100;d\u1222\u35C5ot;\u6AC4s\u0100ou\u35CF\u35D2l;\u67C9b;\u6AD7arr;\u697Bult;\u6AC2\u0100Ee\u35E4\u35E6;\u6ACC;\u628Blus;\u6AC0\u0180eiu\u35F4\u3609\u360Ct\u0180;en\u121C\u35FC\u3602q\u0100;q\u1222\u35B2eq\u0100;q\u35E7\u35E4m;\u6AC8\u0100bp\u3611\u3613;\u6AD4;\u6AD6\u0180Aan\u361C\u3620\u362Drr;\u61D9r\u0100hr\u3626\u3628\xEB\u222E\u0100;o\u0A2B\u0A29war;\u692Alig\u803B\xDF\u40DF\u0BE1\u3651\u365D\u3660\u12CE\u3673\u3679\0\u367E\u36C2\0\0\0\0\0\u36DB\u3703\0\u3709\u376C\0\0\0\u3787\u0272\u3656\0\0\u365Bget;\u6316;\u43C4r\xEB\u0E5F\u0180aey\u3666\u366B\u3670ron;\u4165dil;\u4163;\u4442lrec;\u6315r;\uC000\u{1D531}\u0200eiko\u3686\u369D\u36B5\u36BC\u01F2\u368B\0\u3691e\u01004f\u1284\u1281a\u0180;sv\u3698\u3699\u369B\u43B8ym;\u43D1\u0100cn\u36A2\u36B2k\u0100as\u36A8\u36AEppro\xF8\u12C1im\xBB\u12ACs\xF0\u129E\u0100as\u36BA\u36AE\xF0\u12C1rn\u803B\xFE\u40FE\u01EC\u031F\u36C6\u22E7es\u8180\xD7;bd\u36CF\u36D0\u36D8\u40D7\u0100;a\u190F\u36D5r;\u6A31;\u6A30\u0180eps\u36E1\u36E3\u3700\xE1\u2A4D\u0200;bcf\u0486\u36EC\u36F0\u36F4ot;\u6336ir;\u6AF1\u0100;o\u36F9\u36FC\uC000\u{1D565}rk;\u6ADA\xE1\u3362rime;\u6034\u0180aip\u370F\u3712\u3764d\xE5\u1248\u0380adempst\u3721\u374D\u3740\u3751\u3757\u375C\u375Fngle\u0280;dlqr\u3730\u3731\u3736\u3740\u3742\u65B5own\xBB\u1DBBeft\u0100;e\u2800\u373E\xF1\u092E;\u625Cight\u0100;e\u32AA\u374B\xF1\u105Aot;\u65ECinus;\u6A3Alus;\u6A39b;\u69CDime;\u6A3Bezium;\u63E2\u0180cht\u3772\u377D\u3781\u0100ry\u3777\u377B;\uC000\u{1D4C9};\u4446cy;\u445Brok;\u4167\u0100io\u378B\u378Ex\xF4\u1777head\u0100lr\u3797\u37A0eftarro\xF7\u084Fightarrow\xBB\u0F5D\u0900AHabcdfghlmoprstuw\u37D0\u37D3\u37D7\u37E4\u37F0\u37FC\u380E\u381C\u3823\u3834\u3851\u385D\u386B\u38A9\u38CC\u38D2\u38EA\u38F6r\xF2\u03EDar;\u6963\u0100cr\u37DC\u37E2ute\u803B\xFA\u40FA\xF2\u1150r\u01E3\u37EA\0\u37EDy;\u445Eve;\u416D\u0100iy\u37F5\u37FArc\u803B\xFB\u40FB;\u4443\u0180abh\u3803\u3806\u380Br\xF2\u13ADlac;\u4171a\xF2\u13C3\u0100ir\u3813\u3818sht;\u697E;\uC000\u{1D532}rave\u803B\xF9\u40F9\u0161\u3827\u3831r\u0100lr\u382C\u382E\xBB\u0957\xBB\u1083lk;\u6580\u0100ct\u3839\u384D\u026F\u383F\0\0\u384Arn\u0100;e\u3845\u3846\u631Cr\xBB\u3846op;\u630Fri;\u65F8\u0100al\u3856\u385Acr;\u416B\u80BB\xA8\u0349\u0100gp\u3862\u3866on;\u4173f;\uC000\u{1D566}\u0300adhlsu\u114B\u3878\u387D\u1372\u3891\u38A0own\xE1\u13B3arpoon\u0100lr\u3888\u388Cef\xF4\u382Digh\xF4\u382Fi\u0180;hl\u3899\u389A\u389C\u43C5\xBB\u13FAon\xBB\u389Aparrows;\u61C8\u0180cit\u38B0\u38C4\u38C8\u026F\u38B6\0\0\u38C1rn\u0100;e\u38BC\u38BD\u631Dr\xBB\u38BDop;\u630Eng;\u416Fri;\u65F9cr;\uC000\u{1D4CA}\u0180dir\u38D9\u38DD\u38E2ot;\u62F0lde;\u4169i\u0100;f\u3730\u38E8\xBB\u1813\u0100am\u38EF\u38F2r\xF2\u38A8l\u803B\xFC\u40FCangle;\u69A7\u0780ABDacdeflnoprsz\u391C\u391F\u3929\u392D\u39B5\u39B8\u39BD\u39DF\u39E4\u39E8\u39F3\u39F9\u39FD\u3A01\u3A20r\xF2\u03F7ar\u0100;v\u3926\u3927\u6AE8;\u6AE9as\xE8\u03E1\u0100nr\u3932\u3937grt;\u699C\u0380eknprst\u34E3\u3946\u394B\u3952\u395D\u3964\u3996app\xE1\u2415othin\xE7\u1E96\u0180hir\u34EB\u2EC8\u3959op\xF4\u2FB5\u0100;h\u13B7\u3962\xEF\u318D\u0100iu\u3969\u396Dgm\xE1\u33B3\u0100bp\u3972\u3984setneq\u0100;q\u397D\u3980\uC000\u228A\uFE00;\uC000\u2ACB\uFE00setneq\u0100;q\u398F\u3992\uC000\u228B\uFE00;\uC000\u2ACC\uFE00\u0100hr\u399B\u399Fet\xE1\u369Ciangle\u0100lr\u39AA\u39AFeft\xBB\u0925ight\xBB\u1051y;\u4432ash\xBB\u1036\u0180elr\u39C4\u39D2\u39D7\u0180;be\u2DEA\u39CB\u39CFar;\u62BBq;\u625Alip;\u62EE\u0100bt\u39DC\u1468a\xF2\u1469r;\uC000\u{1D533}tr\xE9\u39AEsu\u0100bp\u39EF\u39F1\xBB\u0D1C\xBB\u0D59pf;\uC000\u{1D567}ro\xF0\u0EFBtr\xE9\u39B4\u0100cu\u3A06\u3A0Br;\uC000\u{1D4CB}\u0100bp\u3A10\u3A18n\u0100Ee\u3980\u3A16\xBB\u397En\u0100Ee\u3992\u3A1E\xBB\u3990igzag;\u699A\u0380cefoprs\u3A36\u3A3B\u3A56\u3A5B\u3A54\u3A61\u3A6Airc;\u4175\u0100di\u3A40\u3A51\u0100bg\u3A45\u3A49ar;\u6A5Fe\u0100;q\u15FA\u3A4F;\u6259erp;\u6118r;\uC000\u{1D534}pf;\uC000\u{1D568}\u0100;e\u1479\u3A66at\xE8\u1479cr;\uC000\u{1D4CC}\u0AE3\u178E\u3A87\0\u3A8B\0\u3A90\u3A9B\0\0\u3A9D\u3AA8\u3AAB\u3AAF\0\0\u3AC3\u3ACE\0\u3AD8\u17DC\u17DFtr\xE9\u17D1r;\uC000\u{1D535}\u0100Aa\u3A94\u3A97r\xF2\u03C3r\xF2\u09F6;\u43BE\u0100Aa\u3AA1\u3AA4r\xF2\u03B8r\xF2\u09EBa\xF0\u2713is;\u62FB\u0180dpt\u17A4\u3AB5\u3ABE\u0100fl\u3ABA\u17A9;\uC000\u{1D569}im\xE5\u17B2\u0100Aa\u3AC7\u3ACAr\xF2\u03CEr\xF2\u0A01\u0100cq\u3AD2\u17B8r;\uC000\u{1D4CD}\u0100pt\u17D6\u3ADCr\xE9\u17D4\u0400acefiosu\u3AF0\u3AFD\u3B08\u3B0C\u3B11\u3B15\u3B1B\u3B21c\u0100uy\u3AF6\u3AFBte\u803B\xFD\u40FD;\u444F\u0100iy\u3B02\u3B06rc;\u4177;\u444Bn\u803B\xA5\u40A5r;\uC000\u{1D536}cy;\u4457pf;\uC000\u{1D56A}cr;\uC000\u{1D4CE}\u0100cm\u3B26\u3B29y;\u444El\u803B\xFF\u40FF\u0500acdefhiosw\u3B42\u3B48\u3B54\u3B58\u3B64\u3B69\u3B6D\u3B74\u3B7A\u3B80cute;\u417A\u0100ay\u3B4D\u3B52ron;\u417E;\u4437ot;\u417C\u0100et\u3B5D\u3B61tr\xE6\u155Fa;\u43B6r;\uC000\u{1D537}cy;\u4436grarr;\u61DDpf;\uC000\u{1D56B}cr;\uC000\u{1D4CF}\u0100jn\u3B85\u3B87;\u600Dj;\u600C'.split("").map((c) => c.charCodeAt(0))
+);
+
+// ../../../node_modules/markdown-it/node_modules/entities/lib/esm/generated/decode-data-xml.js
+var decode_data_xml_default = new Uint16Array(
+  // prettier-ignore
+  "\u0200aglq	\x1B\u026D\0\0p;\u4026os;\u4027t;\u403Et;\u403Cuot;\u4022".split("").map((c) => c.charCodeAt(0))
+);
+
+// ../../../node_modules/markdown-it/node_modules/entities/lib/esm/decode_codepoint.js
+var _a;
+var decodeMap = /* @__PURE__ */ new Map([
+  [0, 65533],
+  // C1 Unicode control character reference replacements
+  [128, 8364],
+  [130, 8218],
+  [131, 402],
+  [132, 8222],
+  [133, 8230],
+  [134, 8224],
+  [135, 8225],
+  [136, 710],
+  [137, 8240],
+  [138, 352],
+  [139, 8249],
+  [140, 338],
+  [142, 381],
+  [145, 8216],
+  [146, 8217],
+  [147, 8220],
+  [148, 8221],
+  [149, 8226],
+  [150, 8211],
+  [151, 8212],
+  [152, 732],
+  [153, 8482],
+  [154, 353],
+  [155, 8250],
+  [156, 339],
+  [158, 382],
+  [159, 376]
+]);
+var fromCodePoint = (
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, node/no-unsupported-features/es-builtins
+  (_a = String.fromCodePoint) !== null && _a !== void 0 ? _a : function(codePoint) {
+    let output = "";
+    if (codePoint > 65535) {
+      codePoint -= 65536;
+      output += String.fromCharCode(codePoint >>> 10 & 1023 | 55296);
+      codePoint = 56320 | codePoint & 1023;
+    }
+    output += String.fromCharCode(codePoint);
+    return output;
+  }
+);
+function replaceCodePoint(codePoint) {
+  var _a2;
+  if (codePoint >= 55296 && codePoint <= 57343 || codePoint > 1114111) {
+    return 65533;
+  }
+  return (_a2 = decodeMap.get(codePoint)) !== null && _a2 !== void 0 ? _a2 : codePoint;
+}
+
+// ../../../node_modules/markdown-it/node_modules/entities/lib/esm/decode.js
+var CharCodes;
+(function(CharCodes2) {
+  CharCodes2[CharCodes2["NUM"] = 35] = "NUM";
+  CharCodes2[CharCodes2["SEMI"] = 59] = "SEMI";
+  CharCodes2[CharCodes2["EQUALS"] = 61] = "EQUALS";
+  CharCodes2[CharCodes2["ZERO"] = 48] = "ZERO";
+  CharCodes2[CharCodes2["NINE"] = 57] = "NINE";
+  CharCodes2[CharCodes2["LOWER_A"] = 97] = "LOWER_A";
+  CharCodes2[CharCodes2["LOWER_F"] = 102] = "LOWER_F";
+  CharCodes2[CharCodes2["LOWER_X"] = 120] = "LOWER_X";
+  CharCodes2[CharCodes2["LOWER_Z"] = 122] = "LOWER_Z";
+  CharCodes2[CharCodes2["UPPER_A"] = 65] = "UPPER_A";
+  CharCodes2[CharCodes2["UPPER_F"] = 70] = "UPPER_F";
+  CharCodes2[CharCodes2["UPPER_Z"] = 90] = "UPPER_Z";
+})(CharCodes || (CharCodes = {}));
+var TO_LOWER_BIT = 32;
+var BinTrieFlags;
+(function(BinTrieFlags2) {
+  BinTrieFlags2[BinTrieFlags2["VALUE_LENGTH"] = 49152] = "VALUE_LENGTH";
+  BinTrieFlags2[BinTrieFlags2["BRANCH_LENGTH"] = 16256] = "BRANCH_LENGTH";
+  BinTrieFlags2[BinTrieFlags2["JUMP_TABLE"] = 127] = "JUMP_TABLE";
+})(BinTrieFlags || (BinTrieFlags = {}));
+function isNumber(code2) {
+  return code2 >= CharCodes.ZERO && code2 <= CharCodes.NINE;
+}
+function isHexadecimalCharacter(code2) {
+  return code2 >= CharCodes.UPPER_A && code2 <= CharCodes.UPPER_F || code2 >= CharCodes.LOWER_A && code2 <= CharCodes.LOWER_F;
+}
+function isAsciiAlphaNumeric(code2) {
+  return code2 >= CharCodes.UPPER_A && code2 <= CharCodes.UPPER_Z || code2 >= CharCodes.LOWER_A && code2 <= CharCodes.LOWER_Z || isNumber(code2);
+}
+function isEntityInAttributeInvalidEnd(code2) {
+  return code2 === CharCodes.EQUALS || isAsciiAlphaNumeric(code2);
+}
+var EntityDecoderState;
+(function(EntityDecoderState2) {
+  EntityDecoderState2[EntityDecoderState2["EntityStart"] = 0] = "EntityStart";
+  EntityDecoderState2[EntityDecoderState2["NumericStart"] = 1] = "NumericStart";
+  EntityDecoderState2[EntityDecoderState2["NumericDecimal"] = 2] = "NumericDecimal";
+  EntityDecoderState2[EntityDecoderState2["NumericHex"] = 3] = "NumericHex";
+  EntityDecoderState2[EntityDecoderState2["NamedEntity"] = 4] = "NamedEntity";
+})(EntityDecoderState || (EntityDecoderState = {}));
+var DecodingMode;
+(function(DecodingMode2) {
+  DecodingMode2[DecodingMode2["Legacy"] = 0] = "Legacy";
+  DecodingMode2[DecodingMode2["Strict"] = 1] = "Strict";
+  DecodingMode2[DecodingMode2["Attribute"] = 2] = "Attribute";
+})(DecodingMode || (DecodingMode = {}));
+var EntityDecoder = class {
+  constructor(decodeTree, emitCodePoint, errors2) {
+    this.decodeTree = decodeTree;
+    this.emitCodePoint = emitCodePoint;
+    this.errors = errors2;
+    this.state = EntityDecoderState.EntityStart;
+    this.consumed = 1;
+    this.result = 0;
+    this.treeIndex = 0;
+    this.excess = 1;
+    this.decodeMode = DecodingMode.Strict;
+  }
+  /** Resets the instance to make it reusable. */
+  startEntity(decodeMode) {
+    this.decodeMode = decodeMode;
+    this.state = EntityDecoderState.EntityStart;
+    this.result = 0;
+    this.treeIndex = 0;
+    this.excess = 1;
+    this.consumed = 1;
+  }
+  /**
+   * Write an entity to the decoder. This can be called multiple times with partial entities.
+   * If the entity is incomplete, the decoder will return -1.
+   *
+   * Mirrors the implementation of `getDecoder`, but with the ability to stop decoding if the
+   * entity is incomplete, and resume when the next string is written.
+   *
+   * @param string The string containing the entity (or a continuation of the entity).
+   * @param offset The offset at which the entity begins. Should be 0 if this is not the first call.
+   * @returns The number of characters that were consumed, or -1 if the entity is incomplete.
+   */
+  write(str, offset) {
+    switch (this.state) {
+      case EntityDecoderState.EntityStart: {
+        if (str.charCodeAt(offset) === CharCodes.NUM) {
+          this.state = EntityDecoderState.NumericStart;
+          this.consumed += 1;
+          return this.stateNumericStart(str, offset + 1);
+        }
+        this.state = EntityDecoderState.NamedEntity;
+        return this.stateNamedEntity(str, offset);
+      }
+      case EntityDecoderState.NumericStart: {
+        return this.stateNumericStart(str, offset);
+      }
+      case EntityDecoderState.NumericDecimal: {
+        return this.stateNumericDecimal(str, offset);
+      }
+      case EntityDecoderState.NumericHex: {
+        return this.stateNumericHex(str, offset);
+      }
+      case EntityDecoderState.NamedEntity: {
+        return this.stateNamedEntity(str, offset);
+      }
+    }
+  }
+  /**
+   * Switches between the numeric decimal and hexadecimal states.
+   *
+   * Equivalent to the `Numeric character reference state` in the HTML spec.
+   *
+   * @param str The string containing the entity (or a continuation of the entity).
+   * @param offset The current offset.
+   * @returns The number of characters that were consumed, or -1 if the entity is incomplete.
+   */
+  stateNumericStart(str, offset) {
+    if (offset >= str.length) {
+      return -1;
+    }
+    if ((str.charCodeAt(offset) | TO_LOWER_BIT) === CharCodes.LOWER_X) {
+      this.state = EntityDecoderState.NumericHex;
+      this.consumed += 1;
+      return this.stateNumericHex(str, offset + 1);
+    }
+    this.state = EntityDecoderState.NumericDecimal;
+    return this.stateNumericDecimal(str, offset);
+  }
+  addToNumericResult(str, start, end, base2) {
+    if (start !== end) {
+      const digitCount = end - start;
+      this.result = this.result * Math.pow(base2, digitCount) + parseInt(str.substr(start, digitCount), base2);
+      this.consumed += digitCount;
+    }
+  }
+  /**
+   * Parses a hexadecimal numeric entity.
+   *
+   * Equivalent to the `Hexademical character reference state` in the HTML spec.
+   *
+   * @param str The string containing the entity (or a continuation of the entity).
+   * @param offset The current offset.
+   * @returns The number of characters that were consumed, or -1 if the entity is incomplete.
+   */
+  stateNumericHex(str, offset) {
+    const startIdx = offset;
+    while (offset < str.length) {
+      const char = str.charCodeAt(offset);
+      if (isNumber(char) || isHexadecimalCharacter(char)) {
+        offset += 1;
+      } else {
+        this.addToNumericResult(str, startIdx, offset, 16);
+        return this.emitNumericEntity(char, 3);
+      }
+    }
+    this.addToNumericResult(str, startIdx, offset, 16);
+    return -1;
+  }
+  /**
+   * Parses a decimal numeric entity.
+   *
+   * Equivalent to the `Decimal character reference state` in the HTML spec.
+   *
+   * @param str The string containing the entity (or a continuation of the entity).
+   * @param offset The current offset.
+   * @returns The number of characters that were consumed, or -1 if the entity is incomplete.
+   */
+  stateNumericDecimal(str, offset) {
+    const startIdx = offset;
+    while (offset < str.length) {
+      const char = str.charCodeAt(offset);
+      if (isNumber(char)) {
+        offset += 1;
+      } else {
+        this.addToNumericResult(str, startIdx, offset, 10);
+        return this.emitNumericEntity(char, 2);
+      }
+    }
+    this.addToNumericResult(str, startIdx, offset, 10);
+    return -1;
+  }
+  /**
+   * Validate and emit a numeric entity.
+   *
+   * Implements the logic from the `Hexademical character reference start
+   * state` and `Numeric character reference end state` in the HTML spec.
+   *
+   * @param lastCp The last code point of the entity. Used to see if the
+   *               entity was terminated with a semicolon.
+   * @param expectedLength The minimum number of characters that should be
+   *                       consumed. Used to validate that at least one digit
+   *                       was consumed.
+   * @returns The number of characters that were consumed.
+   */
+  emitNumericEntity(lastCp, expectedLength) {
+    var _a2;
+    if (this.consumed <= expectedLength) {
+      (_a2 = this.errors) === null || _a2 === void 0 ? void 0 : _a2.absenceOfDigitsInNumericCharacterReference(this.consumed);
+      return 0;
+    }
+    if (lastCp === CharCodes.SEMI) {
+      this.consumed += 1;
+    } else if (this.decodeMode === DecodingMode.Strict) {
+      return 0;
+    }
+    this.emitCodePoint(replaceCodePoint(this.result), this.consumed);
+    if (this.errors) {
+      if (lastCp !== CharCodes.SEMI) {
+        this.errors.missingSemicolonAfterCharacterReference();
+      }
+      this.errors.validateNumericCharacterReference(this.result);
+    }
+    return this.consumed;
+  }
+  /**
+   * Parses a named entity.
+   *
+   * Equivalent to the `Named character reference state` in the HTML spec.
+   *
+   * @param str The string containing the entity (or a continuation of the entity).
+   * @param offset The current offset.
+   * @returns The number of characters that were consumed, or -1 if the entity is incomplete.
+   */
+  stateNamedEntity(str, offset) {
+    const { decodeTree } = this;
+    let current = decodeTree[this.treeIndex];
+    let valueLength = (current & BinTrieFlags.VALUE_LENGTH) >> 14;
+    for (; offset < str.length; offset++, this.excess++) {
+      const char = str.charCodeAt(offset);
+      this.treeIndex = determineBranch(decodeTree, current, this.treeIndex + Math.max(1, valueLength), char);
+      if (this.treeIndex < 0) {
+        return this.result === 0 || // If we are parsing an attribute
+        this.decodeMode === DecodingMode.Attribute && // We shouldn't have consumed any characters after the entity,
+        (valueLength === 0 || // And there should be no invalid characters.
+        isEntityInAttributeInvalidEnd(char)) ? 0 : this.emitNotTerminatedNamedEntity();
+      }
+      current = decodeTree[this.treeIndex];
+      valueLength = (current & BinTrieFlags.VALUE_LENGTH) >> 14;
+      if (valueLength !== 0) {
+        if (char === CharCodes.SEMI) {
+          return this.emitNamedEntityData(this.treeIndex, valueLength, this.consumed + this.excess);
+        }
+        if (this.decodeMode !== DecodingMode.Strict) {
+          this.result = this.treeIndex;
+          this.consumed += this.excess;
+          this.excess = 0;
+        }
+      }
+    }
+    return -1;
+  }
+  /**
+   * Emit a named entity that was not terminated with a semicolon.
+   *
+   * @returns The number of characters consumed.
+   */
+  emitNotTerminatedNamedEntity() {
+    var _a2;
+    const { result, decodeTree } = this;
+    const valueLength = (decodeTree[result] & BinTrieFlags.VALUE_LENGTH) >> 14;
+    this.emitNamedEntityData(result, valueLength, this.consumed);
+    (_a2 = this.errors) === null || _a2 === void 0 ? void 0 : _a2.missingSemicolonAfterCharacterReference();
+    return this.consumed;
+  }
+  /**
+   * Emit a named entity.
+   *
+   * @param result The index of the entity in the decode tree.
+   * @param valueLength The number of bytes in the entity.
+   * @param consumed The number of characters consumed.
+   *
+   * @returns The number of characters consumed.
+   */
+  emitNamedEntityData(result, valueLength, consumed) {
+    const { decodeTree } = this;
+    this.emitCodePoint(valueLength === 1 ? decodeTree[result] & ~BinTrieFlags.VALUE_LENGTH : decodeTree[result + 1], consumed);
+    if (valueLength === 3) {
+      this.emitCodePoint(decodeTree[result + 2], consumed);
+    }
+    return consumed;
+  }
+  /**
+   * Signal to the parser that the end of the input was reached.
+   *
+   * Remaining data will be emitted and relevant errors will be produced.
+   *
+   * @returns The number of characters consumed.
+   */
+  end() {
+    var _a2;
+    switch (this.state) {
+      case EntityDecoderState.NamedEntity: {
+        return this.result !== 0 && (this.decodeMode !== DecodingMode.Attribute || this.result === this.treeIndex) ? this.emitNotTerminatedNamedEntity() : 0;
+      }
+      // Otherwise, emit a numeric entity if we have one.
+      case EntityDecoderState.NumericDecimal: {
+        return this.emitNumericEntity(0, 2);
+      }
+      case EntityDecoderState.NumericHex: {
+        return this.emitNumericEntity(0, 3);
+      }
+      case EntityDecoderState.NumericStart: {
+        (_a2 = this.errors) === null || _a2 === void 0 ? void 0 : _a2.absenceOfDigitsInNumericCharacterReference(this.consumed);
+        return 0;
+      }
+      case EntityDecoderState.EntityStart: {
+        return 0;
+      }
+    }
+  }
+};
+function getDecoder(decodeTree) {
+  let ret = "";
+  const decoder = new EntityDecoder(decodeTree, (str) => ret += fromCodePoint(str));
+  return function decodeWithTrie(str, decodeMode) {
+    let lastIndex = 0;
+    let offset = 0;
+    while ((offset = str.indexOf("&", offset)) >= 0) {
+      ret += str.slice(lastIndex, offset);
+      decoder.startEntity(decodeMode);
+      const len = decoder.write(
+        str,
+        // Skip the "&"
+        offset + 1
+      );
+      if (len < 0) {
+        lastIndex = offset + decoder.end();
+        break;
+      }
+      lastIndex = offset + len;
+      offset = len === 0 ? lastIndex + 1 : lastIndex;
+    }
+    const result = ret + str.slice(lastIndex);
+    ret = "";
+    return result;
+  };
+}
+function determineBranch(decodeTree, current, nodeIdx, char) {
+  const branchCount = (current & BinTrieFlags.BRANCH_LENGTH) >> 7;
+  const jumpOffset = current & BinTrieFlags.JUMP_TABLE;
+  if (branchCount === 0) {
+    return jumpOffset !== 0 && char === jumpOffset ? nodeIdx : -1;
+  }
+  if (jumpOffset) {
+    const value = char - jumpOffset;
+    return value < 0 || value >= branchCount ? -1 : decodeTree[nodeIdx + value] - 1;
+  }
+  let lo = nodeIdx;
+  let hi = lo + branchCount - 1;
+  while (lo <= hi) {
+    const mid = lo + hi >>> 1;
+    const midVal = decodeTree[mid];
+    if (midVal < char) {
+      lo = mid + 1;
+    } else if (midVal > char) {
+      hi = mid - 1;
+    } else {
+      return decodeTree[mid + branchCount];
+    }
+  }
+  return -1;
+}
+var htmlDecoder = getDecoder(decode_data_html_default);
+var xmlDecoder = getDecoder(decode_data_xml_default);
+function decodeHTML(str, mode = DecodingMode.Legacy) {
+  return htmlDecoder(str, mode);
+}
+function decodeHTMLStrict(str) {
+  return htmlDecoder(str, DecodingMode.Strict);
+}
+
+// ../../../node_modules/markdown-it/node_modules/entities/lib/esm/generated/encode-html.js
+function restoreDiff(arr) {
+  for (let i = 1; i < arr.length; i++) {
+    arr[i][0] += arr[i - 1][0] + 1;
+  }
+  return arr;
+}
+var encode_html_default = new Map(/* @__PURE__ */ restoreDiff([[9, "&Tab;"], [0, "&NewLine;"], [22, "&excl;"], [0, "&quot;"], [0, "&num;"], [0, "&dollar;"], [0, "&percnt;"], [0, "&amp;"], [0, "&apos;"], [0, "&lpar;"], [0, "&rpar;"], [0, "&ast;"], [0, "&plus;"], [0, "&comma;"], [1, "&period;"], [0, "&sol;"], [10, "&colon;"], [0, "&semi;"], [0, { v: "&lt;", n: 8402, o: "&nvlt;" }], [0, { v: "&equals;", n: 8421, o: "&bne;" }], [0, { v: "&gt;", n: 8402, o: "&nvgt;" }], [0, "&quest;"], [0, "&commat;"], [26, "&lbrack;"], [0, "&bsol;"], [0, "&rbrack;"], [0, "&Hat;"], [0, "&lowbar;"], [0, "&DiacriticalGrave;"], [5, { n: 106, o: "&fjlig;" }], [20, "&lbrace;"], [0, "&verbar;"], [0, "&rbrace;"], [34, "&nbsp;"], [0, "&iexcl;"], [0, "&cent;"], [0, "&pound;"], [0, "&curren;"], [0, "&yen;"], [0, "&brvbar;"], [0, "&sect;"], [0, "&die;"], [0, "&copy;"], [0, "&ordf;"], [0, "&laquo;"], [0, "&not;"], [0, "&shy;"], [0, "&circledR;"], [0, "&macr;"], [0, "&deg;"], [0, "&PlusMinus;"], [0, "&sup2;"], [0, "&sup3;"], [0, "&acute;"], [0, "&micro;"], [0, "&para;"], [0, "&centerdot;"], [0, "&cedil;"], [0, "&sup1;"], [0, "&ordm;"], [0, "&raquo;"], [0, "&frac14;"], [0, "&frac12;"], [0, "&frac34;"], [0, "&iquest;"], [0, "&Agrave;"], [0, "&Aacute;"], [0, "&Acirc;"], [0, "&Atilde;"], [0, "&Auml;"], [0, "&angst;"], [0, "&AElig;"], [0, "&Ccedil;"], [0, "&Egrave;"], [0, "&Eacute;"], [0, "&Ecirc;"], [0, "&Euml;"], [0, "&Igrave;"], [0, "&Iacute;"], [0, "&Icirc;"], [0, "&Iuml;"], [0, "&ETH;"], [0, "&Ntilde;"], [0, "&Ograve;"], [0, "&Oacute;"], [0, "&Ocirc;"], [0, "&Otilde;"], [0, "&Ouml;"], [0, "&times;"], [0, "&Oslash;"], [0, "&Ugrave;"], [0, "&Uacute;"], [0, "&Ucirc;"], [0, "&Uuml;"], [0, "&Yacute;"], [0, "&THORN;"], [0, "&szlig;"], [0, "&agrave;"], [0, "&aacute;"], [0, "&acirc;"], [0, "&atilde;"], [0, "&auml;"], [0, "&aring;"], [0, "&aelig;"], [0, "&ccedil;"], [0, "&egrave;"], [0, "&eacute;"], [0, "&ecirc;"], [0, "&euml;"], [0, "&igrave;"], [0, "&iacute;"], [0, "&icirc;"], [0, "&iuml;"], [0, "&eth;"], [0, "&ntilde;"], [0, "&ograve;"], [0, "&oacute;"], [0, "&ocirc;"], [0, "&otilde;"], [0, "&ouml;"], [0, "&div;"], [0, "&oslash;"], [0, "&ugrave;"], [0, "&uacute;"], [0, "&ucirc;"], [0, "&uuml;"], [0, "&yacute;"], [0, "&thorn;"], [0, "&yuml;"], [0, "&Amacr;"], [0, "&amacr;"], [0, "&Abreve;"], [0, "&abreve;"], [0, "&Aogon;"], [0, "&aogon;"], [0, "&Cacute;"], [0, "&cacute;"], [0, "&Ccirc;"], [0, "&ccirc;"], [0, "&Cdot;"], [0, "&cdot;"], [0, "&Ccaron;"], [0, "&ccaron;"], [0, "&Dcaron;"], [0, "&dcaron;"], [0, "&Dstrok;"], [0, "&dstrok;"], [0, "&Emacr;"], [0, "&emacr;"], [2, "&Edot;"], [0, "&edot;"], [0, "&Eogon;"], [0, "&eogon;"], [0, "&Ecaron;"], [0, "&ecaron;"], [0, "&Gcirc;"], [0, "&gcirc;"], [0, "&Gbreve;"], [0, "&gbreve;"], [0, "&Gdot;"], [0, "&gdot;"], [0, "&Gcedil;"], [1, "&Hcirc;"], [0, "&hcirc;"], [0, "&Hstrok;"], [0, "&hstrok;"], [0, "&Itilde;"], [0, "&itilde;"], [0, "&Imacr;"], [0, "&imacr;"], [2, "&Iogon;"], [0, "&iogon;"], [0, "&Idot;"], [0, "&imath;"], [0, "&IJlig;"], [0, "&ijlig;"], [0, "&Jcirc;"], [0, "&jcirc;"], [0, "&Kcedil;"], [0, "&kcedil;"], [0, "&kgreen;"], [0, "&Lacute;"], [0, "&lacute;"], [0, "&Lcedil;"], [0, "&lcedil;"], [0, "&Lcaron;"], [0, "&lcaron;"], [0, "&Lmidot;"], [0, "&lmidot;"], [0, "&Lstrok;"], [0, "&lstrok;"], [0, "&Nacute;"], [0, "&nacute;"], [0, "&Ncedil;"], [0, "&ncedil;"], [0, "&Ncaron;"], [0, "&ncaron;"], [0, "&napos;"], [0, "&ENG;"], [0, "&eng;"], [0, "&Omacr;"], [0, "&omacr;"], [2, "&Odblac;"], [0, "&odblac;"], [0, "&OElig;"], [0, "&oelig;"], [0, "&Racute;"], [0, "&racute;"], [0, "&Rcedil;"], [0, "&rcedil;"], [0, "&Rcaron;"], [0, "&rcaron;"], [0, "&Sacute;"], [0, "&sacute;"], [0, "&Scirc;"], [0, "&scirc;"], [0, "&Scedil;"], [0, "&scedil;"], [0, "&Scaron;"], [0, "&scaron;"], [0, "&Tcedil;"], [0, "&tcedil;"], [0, "&Tcaron;"], [0, "&tcaron;"], [0, "&Tstrok;"], [0, "&tstrok;"], [0, "&Utilde;"], [0, "&utilde;"], [0, "&Umacr;"], [0, "&umacr;"], [0, "&Ubreve;"], [0, "&ubreve;"], [0, "&Uring;"], [0, "&uring;"], [0, "&Udblac;"], [0, "&udblac;"], [0, "&Uogon;"], [0, "&uogon;"], [0, "&Wcirc;"], [0, "&wcirc;"], [0, "&Ycirc;"], [0, "&ycirc;"], [0, "&Yuml;"], [0, "&Zacute;"], [0, "&zacute;"], [0, "&Zdot;"], [0, "&zdot;"], [0, "&Zcaron;"], [0, "&zcaron;"], [19, "&fnof;"], [34, "&imped;"], [63, "&gacute;"], [65, "&jmath;"], [142, "&circ;"], [0, "&caron;"], [16, "&breve;"], [0, "&DiacriticalDot;"], [0, "&ring;"], [0, "&ogon;"], [0, "&DiacriticalTilde;"], [0, "&dblac;"], [51, "&DownBreve;"], [127, "&Alpha;"], [0, "&Beta;"], [0, "&Gamma;"], [0, "&Delta;"], [0, "&Epsilon;"], [0, "&Zeta;"], [0, "&Eta;"], [0, "&Theta;"], [0, "&Iota;"], [0, "&Kappa;"], [0, "&Lambda;"], [0, "&Mu;"], [0, "&Nu;"], [0, "&Xi;"], [0, "&Omicron;"], [0, "&Pi;"], [0, "&Rho;"], [1, "&Sigma;"], [0, "&Tau;"], [0, "&Upsilon;"], [0, "&Phi;"], [0, "&Chi;"], [0, "&Psi;"], [0, "&ohm;"], [7, "&alpha;"], [0, "&beta;"], [0, "&gamma;"], [0, "&delta;"], [0, "&epsi;"], [0, "&zeta;"], [0, "&eta;"], [0, "&theta;"], [0, "&iota;"], [0, "&kappa;"], [0, "&lambda;"], [0, "&mu;"], [0, "&nu;"], [0, "&xi;"], [0, "&omicron;"], [0, "&pi;"], [0, "&rho;"], [0, "&sigmaf;"], [0, "&sigma;"], [0, "&tau;"], [0, "&upsi;"], [0, "&phi;"], [0, "&chi;"], [0, "&psi;"], [0, "&omega;"], [7, "&thetasym;"], [0, "&Upsi;"], [2, "&phiv;"], [0, "&piv;"], [5, "&Gammad;"], [0, "&digamma;"], [18, "&kappav;"], [0, "&rhov;"], [3, "&epsiv;"], [0, "&backepsilon;"], [10, "&IOcy;"], [0, "&DJcy;"], [0, "&GJcy;"], [0, "&Jukcy;"], [0, "&DScy;"], [0, "&Iukcy;"], [0, "&YIcy;"], [0, "&Jsercy;"], [0, "&LJcy;"], [0, "&NJcy;"], [0, "&TSHcy;"], [0, "&KJcy;"], [1, "&Ubrcy;"], [0, "&DZcy;"], [0, "&Acy;"], [0, "&Bcy;"], [0, "&Vcy;"], [0, "&Gcy;"], [0, "&Dcy;"], [0, "&IEcy;"], [0, "&ZHcy;"], [0, "&Zcy;"], [0, "&Icy;"], [0, "&Jcy;"], [0, "&Kcy;"], [0, "&Lcy;"], [0, "&Mcy;"], [0, "&Ncy;"], [0, "&Ocy;"], [0, "&Pcy;"], [0, "&Rcy;"], [0, "&Scy;"], [0, "&Tcy;"], [0, "&Ucy;"], [0, "&Fcy;"], [0, "&KHcy;"], [0, "&TScy;"], [0, "&CHcy;"], [0, "&SHcy;"], [0, "&SHCHcy;"], [0, "&HARDcy;"], [0, "&Ycy;"], [0, "&SOFTcy;"], [0, "&Ecy;"], [0, "&YUcy;"], [0, "&YAcy;"], [0, "&acy;"], [0, "&bcy;"], [0, "&vcy;"], [0, "&gcy;"], [0, "&dcy;"], [0, "&iecy;"], [0, "&zhcy;"], [0, "&zcy;"], [0, "&icy;"], [0, "&jcy;"], [0, "&kcy;"], [0, "&lcy;"], [0, "&mcy;"], [0, "&ncy;"], [0, "&ocy;"], [0, "&pcy;"], [0, "&rcy;"], [0, "&scy;"], [0, "&tcy;"], [0, "&ucy;"], [0, "&fcy;"], [0, "&khcy;"], [0, "&tscy;"], [0, "&chcy;"], [0, "&shcy;"], [0, "&shchcy;"], [0, "&hardcy;"], [0, "&ycy;"], [0, "&softcy;"], [0, "&ecy;"], [0, "&yucy;"], [0, "&yacy;"], [1, "&iocy;"], [0, "&djcy;"], [0, "&gjcy;"], [0, "&jukcy;"], [0, "&dscy;"], [0, "&iukcy;"], [0, "&yicy;"], [0, "&jsercy;"], [0, "&ljcy;"], [0, "&njcy;"], [0, "&tshcy;"], [0, "&kjcy;"], [1, "&ubrcy;"], [0, "&dzcy;"], [7074, "&ensp;"], [0, "&emsp;"], [0, "&emsp13;"], [0, "&emsp14;"], [1, "&numsp;"], [0, "&puncsp;"], [0, "&ThinSpace;"], [0, "&hairsp;"], [0, "&NegativeMediumSpace;"], [0, "&zwnj;"], [0, "&zwj;"], [0, "&lrm;"], [0, "&rlm;"], [0, "&dash;"], [2, "&ndash;"], [0, "&mdash;"], [0, "&horbar;"], [0, "&Verbar;"], [1, "&lsquo;"], [0, "&CloseCurlyQuote;"], [0, "&lsquor;"], [1, "&ldquo;"], [0, "&CloseCurlyDoubleQuote;"], [0, "&bdquo;"], [1, "&dagger;"], [0, "&Dagger;"], [0, "&bull;"], [2, "&nldr;"], [0, "&hellip;"], [9, "&permil;"], [0, "&pertenk;"], [0, "&prime;"], [0, "&Prime;"], [0, "&tprime;"], [0, "&backprime;"], [3, "&lsaquo;"], [0, "&rsaquo;"], [3, "&oline;"], [2, "&caret;"], [1, "&hybull;"], [0, "&frasl;"], [10, "&bsemi;"], [7, "&qprime;"], [7, { v: "&MediumSpace;", n: 8202, o: "&ThickSpace;" }], [0, "&NoBreak;"], [0, "&af;"], [0, "&InvisibleTimes;"], [0, "&ic;"], [72, "&euro;"], [46, "&tdot;"], [0, "&DotDot;"], [37, "&complexes;"], [2, "&incare;"], [4, "&gscr;"], [0, "&hamilt;"], [0, "&Hfr;"], [0, "&Hopf;"], [0, "&planckh;"], [0, "&hbar;"], [0, "&imagline;"], [0, "&Ifr;"], [0, "&lagran;"], [0, "&ell;"], [1, "&naturals;"], [0, "&numero;"], [0, "&copysr;"], [0, "&weierp;"], [0, "&Popf;"], [0, "&Qopf;"], [0, "&realine;"], [0, "&real;"], [0, "&reals;"], [0, "&rx;"], [3, "&trade;"], [1, "&integers;"], [2, "&mho;"], [0, "&zeetrf;"], [0, "&iiota;"], [2, "&bernou;"], [0, "&Cayleys;"], [1, "&escr;"], [0, "&Escr;"], [0, "&Fouriertrf;"], [1, "&Mellintrf;"], [0, "&order;"], [0, "&alefsym;"], [0, "&beth;"], [0, "&gimel;"], [0, "&daleth;"], [12, "&CapitalDifferentialD;"], [0, "&dd;"], [0, "&ee;"], [0, "&ii;"], [10, "&frac13;"], [0, "&frac23;"], [0, "&frac15;"], [0, "&frac25;"], [0, "&frac35;"], [0, "&frac45;"], [0, "&frac16;"], [0, "&frac56;"], [0, "&frac18;"], [0, "&frac38;"], [0, "&frac58;"], [0, "&frac78;"], [49, "&larr;"], [0, "&ShortUpArrow;"], [0, "&rarr;"], [0, "&darr;"], [0, "&harr;"], [0, "&updownarrow;"], [0, "&nwarr;"], [0, "&nearr;"], [0, "&LowerRightArrow;"], [0, "&LowerLeftArrow;"], [0, "&nlarr;"], [0, "&nrarr;"], [1, { v: "&rarrw;", n: 824, o: "&nrarrw;" }], [0, "&Larr;"], [0, "&Uarr;"], [0, "&Rarr;"], [0, "&Darr;"], [0, "&larrtl;"], [0, "&rarrtl;"], [0, "&LeftTeeArrow;"], [0, "&mapstoup;"], [0, "&map;"], [0, "&DownTeeArrow;"], [1, "&hookleftarrow;"], [0, "&hookrightarrow;"], [0, "&larrlp;"], [0, "&looparrowright;"], [0, "&harrw;"], [0, "&nharr;"], [1, "&lsh;"], [0, "&rsh;"], [0, "&ldsh;"], [0, "&rdsh;"], [1, "&crarr;"], [0, "&cularr;"], [0, "&curarr;"], [2, "&circlearrowleft;"], [0, "&circlearrowright;"], [0, "&leftharpoonup;"], [0, "&DownLeftVector;"], [0, "&RightUpVector;"], [0, "&LeftUpVector;"], [0, "&rharu;"], [0, "&DownRightVector;"], [0, "&dharr;"], [0, "&dharl;"], [0, "&RightArrowLeftArrow;"], [0, "&udarr;"], [0, "&LeftArrowRightArrow;"], [0, "&leftleftarrows;"], [0, "&upuparrows;"], [0, "&rightrightarrows;"], [0, "&ddarr;"], [0, "&leftrightharpoons;"], [0, "&Equilibrium;"], [0, "&nlArr;"], [0, "&nhArr;"], [0, "&nrArr;"], [0, "&DoubleLeftArrow;"], [0, "&DoubleUpArrow;"], [0, "&DoubleRightArrow;"], [0, "&dArr;"], [0, "&DoubleLeftRightArrow;"], [0, "&DoubleUpDownArrow;"], [0, "&nwArr;"], [0, "&neArr;"], [0, "&seArr;"], [0, "&swArr;"], [0, "&lAarr;"], [0, "&rAarr;"], [1, "&zigrarr;"], [6, "&larrb;"], [0, "&rarrb;"], [15, "&DownArrowUpArrow;"], [7, "&loarr;"], [0, "&roarr;"], [0, "&hoarr;"], [0, "&forall;"], [0, "&comp;"], [0, { v: "&part;", n: 824, o: "&npart;" }], [0, "&exist;"], [0, "&nexist;"], [0, "&empty;"], [1, "&Del;"], [0, "&Element;"], [0, "&NotElement;"], [1, "&ni;"], [0, "&notni;"], [2, "&prod;"], [0, "&coprod;"], [0, "&sum;"], [0, "&minus;"], [0, "&MinusPlus;"], [0, "&dotplus;"], [1, "&Backslash;"], [0, "&lowast;"], [0, "&compfn;"], [1, "&radic;"], [2, "&prop;"], [0, "&infin;"], [0, "&angrt;"], [0, { v: "&ang;", n: 8402, o: "&nang;" }], [0, "&angmsd;"], [0, "&angsph;"], [0, "&mid;"], [0, "&nmid;"], [0, "&DoubleVerticalBar;"], [0, "&NotDoubleVerticalBar;"], [0, "&and;"], [0, "&or;"], [0, { v: "&cap;", n: 65024, o: "&caps;" }], [0, { v: "&cup;", n: 65024, o: "&cups;" }], [0, "&int;"], [0, "&Int;"], [0, "&iiint;"], [0, "&conint;"], [0, "&Conint;"], [0, "&Cconint;"], [0, "&cwint;"], [0, "&ClockwiseContourIntegral;"], [0, "&awconint;"], [0, "&there4;"], [0, "&becaus;"], [0, "&ratio;"], [0, "&Colon;"], [0, "&dotminus;"], [1, "&mDDot;"], [0, "&homtht;"], [0, { v: "&sim;", n: 8402, o: "&nvsim;" }], [0, { v: "&backsim;", n: 817, o: "&race;" }], [0, { v: "&ac;", n: 819, o: "&acE;" }], [0, "&acd;"], [0, "&VerticalTilde;"], [0, "&NotTilde;"], [0, { v: "&eqsim;", n: 824, o: "&nesim;" }], [0, "&sime;"], [0, "&NotTildeEqual;"], [0, "&cong;"], [0, "&simne;"], [0, "&ncong;"], [0, "&ap;"], [0, "&nap;"], [0, "&ape;"], [0, { v: "&apid;", n: 824, o: "&napid;" }], [0, "&backcong;"], [0, { v: "&asympeq;", n: 8402, o: "&nvap;" }], [0, { v: "&bump;", n: 824, o: "&nbump;" }], [0, { v: "&bumpe;", n: 824, o: "&nbumpe;" }], [0, { v: "&doteq;", n: 824, o: "&nedot;" }], [0, "&doteqdot;"], [0, "&efDot;"], [0, "&erDot;"], [0, "&Assign;"], [0, "&ecolon;"], [0, "&ecir;"], [0, "&circeq;"], [1, "&wedgeq;"], [0, "&veeeq;"], [1, "&triangleq;"], [2, "&equest;"], [0, "&ne;"], [0, { v: "&Congruent;", n: 8421, o: "&bnequiv;" }], [0, "&nequiv;"], [1, { v: "&le;", n: 8402, o: "&nvle;" }], [0, { v: "&ge;", n: 8402, o: "&nvge;" }], [0, { v: "&lE;", n: 824, o: "&nlE;" }], [0, { v: "&gE;", n: 824, o: "&ngE;" }], [0, { v: "&lnE;", n: 65024, o: "&lvertneqq;" }], [0, { v: "&gnE;", n: 65024, o: "&gvertneqq;" }], [0, { v: "&ll;", n: new Map(/* @__PURE__ */ restoreDiff([[824, "&nLtv;"], [7577, "&nLt;"]])) }], [0, { v: "&gg;", n: new Map(/* @__PURE__ */ restoreDiff([[824, "&nGtv;"], [7577, "&nGt;"]])) }], [0, "&between;"], [0, "&NotCupCap;"], [0, "&nless;"], [0, "&ngt;"], [0, "&nle;"], [0, "&nge;"], [0, "&lesssim;"], [0, "&GreaterTilde;"], [0, "&nlsim;"], [0, "&ngsim;"], [0, "&LessGreater;"], [0, "&gl;"], [0, "&NotLessGreater;"], [0, "&NotGreaterLess;"], [0, "&pr;"], [0, "&sc;"], [0, "&prcue;"], [0, "&sccue;"], [0, "&PrecedesTilde;"], [0, { v: "&scsim;", n: 824, o: "&NotSucceedsTilde;" }], [0, "&NotPrecedes;"], [0, "&NotSucceeds;"], [0, { v: "&sub;", n: 8402, o: "&NotSubset;" }], [0, { v: "&sup;", n: 8402, o: "&NotSuperset;" }], [0, "&nsub;"], [0, "&nsup;"], [0, "&sube;"], [0, "&supe;"], [0, "&NotSubsetEqual;"], [0, "&NotSupersetEqual;"], [0, { v: "&subne;", n: 65024, o: "&varsubsetneq;" }], [0, { v: "&supne;", n: 65024, o: "&varsupsetneq;" }], [1, "&cupdot;"], [0, "&UnionPlus;"], [0, { v: "&sqsub;", n: 824, o: "&NotSquareSubset;" }], [0, { v: "&sqsup;", n: 824, o: "&NotSquareSuperset;" }], [0, "&sqsube;"], [0, "&sqsupe;"], [0, { v: "&sqcap;", n: 65024, o: "&sqcaps;" }], [0, { v: "&sqcup;", n: 65024, o: "&sqcups;" }], [0, "&CirclePlus;"], [0, "&CircleMinus;"], [0, "&CircleTimes;"], [0, "&osol;"], [0, "&CircleDot;"], [0, "&circledcirc;"], [0, "&circledast;"], [1, "&circleddash;"], [0, "&boxplus;"], [0, "&boxminus;"], [0, "&boxtimes;"], [0, "&dotsquare;"], [0, "&RightTee;"], [0, "&dashv;"], [0, "&DownTee;"], [0, "&bot;"], [1, "&models;"], [0, "&DoubleRightTee;"], [0, "&Vdash;"], [0, "&Vvdash;"], [0, "&VDash;"], [0, "&nvdash;"], [0, "&nvDash;"], [0, "&nVdash;"], [0, "&nVDash;"], [0, "&prurel;"], [1, "&LeftTriangle;"], [0, "&RightTriangle;"], [0, { v: "&LeftTriangleEqual;", n: 8402, o: "&nvltrie;" }], [0, { v: "&RightTriangleEqual;", n: 8402, o: "&nvrtrie;" }], [0, "&origof;"], [0, "&imof;"], [0, "&multimap;"], [0, "&hercon;"], [0, "&intcal;"], [0, "&veebar;"], [1, "&barvee;"], [0, "&angrtvb;"], [0, "&lrtri;"], [0, "&bigwedge;"], [0, "&bigvee;"], [0, "&bigcap;"], [0, "&bigcup;"], [0, "&diam;"], [0, "&sdot;"], [0, "&sstarf;"], [0, "&divideontimes;"], [0, "&bowtie;"], [0, "&ltimes;"], [0, "&rtimes;"], [0, "&leftthreetimes;"], [0, "&rightthreetimes;"], [0, "&backsimeq;"], [0, "&curlyvee;"], [0, "&curlywedge;"], [0, "&Sub;"], [0, "&Sup;"], [0, "&Cap;"], [0, "&Cup;"], [0, "&fork;"], [0, "&epar;"], [0, "&lessdot;"], [0, "&gtdot;"], [0, { v: "&Ll;", n: 824, o: "&nLl;" }], [0, { v: "&Gg;", n: 824, o: "&nGg;" }], [0, { v: "&leg;", n: 65024, o: "&lesg;" }], [0, { v: "&gel;", n: 65024, o: "&gesl;" }], [2, "&cuepr;"], [0, "&cuesc;"], [0, "&NotPrecedesSlantEqual;"], [0, "&NotSucceedsSlantEqual;"], [0, "&NotSquareSubsetEqual;"], [0, "&NotSquareSupersetEqual;"], [2, "&lnsim;"], [0, "&gnsim;"], [0, "&precnsim;"], [0, "&scnsim;"], [0, "&nltri;"], [0, "&NotRightTriangle;"], [0, "&nltrie;"], [0, "&NotRightTriangleEqual;"], [0, "&vellip;"], [0, "&ctdot;"], [0, "&utdot;"], [0, "&dtdot;"], [0, "&disin;"], [0, "&isinsv;"], [0, "&isins;"], [0, { v: "&isindot;", n: 824, o: "&notindot;" }], [0, "&notinvc;"], [0, "&notinvb;"], [1, { v: "&isinE;", n: 824, o: "&notinE;" }], [0, "&nisd;"], [0, "&xnis;"], [0, "&nis;"], [0, "&notnivc;"], [0, "&notnivb;"], [6, "&barwed;"], [0, "&Barwed;"], [1, "&lceil;"], [0, "&rceil;"], [0, "&LeftFloor;"], [0, "&rfloor;"], [0, "&drcrop;"], [0, "&dlcrop;"], [0, "&urcrop;"], [0, "&ulcrop;"], [0, "&bnot;"], [1, "&profline;"], [0, "&profsurf;"], [1, "&telrec;"], [0, "&target;"], [5, "&ulcorn;"], [0, "&urcorn;"], [0, "&dlcorn;"], [0, "&drcorn;"], [2, "&frown;"], [0, "&smile;"], [9, "&cylcty;"], [0, "&profalar;"], [7, "&topbot;"], [6, "&ovbar;"], [1, "&solbar;"], [60, "&angzarr;"], [51, "&lmoustache;"], [0, "&rmoustache;"], [2, "&OverBracket;"], [0, "&bbrk;"], [0, "&bbrktbrk;"], [37, "&OverParenthesis;"], [0, "&UnderParenthesis;"], [0, "&OverBrace;"], [0, "&UnderBrace;"], [2, "&trpezium;"], [4, "&elinters;"], [59, "&blank;"], [164, "&circledS;"], [55, "&boxh;"], [1, "&boxv;"], [9, "&boxdr;"], [3, "&boxdl;"], [3, "&boxur;"], [3, "&boxul;"], [3, "&boxvr;"], [7, "&boxvl;"], [7, "&boxhd;"], [7, "&boxhu;"], [7, "&boxvh;"], [19, "&boxH;"], [0, "&boxV;"], [0, "&boxdR;"], [0, "&boxDr;"], [0, "&boxDR;"], [0, "&boxdL;"], [0, "&boxDl;"], [0, "&boxDL;"], [0, "&boxuR;"], [0, "&boxUr;"], [0, "&boxUR;"], [0, "&boxuL;"], [0, "&boxUl;"], [0, "&boxUL;"], [0, "&boxvR;"], [0, "&boxVr;"], [0, "&boxVR;"], [0, "&boxvL;"], [0, "&boxVl;"], [0, "&boxVL;"], [0, "&boxHd;"], [0, "&boxhD;"], [0, "&boxHD;"], [0, "&boxHu;"], [0, "&boxhU;"], [0, "&boxHU;"], [0, "&boxvH;"], [0, "&boxVh;"], [0, "&boxVH;"], [19, "&uhblk;"], [3, "&lhblk;"], [3, "&block;"], [8, "&blk14;"], [0, "&blk12;"], [0, "&blk34;"], [13, "&square;"], [8, "&blacksquare;"], [0, "&EmptyVerySmallSquare;"], [1, "&rect;"], [0, "&marker;"], [2, "&fltns;"], [1, "&bigtriangleup;"], [0, "&blacktriangle;"], [0, "&triangle;"], [2, "&blacktriangleright;"], [0, "&rtri;"], [3, "&bigtriangledown;"], [0, "&blacktriangledown;"], [0, "&dtri;"], [2, "&blacktriangleleft;"], [0, "&ltri;"], [6, "&loz;"], [0, "&cir;"], [32, "&tridot;"], [2, "&bigcirc;"], [8, "&ultri;"], [0, "&urtri;"], [0, "&lltri;"], [0, "&EmptySmallSquare;"], [0, "&FilledSmallSquare;"], [8, "&bigstar;"], [0, "&star;"], [7, "&phone;"], [49, "&female;"], [1, "&male;"], [29, "&spades;"], [2, "&clubs;"], [1, "&hearts;"], [0, "&diamondsuit;"], [3, "&sung;"], [2, "&flat;"], [0, "&natural;"], [0, "&sharp;"], [163, "&check;"], [3, "&cross;"], [8, "&malt;"], [21, "&sext;"], [33, "&VerticalSeparator;"], [25, "&lbbrk;"], [0, "&rbbrk;"], [84, "&bsolhsub;"], [0, "&suphsol;"], [28, "&LeftDoubleBracket;"], [0, "&RightDoubleBracket;"], [0, "&lang;"], [0, "&rang;"], [0, "&Lang;"], [0, "&Rang;"], [0, "&loang;"], [0, "&roang;"], [7, "&longleftarrow;"], [0, "&longrightarrow;"], [0, "&longleftrightarrow;"], [0, "&DoubleLongLeftArrow;"], [0, "&DoubleLongRightArrow;"], [0, "&DoubleLongLeftRightArrow;"], [1, "&longmapsto;"], [2, "&dzigrarr;"], [258, "&nvlArr;"], [0, "&nvrArr;"], [0, "&nvHarr;"], [0, "&Map;"], [6, "&lbarr;"], [0, "&bkarow;"], [0, "&lBarr;"], [0, "&dbkarow;"], [0, "&drbkarow;"], [0, "&DDotrahd;"], [0, "&UpArrowBar;"], [0, "&DownArrowBar;"], [2, "&Rarrtl;"], [2, "&latail;"], [0, "&ratail;"], [0, "&lAtail;"], [0, "&rAtail;"], [0, "&larrfs;"], [0, "&rarrfs;"], [0, "&larrbfs;"], [0, "&rarrbfs;"], [2, "&nwarhk;"], [0, "&nearhk;"], [0, "&hksearow;"], [0, "&hkswarow;"], [0, "&nwnear;"], [0, "&nesear;"], [0, "&seswar;"], [0, "&swnwar;"], [8, { v: "&rarrc;", n: 824, o: "&nrarrc;" }], [1, "&cudarrr;"], [0, "&ldca;"], [0, "&rdca;"], [0, "&cudarrl;"], [0, "&larrpl;"], [2, "&curarrm;"], [0, "&cularrp;"], [7, "&rarrpl;"], [2, "&harrcir;"], [0, "&Uarrocir;"], [0, "&lurdshar;"], [0, "&ldrushar;"], [2, "&LeftRightVector;"], [0, "&RightUpDownVector;"], [0, "&DownLeftRightVector;"], [0, "&LeftUpDownVector;"], [0, "&LeftVectorBar;"], [0, "&RightVectorBar;"], [0, "&RightUpVectorBar;"], [0, "&RightDownVectorBar;"], [0, "&DownLeftVectorBar;"], [0, "&DownRightVectorBar;"], [0, "&LeftUpVectorBar;"], [0, "&LeftDownVectorBar;"], [0, "&LeftTeeVector;"], [0, "&RightTeeVector;"], [0, "&RightUpTeeVector;"], [0, "&RightDownTeeVector;"], [0, "&DownLeftTeeVector;"], [0, "&DownRightTeeVector;"], [0, "&LeftUpTeeVector;"], [0, "&LeftDownTeeVector;"], [0, "&lHar;"], [0, "&uHar;"], [0, "&rHar;"], [0, "&dHar;"], [0, "&luruhar;"], [0, "&ldrdhar;"], [0, "&ruluhar;"], [0, "&rdldhar;"], [0, "&lharul;"], [0, "&llhard;"], [0, "&rharul;"], [0, "&lrhard;"], [0, "&udhar;"], [0, "&duhar;"], [0, "&RoundImplies;"], [0, "&erarr;"], [0, "&simrarr;"], [0, "&larrsim;"], [0, "&rarrsim;"], [0, "&rarrap;"], [0, "&ltlarr;"], [1, "&gtrarr;"], [0, "&subrarr;"], [1, "&suplarr;"], [0, "&lfisht;"], [0, "&rfisht;"], [0, "&ufisht;"], [0, "&dfisht;"], [5, "&lopar;"], [0, "&ropar;"], [4, "&lbrke;"], [0, "&rbrke;"], [0, "&lbrkslu;"], [0, "&rbrksld;"], [0, "&lbrksld;"], [0, "&rbrkslu;"], [0, "&langd;"], [0, "&rangd;"], [0, "&lparlt;"], [0, "&rpargt;"], [0, "&gtlPar;"], [0, "&ltrPar;"], [3, "&vzigzag;"], [1, "&vangrt;"], [0, "&angrtvbd;"], [6, "&ange;"], [0, "&range;"], [0, "&dwangle;"], [0, "&uwangle;"], [0, "&angmsdaa;"], [0, "&angmsdab;"], [0, "&angmsdac;"], [0, "&angmsdad;"], [0, "&angmsdae;"], [0, "&angmsdaf;"], [0, "&angmsdag;"], [0, "&angmsdah;"], [0, "&bemptyv;"], [0, "&demptyv;"], [0, "&cemptyv;"], [0, "&raemptyv;"], [0, "&laemptyv;"], [0, "&ohbar;"], [0, "&omid;"], [0, "&opar;"], [1, "&operp;"], [1, "&olcross;"], [0, "&odsold;"], [1, "&olcir;"], [0, "&ofcir;"], [0, "&olt;"], [0, "&ogt;"], [0, "&cirscir;"], [0, "&cirE;"], [0, "&solb;"], [0, "&bsolb;"], [3, "&boxbox;"], [3, "&trisb;"], [0, "&rtriltri;"], [0, { v: "&LeftTriangleBar;", n: 824, o: "&NotLeftTriangleBar;" }], [0, { v: "&RightTriangleBar;", n: 824, o: "&NotRightTriangleBar;" }], [11, "&iinfin;"], [0, "&infintie;"], [0, "&nvinfin;"], [4, "&eparsl;"], [0, "&smeparsl;"], [0, "&eqvparsl;"], [5, "&blacklozenge;"], [8, "&RuleDelayed;"], [1, "&dsol;"], [9, "&bigodot;"], [0, "&bigoplus;"], [0, "&bigotimes;"], [1, "&biguplus;"], [1, "&bigsqcup;"], [5, "&iiiint;"], [0, "&fpartint;"], [2, "&cirfnint;"], [0, "&awint;"], [0, "&rppolint;"], [0, "&scpolint;"], [0, "&npolint;"], [0, "&pointint;"], [0, "&quatint;"], [0, "&intlarhk;"], [10, "&pluscir;"], [0, "&plusacir;"], [0, "&simplus;"], [0, "&plusdu;"], [0, "&plussim;"], [0, "&plustwo;"], [1, "&mcomma;"], [0, "&minusdu;"], [2, "&loplus;"], [0, "&roplus;"], [0, "&Cross;"], [0, "&timesd;"], [0, "&timesbar;"], [1, "&smashp;"], [0, "&lotimes;"], [0, "&rotimes;"], [0, "&otimesas;"], [0, "&Otimes;"], [0, "&odiv;"], [0, "&triplus;"], [0, "&triminus;"], [0, "&tritime;"], [0, "&intprod;"], [2, "&amalg;"], [0, "&capdot;"], [1, "&ncup;"], [0, "&ncap;"], [0, "&capand;"], [0, "&cupor;"], [0, "&cupcap;"], [0, "&capcup;"], [0, "&cupbrcap;"], [0, "&capbrcup;"], [0, "&cupcup;"], [0, "&capcap;"], [0, "&ccups;"], [0, "&ccaps;"], [2, "&ccupssm;"], [2, "&And;"], [0, "&Or;"], [0, "&andand;"], [0, "&oror;"], [0, "&orslope;"], [0, "&andslope;"], [1, "&andv;"], [0, "&orv;"], [0, "&andd;"], [0, "&ord;"], [1, "&wedbar;"], [6, "&sdote;"], [3, "&simdot;"], [2, { v: "&congdot;", n: 824, o: "&ncongdot;" }], [0, "&easter;"], [0, "&apacir;"], [0, { v: "&apE;", n: 824, o: "&napE;" }], [0, "&eplus;"], [0, "&pluse;"], [0, "&Esim;"], [0, "&Colone;"], [0, "&Equal;"], [1, "&ddotseq;"], [0, "&equivDD;"], [0, "&ltcir;"], [0, "&gtcir;"], [0, "&ltquest;"], [0, "&gtquest;"], [0, { v: "&leqslant;", n: 824, o: "&nleqslant;" }], [0, { v: "&geqslant;", n: 824, o: "&ngeqslant;" }], [0, "&lesdot;"], [0, "&gesdot;"], [0, "&lesdoto;"], [0, "&gesdoto;"], [0, "&lesdotor;"], [0, "&gesdotol;"], [0, "&lap;"], [0, "&gap;"], [0, "&lne;"], [0, "&gne;"], [0, "&lnap;"], [0, "&gnap;"], [0, "&lEg;"], [0, "&gEl;"], [0, "&lsime;"], [0, "&gsime;"], [0, "&lsimg;"], [0, "&gsiml;"], [0, "&lgE;"], [0, "&glE;"], [0, "&lesges;"], [0, "&gesles;"], [0, "&els;"], [0, "&egs;"], [0, "&elsdot;"], [0, "&egsdot;"], [0, "&el;"], [0, "&eg;"], [2, "&siml;"], [0, "&simg;"], [0, "&simlE;"], [0, "&simgE;"], [0, { v: "&LessLess;", n: 824, o: "&NotNestedLessLess;" }], [0, { v: "&GreaterGreater;", n: 824, o: "&NotNestedGreaterGreater;" }], [1, "&glj;"], [0, "&gla;"], [0, "&ltcc;"], [0, "&gtcc;"], [0, "&lescc;"], [0, "&gescc;"], [0, "&smt;"], [0, "&lat;"], [0, { v: "&smte;", n: 65024, o: "&smtes;" }], [0, { v: "&late;", n: 65024, o: "&lates;" }], [0, "&bumpE;"], [0, { v: "&PrecedesEqual;", n: 824, o: "&NotPrecedesEqual;" }], [0, { v: "&sce;", n: 824, o: "&NotSucceedsEqual;" }], [2, "&prE;"], [0, "&scE;"], [0, "&precneqq;"], [0, "&scnE;"], [0, "&prap;"], [0, "&scap;"], [0, "&precnapprox;"], [0, "&scnap;"], [0, "&Pr;"], [0, "&Sc;"], [0, "&subdot;"], [0, "&supdot;"], [0, "&subplus;"], [0, "&supplus;"], [0, "&submult;"], [0, "&supmult;"], [0, "&subedot;"], [0, "&supedot;"], [0, { v: "&subE;", n: 824, o: "&nsubE;" }], [0, { v: "&supE;", n: 824, o: "&nsupE;" }], [0, "&subsim;"], [0, "&supsim;"], [2, { v: "&subnE;", n: 65024, o: "&varsubsetneqq;" }], [0, { v: "&supnE;", n: 65024, o: "&varsupsetneqq;" }], [2, "&csub;"], [0, "&csup;"], [0, "&csube;"], [0, "&csupe;"], [0, "&subsup;"], [0, "&supsub;"], [0, "&subsub;"], [0, "&supsup;"], [0, "&suphsub;"], [0, "&supdsub;"], [0, "&forkv;"], [0, "&topfork;"], [0, "&mlcp;"], [8, "&Dashv;"], [1, "&Vdashl;"], [0, "&Barv;"], [0, "&vBar;"], [0, "&vBarv;"], [1, "&Vbar;"], [0, "&Not;"], [0, "&bNot;"], [0, "&rnmid;"], [0, "&cirmid;"], [0, "&midcir;"], [0, "&topcir;"], [0, "&nhpar;"], [0, "&parsim;"], [9, { v: "&parsl;", n: 8421, o: "&nparsl;" }], [44343, { n: new Map(/* @__PURE__ */ restoreDiff([[56476, "&Ascr;"], [1, "&Cscr;"], [0, "&Dscr;"], [2, "&Gscr;"], [2, "&Jscr;"], [0, "&Kscr;"], [2, "&Nscr;"], [0, "&Oscr;"], [0, "&Pscr;"], [0, "&Qscr;"], [1, "&Sscr;"], [0, "&Tscr;"], [0, "&Uscr;"], [0, "&Vscr;"], [0, "&Wscr;"], [0, "&Xscr;"], [0, "&Yscr;"], [0, "&Zscr;"], [0, "&ascr;"], [0, "&bscr;"], [0, "&cscr;"], [0, "&dscr;"], [1, "&fscr;"], [1, "&hscr;"], [0, "&iscr;"], [0, "&jscr;"], [0, "&kscr;"], [0, "&lscr;"], [0, "&mscr;"], [0, "&nscr;"], [1, "&pscr;"], [0, "&qscr;"], [0, "&rscr;"], [0, "&sscr;"], [0, "&tscr;"], [0, "&uscr;"], [0, "&vscr;"], [0, "&wscr;"], [0, "&xscr;"], [0, "&yscr;"], [0, "&zscr;"], [52, "&Afr;"], [0, "&Bfr;"], [1, "&Dfr;"], [0, "&Efr;"], [0, "&Ffr;"], [0, "&Gfr;"], [2, "&Jfr;"], [0, "&Kfr;"], [0, "&Lfr;"], [0, "&Mfr;"], [0, "&Nfr;"], [0, "&Ofr;"], [0, "&Pfr;"], [0, "&Qfr;"], [1, "&Sfr;"], [0, "&Tfr;"], [0, "&Ufr;"], [0, "&Vfr;"], [0, "&Wfr;"], [0, "&Xfr;"], [0, "&Yfr;"], [1, "&afr;"], [0, "&bfr;"], [0, "&cfr;"], [0, "&dfr;"], [0, "&efr;"], [0, "&ffr;"], [0, "&gfr;"], [0, "&hfr;"], [0, "&ifr;"], [0, "&jfr;"], [0, "&kfr;"], [0, "&lfr;"], [0, "&mfr;"], [0, "&nfr;"], [0, "&ofr;"], [0, "&pfr;"], [0, "&qfr;"], [0, "&rfr;"], [0, "&sfr;"], [0, "&tfr;"], [0, "&ufr;"], [0, "&vfr;"], [0, "&wfr;"], [0, "&xfr;"], [0, "&yfr;"], [0, "&zfr;"], [0, "&Aopf;"], [0, "&Bopf;"], [1, "&Dopf;"], [0, "&Eopf;"], [0, "&Fopf;"], [0, "&Gopf;"], [1, "&Iopf;"], [0, "&Jopf;"], [0, "&Kopf;"], [0, "&Lopf;"], [0, "&Mopf;"], [1, "&Oopf;"], [3, "&Sopf;"], [0, "&Topf;"], [0, "&Uopf;"], [0, "&Vopf;"], [0, "&Wopf;"], [0, "&Xopf;"], [0, "&Yopf;"], [1, "&aopf;"], [0, "&bopf;"], [0, "&copf;"], [0, "&dopf;"], [0, "&eopf;"], [0, "&fopf;"], [0, "&gopf;"], [0, "&hopf;"], [0, "&iopf;"], [0, "&jopf;"], [0, "&kopf;"], [0, "&lopf;"], [0, "&mopf;"], [0, "&nopf;"], [0, "&oopf;"], [0, "&popf;"], [0, "&qopf;"], [0, "&ropf;"], [0, "&sopf;"], [0, "&topf;"], [0, "&uopf;"], [0, "&vopf;"], [0, "&wopf;"], [0, "&xopf;"], [0, "&yopf;"], [0, "&zopf;"]])) }], [8906, "&fflig;"], [0, "&filig;"], [0, "&fllig;"], [0, "&ffilig;"], [0, "&ffllig;"]]));
+
+// ../../../node_modules/markdown-it/node_modules/entities/lib/esm/escape.js
+var xmlCodeMap = /* @__PURE__ */ new Map([
+  [34, "&quot;"],
+  [38, "&amp;"],
+  [39, "&apos;"],
+  [60, "&lt;"],
+  [62, "&gt;"]
+]);
+var getCodePoint = (
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  String.prototype.codePointAt != null ? (str, index2) => str.codePointAt(index2) : (
+    // http://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
+    (c, index2) => (c.charCodeAt(index2) & 64512) === 55296 ? (c.charCodeAt(index2) - 55296) * 1024 + c.charCodeAt(index2 + 1) - 56320 + 65536 : c.charCodeAt(index2)
+  )
+);
+function getEscaper(regex, map2) {
+  return function escape3(data) {
+    let match2;
+    let lastIdx = 0;
+    let result = "";
+    while (match2 = regex.exec(data)) {
+      if (lastIdx !== match2.index) {
+        result += data.substring(lastIdx, match2.index);
+      }
+      result += map2.get(match2[0].charCodeAt(0));
+      lastIdx = match2.index + 1;
+    }
+    return result + data.substring(lastIdx);
+  };
+}
+var escapeUTF8 = getEscaper(/[&<>'"]/g, xmlCodeMap);
+var escapeAttribute = getEscaper(/["&\u00A0]/g, /* @__PURE__ */ new Map([
+  [34, "&quot;"],
+  [38, "&amp;"],
+  [160, "&nbsp;"]
+]));
+var escapeText = getEscaper(/[&<>\u00A0]/g, /* @__PURE__ */ new Map([
+  [38, "&amp;"],
+  [60, "&lt;"],
+  [62, "&gt;"],
+  [160, "&nbsp;"]
+]));
+
+// ../../../node_modules/markdown-it/node_modules/entities/lib/esm/index.js
+var EntityLevel;
+(function(EntityLevel2) {
+  EntityLevel2[EntityLevel2["XML"] = 0] = "XML";
+  EntityLevel2[EntityLevel2["HTML"] = 1] = "HTML";
+})(EntityLevel || (EntityLevel = {}));
+var EncodingMode;
+(function(EncodingMode2) {
+  EncodingMode2[EncodingMode2["UTF8"] = 0] = "UTF8";
+  EncodingMode2[EncodingMode2["ASCII"] = 1] = "ASCII";
+  EncodingMode2[EncodingMode2["Extensive"] = 2] = "Extensive";
+  EncodingMode2[EncodingMode2["Attribute"] = 3] = "Attribute";
+  EncodingMode2[EncodingMode2["Text"] = 4] = "Text";
+})(EncodingMode || (EncodingMode = {}));
+
+// ../../../node_modules/markdown-it/lib/common/utils.mjs
+function _class(obj) {
+  return Object.prototype.toString.call(obj);
+}
+function isString(obj) {
+  return _class(obj) === "[object String]";
+}
+var _hasOwnProperty = Object.prototype.hasOwnProperty;
+function has(object, key2) {
+  return _hasOwnProperty.call(object, key2);
+}
+function assign2(obj) {
+  const sources = Array.prototype.slice.call(arguments, 1);
+  sources.forEach(function(source2) {
+    if (!source2) {
+      return;
+    }
+    if (typeof source2 !== "object") {
+      throw new TypeError(source2 + "must be object");
+    }
+    Object.keys(source2).forEach(function(key2) {
+      obj[key2] = source2[key2];
+    });
+  });
+  return obj;
+}
+function arrayReplaceAt(src, pos, newElements) {
+  return [].concat(src.slice(0, pos), newElements, src.slice(pos + 1));
+}
+function isValidEntityCode(c) {
+  if (c >= 55296 && c <= 57343) {
+    return false;
+  }
+  if (c >= 64976 && c <= 65007) {
+    return false;
+  }
+  if ((c & 65535) === 65535 || (c & 65535) === 65534) {
+    return false;
+  }
+  if (c >= 0 && c <= 8) {
+    return false;
+  }
+  if (c === 11) {
+    return false;
+  }
+  if (c >= 14 && c <= 31) {
+    return false;
+  }
+  if (c >= 127 && c <= 159) {
+    return false;
+  }
+  if (c > 1114111) {
+    return false;
+  }
+  return true;
+}
+function fromCodePoint2(c) {
+  if (c > 65535) {
+    c -= 65536;
+    const surrogate1 = 55296 + (c >> 10);
+    const surrogate2 = 56320 + (c & 1023);
+    return String.fromCharCode(surrogate1, surrogate2);
+  }
+  return String.fromCharCode(c);
+}
+var UNESCAPE_MD_RE = /\\([!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~])/g;
+var ENTITY_RE = /&([a-z#][a-z0-9]{1,31});/gi;
+var UNESCAPE_ALL_RE = new RegExp(UNESCAPE_MD_RE.source + "|" + ENTITY_RE.source, "gi");
+var DIGITAL_ENTITY_TEST_RE = /^#((?:x[a-f0-9]{1,8}|[0-9]{1,8}))$/i;
+function replaceEntityPattern(match2, name) {
+  if (name.charCodeAt(0) === 35 && DIGITAL_ENTITY_TEST_RE.test(name)) {
+    const code2 = name[1].toLowerCase() === "x" ? parseInt(name.slice(2), 16) : parseInt(name.slice(1), 10);
+    if (isValidEntityCode(code2)) {
+      return fromCodePoint2(code2);
+    }
+    return match2;
+  }
+  const decoded = decodeHTML(match2);
+  if (decoded !== match2) {
+    return decoded;
+  }
+  return match2;
+}
+function unescapeMd(str) {
+  if (str.indexOf("\\") < 0) {
+    return str;
+  }
+  return str.replace(UNESCAPE_MD_RE, "$1");
+}
+function unescapeAll(str) {
+  if (str.indexOf("\\") < 0 && str.indexOf("&") < 0) {
+    return str;
+  }
+  return str.replace(UNESCAPE_ALL_RE, function(match2, escaped, entity2) {
+    if (escaped) {
+      return escaped;
+    }
+    return replaceEntityPattern(match2, entity2);
+  });
+}
+var HTML_ESCAPE_TEST_RE = /[&<>"]/;
+var HTML_ESCAPE_REPLACE_RE = /[&<>"]/g;
+var HTML_REPLACEMENTS = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;"
+};
+function replaceUnsafeChar(ch) {
+  return HTML_REPLACEMENTS[ch];
+}
+function escapeHtml(str) {
+  if (HTML_ESCAPE_TEST_RE.test(str)) {
+    return str.replace(HTML_ESCAPE_REPLACE_RE, replaceUnsafeChar);
+  }
+  return str;
+}
+var REGEXP_ESCAPE_RE = /[.?*+^$[\]\\(){}|-]/g;
+function escapeRE(str) {
+  return str.replace(REGEXP_ESCAPE_RE, "\\$&");
+}
+function isSpace(code2) {
+  switch (code2) {
+    case 9:
+    case 32:
+      return true;
+  }
+  return false;
+}
+function isWhiteSpace(code2) {
+  if (code2 >= 8192 && code2 <= 8202) {
+    return true;
+  }
+  switch (code2) {
+    case 9:
+    // \t
+    case 10:
+    // \n
+    case 11:
+    // \v
+    case 12:
+    // \f
+    case 13:
+    // \r
+    case 32:
+    case 160:
+    case 5760:
+    case 8239:
+    case 8287:
+    case 12288:
+      return true;
+  }
+  return false;
+}
+function isPunctChar(ch) {
+  return regex_default4.test(ch) || regex_default5.test(ch);
+}
+function isPunctCharCode(code2) {
+  return isPunctChar(fromCodePoint2(code2));
+}
+function isMdAsciiPunct(ch) {
+  switch (ch) {
+    case 33:
+    case 34:
+    case 35:
+    case 36:
+    case 37:
+    case 38:
+    case 39:
+    case 40:
+    case 41:
+    case 42:
+    case 43:
+    case 44:
+    case 45:
+    case 46:
+    case 47:
+    case 58:
+    case 59:
+    case 60:
+    case 61:
+    case 62:
+    case 63:
+    case 64:
+    case 91:
+    case 92:
+    case 93:
+    case 94:
+    case 95:
+    case 96:
+    case 123:
+    case 124:
+    case 125:
+    case 126:
+      return true;
+    default:
+      return false;
+  }
+}
+function normalizeReference(str) {
+  str = str.trim().replace(/\s+/g, " ");
+  if ("\u1E9E".toLowerCase() === "\u1E7E") {
+    str = str.replace(/ẞ/g, "\xDF");
+  }
+  return str.toLowerCase().toUpperCase();
+}
+function isAsciiTrimmable(c) {
+  return c === 32 || c === 9 || c === 10 || c === 13;
+}
+function asciiTrim(str) {
+  let start = 0;
+  for (; start < str.length; start++) {
+    if (!isAsciiTrimmable(str.charCodeAt(start))) {
+      break;
+    }
+  }
+  let end = str.length - 1;
+  for (; end >= start; end--) {
+    if (!isAsciiTrimmable(str.charCodeAt(end))) {
+      break;
+    }
+  }
+  return str.slice(start, end + 1);
+}
+var lib = { mdurl: mdurl_exports, ucmicro: uc_exports };
+
+// ../../../node_modules/markdown-it/lib/helpers/index.mjs
+var helpers_exports = {};
+__export(helpers_exports, {
+  parseLinkDestination: () => parseLinkDestination,
+  parseLinkLabel: () => parseLinkLabel,
+  parseLinkTitle: () => parseLinkTitle
+});
+
+// ../../../node_modules/markdown-it/lib/helpers/parse_link_label.mjs
+function parseLinkLabel(state3, start, disableNested) {
+  let level, found, marker, prevPos;
+  const max = state3.posMax;
+  const oldPos = state3.pos;
+  state3.pos = start + 1;
+  level = 1;
+  while (state3.pos < max) {
+    marker = state3.src.charCodeAt(state3.pos);
+    if (marker === 93) {
+      level--;
+      if (level === 0) {
+        found = true;
+        break;
+      }
+    }
+    prevPos = state3.pos;
+    state3.md.inline.skipToken(state3);
+    if (marker === 91) {
+      if (prevPos === state3.pos - 1) {
+        level++;
+      } else if (disableNested) {
+        state3.pos = oldPos;
+        return -1;
+      }
+    }
+  }
+  let labelEnd = -1;
+  if (found) {
+    labelEnd = state3.pos;
+  }
+  state3.pos = oldPos;
+  return labelEnd;
+}
+
+// ../../../node_modules/markdown-it/lib/helpers/parse_link_destination.mjs
+function parseLinkDestination(str, start, max) {
+  let code2;
+  let pos = start;
+  const result = {
+    ok: false,
+    pos: 0,
+    str: ""
+  };
+  if (str.charCodeAt(pos) === 60) {
+    pos++;
+    while (pos < max) {
+      code2 = str.charCodeAt(pos);
+      if (code2 === 10) {
+        return result;
+      }
+      if (code2 === 60) {
+        return result;
+      }
+      if (code2 === 62) {
+        result.pos = pos + 1;
+        result.str = unescapeAll(str.slice(start + 1, pos));
+        result.ok = true;
+        return result;
+      }
+      if (code2 === 92 && pos + 1 < max) {
+        pos += 2;
+        continue;
+      }
+      pos++;
+    }
+    return result;
+  }
+  let level = 0;
+  while (pos < max) {
+    code2 = str.charCodeAt(pos);
+    if (code2 === 32) {
+      break;
+    }
+    if (code2 < 32 || code2 === 127) {
+      break;
+    }
+    if (code2 === 92 && pos + 1 < max) {
+      if (str.charCodeAt(pos + 1) === 32) {
+        break;
+      }
+      pos += 2;
+      continue;
+    }
+    if (code2 === 40) {
+      level++;
+      if (level > 32) {
+        return result;
+      }
+    }
+    if (code2 === 41) {
+      if (level === 0) {
+        break;
+      }
+      level--;
+    }
+    pos++;
+  }
+  if (start === pos) {
+    return result;
+  }
+  if (level !== 0) {
+    return result;
+  }
+  result.str = unescapeAll(str.slice(start, pos));
+  result.pos = pos;
+  result.ok = true;
+  return result;
+}
+
+// ../../../node_modules/markdown-it/lib/helpers/parse_link_title.mjs
+function parseLinkTitle(str, start, max, prev_state) {
+  let code2;
+  let pos = start;
+  const state3 = {
+    // if `true`, this is a valid link title
+    ok: false,
+    // if `true`, this link can be continued on the next line
+    can_continue: false,
+    // if `ok`, it's the position of the first character after the closing marker
+    pos: 0,
+    // if `ok`, it's the unescaped title
+    str: "",
+    // expected closing marker character code
+    marker: 0
+  };
+  if (prev_state) {
+    state3.str = prev_state.str;
+    state3.marker = prev_state.marker;
+  } else {
+    if (pos >= max) {
+      return state3;
+    }
+    let marker = str.charCodeAt(pos);
+    if (marker !== 34 && marker !== 39 && marker !== 40) {
+      return state3;
+    }
+    start++;
+    pos++;
+    if (marker === 40) {
+      marker = 41;
+    }
+    state3.marker = marker;
+  }
+  while (pos < max) {
+    code2 = str.charCodeAt(pos);
+    if (code2 === state3.marker) {
+      state3.pos = pos + 1;
+      state3.str += unescapeAll(str.slice(start, pos));
+      state3.ok = true;
+      return state3;
+    } else if (code2 === 40 && state3.marker === 41) {
+      return state3;
+    } else if (code2 === 92 && pos + 1 < max) {
+      pos++;
+    }
+    pos++;
+  }
+  state3.can_continue = true;
+  state3.str += unescapeAll(str.slice(start, pos));
+  return state3;
+}
+
+// ../../../node_modules/markdown-it/lib/renderer.mjs
+var default_rules = {};
+default_rules.code_inline = function(tokens, idx, options, env, slf) {
+  const token = tokens[idx];
+  return "<code" + slf.renderAttrs(token) + ">" + escapeHtml(token.content) + "</code>";
+};
+default_rules.code_block = function(tokens, idx, options, env, slf) {
+  const token = tokens[idx];
+  return "<pre" + slf.renderAttrs(token) + "><code>" + escapeHtml(tokens[idx].content) + "</code></pre>\n";
+};
+default_rules.fence = function(tokens, idx, options, env, slf) {
+  const token = tokens[idx];
+  const info = token.info ? unescapeAll(token.info).trim() : "";
+  let langName = "";
+  let langAttrs = "";
+  if (info) {
+    const arr = info.split(/(\s+)/g);
+    langName = arr[0];
+    langAttrs = arr.slice(2).join("");
+  }
+  let highlighted;
+  if (options.highlight) {
+    highlighted = options.highlight(token.content, langName, langAttrs) || escapeHtml(token.content);
+  } else {
+    highlighted = escapeHtml(token.content);
+  }
+  if (highlighted.indexOf("<pre") === 0) {
+    return highlighted + "\n";
+  }
+  if (info) {
+    const i = token.attrIndex("class");
+    const tmpAttrs = token.attrs ? token.attrs.slice() : [];
+    if (i < 0) {
+      tmpAttrs.push(["class", options.langPrefix + langName]);
+    } else {
+      tmpAttrs[i] = tmpAttrs[i].slice();
+      tmpAttrs[i][1] += " " + options.langPrefix + langName;
+    }
+    const tmpToken = {
+      attrs: tmpAttrs
+    };
+    return `<pre><code${slf.renderAttrs(tmpToken)}>${highlighted}</code></pre>
+`;
+  }
+  return `<pre><code${slf.renderAttrs(token)}>${highlighted}</code></pre>
+`;
+};
+default_rules.image = function(tokens, idx, options, env, slf) {
+  const token = tokens[idx];
+  token.attrs[token.attrIndex("alt")][1] = slf.renderInlineAsText(token.children, options, env);
+  return slf.renderToken(tokens, idx, options);
+};
+default_rules.hardbreak = function(tokens, idx, options) {
+  return options.xhtmlOut ? "<br />\n" : "<br>\n";
+};
+default_rules.softbreak = function(tokens, idx, options) {
+  return options.breaks ? options.xhtmlOut ? "<br />\n" : "<br>\n" : "\n";
+};
+default_rules.text = function(tokens, idx) {
+  return escapeHtml(tokens[idx].content);
+};
+default_rules.html_block = function(tokens, idx) {
+  return tokens[idx].content;
+};
+default_rules.html_inline = function(tokens, idx) {
+  return tokens[idx].content;
+};
+function Renderer() {
+  this.rules = assign2({}, default_rules);
+}
+Renderer.prototype.renderAttrs = function renderAttrs(token) {
+  let i, l, result;
+  if (!token.attrs) {
+    return "";
+  }
+  result = "";
+  for (i = 0, l = token.attrs.length; i < l; i++) {
+    result += " " + escapeHtml(token.attrs[i][0]) + '="' + escapeHtml(token.attrs[i][1]) + '"';
+  }
+  return result;
+};
+Renderer.prototype.renderToken = function renderToken(tokens, idx, options) {
+  const token = tokens[idx];
+  let result = "";
+  if (token.hidden) {
+    return "";
+  }
+  if (token.block && token.nesting !== -1 && idx && tokens[idx - 1].hidden) {
+    result += "\n";
+  }
+  result += (token.nesting === -1 ? "</" : "<") + token.tag;
+  result += this.renderAttrs(token);
+  if (token.nesting === 0 && options.xhtmlOut) {
+    result += " /";
+  }
+  let needLf = false;
+  if (token.block) {
+    needLf = true;
+    if (token.nesting === 1) {
+      if (idx + 1 < tokens.length) {
+        const nextToken = tokens[idx + 1];
+        if (nextToken.type === "inline" || nextToken.hidden) {
+          needLf = false;
+        } else if (nextToken.nesting === -1 && nextToken.tag === token.tag) {
+          needLf = false;
+        }
+      }
+    }
+  }
+  result += needLf ? ">\n" : ">";
+  return result;
+};
+Renderer.prototype.renderInline = function(tokens, options, env) {
+  let result = "";
+  const rules = this.rules;
+  for (let i = 0, len = tokens.length; i < len; i++) {
+    const type = tokens[i].type;
+    if (typeof rules[type] !== "undefined") {
+      result += rules[type](tokens, i, options, env, this);
+    } else {
+      result += this.renderToken(tokens, i, options);
+    }
+  }
+  return result;
+};
+Renderer.prototype.renderInlineAsText = function(tokens, options, env) {
+  let result = "";
+  for (let i = 0, len = tokens.length; i < len; i++) {
+    switch (tokens[i].type) {
+      case "text":
+        result += tokens[i].content;
+        break;
+      case "image":
+        result += this.renderInlineAsText(tokens[i].children, options, env);
+        break;
+      case "html_inline":
+      case "html_block":
+        result += tokens[i].content;
+        break;
+      case "softbreak":
+      case "hardbreak":
+        result += "\n";
+        break;
+      default:
+    }
+  }
+  return result;
+};
+Renderer.prototype.render = function(tokens, options, env) {
+  let result = "";
+  const rules = this.rules;
+  for (let i = 0, len = tokens.length; i < len; i++) {
+    const type = tokens[i].type;
+    if (type === "inline") {
+      result += this.renderInline(tokens[i].children, options, env);
+    } else if (typeof rules[type] !== "undefined") {
+      result += rules[type](tokens, i, options, env, this);
+    } else {
+      result += this.renderToken(tokens, i, options, env);
+    }
+  }
+  return result;
+};
+var renderer_default = Renderer;
+
+// ../../../node_modules/markdown-it/lib/ruler.mjs
+function Ruler() {
+  this.__rules__ = [];
+  this.__cache__ = null;
+}
+Ruler.prototype.__find__ = function(name) {
+  for (let i = 0; i < this.__rules__.length; i++) {
+    if (this.__rules__[i].name === name) {
+      return i;
+    }
+  }
+  return -1;
+};
+Ruler.prototype.__compile__ = function() {
+  const self2 = this;
+  const chains = [""];
+  self2.__rules__.forEach(function(rule) {
+    if (!rule.enabled) {
+      return;
+    }
+    rule.alt.forEach(function(altName) {
+      if (chains.indexOf(altName) < 0) {
+        chains.push(altName);
+      }
+    });
+  });
+  self2.__cache__ = {};
+  chains.forEach(function(chain) {
+    self2.__cache__[chain] = [];
+    self2.__rules__.forEach(function(rule) {
+      if (!rule.enabled) {
+        return;
+      }
+      if (chain && rule.alt.indexOf(chain) < 0) {
+        return;
+      }
+      self2.__cache__[chain].push(rule.fn);
+    });
+  });
+};
+Ruler.prototype.at = function(name, fn, options) {
+  const index2 = this.__find__(name);
+  const opt = options || {};
+  if (index2 === -1) {
+    throw new Error("Parser rule not found: " + name);
+  }
+  this.__rules__[index2].fn = fn;
+  this.__rules__[index2].alt = opt.alt || [];
+  this.__cache__ = null;
+};
+Ruler.prototype.before = function(beforeName, ruleName, fn, options) {
+  const index2 = this.__find__(beforeName);
+  const opt = options || {};
+  if (index2 === -1) {
+    throw new Error("Parser rule not found: " + beforeName);
+  }
+  this.__rules__.splice(index2, 0, {
+    name: ruleName,
+    enabled: true,
+    fn,
+    alt: opt.alt || []
+  });
+  this.__cache__ = null;
+};
+Ruler.prototype.after = function(afterName, ruleName, fn, options) {
+  const index2 = this.__find__(afterName);
+  const opt = options || {};
+  if (index2 === -1) {
+    throw new Error("Parser rule not found: " + afterName);
+  }
+  this.__rules__.splice(index2 + 1, 0, {
+    name: ruleName,
+    enabled: true,
+    fn,
+    alt: opt.alt || []
+  });
+  this.__cache__ = null;
+};
+Ruler.prototype.push = function(ruleName, fn, options) {
+  const opt = options || {};
+  this.__rules__.push({
+    name: ruleName,
+    enabled: true,
+    fn,
+    alt: opt.alt || []
+  });
+  this.__cache__ = null;
+};
+Ruler.prototype.enable = function(list2, ignoreInvalid) {
+  if (!Array.isArray(list2)) {
+    list2 = [list2];
+  }
+  const result = [];
+  list2.forEach(function(name) {
+    const idx = this.__find__(name);
+    if (idx < 0) {
+      if (ignoreInvalid) {
+        return;
+      }
+      throw new Error("Rules manager: invalid rule name " + name);
+    }
+    this.__rules__[idx].enabled = true;
+    result.push(name);
+  }, this);
+  this.__cache__ = null;
+  return result;
+};
+Ruler.prototype.enableOnly = function(list2, ignoreInvalid) {
+  if (!Array.isArray(list2)) {
+    list2 = [list2];
+  }
+  this.__rules__.forEach(function(rule) {
+    rule.enabled = false;
+  });
+  this.enable(list2, ignoreInvalid);
+};
+Ruler.prototype.disable = function(list2, ignoreInvalid) {
+  if (!Array.isArray(list2)) {
+    list2 = [list2];
+  }
+  const result = [];
+  list2.forEach(function(name) {
+    const idx = this.__find__(name);
+    if (idx < 0) {
+      if (ignoreInvalid) {
+        return;
+      }
+      throw new Error("Rules manager: invalid rule name " + name);
+    }
+    this.__rules__[idx].enabled = false;
+    result.push(name);
+  }, this);
+  this.__cache__ = null;
+  return result;
+};
+Ruler.prototype.getRules = function(chainName) {
+  if (this.__cache__ === null) {
+    this.__compile__();
+  }
+  return this.__cache__[chainName] || [];
+};
+var ruler_default = Ruler;
+
+// ../../../node_modules/markdown-it/lib/token.mjs
+function Token(type, tag2, nesting) {
+  this.type = type;
+  this.tag = tag2;
+  this.attrs = null;
+  this.map = null;
+  this.nesting = nesting;
+  this.level = 0;
+  this.children = null;
+  this.content = "";
+  this.markup = "";
+  this.info = "";
+  this.meta = null;
+  this.block = false;
+  this.hidden = false;
+}
+Token.prototype.attrIndex = function attrIndex(name) {
+  if (!this.attrs) {
+    return -1;
+  }
+  const attrs = this.attrs;
+  for (let i = 0, len = attrs.length; i < len; i++) {
+    if (attrs[i][0] === name) {
+      return i;
+    }
+  }
+  return -1;
+};
+Token.prototype.attrPush = function attrPush(attrData) {
+  if (this.attrs) {
+    this.attrs.push(attrData);
+  } else {
+    this.attrs = [attrData];
+  }
+};
+Token.prototype.attrSet = function attrSet(name, value) {
+  const idx = this.attrIndex(name);
+  const attrData = [name, value];
+  if (idx < 0) {
+    this.attrPush(attrData);
+  } else {
+    this.attrs[idx] = attrData;
+  }
+};
+Token.prototype.attrGet = function attrGet(name) {
+  const idx = this.attrIndex(name);
+  let value = null;
+  if (idx >= 0) {
+    value = this.attrs[idx][1];
+  }
+  return value;
+};
+Token.prototype.attrJoin = function attrJoin(name, value) {
+  const idx = this.attrIndex(name);
+  if (idx < 0) {
+    this.attrPush([name, value]);
+  } else {
+    this.attrs[idx][1] = this.attrs[idx][1] + " " + value;
+  }
+};
+var token_default = Token;
+
+// ../../../node_modules/markdown-it/lib/rules_core/state_core.mjs
+function StateCore(src, md, env) {
+  this.src = src;
+  this.env = env;
+  this.tokens = [];
+  this.inlineMode = false;
+  this.md = md;
+}
+StateCore.prototype.Token = token_default;
+var state_core_default = StateCore;
+
+// ../../../node_modules/markdown-it/lib/rules_core/normalize.mjs
+var NEWLINES_RE = /\r\n?|\n/g;
+var NULL_RE = /\0/g;
+function normalize(state3) {
+  let str;
+  str = state3.src.replace(NEWLINES_RE, "\n");
+  str = str.replace(NULL_RE, "\uFFFD");
+  state3.src = str;
+}
+
+// ../../../node_modules/markdown-it/lib/rules_core/block.mjs
+function block2(state3) {
+  let token;
+  if (state3.inlineMode) {
+    token = new state3.Token("inline", "", 0);
+    token.content = state3.src;
+    token.map = [0, 1];
+    token.children = [];
+    state3.tokens.push(token);
+  } else {
+    state3.md.block.parse(state3.src, state3.md, state3.env, state3.tokens);
+  }
+}
+
+// ../../../node_modules/markdown-it/lib/rules_core/inline.mjs
+function inline(state3) {
+  const tokens = state3.tokens;
+  for (let i = 0, l = tokens.length; i < l; i++) {
+    const tok = tokens[i];
+    if (tok.type === "inline") {
+      state3.md.inline.parse(tok.content, state3.md, state3.env, tok.children);
+    }
+  }
+}
+
+// ../../../node_modules/markdown-it/lib/rules_core/linkify.mjs
+function isLinkOpen(str) {
+  return /^<a[>\s]/i.test(str);
+}
+function isLinkClose(str) {
+  return /^<\/a\s*>/i.test(str);
+}
+function linkify(state3) {
+  const blockTokens = state3.tokens;
+  if (!state3.md.options.linkify) {
+    return;
+  }
+  for (let j = 0, l = blockTokens.length; j < l; j++) {
+    if (blockTokens[j].type !== "inline" || !state3.md.linkify.pretest(blockTokens[j].content)) {
+      continue;
+    }
+    let tokens = blockTokens[j].children;
+    let htmlLinkLevel = 0;
+    for (let i = tokens.length - 1; i >= 0; i--) {
+      const currentToken = tokens[i];
+      if (currentToken.type === "link_close") {
+        i--;
+        while (tokens[i].level !== currentToken.level && tokens[i].type !== "link_open") {
+          i--;
+        }
+        continue;
+      }
+      if (currentToken.type === "html_inline") {
+        if (isLinkOpen(currentToken.content) && htmlLinkLevel > 0) {
+          htmlLinkLevel--;
+        }
+        if (isLinkClose(currentToken.content)) {
+          htmlLinkLevel++;
+        }
+      }
+      if (htmlLinkLevel > 0) {
+        continue;
+      }
+      if (currentToken.type === "text" && state3.md.linkify.test(currentToken.content)) {
+        const text3 = currentToken.content;
+        let links = state3.md.linkify.match(text3);
+        const nodes = [];
+        let level = currentToken.level;
+        let lastPos = 0;
+        if (links.length > 0 && links[0].index === 0 && i > 0 && tokens[i - 1].type === "text_special") {
+          links = links.slice(1);
+        }
+        for (let ln = 0; ln < links.length; ln++) {
+          const url = links[ln].url;
+          const fullUrl = state3.md.normalizeLink(url);
+          if (!state3.md.validateLink(fullUrl)) {
+            continue;
+          }
+          let urlText = links[ln].text;
+          if (!links[ln].schema) {
+            urlText = state3.md.normalizeLinkText("http://" + urlText).replace(/^http:\/\//, "");
+          } else if (links[ln].schema === "mailto:" && !/^mailto:/i.test(urlText)) {
+            urlText = state3.md.normalizeLinkText("mailto:" + urlText).replace(/^mailto:/, "");
+          } else {
+            urlText = state3.md.normalizeLinkText(urlText);
+          }
+          const pos = links[ln].index;
+          if (pos > lastPos) {
+            const token = new state3.Token("text", "", 0);
+            token.content = text3.slice(lastPos, pos);
+            token.level = level;
+            nodes.push(token);
+          }
+          const token_o = new state3.Token("link_open", "a", 1);
+          token_o.attrs = [["href", fullUrl]];
+          token_o.level = level++;
+          token_o.markup = "linkify";
+          token_o.info = "auto";
+          nodes.push(token_o);
+          const token_t = new state3.Token("text", "", 0);
+          token_t.content = urlText;
+          token_t.level = level;
+          nodes.push(token_t);
+          const token_c = new state3.Token("link_close", "a", -1);
+          token_c.level = --level;
+          token_c.markup = "linkify";
+          token_c.info = "auto";
+          nodes.push(token_c);
+          lastPos = links[ln].lastIndex;
+        }
+        if (lastPos < text3.length) {
+          const token = new state3.Token("text", "", 0);
+          token.content = text3.slice(lastPos);
+          token.level = level;
+          nodes.push(token);
+        }
+        blockTokens[j].children = tokens = arrayReplaceAt(tokens, i, nodes);
+      }
+    }
+  }
+}
+
+// ../../../node_modules/markdown-it/lib/rules_core/replacements.mjs
+var RARE_RE = /\+-|\.\.|\?\?\?\?|!!!!|,,|--/;
+var SCOPED_ABBR_TEST_RE = /\((c|tm|r)\)/i;
+var SCOPED_ABBR_RE = /\((c|tm|r)\)/ig;
+var SCOPED_ABBR = {
+  c: "\xA9",
+  r: "\xAE",
+  tm: "\u2122"
+};
+function replaceFn(match2, name) {
+  return SCOPED_ABBR[name.toLowerCase()];
+}
+function replace_scoped(inlineTokens) {
+  let inside_autolink = 0;
+  for (let i = inlineTokens.length - 1; i >= 0; i--) {
+    const token = inlineTokens[i];
+    if (token.type === "text" && !inside_autolink) {
+      token.content = token.content.replace(SCOPED_ABBR_RE, replaceFn);
+    }
+    if (token.type === "link_open" && token.info === "auto") {
+      inside_autolink--;
+    }
+    if (token.type === "link_close" && token.info === "auto") {
+      inside_autolink++;
+    }
+  }
+}
+function replace_rare(inlineTokens) {
+  let inside_autolink = 0;
+  for (let i = inlineTokens.length - 1; i >= 0; i--) {
+    const token = inlineTokens[i];
+    if (token.type === "text" && !inside_autolink) {
+      if (RARE_RE.test(token.content)) {
+        token.content = token.content.replace(/\+-/g, "\xB1").replace(/\.{2,}/g, "\u2026").replace(/([?!])…/g, "$1..").replace(/([?!]){4,}/g, "$1$1$1").replace(/,{2,}/g, ",").replace(/(^|[^-])---(?=[^-]|$)/mg, "$1\u2014").replace(/(^|\s)--(?=\s|$)/mg, "$1\u2013").replace(/(^|[^-\s])--(?=[^-\s]|$)/mg, "$1\u2013");
+      }
+    }
+    if (token.type === "link_open" && token.info === "auto") {
+      inside_autolink--;
+    }
+    if (token.type === "link_close" && token.info === "auto") {
+      inside_autolink++;
+    }
+  }
+}
+function replace(state3) {
+  let blkIdx;
+  if (!state3.md.options.typographer) {
+    return;
+  }
+  for (blkIdx = state3.tokens.length - 1; blkIdx >= 0; blkIdx--) {
+    if (state3.tokens[blkIdx].type !== "inline") {
+      continue;
+    }
+    if (SCOPED_ABBR_TEST_RE.test(state3.tokens[blkIdx].content)) {
+      replace_scoped(state3.tokens[blkIdx].children);
+    }
+    if (RARE_RE.test(state3.tokens[blkIdx].content)) {
+      replace_rare(state3.tokens[blkIdx].children);
+    }
+  }
+}
+
+// ../../../node_modules/markdown-it/lib/rules_core/smartquotes.mjs
+var QUOTE_TEST_RE = /['"]/;
+var QUOTE_RE = /['"]/g;
+var APOSTROPHE = "\u2019";
+function addReplacement(replacements, tokenIdx, pos, ch) {
+  if (!replacements[tokenIdx]) {
+    replacements[tokenIdx] = [];
+  }
+  replacements[tokenIdx].push({ pos, ch });
+}
+function applyReplacements(str, replacements) {
+  let result = "";
+  let lastPos = 0;
+  replacements.sort((a, b) => a.pos - b.pos);
+  for (let i = 0; i < replacements.length; i++) {
+    const replacement = replacements[i];
+    result += str.slice(lastPos, replacement.pos) + replacement.ch;
+    lastPos = replacement.pos + 1;
+  }
+  return result + str.slice(lastPos);
+}
+function process_inlines(tokens, state3) {
+  let j;
+  const stack2 = [];
+  const replacements = {};
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i];
+    const thisLevel = tokens[i].level;
+    for (j = stack2.length - 1; j >= 0; j--) {
+      if (stack2[j].level <= thisLevel) {
+        break;
+      }
+    }
+    stack2.length = j + 1;
+    if (token.type !== "text") {
+      continue;
+    }
+    const text3 = token.content;
+    let pos = 0;
+    const max = text3.length;
+    OUTER:
+      while (pos < max) {
+        QUOTE_RE.lastIndex = pos;
+        const t = QUOTE_RE.exec(text3);
+        if (!t) {
+          break;
+        }
+        let canOpen = true;
+        let canClose = true;
+        pos = t.index + 1;
+        const isSingle = t[0] === "'";
+        let lastChar = 32;
+        if (t.index - 1 >= 0) {
+          lastChar = text3.charCodeAt(t.index - 1);
+        } else {
+          for (j = i - 1; j >= 0; j--) {
+            if (tokens[j].type === "softbreak" || tokens[j].type === "hardbreak") break;
+            if (!tokens[j].content) continue;
+            lastChar = tokens[j].content.charCodeAt(tokens[j].content.length - 1);
+            break;
+          }
+        }
+        let nextChar = 32;
+        if (pos < max) {
+          nextChar = text3.charCodeAt(pos);
+        } else {
+          for (j = i + 1; j < tokens.length; j++) {
+            if (tokens[j].type === "softbreak" || tokens[j].type === "hardbreak") break;
+            if (!tokens[j].content) continue;
+            nextChar = tokens[j].content.charCodeAt(0);
+            break;
+          }
+        }
+        const isLastPunctChar = isMdAsciiPunct(lastChar) || isPunctCharCode(lastChar);
+        const isNextPunctChar = isMdAsciiPunct(nextChar) || isPunctCharCode(nextChar);
+        const isLastWhiteSpace = isWhiteSpace(lastChar);
+        const isNextWhiteSpace = isWhiteSpace(nextChar);
+        if (isNextWhiteSpace) {
+          canOpen = false;
+        } else if (isNextPunctChar) {
+          if (!(isLastWhiteSpace || isLastPunctChar)) {
+            canOpen = false;
+          }
+        }
+        if (isLastWhiteSpace) {
+          canClose = false;
+        } else if (isLastPunctChar) {
+          if (!(isNextWhiteSpace || isNextPunctChar)) {
+            canClose = false;
+          }
+        }
+        if (nextChar === 34 && t[0] === '"') {
+          if (lastChar >= 48 && lastChar <= 57) {
+            canClose = canOpen = false;
+          }
+        }
+        if (canOpen && canClose) {
+          canOpen = isLastPunctChar;
+          canClose = isNextPunctChar;
+        }
+        if (!canOpen && !canClose) {
+          if (isSingle) {
+            addReplacement(replacements, i, t.index, APOSTROPHE);
+          }
+          continue;
+        }
+        if (canClose) {
+          for (j = stack2.length - 1; j >= 0; j--) {
+            let item = stack2[j];
+            if (stack2[j].level < thisLevel) {
+              break;
+            }
+            if (item.single === isSingle && stack2[j].level === thisLevel) {
+              item = stack2[j];
+              let openQuote;
+              let closeQuote;
+              if (isSingle) {
+                openQuote = state3.md.options.quotes[2];
+                closeQuote = state3.md.options.quotes[3];
+              } else {
+                openQuote = state3.md.options.quotes[0];
+                closeQuote = state3.md.options.quotes[1];
+              }
+              addReplacement(replacements, i, t.index, closeQuote);
+              addReplacement(replacements, item.token, item.pos, openQuote);
+              stack2.length = j;
+              continue OUTER;
+            }
+          }
+        }
+        if (canOpen) {
+          stack2.push({
+            token: i,
+            pos: t.index,
+            single: isSingle,
+            level: thisLevel
+          });
+        } else if (canClose && isSingle) {
+          addReplacement(replacements, i, t.index, APOSTROPHE);
+        }
+      }
+  }
+  Object.keys(replacements).forEach(function(tokenIdx) {
+    tokens[tokenIdx].content = applyReplacements(tokens[tokenIdx].content, replacements[tokenIdx]);
+  });
+}
+function smartquotes(state3) {
+  if (!state3.md.options.typographer) {
+    return;
+  }
+  for (let blkIdx = state3.tokens.length - 1; blkIdx >= 0; blkIdx--) {
+    if (state3.tokens[blkIdx].type !== "inline" || !QUOTE_TEST_RE.test(state3.tokens[blkIdx].content)) {
+      continue;
+    }
+    process_inlines(state3.tokens[blkIdx].children, state3);
+  }
+}
+
+// ../../../node_modules/markdown-it/lib/rules_core/text_join.mjs
+function text_join(state3) {
+  let curr, last;
+  const blockTokens = state3.tokens;
+  const l = blockTokens.length;
+  for (let j = 0; j < l; j++) {
+    if (blockTokens[j].type !== "inline") continue;
+    const tokens = blockTokens[j].children;
+    const max = tokens.length;
+    for (curr = 0; curr < max; curr++) {
+      if (tokens[curr].type === "text_special") {
+        tokens[curr].type = "text";
+      }
+    }
+    for (curr = last = 0; curr < max; curr++) {
+      if (tokens[curr].type === "text" && curr + 1 < max && tokens[curr + 1].type === "text") {
+        tokens[curr + 1].content = tokens[curr].content + tokens[curr + 1].content;
+      } else {
+        if (curr !== last) {
+          tokens[last] = tokens[curr];
+        }
+        last++;
+      }
+    }
+    if (curr !== last) {
+      tokens.length = last;
+    }
+  }
+}
+
+// ../../../node_modules/markdown-it/lib/parser_core.mjs
+var _rules = [
+  ["normalize", normalize],
+  ["block", block2],
+  ["inline", inline],
+  ["linkify", linkify],
+  ["replacements", replace],
+  ["smartquotes", smartquotes],
+  // `text_join` finds `text_special` tokens (for escape sequences)
+  // and joins them with the rest of the text
+  ["text_join", text_join]
+];
+function Core() {
+  this.ruler = new ruler_default();
+  for (let i = 0; i < _rules.length; i++) {
+    this.ruler.push(_rules[i][0], _rules[i][1]);
+  }
+}
+Core.prototype.process = function(state3) {
+  const rules = this.ruler.getRules("");
+  for (let i = 0, l = rules.length; i < l; i++) {
+    rules[i](state3);
+  }
+};
+Core.prototype.State = state_core_default;
+var parser_core_default = Core;
+
+// ../../../node_modules/markdown-it/lib/rules_block/state_block.mjs
+function StateBlock(src, md, env, tokens) {
+  this.src = src;
+  this.md = md;
+  this.env = env;
+  this.tokens = tokens;
+  this.bMarks = [];
+  this.eMarks = [];
+  this.tShift = [];
+  this.sCount = [];
+  this.bsCount = [];
+  this.blkIndent = 0;
+  this.line = 0;
+  this.lineMax = 0;
+  this.tight = false;
+  this.ddIndent = -1;
+  this.listIndent = -1;
+  this.parentType = "root";
+  this.level = 0;
+  const s = this.src;
+  for (let start = 0, pos = 0, indent = 0, offset = 0, len = s.length, indent_found = false; pos < len; pos++) {
+    const ch = s.charCodeAt(pos);
+    if (!indent_found) {
+      if (isSpace(ch)) {
+        indent++;
+        if (ch === 9) {
+          offset += 4 - offset % 4;
+        } else {
+          offset++;
+        }
+        continue;
+      } else {
+        indent_found = true;
+      }
+    }
+    if (ch === 10 || pos === len - 1) {
+      if (ch !== 10) {
+        pos++;
+      }
+      this.bMarks.push(start);
+      this.eMarks.push(pos);
+      this.tShift.push(indent);
+      this.sCount.push(offset);
+      this.bsCount.push(0);
+      indent_found = false;
+      indent = 0;
+      offset = 0;
+      start = pos + 1;
+    }
+  }
+  this.bMarks.push(s.length);
+  this.eMarks.push(s.length);
+  this.tShift.push(0);
+  this.sCount.push(0);
+  this.bsCount.push(0);
+  this.lineMax = this.bMarks.length - 1;
+}
+StateBlock.prototype.push = function(type, tag2, nesting) {
+  const token = new token_default(type, tag2, nesting);
+  token.block = true;
+  if (nesting < 0) this.level--;
+  token.level = this.level;
+  if (nesting > 0) this.level++;
+  this.tokens.push(token);
+  return token;
+};
+StateBlock.prototype.isEmpty = function isEmpty(line) {
+  return this.bMarks[line] + this.tShift[line] >= this.eMarks[line];
+};
+StateBlock.prototype.skipEmptyLines = function skipEmptyLines(from) {
+  for (let max = this.lineMax; from < max; from++) {
+    if (this.bMarks[from] + this.tShift[from] < this.eMarks[from]) {
+      break;
+    }
+  }
+  return from;
+};
+StateBlock.prototype.skipSpaces = function skipSpaces(pos) {
+  for (let max = this.src.length; pos < max; pos++) {
+    const ch = this.src.charCodeAt(pos);
+    if (!isSpace(ch)) {
+      break;
+    }
+  }
+  return pos;
+};
+StateBlock.prototype.skipSpacesBack = function skipSpacesBack(pos, min) {
+  if (pos <= min) {
+    return pos;
+  }
+  while (pos > min) {
+    if (!isSpace(this.src.charCodeAt(--pos))) {
+      return pos + 1;
+    }
+  }
+  return pos;
+};
+StateBlock.prototype.skipChars = function skipChars(pos, code2) {
+  for (let max = this.src.length; pos < max; pos++) {
+    if (this.src.charCodeAt(pos) !== code2) {
+      break;
+    }
+  }
+  return pos;
+};
+StateBlock.prototype.skipCharsBack = function skipCharsBack(pos, code2, min) {
+  if (pos <= min) {
+    return pos;
+  }
+  while (pos > min) {
+    if (code2 !== this.src.charCodeAt(--pos)) {
+      return pos + 1;
+    }
+  }
+  return pos;
+};
+StateBlock.prototype.getLines = function getLines(begin, end, indent, keepLastLF) {
+  if (begin >= end) {
+    return "";
+  }
+  const queue = new Array(end - begin);
+  for (let i = 0, line = begin; line < end; line++, i++) {
+    let lineIndent = 0;
+    const lineStart = this.bMarks[line];
+    let first = lineStart;
+    let last;
+    if (line + 1 < end || keepLastLF) {
+      last = this.eMarks[line] + 1;
+    } else {
+      last = this.eMarks[line];
+    }
+    while (first < last && lineIndent < indent) {
+      const ch = this.src.charCodeAt(first);
+      if (isSpace(ch)) {
+        if (ch === 9) {
+          lineIndent += 4 - (lineIndent + this.bsCount[line]) % 4;
+        } else {
+          lineIndent++;
+        }
+      } else if (first - lineStart < this.tShift[line]) {
+        lineIndent++;
+      } else {
+        break;
+      }
+      first++;
+    }
+    if (lineIndent > indent) {
+      queue[i] = new Array(lineIndent - indent + 1).join(" ") + this.src.slice(first, last);
+    } else {
+      queue[i] = this.src.slice(first, last);
+    }
+  }
+  return queue.join("");
+};
+StateBlock.prototype.Token = token_default;
+var state_block_default = StateBlock;
+
+// ../../../node_modules/markdown-it/lib/rules_block/table.mjs
+var MAX_AUTOCOMPLETED_CELLS = 65536;
+function getLine(state3, line) {
+  const pos = state3.bMarks[line] + state3.tShift[line];
+  const max = state3.eMarks[line];
+  return state3.src.slice(pos, max);
+}
+function escapedSplit(str) {
+  const result = [];
+  const max = str.length;
+  let pos = 0;
+  let ch = str.charCodeAt(pos);
+  let isEscaped = false;
+  let lastPos = 0;
+  let current = "";
+  while (pos < max) {
+    if (ch === 124) {
+      if (!isEscaped) {
+        result.push(current + str.substring(lastPos, pos));
+        current = "";
+        lastPos = pos + 1;
+      } else {
+        current += str.substring(lastPos, pos - 1);
+        lastPos = pos;
+      }
+    }
+    isEscaped = ch === 92;
+    pos++;
+    ch = str.charCodeAt(pos);
+  }
+  result.push(current + str.substring(lastPos));
+  return result;
+}
+function table(state3, startLine, endLine, silent) {
+  if (startLine + 2 > endLine) {
+    return false;
+  }
+  let nextLine = startLine + 1;
+  if (state3.sCount[nextLine] < state3.blkIndent) {
+    return false;
+  }
+  if (state3.sCount[nextLine] - state3.blkIndent >= 4) {
+    return false;
+  }
+  let pos = state3.bMarks[nextLine] + state3.tShift[nextLine];
+  if (pos >= state3.eMarks[nextLine]) {
+    return false;
+  }
+  const firstCh = state3.src.charCodeAt(pos++);
+  if (firstCh !== 124 && firstCh !== 45 && firstCh !== 58) {
+    return false;
+  }
+  if (pos >= state3.eMarks[nextLine]) {
+    return false;
+  }
+  const secondCh = state3.src.charCodeAt(pos++);
+  if (secondCh !== 124 && secondCh !== 45 && secondCh !== 58 && !isSpace(secondCh)) {
+    return false;
+  }
+  if (firstCh === 45 && isSpace(secondCh)) {
+    return false;
+  }
+  while (pos < state3.eMarks[nextLine]) {
+    const ch = state3.src.charCodeAt(pos);
+    if (ch !== 124 && ch !== 45 && ch !== 58 && !isSpace(ch)) {
+      return false;
+    }
+    pos++;
+  }
+  let lineText = getLine(state3, startLine + 1);
+  let columns = lineText.split("|");
+  const aligns = [];
+  for (let i = 0; i < columns.length; i++) {
+    const t = columns[i].trim();
+    if (!t) {
+      if (i === 0 || i === columns.length - 1) {
+        continue;
+      } else {
+        return false;
+      }
+    }
+    if (!/^:?-+:?$/.test(t)) {
+      return false;
+    }
+    if (t.charCodeAt(t.length - 1) === 58) {
+      aligns.push(t.charCodeAt(0) === 58 ? "center" : "right");
+    } else if (t.charCodeAt(0) === 58) {
+      aligns.push("left");
+    } else {
+      aligns.push("");
+    }
+  }
+  lineText = getLine(state3, startLine).trim();
+  if (lineText.indexOf("|") === -1) {
+    return false;
+  }
+  if (state3.sCount[startLine] - state3.blkIndent >= 4) {
+    return false;
+  }
+  columns = escapedSplit(lineText);
+  if (columns.length && columns[0] === "") columns.shift();
+  if (columns.length && columns[columns.length - 1] === "") columns.pop();
+  const columnCount = columns.length;
+  if (columnCount === 0 || columnCount !== aligns.length) {
+    return false;
+  }
+  if (silent) {
+    return true;
+  }
+  const oldParentType = state3.parentType;
+  state3.parentType = "table";
+  const terminatorRules = state3.md.block.ruler.getRules("blockquote");
+  const token_to = state3.push("table_open", "table", 1);
+  const tableLines = [startLine, 0];
+  token_to.map = tableLines;
+  const token_tho = state3.push("thead_open", "thead", 1);
+  token_tho.map = [startLine, startLine + 1];
+  const token_htro = state3.push("tr_open", "tr", 1);
+  token_htro.map = [startLine, startLine + 1];
+  for (let i = 0; i < columns.length; i++) {
+    const token_ho = state3.push("th_open", "th", 1);
+    if (aligns[i]) {
+      token_ho.attrs = [["style", "text-align:" + aligns[i]]];
+    }
+    const token_il = state3.push("inline", "", 0);
+    token_il.content = columns[i].trim();
+    token_il.children = [];
+    state3.push("th_close", "th", -1);
+  }
+  state3.push("tr_close", "tr", -1);
+  state3.push("thead_close", "thead", -1);
+  let tbodyLines;
+  let autocompletedCells = 0;
+  for (nextLine = startLine + 2; nextLine < endLine; nextLine++) {
+    if (state3.sCount[nextLine] < state3.blkIndent) {
+      break;
+    }
+    let terminate = false;
+    for (let i = 0, l = terminatorRules.length; i < l; i++) {
+      if (terminatorRules[i](state3, nextLine, endLine, true)) {
+        terminate = true;
+        break;
+      }
+    }
+    if (terminate) {
+      break;
+    }
+    lineText = getLine(state3, nextLine).trim();
+    if (!lineText) {
+      break;
+    }
+    if (state3.sCount[nextLine] - state3.blkIndent >= 4) {
+      break;
+    }
+    columns = escapedSplit(lineText);
+    if (columns.length && columns[0] === "") columns.shift();
+    if (columns.length && columns[columns.length - 1] === "") columns.pop();
+    autocompletedCells += columnCount - columns.length;
+    if (autocompletedCells > MAX_AUTOCOMPLETED_CELLS) {
+      break;
+    }
+    if (nextLine === startLine + 2) {
+      const token_tbo = state3.push("tbody_open", "tbody", 1);
+      token_tbo.map = tbodyLines = [startLine + 2, 0];
+    }
+    const token_tro = state3.push("tr_open", "tr", 1);
+    token_tro.map = [nextLine, nextLine + 1];
+    for (let i = 0; i < columnCount; i++) {
+      const token_tdo = state3.push("td_open", "td", 1);
+      if (aligns[i]) {
+        token_tdo.attrs = [["style", "text-align:" + aligns[i]]];
+      }
+      const token_il = state3.push("inline", "", 0);
+      token_il.content = columns[i] ? columns[i].trim() : "";
+      token_il.children = [];
+      state3.push("td_close", "td", -1);
+    }
+    state3.push("tr_close", "tr", -1);
+  }
+  if (tbodyLines) {
+    state3.push("tbody_close", "tbody", -1);
+    tbodyLines[1] = nextLine;
+  }
+  state3.push("table_close", "table", -1);
+  tableLines[1] = nextLine;
+  state3.parentType = oldParentType;
+  state3.line = nextLine;
+  return true;
+}
+
+// ../../../node_modules/markdown-it/lib/rules_block/code.mjs
+function code(state3, startLine, endLine) {
+  if (state3.sCount[startLine] - state3.blkIndent < 4) {
+    return false;
+  }
+  let nextLine = startLine + 1;
+  let last = nextLine;
+  while (nextLine < endLine) {
+    if (state3.isEmpty(nextLine)) {
+      nextLine++;
+      continue;
+    }
+    if (state3.sCount[nextLine] - state3.blkIndent >= 4) {
+      nextLine++;
+      last = nextLine;
+      continue;
+    }
+    break;
+  }
+  state3.line = last;
+  const token = state3.push("code_block", "code", 0);
+  token.content = state3.getLines(startLine, last, 4 + state3.blkIndent, false) + "\n";
+  token.map = [startLine, state3.line];
+  return true;
+}
+
+// ../../../node_modules/markdown-it/lib/rules_block/fence.mjs
+function fence(state3, startLine, endLine, silent) {
+  let pos = state3.bMarks[startLine] + state3.tShift[startLine];
+  let max = state3.eMarks[startLine];
+  if (state3.sCount[startLine] - state3.blkIndent >= 4) {
+    return false;
+  }
+  if (pos + 3 > max) {
+    return false;
+  }
+  const marker = state3.src.charCodeAt(pos);
+  if (marker !== 126 && marker !== 96) {
+    return false;
+  }
+  let mem = pos;
+  pos = state3.skipChars(pos, marker);
+  let len = pos - mem;
+  if (len < 3) {
+    return false;
+  }
+  const markup = state3.src.slice(mem, pos);
+  const params = state3.src.slice(pos, max);
+  if (marker === 96) {
+    if (params.indexOf(String.fromCharCode(marker)) >= 0) {
+      return false;
+    }
+  }
+  if (silent) {
+    return true;
+  }
+  let nextLine = startLine;
+  let haveEndMarker = false;
+  for (; ; ) {
+    nextLine++;
+    if (nextLine >= endLine) {
+      break;
+    }
+    pos = mem = state3.bMarks[nextLine] + state3.tShift[nextLine];
+    max = state3.eMarks[nextLine];
+    if (pos < max && state3.sCount[nextLine] < state3.blkIndent) {
+      break;
+    }
+    if (state3.src.charCodeAt(pos) !== marker) {
+      continue;
+    }
+    if (state3.sCount[nextLine] - state3.blkIndent >= 4) {
+      continue;
+    }
+    pos = state3.skipChars(pos, marker);
+    if (pos - mem < len) {
+      continue;
+    }
+    pos = state3.skipSpaces(pos);
+    if (pos < max) {
+      continue;
+    }
+    haveEndMarker = true;
+    break;
+  }
+  len = state3.sCount[startLine];
+  state3.line = nextLine + (haveEndMarker ? 1 : 0);
+  const token = state3.push("fence", "code", 0);
+  token.info = params;
+  token.content = state3.getLines(startLine + 1, nextLine, len, true);
+  token.markup = markup;
+  token.map = [startLine, state3.line];
+  return true;
+}
+
+// ../../../node_modules/markdown-it/lib/rules_block/blockquote.mjs
+function blockquote(state3, startLine, endLine, silent) {
+  let pos = state3.bMarks[startLine] + state3.tShift[startLine];
+  let max = state3.eMarks[startLine];
+  const oldLineMax = state3.lineMax;
+  if (state3.sCount[startLine] - state3.blkIndent >= 4) {
+    return false;
+  }
+  if (state3.src.charCodeAt(pos) !== 62) {
+    return false;
+  }
+  if (silent) {
+    return true;
+  }
+  const oldBMarks = [];
+  const oldBSCount = [];
+  const oldSCount = [];
+  const oldTShift = [];
+  const terminatorRules = state3.md.block.ruler.getRules("blockquote");
+  const oldParentType = state3.parentType;
+  state3.parentType = "blockquote";
+  let lastLineEmpty = false;
+  let nextLine;
+  for (nextLine = startLine; nextLine < endLine; nextLine++) {
+    const isOutdented = state3.sCount[nextLine] < state3.blkIndent;
+    pos = state3.bMarks[nextLine] + state3.tShift[nextLine];
+    max = state3.eMarks[nextLine];
+    if (pos >= max) {
+      break;
+    }
+    if (state3.src.charCodeAt(pos++) === 62 && !isOutdented) {
+      let initial = state3.sCount[nextLine] + 1;
+      let spaceAfterMarker;
+      let adjustTab;
+      if (state3.src.charCodeAt(pos) === 32) {
+        pos++;
+        initial++;
+        adjustTab = false;
+        spaceAfterMarker = true;
+      } else if (state3.src.charCodeAt(pos) === 9) {
+        spaceAfterMarker = true;
+        if ((state3.bsCount[nextLine] + initial) % 4 === 3) {
+          pos++;
+          initial++;
+          adjustTab = false;
+        } else {
+          adjustTab = true;
+        }
+      } else {
+        spaceAfterMarker = false;
+      }
+      let offset = initial;
+      oldBMarks.push(state3.bMarks[nextLine]);
+      state3.bMarks[nextLine] = pos;
+      while (pos < max) {
+        const ch = state3.src.charCodeAt(pos);
+        if (isSpace(ch)) {
+          if (ch === 9) {
+            offset += 4 - (offset + state3.bsCount[nextLine] + (adjustTab ? 1 : 0)) % 4;
+          } else {
+            offset++;
+          }
+        } else {
+          break;
+        }
+        pos++;
+      }
+      lastLineEmpty = pos >= max;
+      oldBSCount.push(state3.bsCount[nextLine]);
+      state3.bsCount[nextLine] = state3.sCount[nextLine] + 1 + (spaceAfterMarker ? 1 : 0);
+      oldSCount.push(state3.sCount[nextLine]);
+      state3.sCount[nextLine] = offset - initial;
+      oldTShift.push(state3.tShift[nextLine]);
+      state3.tShift[nextLine] = pos - state3.bMarks[nextLine];
+      continue;
+    }
+    if (lastLineEmpty) {
+      break;
+    }
+    let terminate = false;
+    for (let i = 0, l = terminatorRules.length; i < l; i++) {
+      if (terminatorRules[i](state3, nextLine, endLine, true)) {
+        terminate = true;
+        break;
+      }
+    }
+    if (terminate) {
+      state3.lineMax = nextLine;
+      if (state3.blkIndent !== 0) {
+        oldBMarks.push(state3.bMarks[nextLine]);
+        oldBSCount.push(state3.bsCount[nextLine]);
+        oldTShift.push(state3.tShift[nextLine]);
+        oldSCount.push(state3.sCount[nextLine]);
+        state3.sCount[nextLine] -= state3.blkIndent;
+      }
+      break;
+    }
+    oldBMarks.push(state3.bMarks[nextLine]);
+    oldBSCount.push(state3.bsCount[nextLine]);
+    oldTShift.push(state3.tShift[nextLine]);
+    oldSCount.push(state3.sCount[nextLine]);
+    state3.sCount[nextLine] = -1;
+  }
+  const oldIndent = state3.blkIndent;
+  state3.blkIndent = 0;
+  const token_o = state3.push("blockquote_open", "blockquote", 1);
+  token_o.markup = ">";
+  const lines = [startLine, 0];
+  token_o.map = lines;
+  state3.md.block.tokenize(state3, startLine, nextLine);
+  const token_c = state3.push("blockquote_close", "blockquote", -1);
+  token_c.markup = ">";
+  state3.lineMax = oldLineMax;
+  state3.parentType = oldParentType;
+  lines[1] = state3.line;
+  for (let i = 0; i < oldTShift.length; i++) {
+    state3.bMarks[i + startLine] = oldBMarks[i];
+    state3.tShift[i + startLine] = oldTShift[i];
+    state3.sCount[i + startLine] = oldSCount[i];
+    state3.bsCount[i + startLine] = oldBSCount[i];
+  }
+  state3.blkIndent = oldIndent;
+  return true;
+}
+
+// ../../../node_modules/markdown-it/lib/rules_block/hr.mjs
+function hr(state3, startLine, endLine, silent) {
+  const max = state3.eMarks[startLine];
+  if (state3.sCount[startLine] - state3.blkIndent >= 4) {
+    return false;
+  }
+  let pos = state3.bMarks[startLine] + state3.tShift[startLine];
+  const marker = state3.src.charCodeAt(pos++);
+  if (marker !== 42 && marker !== 45 && marker !== 95) {
+    return false;
+  }
+  let cnt = 1;
+  while (pos < max) {
+    const ch = state3.src.charCodeAt(pos++);
+    if (ch !== marker && !isSpace(ch)) {
+      return false;
+    }
+    if (ch === marker) {
+      cnt++;
+    }
+  }
+  if (cnt < 3) {
+    return false;
+  }
+  if (silent) {
+    return true;
+  }
+  state3.line = startLine + 1;
+  const token = state3.push("hr", "hr", 0);
+  token.map = [startLine, state3.line];
+  token.markup = Array(cnt + 1).join(String.fromCharCode(marker));
+  return true;
+}
+
+// ../../../node_modules/markdown-it/lib/rules_block/list.mjs
+function skipBulletListMarker(state3, startLine) {
+  const max = state3.eMarks[startLine];
+  let pos = state3.bMarks[startLine] + state3.tShift[startLine];
+  const marker = state3.src.charCodeAt(pos++);
+  if (marker !== 42 && marker !== 45 && marker !== 43) {
+    return -1;
+  }
+  if (pos < max) {
+    const ch = state3.src.charCodeAt(pos);
+    if (!isSpace(ch)) {
+      return -1;
+    }
+  }
+  return pos;
+}
+function skipOrderedListMarker(state3, startLine) {
+  const start = state3.bMarks[startLine] + state3.tShift[startLine];
+  const max = state3.eMarks[startLine];
+  let pos = start;
+  if (pos + 1 >= max) {
+    return -1;
+  }
+  let ch = state3.src.charCodeAt(pos++);
+  if (ch < 48 || ch > 57) {
+    return -1;
+  }
+  for (; ; ) {
+    if (pos >= max) {
+      return -1;
+    }
+    ch = state3.src.charCodeAt(pos++);
+    if (ch >= 48 && ch <= 57) {
+      if (pos - start >= 10) {
+        return -1;
+      }
+      continue;
+    }
+    if (ch === 41 || ch === 46) {
+      break;
+    }
+    return -1;
+  }
+  if (pos < max) {
+    ch = state3.src.charCodeAt(pos);
+    if (!isSpace(ch)) {
+      return -1;
+    }
+  }
+  return pos;
+}
+function markTightParagraphs(state3, idx) {
+  const level = state3.level + 2;
+  for (let i = idx + 2, l = state3.tokens.length - 2; i < l; i++) {
+    if (state3.tokens[i].level === level && state3.tokens[i].type === "paragraph_open") {
+      state3.tokens[i + 2].hidden = true;
+      state3.tokens[i].hidden = true;
+      i += 2;
+    }
+  }
+}
+function list(state3, startLine, endLine, silent) {
+  let max, pos, start, token;
+  let nextLine = startLine;
+  let tight = true;
+  if (state3.sCount[nextLine] - state3.blkIndent >= 4) {
+    return false;
+  }
+  if (state3.listIndent >= 0 && state3.sCount[nextLine] - state3.listIndent >= 4 && state3.sCount[nextLine] < state3.blkIndent) {
+    return false;
+  }
+  let isTerminatingParagraph = false;
+  if (silent && state3.parentType === "paragraph") {
+    if (state3.sCount[nextLine] >= state3.blkIndent) {
+      isTerminatingParagraph = true;
+    }
+  }
+  let isOrdered;
+  let markerValue;
+  let posAfterMarker;
+  if ((posAfterMarker = skipOrderedListMarker(state3, nextLine)) >= 0) {
+    isOrdered = true;
+    start = state3.bMarks[nextLine] + state3.tShift[nextLine];
+    markerValue = Number(state3.src.slice(start, posAfterMarker - 1));
+    if (isTerminatingParagraph && markerValue !== 1) return false;
+  } else if ((posAfterMarker = skipBulletListMarker(state3, nextLine)) >= 0) {
+    isOrdered = false;
+  } else {
+    return false;
+  }
+  if (isTerminatingParagraph) {
+    if (state3.skipSpaces(posAfterMarker) >= state3.eMarks[nextLine]) return false;
+  }
+  if (silent) {
+    return true;
+  }
+  const markerCharCode = state3.src.charCodeAt(posAfterMarker - 1);
+  const listTokIdx = state3.tokens.length;
+  if (isOrdered) {
+    token = state3.push("ordered_list_open", "ol", 1);
+    if (markerValue !== 1) {
+      token.attrs = [["start", markerValue]];
+    }
+  } else {
+    token = state3.push("bullet_list_open", "ul", 1);
+  }
+  const listLines = [nextLine, 0];
+  token.map = listLines;
+  token.markup = String.fromCharCode(markerCharCode);
+  let prevEmptyEnd = false;
+  const terminatorRules = state3.md.block.ruler.getRules("list");
+  const oldParentType = state3.parentType;
+  state3.parentType = "list";
+  while (nextLine < endLine) {
+    pos = posAfterMarker;
+    max = state3.eMarks[nextLine];
+    const initial = state3.sCount[nextLine] + posAfterMarker - (state3.bMarks[nextLine] + state3.tShift[nextLine]);
+    let offset = initial;
+    while (pos < max) {
+      const ch = state3.src.charCodeAt(pos);
+      if (ch === 9) {
+        offset += 4 - (offset + state3.bsCount[nextLine]) % 4;
+      } else if (ch === 32) {
+        offset++;
+      } else {
+        break;
+      }
+      pos++;
+    }
+    const contentStart = pos;
+    let indentAfterMarker;
+    if (contentStart >= max) {
+      indentAfterMarker = 1;
+    } else {
+      indentAfterMarker = offset - initial;
+    }
+    if (indentAfterMarker > 4) {
+      indentAfterMarker = 1;
+    }
+    const indent = initial + indentAfterMarker;
+    token = state3.push("list_item_open", "li", 1);
+    token.markup = String.fromCharCode(markerCharCode);
+    const itemLines = [nextLine, 0];
+    token.map = itemLines;
+    if (isOrdered) {
+      token.info = state3.src.slice(start, posAfterMarker - 1);
+    }
+    const oldTight = state3.tight;
+    const oldTShift = state3.tShift[nextLine];
+    const oldSCount = state3.sCount[nextLine];
+    const oldListIndent = state3.listIndent;
+    state3.listIndent = state3.blkIndent;
+    state3.blkIndent = indent;
+    state3.tight = true;
+    state3.tShift[nextLine] = contentStart - state3.bMarks[nextLine];
+    state3.sCount[nextLine] = offset;
+    if (contentStart >= max && state3.isEmpty(nextLine + 1)) {
+      state3.line = Math.min(state3.line + 2, endLine);
+    } else {
+      state3.md.block.tokenize(state3, nextLine, endLine, true);
+    }
+    if (!state3.tight || prevEmptyEnd) {
+      tight = false;
+    }
+    prevEmptyEnd = state3.line - nextLine > 1 && state3.isEmpty(state3.line - 1);
+    state3.blkIndent = state3.listIndent;
+    state3.listIndent = oldListIndent;
+    state3.tShift[nextLine] = oldTShift;
+    state3.sCount[nextLine] = oldSCount;
+    state3.tight = oldTight;
+    token = state3.push("list_item_close", "li", -1);
+    token.markup = String.fromCharCode(markerCharCode);
+    nextLine = state3.line;
+    itemLines[1] = nextLine;
+    if (nextLine >= endLine) {
+      break;
+    }
+    if (state3.sCount[nextLine] < state3.blkIndent) {
+      break;
+    }
+    if (state3.sCount[nextLine] - state3.blkIndent >= 4) {
+      break;
+    }
+    let terminate = false;
+    for (let i = 0, l = terminatorRules.length; i < l; i++) {
+      if (terminatorRules[i](state3, nextLine, endLine, true)) {
+        terminate = true;
+        break;
+      }
+    }
+    if (terminate) {
+      break;
+    }
+    if (isOrdered) {
+      posAfterMarker = skipOrderedListMarker(state3, nextLine);
+      if (posAfterMarker < 0) {
+        break;
+      }
+      start = state3.bMarks[nextLine] + state3.tShift[nextLine];
+    } else {
+      posAfterMarker = skipBulletListMarker(state3, nextLine);
+      if (posAfterMarker < 0) {
+        break;
+      }
+    }
+    if (markerCharCode !== state3.src.charCodeAt(posAfterMarker - 1)) {
+      break;
+    }
+  }
+  if (isOrdered) {
+    token = state3.push("ordered_list_close", "ol", -1);
+  } else {
+    token = state3.push("bullet_list_close", "ul", -1);
+  }
+  token.markup = String.fromCharCode(markerCharCode);
+  listLines[1] = nextLine;
+  state3.line = nextLine;
+  state3.parentType = oldParentType;
+  if (tight) {
+    markTightParagraphs(state3, listTokIdx);
+  }
+  return true;
+}
+
+// ../../../node_modules/markdown-it/lib/rules_block/reference.mjs
+function reference(state3, startLine, _endLine, silent) {
+  let pos = state3.bMarks[startLine] + state3.tShift[startLine];
+  let max = state3.eMarks[startLine];
+  let nextLine = startLine + 1;
+  if (state3.sCount[startLine] - state3.blkIndent >= 4) {
+    return false;
+  }
+  if (state3.src.charCodeAt(pos) !== 91) {
+    return false;
+  }
+  function getNextLine(nextLine2) {
+    const endLine = state3.lineMax;
+    if (nextLine2 >= endLine || state3.isEmpty(nextLine2)) {
+      return null;
+    }
+    let isContinuation = false;
+    if (state3.sCount[nextLine2] - state3.blkIndent > 3) {
+      isContinuation = true;
+    }
+    if (state3.sCount[nextLine2] < 0) {
+      isContinuation = true;
+    }
+    if (!isContinuation) {
+      const terminatorRules = state3.md.block.ruler.getRules("reference");
+      const oldParentType = state3.parentType;
+      state3.parentType = "reference";
+      let terminate = false;
+      for (let i = 0, l = terminatorRules.length; i < l; i++) {
+        if (terminatorRules[i](state3, nextLine2, endLine, true)) {
+          terminate = true;
+          break;
+        }
+      }
+      state3.parentType = oldParentType;
+      if (terminate) {
+        return null;
+      }
+    }
+    const pos2 = state3.bMarks[nextLine2] + state3.tShift[nextLine2];
+    const max2 = state3.eMarks[nextLine2];
+    return state3.src.slice(pos2, max2 + 1);
+  }
+  let str = state3.src.slice(pos, max + 1);
+  max = str.length;
+  let labelEnd = -1;
+  for (pos = 1; pos < max; pos++) {
+    const ch = str.charCodeAt(pos);
+    if (ch === 91) {
+      return false;
+    } else if (ch === 93) {
+      labelEnd = pos;
+      break;
+    } else if (ch === 10) {
+      const lineContent = getNextLine(nextLine);
+      if (lineContent !== null) {
+        str += lineContent;
+        max = str.length;
+        nextLine++;
+      }
+    } else if (ch === 92) {
+      pos++;
+      if (pos < max && str.charCodeAt(pos) === 10) {
+        const lineContent = getNextLine(nextLine);
+        if (lineContent !== null) {
+          str += lineContent;
+          max = str.length;
+          nextLine++;
+        }
+      }
+    }
+  }
+  if (labelEnd < 0 || str.charCodeAt(labelEnd + 1) !== 58) {
+    return false;
+  }
+  for (pos = labelEnd + 2; pos < max; pos++) {
+    const ch = str.charCodeAt(pos);
+    if (ch === 10) {
+      const lineContent = getNextLine(nextLine);
+      if (lineContent !== null) {
+        str += lineContent;
+        max = str.length;
+        nextLine++;
+      }
+    } else if (isSpace(ch)) {
+    } else {
+      break;
+    }
+  }
+  const destRes = state3.md.helpers.parseLinkDestination(str, pos, max);
+  if (!destRes.ok) {
+    return false;
+  }
+  const href = state3.md.normalizeLink(destRes.str);
+  if (!state3.md.validateLink(href)) {
+    return false;
+  }
+  pos = destRes.pos;
+  const destEndPos = pos;
+  const destEndLineNo = nextLine;
+  const start = pos;
+  for (; pos < max; pos++) {
+    const ch = str.charCodeAt(pos);
+    if (ch === 10) {
+      const lineContent = getNextLine(nextLine);
+      if (lineContent !== null) {
+        str += lineContent;
+        max = str.length;
+        nextLine++;
+      }
+    } else if (isSpace(ch)) {
+    } else {
+      break;
+    }
+  }
+  let titleRes = state3.md.helpers.parseLinkTitle(str, pos, max);
+  while (titleRes.can_continue) {
+    const lineContent = getNextLine(nextLine);
+    if (lineContent === null) break;
+    str += lineContent;
+    pos = max;
+    max = str.length;
+    nextLine++;
+    titleRes = state3.md.helpers.parseLinkTitle(str, pos, max, titleRes);
+  }
+  let title;
+  if (pos < max && start !== pos && titleRes.ok) {
+    title = titleRes.str;
+    pos = titleRes.pos;
+  } else {
+    title = "";
+    pos = destEndPos;
+    nextLine = destEndLineNo;
+  }
+  while (pos < max) {
+    const ch = str.charCodeAt(pos);
+    if (!isSpace(ch)) {
+      break;
+    }
+    pos++;
+  }
+  if (pos < max && str.charCodeAt(pos) !== 10) {
+    if (title) {
+      title = "";
+      pos = destEndPos;
+      nextLine = destEndLineNo;
+      while (pos < max) {
+        const ch = str.charCodeAt(pos);
+        if (!isSpace(ch)) {
+          break;
+        }
+        pos++;
+      }
+    }
+  }
+  if (pos < max && str.charCodeAt(pos) !== 10) {
+    return false;
+  }
+  const label = normalizeReference(str.slice(1, labelEnd));
+  if (!label) {
+    return false;
+  }
+  if (silent) {
+    return true;
+  }
+  if (typeof state3.env.references === "undefined") {
+    state3.env.references = {};
+  }
+  if (typeof state3.env.references[label] === "undefined") {
+    state3.env.references[label] = { title, href };
+  }
+  state3.line = nextLine;
+  return true;
+}
+
+// ../../../node_modules/markdown-it/lib/common/html_blocks.mjs
+var html_blocks_default = [
+  "address",
+  "article",
+  "aside",
+  "base",
+  "basefont",
+  "blockquote",
+  "body",
+  "caption",
+  "center",
+  "col",
+  "colgroup",
+  "dd",
+  "details",
+  "dialog",
+  "dir",
+  "div",
+  "dl",
+  "dt",
+  "fieldset",
+  "figcaption",
+  "figure",
+  "footer",
+  "form",
+  "frame",
+  "frameset",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "head",
+  "header",
+  "hr",
+  "html",
+  "iframe",
+  "legend",
+  "li",
+  "link",
+  "main",
+  "menu",
+  "menuitem",
+  "nav",
+  "noframes",
+  "ol",
+  "optgroup",
+  "option",
+  "p",
+  "param",
+  "search",
+  "section",
+  "summary",
+  "table",
+  "tbody",
+  "td",
+  "tfoot",
+  "th",
+  "thead",
+  "title",
+  "tr",
+  "track",
+  "ul"
+];
+
+// ../../../node_modules/markdown-it/lib/common/html_re.mjs
+var attr_name = "[a-zA-Z_:][a-zA-Z0-9:._-]*";
+var unquoted = "[^\"'=<>`\\x00-\\x20]+";
+var single_quoted = "'[^']*'";
+var double_quoted = '"[^"]*"';
+var attr_value = "(?:" + unquoted + "|" + single_quoted + "|" + double_quoted + ")";
+var attribute = "(?:\\s+" + attr_name + "(?:\\s*=\\s*" + attr_value + ")?)";
+var open_tag = "<[A-Za-z][A-Za-z0-9\\-]*" + attribute + "*\\s*\\/?>";
+var close_tag = "<\\/[A-Za-z][A-Za-z0-9\\-]*\\s*>";
+var comment2 = "<!---?>|<!--(?:[^-]|-[^-]|--[^>])*-->";
+var processing = "<[?][\\s\\S]*?[?]>";
+var declaration = "<![A-Za-z][^>]*>";
+var cdata = "<!\\[CDATA\\[[\\s\\S]*?\\]\\]>";
+var HTML_TAG_RE = new RegExp("^(?:" + open_tag + "|" + close_tag + "|" + comment2 + "|" + processing + "|" + declaration + "|" + cdata + ")");
+var HTML_OPEN_CLOSE_TAG_RE = new RegExp("^(?:" + open_tag + "|" + close_tag + ")");
+
+// ../../../node_modules/markdown-it/lib/rules_block/html_block.mjs
+var HTML_SEQUENCES = [
+  [/^<(script|pre|style|textarea)(?=(\s|>|$))/i, /<\/(script|pre|style|textarea)>/i, true],
+  [/^<!--/, /-->/, true],
+  [/^<\?/, /\?>/, true],
+  [/^<![A-Z]/, />/, true],
+  [/^<!\[CDATA\[/, /\]\]>/, true],
+  [new RegExp("^</?(" + html_blocks_default.join("|") + ")(?=(\\s|/?>|$))", "i"), /^$/, true],
+  [new RegExp(HTML_OPEN_CLOSE_TAG_RE.source + "\\s*$"), /^$/, false]
+];
+function html_block(state3, startLine, endLine, silent) {
+  let pos = state3.bMarks[startLine] + state3.tShift[startLine];
+  let max = state3.eMarks[startLine];
+  if (state3.sCount[startLine] - state3.blkIndent >= 4) {
+    return false;
+  }
+  if (!state3.md.options.html) {
+    return false;
+  }
+  if (state3.src.charCodeAt(pos) !== 60) {
+    return false;
+  }
+  let lineText = state3.src.slice(pos, max);
+  let i = 0;
+  for (; i < HTML_SEQUENCES.length; i++) {
+    if (HTML_SEQUENCES[i][0].test(lineText)) {
+      break;
+    }
+  }
+  if (i === HTML_SEQUENCES.length) {
+    return false;
+  }
+  if (silent) {
+    return HTML_SEQUENCES[i][2];
+  }
+  let nextLine = startLine + 1;
+  const endsOnBlankLine = HTML_SEQUENCES[i][1].test("");
+  if (!HTML_SEQUENCES[i][1].test(lineText)) {
+    for (; nextLine < endLine; nextLine++) {
+      if (state3.sCount[nextLine] < state3.blkIndent) {
+        if (endsOnBlankLine || !state3.isEmpty(nextLine)) {
+          break;
+        }
+      }
+      pos = state3.bMarks[nextLine] + state3.tShift[nextLine];
+      max = state3.eMarks[nextLine];
+      lineText = state3.src.slice(pos, max);
+      if (HTML_SEQUENCES[i][1].test(lineText)) {
+        if (lineText.length !== 0) {
+          nextLine++;
+        }
+        break;
+      }
+    }
+  }
+  state3.line = nextLine;
+  const token = state3.push("html_block", "", 0);
+  token.map = [startLine, nextLine];
+  token.content = state3.getLines(startLine, nextLine, state3.blkIndent, true);
+  return true;
+}
+
+// ../../../node_modules/markdown-it/lib/rules_block/heading.mjs
+function heading(state3, startLine, endLine, silent) {
+  let pos = state3.bMarks[startLine] + state3.tShift[startLine];
+  let max = state3.eMarks[startLine];
+  if (state3.sCount[startLine] - state3.blkIndent >= 4) {
+    return false;
+  }
+  let ch = state3.src.charCodeAt(pos);
+  if (ch !== 35 || pos >= max) {
+    return false;
+  }
+  let level = 1;
+  ch = state3.src.charCodeAt(++pos);
+  while (ch === 35 && pos < max && level <= 6) {
+    level++;
+    ch = state3.src.charCodeAt(++pos);
+  }
+  if (level > 6 || pos < max && !isSpace(ch)) {
+    return false;
+  }
+  if (silent) {
+    return true;
+  }
+  max = state3.skipSpacesBack(max, pos);
+  const tmp = state3.skipCharsBack(max, 35, pos);
+  if (tmp > pos && isSpace(state3.src.charCodeAt(tmp - 1))) {
+    max = tmp;
+  }
+  state3.line = startLine + 1;
+  const token_o = state3.push("heading_open", "h" + String(level), 1);
+  token_o.markup = "########".slice(0, level);
+  token_o.map = [startLine, state3.line];
+  const token_i = state3.push("inline", "", 0);
+  token_i.content = asciiTrim(state3.src.slice(pos, max));
+  token_i.map = [startLine, state3.line];
+  token_i.children = [];
+  const token_c = state3.push("heading_close", "h" + String(level), -1);
+  token_c.markup = "########".slice(0, level);
+  return true;
+}
+
+// ../../../node_modules/markdown-it/lib/rules_block/lheading.mjs
+function lheading(state3, startLine, endLine) {
+  const terminatorRules = state3.md.block.ruler.getRules("paragraph");
+  if (state3.sCount[startLine] - state3.blkIndent >= 4) {
+    return false;
+  }
+  const oldParentType = state3.parentType;
+  state3.parentType = "paragraph";
+  let level = 0;
+  let marker;
+  let nextLine = startLine + 1;
+  for (; nextLine < endLine && !state3.isEmpty(nextLine); nextLine++) {
+    if (state3.sCount[nextLine] - state3.blkIndent > 3) {
+      continue;
+    }
+    if (state3.sCount[nextLine] >= state3.blkIndent) {
+      let pos = state3.bMarks[nextLine] + state3.tShift[nextLine];
+      const max = state3.eMarks[nextLine];
+      if (pos < max) {
+        marker = state3.src.charCodeAt(pos);
+        if (marker === 45 || marker === 61) {
+          pos = state3.skipChars(pos, marker);
+          pos = state3.skipSpaces(pos);
+          if (pos >= max) {
+            level = marker === 61 ? 1 : 2;
+            break;
+          }
+        }
+      }
+    }
+    if (state3.sCount[nextLine] < 0) {
+      continue;
+    }
+    let terminate = false;
+    for (let i = 0, l = terminatorRules.length; i < l; i++) {
+      if (terminatorRules[i](state3, nextLine, endLine, true)) {
+        terminate = true;
+        break;
+      }
+    }
+    if (terminate) {
+      break;
+    }
+  }
+  if (!level) {
+    state3.parentType = oldParentType;
+    return false;
+  }
+  const content = asciiTrim(state3.getLines(startLine, nextLine, state3.blkIndent, false));
+  state3.line = nextLine + 1;
+  const token_o = state3.push("heading_open", "h" + String(level), 1);
+  token_o.markup = String.fromCharCode(marker);
+  token_o.map = [startLine, state3.line];
+  const token_i = state3.push("inline", "", 0);
+  token_i.content = content;
+  token_i.map = [startLine, state3.line - 1];
+  token_i.children = [];
+  const token_c = state3.push("heading_close", "h" + String(level), -1);
+  token_c.markup = String.fromCharCode(marker);
+  state3.parentType = oldParentType;
+  return true;
+}
+
+// ../../../node_modules/markdown-it/lib/rules_block/paragraph.mjs
+function paragraph(state3, startLine, endLine) {
+  const terminatorRules = state3.md.block.ruler.getRules("paragraph");
+  const oldParentType = state3.parentType;
+  let nextLine = startLine + 1;
+  state3.parentType = "paragraph";
+  for (; nextLine < endLine && !state3.isEmpty(nextLine); nextLine++) {
+    if (state3.sCount[nextLine] - state3.blkIndent > 3) {
+      continue;
+    }
+    if (state3.sCount[nextLine] < 0) {
+      continue;
+    }
+    let terminate = false;
+    for (let i = 0, l = terminatorRules.length; i < l; i++) {
+      if (terminatorRules[i](state3, nextLine, endLine, true)) {
+        terminate = true;
+        break;
+      }
+    }
+    if (terminate) {
+      break;
+    }
+  }
+  const content = asciiTrim(state3.getLines(startLine, nextLine, state3.blkIndent, false));
+  state3.line = nextLine;
+  const token_o = state3.push("paragraph_open", "p", 1);
+  token_o.map = [startLine, state3.line];
+  const token_i = state3.push("inline", "", 0);
+  token_i.content = content;
+  token_i.map = [startLine, state3.line];
+  token_i.children = [];
+  state3.push("paragraph_close", "p", -1);
+  state3.parentType = oldParentType;
+  return true;
+}
+
+// ../../../node_modules/markdown-it/lib/parser_block.mjs
+var _rules2 = [
+  // First 2 params - rule name & source. Secondary array - list of rules,
+  // which can be terminated by this one.
+  ["table", table, ["paragraph", "reference"]],
+  ["code", code],
+  ["fence", fence, ["paragraph", "reference", "blockquote", "list"]],
+  ["blockquote", blockquote, ["paragraph", "reference", "blockquote", "list"]],
+  ["hr", hr, ["paragraph", "reference", "blockquote", "list"]],
+  ["list", list, ["paragraph", "reference", "blockquote"]],
+  ["reference", reference],
+  ["html_block", html_block, ["paragraph", "reference", "blockquote"]],
+  ["heading", heading, ["paragraph", "reference", "blockquote"]],
+  ["lheading", lheading],
+  ["paragraph", paragraph]
+];
+function ParserBlock() {
+  this.ruler = new ruler_default();
+  for (let i = 0; i < _rules2.length; i++) {
+    this.ruler.push(_rules2[i][0], _rules2[i][1], { alt: (_rules2[i][2] || []).slice() });
+  }
+}
+ParserBlock.prototype.tokenize = function(state3, startLine, endLine) {
+  const rules = this.ruler.getRules("");
+  const len = rules.length;
+  const maxNesting = state3.md.options.maxNesting;
+  let line = startLine;
+  let hasEmptyLines = false;
+  while (line < endLine) {
+    state3.line = line = state3.skipEmptyLines(line);
+    if (line >= endLine) {
+      break;
+    }
+    if (state3.sCount[line] < state3.blkIndent) {
+      break;
+    }
+    if (state3.level >= maxNesting) {
+      state3.line = endLine;
+      break;
+    }
+    const prevLine = state3.line;
+    let ok = false;
+    for (let i = 0; i < len; i++) {
+      ok = rules[i](state3, line, endLine, false);
+      if (ok) {
+        if (prevLine >= state3.line) {
+          throw new Error("block rule didn't increment state.line");
+        }
+        break;
+      }
+    }
+    if (!ok) throw new Error("none of the block rules matched");
+    state3.tight = !hasEmptyLines;
+    if (state3.isEmpty(state3.line - 1)) {
+      hasEmptyLines = true;
+    }
+    line = state3.line;
+    if (line < endLine && state3.isEmpty(line)) {
+      hasEmptyLines = true;
+      line++;
+      state3.line = line;
+    }
+  }
+};
+ParserBlock.prototype.parse = function(src, md, env, outTokens) {
+  if (!src) {
+    return;
+  }
+  const state3 = new this.State(src, md, env, outTokens);
+  this.tokenize(state3, state3.line, state3.lineMax);
+};
+ParserBlock.prototype.State = state_block_default;
+var parser_block_default = ParserBlock;
+
+// ../../../node_modules/markdown-it/lib/rules_inline/state_inline.mjs
+function StateInline(src, md, env, outTokens) {
+  this.src = src;
+  this.env = env;
+  this.md = md;
+  this.tokens = outTokens;
+  this.tokens_meta = Array(outTokens.length);
+  this.pos = 0;
+  this.posMax = this.src.length;
+  this.level = 0;
+  this.pending = "";
+  this.pendingLevel = 0;
+  this.cache = {};
+  this.delimiters = [];
+  this._prev_delimiters = [];
+  this.backticks = {};
+  this.backticksScanned = false;
+  this.linkLevel = 0;
+}
+StateInline.prototype.pushPending = function() {
+  const token = new token_default("text", "", 0);
+  token.content = this.pending;
+  token.level = this.pendingLevel;
+  this.tokens.push(token);
+  this.pending = "";
+  return token;
+};
+StateInline.prototype.push = function(type, tag2, nesting) {
+  if (this.pending) {
+    this.pushPending();
+  }
+  const token = new token_default(type, tag2, nesting);
+  let token_meta = null;
+  if (nesting < 0) {
+    this.level--;
+    this.delimiters = this._prev_delimiters.pop();
+  }
+  token.level = this.level;
+  if (nesting > 0) {
+    this.level++;
+    this._prev_delimiters.push(this.delimiters);
+    this.delimiters = [];
+    token_meta = { delimiters: this.delimiters };
+  }
+  this.pendingLevel = this.level;
+  this.tokens.push(token);
+  this.tokens_meta.push(token_meta);
+  return token;
+};
+StateInline.prototype.scanDelims = function(start, canSplitWord) {
+  const max = this.posMax;
+  const marker = this.src.charCodeAt(start);
+  let lastChar;
+  if (start === 0) {
+    lastChar = 32;
+  } else if (start === 1) {
+    lastChar = this.src.charCodeAt(0);
+    if ((lastChar & 63488) === 55296) {
+      lastChar = 65533;
+    }
+  } else {
+    lastChar = this.src.charCodeAt(start - 1);
+    if ((lastChar & 64512) === 56320) {
+      const highSurr = this.src.charCodeAt(start - 2);
+      lastChar = (highSurr & 64512) === 55296 ? 65536 + (highSurr - 55296 << 10) + (lastChar - 56320) : 65533;
+    } else if ((lastChar & 64512) === 55296) {
+      lastChar = 65533;
+    }
+  }
+  let pos = start;
+  while (pos < max && this.src.charCodeAt(pos) === marker) {
+    pos++;
+  }
+  const count = pos - start;
+  let nextChar = pos < max ? this.src.charCodeAt(pos) : 32;
+  if ((nextChar & 64512) === 55296) {
+    const lowSurr = this.src.charCodeAt(pos + 1);
+    nextChar = (lowSurr & 64512) === 56320 ? 65536 + (nextChar - 55296 << 10) + (lowSurr - 56320) : 65533;
+  } else if ((nextChar & 64512) === 56320) {
+    nextChar = 65533;
+  }
+  const isLastPunctChar = isMdAsciiPunct(lastChar) || isPunctCharCode(lastChar);
+  const isNextPunctChar = isMdAsciiPunct(nextChar) || isPunctCharCode(nextChar);
+  const isLastWhiteSpace = isWhiteSpace(lastChar);
+  const isNextWhiteSpace = isWhiteSpace(nextChar);
+  const left_flanking = !isNextWhiteSpace && (!isNextPunctChar || isLastWhiteSpace || isLastPunctChar);
+  const right_flanking = !isLastWhiteSpace && (!isLastPunctChar || isNextWhiteSpace || isNextPunctChar);
+  const can_open = left_flanking && (canSplitWord || !right_flanking || isLastPunctChar);
+  const can_close = right_flanking && (canSplitWord || !left_flanking || isNextPunctChar);
+  return { can_open, can_close, length: count };
+};
+StateInline.prototype.Token = token_default;
+var state_inline_default = StateInline;
+
+// ../../../node_modules/markdown-it/lib/rules_inline/text.mjs
+function isTerminatorChar(ch) {
+  switch (ch) {
+    case 10:
+    case 33:
+    case 35:
+    case 36:
+    case 37:
+    case 38:
+    case 42:
+    case 43:
+    case 45:
+    case 58:
+    case 60:
+    case 61:
+    case 62:
+    case 64:
+    case 91:
+    case 92:
+    case 93:
+    case 94:
+    case 95:
+    case 96:
+    case 123:
+    case 125:
+    case 126:
+      return true;
+    default:
+      return false;
+  }
+}
+function text2(state3, silent) {
+  let pos = state3.pos;
+  while (pos < state3.posMax && !isTerminatorChar(state3.src.charCodeAt(pos))) {
+    pos++;
+  }
+  if (pos === state3.pos) {
+    return false;
+  }
+  if (!silent) {
+    state3.pending += state3.src.slice(state3.pos, pos);
+  }
+  state3.pos = pos;
+  return true;
+}
+
+// ../../../node_modules/markdown-it/lib/rules_inline/linkify.mjs
+var SCHEME_RE = /(?:^|[^a-z0-9.+-])([a-z][a-z0-9.+-]*)$/i;
+function linkify2(state3, silent) {
+  if (!state3.md.options.linkify) return false;
+  if (state3.linkLevel > 0) return false;
+  const pos = state3.pos;
+  const max = state3.posMax;
+  if (pos + 3 > max) return false;
+  if (state3.src.charCodeAt(pos) !== 58) return false;
+  if (state3.src.charCodeAt(pos + 1) !== 47) return false;
+  if (state3.src.charCodeAt(pos + 2) !== 47) return false;
+  const match2 = state3.pending.match(SCHEME_RE);
+  if (!match2) return false;
+  const proto = match2[1];
+  const link3 = state3.md.linkify.matchAtStart(state3.src.slice(pos - proto.length));
+  if (!link3) return false;
+  let url = link3.url;
+  if (url.length <= proto.length) return false;
+  let urlEnd = url.length;
+  while (urlEnd > 0 && url.charCodeAt(urlEnd - 1) === 42) {
+    urlEnd--;
+  }
+  if (urlEnd !== url.length) {
+    url = url.slice(0, urlEnd);
+  }
+  const fullUrl = state3.md.normalizeLink(url);
+  if (!state3.md.validateLink(fullUrl)) return false;
+  if (!silent) {
+    state3.pending = state3.pending.slice(0, -proto.length);
+    const token_o = state3.push("link_open", "a", 1);
+    token_o.attrs = [["href", fullUrl]];
+    token_o.markup = "linkify";
+    token_o.info = "auto";
+    const token_t = state3.push("text", "", 0);
+    token_t.content = state3.md.normalizeLinkText(url);
+    const token_c = state3.push("link_close", "a", -1);
+    token_c.markup = "linkify";
+    token_c.info = "auto";
+  }
+  state3.pos += url.length - proto.length;
+  return true;
+}
+
+// ../../../node_modules/markdown-it/lib/rules_inline/newline.mjs
+function newline(state3, silent) {
+  let pos = state3.pos;
+  if (state3.src.charCodeAt(pos) !== 10) {
+    return false;
+  }
+  const pmax = state3.pending.length - 1;
+  const max = state3.posMax;
+  if (!silent) {
+    if (pmax >= 0 && state3.pending.charCodeAt(pmax) === 32) {
+      if (pmax >= 1 && state3.pending.charCodeAt(pmax - 1) === 32) {
+        let ws2 = pmax - 1;
+        while (ws2 >= 1 && state3.pending.charCodeAt(ws2 - 1) === 32) ws2--;
+        state3.pending = state3.pending.slice(0, ws2);
+        state3.push("hardbreak", "br", 0);
+      } else {
+        state3.pending = state3.pending.slice(0, -1);
+        state3.push("softbreak", "br", 0);
+      }
+    } else {
+      state3.push("softbreak", "br", 0);
+    }
+  }
+  pos++;
+  while (pos < max && isSpace(state3.src.charCodeAt(pos))) {
+    pos++;
+  }
+  state3.pos = pos;
+  return true;
+}
+
+// ../../../node_modules/markdown-it/lib/rules_inline/escape.mjs
+var ESCAPED = [];
+for (let i = 0; i < 256; i++) {
+  ESCAPED.push(0);
+}
+"\\!\"#$%&'()*+,./:;<=>?@[]^_`{|}~-".split("").forEach(function(ch) {
+  ESCAPED[ch.charCodeAt(0)] = 1;
+});
+function escape2(state3, silent) {
+  let pos = state3.pos;
+  const max = state3.posMax;
+  if (state3.src.charCodeAt(pos) !== 92) return false;
+  pos++;
+  if (pos >= max) return false;
+  let ch1 = state3.src.charCodeAt(pos);
+  if (ch1 === 10) {
+    if (!silent) {
+      state3.push("hardbreak", "br", 0);
+    }
+    pos++;
+    while (pos < max) {
+      ch1 = state3.src.charCodeAt(pos);
+      if (!isSpace(ch1)) break;
+      pos++;
+    }
+    state3.pos = pos;
+    return true;
+  }
+  let escapedStr = state3.src[pos];
+  if (ch1 >= 55296 && ch1 <= 56319 && pos + 1 < max) {
+    const ch2 = state3.src.charCodeAt(pos + 1);
+    if (ch2 >= 56320 && ch2 <= 57343) {
+      escapedStr += state3.src[pos + 1];
+      pos++;
+    }
+  }
+  const origStr = "\\" + escapedStr;
+  if (!silent) {
+    const token = state3.push("text_special", "", 0);
+    if (ch1 < 256 && ESCAPED[ch1] !== 0) {
+      token.content = escapedStr;
+    } else {
+      token.content = origStr;
+    }
+    token.markup = origStr;
+    token.info = "escape";
+  }
+  state3.pos = pos + 1;
+  return true;
+}
+
+// ../../../node_modules/markdown-it/lib/rules_inline/backticks.mjs
+function backtick(state3, silent) {
+  let pos = state3.pos;
+  const ch = state3.src.charCodeAt(pos);
+  if (ch !== 96) {
+    return false;
+  }
+  const start = pos;
+  pos++;
+  const max = state3.posMax;
+  while (pos < max && state3.src.charCodeAt(pos) === 96) {
+    pos++;
+  }
+  const marker = state3.src.slice(start, pos);
+  const openerLength = marker.length;
+  if (state3.backticksScanned && (state3.backticks[openerLength] || 0) <= start) {
+    if (!silent) state3.pending += marker;
+    state3.pos += openerLength;
+    return true;
+  }
+  let matchEnd = pos;
+  let matchStart;
+  while ((matchStart = state3.src.indexOf("`", matchEnd)) !== -1) {
+    matchEnd = matchStart + 1;
+    while (matchEnd < max && state3.src.charCodeAt(matchEnd) === 96) {
+      matchEnd++;
+    }
+    const closerLength = matchEnd - matchStart;
+    if (closerLength === openerLength) {
+      if (!silent) {
+        const token = state3.push("code_inline", "code", 0);
+        token.markup = marker;
+        token.content = state3.src.slice(pos, matchStart).replace(/\n/g, " ").replace(/^ (.+) $/, "$1");
+      }
+      state3.pos = matchEnd;
+      return true;
+    }
+    state3.backticks[closerLength] = matchStart;
+  }
+  state3.backticksScanned = true;
+  if (!silent) state3.pending += marker;
+  state3.pos += openerLength;
+  return true;
+}
+
+// ../../../node_modules/markdown-it/lib/rules_inline/strikethrough.mjs
+function strikethrough_tokenize(state3, silent) {
+  const start = state3.pos;
+  const marker = state3.src.charCodeAt(start);
+  if (silent) {
+    return false;
+  }
+  if (marker !== 126) {
+    return false;
+  }
+  const scanned = state3.scanDelims(state3.pos, true);
+  let len = scanned.length;
+  const ch = String.fromCharCode(marker);
+  if (len < 2) {
+    return false;
+  }
+  let token;
+  if (len % 2) {
+    token = state3.push("text", "", 0);
+    token.content = ch;
+    len--;
+  }
+  for (let i = 0; i < len; i += 2) {
+    token = state3.push("text", "", 0);
+    token.content = ch + ch;
+    state3.delimiters.push({
+      marker,
+      length: 0,
+      // disable "rule of 3" length checks meant for emphasis
+      token: state3.tokens.length - 1,
+      end: -1,
+      open: scanned.can_open,
+      close: scanned.can_close
+    });
+  }
+  state3.pos += scanned.length;
+  return true;
+}
+function postProcess(state3, delimiters) {
+  let token;
+  const loneMarkers = [];
+  const max = delimiters.length;
+  for (let i = 0; i < max; i++) {
+    const startDelim = delimiters[i];
+    if (startDelim.marker !== 126) {
+      continue;
+    }
+    if (startDelim.end === -1) {
+      continue;
+    }
+    const endDelim = delimiters[startDelim.end];
+    token = state3.tokens[startDelim.token];
+    token.type = "s_open";
+    token.tag = "s";
+    token.nesting = 1;
+    token.markup = "~~";
+    token.content = "";
+    token = state3.tokens[endDelim.token];
+    token.type = "s_close";
+    token.tag = "s";
+    token.nesting = -1;
+    token.markup = "~~";
+    token.content = "";
+    if (state3.tokens[endDelim.token - 1].type === "text" && state3.tokens[endDelim.token - 1].content === "~") {
+      loneMarkers.push(endDelim.token - 1);
+    }
+  }
+  while (loneMarkers.length) {
+    const i = loneMarkers.pop();
+    let j = i + 1;
+    while (j < state3.tokens.length && state3.tokens[j].type === "s_close") {
+      j++;
+    }
+    j--;
+    if (i !== j) {
+      token = state3.tokens[j];
+      state3.tokens[j] = state3.tokens[i];
+      state3.tokens[i] = token;
+    }
+  }
+}
+function strikethrough_postProcess(state3) {
+  const tokens_meta = state3.tokens_meta;
+  const max = state3.tokens_meta.length;
+  postProcess(state3, state3.delimiters);
+  for (let curr = 0; curr < max; curr++) {
+    if (tokens_meta[curr] && tokens_meta[curr].delimiters) {
+      postProcess(state3, tokens_meta[curr].delimiters);
+    }
+  }
+}
+var strikethrough_default = {
+  tokenize: strikethrough_tokenize,
+  postProcess: strikethrough_postProcess
+};
+
+// ../../../node_modules/markdown-it/lib/rules_inline/emphasis.mjs
+function emphasis_tokenize(state3, silent) {
+  const start = state3.pos;
+  const marker = state3.src.charCodeAt(start);
+  if (silent) {
+    return false;
+  }
+  if (marker !== 95 && marker !== 42) {
+    return false;
+  }
+  const scanned = state3.scanDelims(state3.pos, marker === 42);
+  for (let i = 0; i < scanned.length; i++) {
+    const token = state3.push("text", "", 0);
+    token.content = String.fromCharCode(marker);
+    state3.delimiters.push({
+      // Char code of the starting marker (number).
+      //
+      marker,
+      // Total length of these series of delimiters.
+      //
+      length: scanned.length,
+      // A position of the token this delimiter corresponds to.
+      //
+      token: state3.tokens.length - 1,
+      // If this delimiter is matched as a valid opener, `end` will be
+      // equal to its position, otherwise it's `-1`.
+      //
+      end: -1,
+      // Boolean flags that determine if this delimiter could open or close
+      // an emphasis.
+      //
+      open: scanned.can_open,
+      close: scanned.can_close
+    });
+  }
+  state3.pos += scanned.length;
+  return true;
+}
+function postProcess2(state3, delimiters) {
+  const max = delimiters.length;
+  for (let i = max - 1; i >= 0; i--) {
+    const startDelim = delimiters[i];
+    if (startDelim.marker !== 95 && startDelim.marker !== 42) {
+      continue;
+    }
+    if (startDelim.end === -1) {
+      continue;
+    }
+    const endDelim = delimiters[startDelim.end];
+    const isStrong = i > 0 && delimiters[i - 1].end === startDelim.end + 1 && // check that first two markers match and adjacent
+    delimiters[i - 1].marker === startDelim.marker && delimiters[i - 1].token === startDelim.token - 1 && // check that last two markers are adjacent (we can safely assume they match)
+    delimiters[startDelim.end + 1].token === endDelim.token + 1;
+    const ch = String.fromCharCode(startDelim.marker);
+    const token_o = state3.tokens[startDelim.token];
+    token_o.type = isStrong ? "strong_open" : "em_open";
+    token_o.tag = isStrong ? "strong" : "em";
+    token_o.nesting = 1;
+    token_o.markup = isStrong ? ch + ch : ch;
+    token_o.content = "";
+    const token_c = state3.tokens[endDelim.token];
+    token_c.type = isStrong ? "strong_close" : "em_close";
+    token_c.tag = isStrong ? "strong" : "em";
+    token_c.nesting = -1;
+    token_c.markup = isStrong ? ch + ch : ch;
+    token_c.content = "";
+    if (isStrong) {
+      state3.tokens[delimiters[i - 1].token].content = "";
+      state3.tokens[delimiters[startDelim.end + 1].token].content = "";
+      i--;
+    }
+  }
+}
+function emphasis_post_process(state3) {
+  const tokens_meta = state3.tokens_meta;
+  const max = state3.tokens_meta.length;
+  postProcess2(state3, state3.delimiters);
+  for (let curr = 0; curr < max; curr++) {
+    if (tokens_meta[curr] && tokens_meta[curr].delimiters) {
+      postProcess2(state3, tokens_meta[curr].delimiters);
+    }
+  }
+}
+var emphasis_default = {
+  tokenize: emphasis_tokenize,
+  postProcess: emphasis_post_process
+};
+
+// ../../../node_modules/markdown-it/lib/rules_inline/link.mjs
+function link2(state3, silent) {
+  let code2, label, res, ref;
+  let href = "";
+  let title = "";
+  let start = state3.pos;
+  let parseReference = true;
+  if (state3.src.charCodeAt(state3.pos) !== 91) {
+    return false;
+  }
+  const oldPos = state3.pos;
+  const max = state3.posMax;
+  const labelStart = state3.pos + 1;
+  const labelEnd = state3.md.helpers.parseLinkLabel(state3, state3.pos, true);
+  if (labelEnd < 0) {
+    return false;
+  }
+  let pos = labelEnd + 1;
+  if (pos < max && state3.src.charCodeAt(pos) === 40) {
+    parseReference = false;
+    pos++;
+    for (; pos < max; pos++) {
+      code2 = state3.src.charCodeAt(pos);
+      if (!isSpace(code2) && code2 !== 10) {
+        break;
+      }
+    }
+    if (pos >= max) {
+      return false;
+    }
+    start = pos;
+    res = state3.md.helpers.parseLinkDestination(state3.src, pos, state3.posMax);
+    if (res.ok) {
+      href = state3.md.normalizeLink(res.str);
+      if (state3.md.validateLink(href)) {
+        pos = res.pos;
+      } else {
+        href = "";
+      }
+      start = pos;
+      for (; pos < max; pos++) {
+        code2 = state3.src.charCodeAt(pos);
+        if (!isSpace(code2) && code2 !== 10) {
+          break;
+        }
+      }
+      res = state3.md.helpers.parseLinkTitle(state3.src, pos, state3.posMax);
+      if (pos < max && start !== pos && res.ok) {
+        title = res.str;
+        pos = res.pos;
+        for (; pos < max; pos++) {
+          code2 = state3.src.charCodeAt(pos);
+          if (!isSpace(code2) && code2 !== 10) {
+            break;
+          }
+        }
+      }
+    }
+    if (pos >= max || state3.src.charCodeAt(pos) !== 41) {
+      parseReference = true;
+    }
+    pos++;
+  }
+  if (parseReference) {
+    if (typeof state3.env.references === "undefined") {
+      return false;
+    }
+    if (pos < max && state3.src.charCodeAt(pos) === 91) {
+      start = pos + 1;
+      pos = state3.md.helpers.parseLinkLabel(state3, pos);
+      if (pos >= 0) {
+        label = state3.src.slice(start, pos++);
+      } else {
+        pos = labelEnd + 1;
+      }
+    } else {
+      pos = labelEnd + 1;
+    }
+    if (!label) {
+      label = state3.src.slice(labelStart, labelEnd);
+    }
+    ref = state3.env.references[normalizeReference(label)];
+    if (!ref) {
+      state3.pos = oldPos;
+      return false;
+    }
+    href = ref.href;
+    title = ref.title;
+  }
+  if (!silent) {
+    state3.pos = labelStart;
+    state3.posMax = labelEnd;
+    const token_o = state3.push("link_open", "a", 1);
+    const attrs = [["href", href]];
+    token_o.attrs = attrs;
+    if (title) {
+      attrs.push(["title", title]);
+    }
+    state3.linkLevel++;
+    state3.md.inline.tokenize(state3);
+    state3.linkLevel--;
+    state3.push("link_close", "a", -1);
+  }
+  state3.pos = pos;
+  state3.posMax = max;
+  return true;
+}
+
+// ../../../node_modules/markdown-it/lib/rules_inline/image.mjs
+function image(state3, silent) {
+  let code2, content, label, pos, ref, res, title, start;
+  let href = "";
+  const oldPos = state3.pos;
+  const max = state3.posMax;
+  if (state3.src.charCodeAt(state3.pos) !== 33) {
+    return false;
+  }
+  if (state3.src.charCodeAt(state3.pos + 1) !== 91) {
+    return false;
+  }
+  const labelStart = state3.pos + 2;
+  const labelEnd = state3.md.helpers.parseLinkLabel(state3, state3.pos + 1, false);
+  if (labelEnd < 0) {
+    return false;
+  }
+  pos = labelEnd + 1;
+  if (pos < max && state3.src.charCodeAt(pos) === 40) {
+    pos++;
+    for (; pos < max; pos++) {
+      code2 = state3.src.charCodeAt(pos);
+      if (!isSpace(code2) && code2 !== 10) {
+        break;
+      }
+    }
+    if (pos >= max) {
+      return false;
+    }
+    start = pos;
+    res = state3.md.helpers.parseLinkDestination(state3.src, pos, state3.posMax);
+    if (res.ok) {
+      href = state3.md.normalizeLink(res.str);
+      if (state3.md.validateLink(href)) {
+        pos = res.pos;
+      } else {
+        href = "";
+      }
+    }
+    start = pos;
+    for (; pos < max; pos++) {
+      code2 = state3.src.charCodeAt(pos);
+      if (!isSpace(code2) && code2 !== 10) {
+        break;
+      }
+    }
+    res = state3.md.helpers.parseLinkTitle(state3.src, pos, state3.posMax);
+    if (pos < max && start !== pos && res.ok) {
+      title = res.str;
+      pos = res.pos;
+      for (; pos < max; pos++) {
+        code2 = state3.src.charCodeAt(pos);
+        if (!isSpace(code2) && code2 !== 10) {
+          break;
+        }
+      }
+    } else {
+      title = "";
+    }
+    if (pos >= max || state3.src.charCodeAt(pos) !== 41) {
+      state3.pos = oldPos;
+      return false;
+    }
+    pos++;
+  } else {
+    if (typeof state3.env.references === "undefined") {
+      return false;
+    }
+    if (pos < max && state3.src.charCodeAt(pos) === 91) {
+      start = pos + 1;
+      pos = state3.md.helpers.parseLinkLabel(state3, pos);
+      if (pos >= 0) {
+        label = state3.src.slice(start, pos++);
+      } else {
+        pos = labelEnd + 1;
+      }
+    } else {
+      pos = labelEnd + 1;
+    }
+    if (!label) {
+      label = state3.src.slice(labelStart, labelEnd);
+    }
+    ref = state3.env.references[normalizeReference(label)];
+    if (!ref) {
+      state3.pos = oldPos;
+      return false;
+    }
+    href = ref.href;
+    title = ref.title;
+  }
+  if (!silent) {
+    content = state3.src.slice(labelStart, labelEnd);
+    const tokens = [];
+    state3.md.inline.parse(
+      content,
+      state3.md,
+      state3.env,
+      tokens
+    );
+    const token = state3.push("image", "img", 0);
+    const attrs = [["src", href], ["alt", ""]];
+    token.attrs = attrs;
+    token.children = tokens;
+    token.content = content;
+    if (title) {
+      attrs.push(["title", title]);
+    }
+  }
+  state3.pos = pos;
+  state3.posMax = max;
+  return true;
+}
+
+// ../../../node_modules/markdown-it/lib/rules_inline/autolink.mjs
+var EMAIL_RE = /^([a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)$/;
+var AUTOLINK_RE = /^([a-zA-Z][a-zA-Z0-9+.-]{1,31}):([^<>\x00-\x20]*)$/;
+function autolink(state3, silent) {
+  let pos = state3.pos;
+  if (state3.src.charCodeAt(pos) !== 60) {
+    return false;
+  }
+  const start = state3.pos;
+  const max = state3.posMax;
+  for (; ; ) {
+    if (++pos >= max) return false;
+    const ch = state3.src.charCodeAt(pos);
+    if (ch === 60) return false;
+    if (ch === 62) break;
+  }
+  const url = state3.src.slice(start + 1, pos);
+  if (AUTOLINK_RE.test(url)) {
+    const fullUrl = state3.md.normalizeLink(url);
+    if (!state3.md.validateLink(fullUrl)) {
+      return false;
+    }
+    if (!silent) {
+      const token_o = state3.push("link_open", "a", 1);
+      token_o.attrs = [["href", fullUrl]];
+      token_o.markup = "autolink";
+      token_o.info = "auto";
+      const token_t = state3.push("text", "", 0);
+      token_t.content = state3.md.normalizeLinkText(url);
+      const token_c = state3.push("link_close", "a", -1);
+      token_c.markup = "autolink";
+      token_c.info = "auto";
+    }
+    state3.pos += url.length + 2;
+    return true;
+  }
+  if (EMAIL_RE.test(url)) {
+    const fullUrl = state3.md.normalizeLink("mailto:" + url);
+    if (!state3.md.validateLink(fullUrl)) {
+      return false;
+    }
+    if (!silent) {
+      const token_o = state3.push("link_open", "a", 1);
+      token_o.attrs = [["href", fullUrl]];
+      token_o.markup = "autolink";
+      token_o.info = "auto";
+      const token_t = state3.push("text", "", 0);
+      token_t.content = state3.md.normalizeLinkText(url);
+      const token_c = state3.push("link_close", "a", -1);
+      token_c.markup = "autolink";
+      token_c.info = "auto";
+    }
+    state3.pos += url.length + 2;
+    return true;
+  }
+  return false;
+}
+
+// ../../../node_modules/markdown-it/lib/rules_inline/html_inline.mjs
+function isLinkOpen2(str) {
+  return /^<a[>\s]/i.test(str);
+}
+function isLinkClose2(str) {
+  return /^<\/a\s*>/i.test(str);
+}
+function isLetter(ch) {
+  const lc = ch | 32;
+  return lc >= 97 && lc <= 122;
+}
+function html_inline(state3, silent) {
+  if (!state3.md.options.html) {
+    return false;
+  }
+  const max = state3.posMax;
+  const pos = state3.pos;
+  if (state3.src.charCodeAt(pos) !== 60 || pos + 2 >= max) {
+    return false;
+  }
+  const ch = state3.src.charCodeAt(pos + 1);
+  if (ch !== 33 && ch !== 63 && ch !== 47 && !isLetter(ch)) {
+    return false;
+  }
+  const match2 = state3.src.slice(pos).match(HTML_TAG_RE);
+  if (!match2) {
+    return false;
+  }
+  if (!silent) {
+    const token = state3.push("html_inline", "", 0);
+    token.content = match2[0];
+    if (isLinkOpen2(token.content)) state3.linkLevel++;
+    if (isLinkClose2(token.content)) state3.linkLevel--;
+  }
+  state3.pos += match2[0].length;
+  return true;
+}
+
+// ../../../node_modules/markdown-it/lib/rules_inline/entity.mjs
+var DIGITAL_RE = /^&#((?:x[a-f0-9]{1,6}|[0-9]{1,7}));/i;
+var NAMED_RE = /^&([a-z][a-z0-9]{1,31});/i;
+function entity(state3, silent) {
+  const pos = state3.pos;
+  const max = state3.posMax;
+  if (state3.src.charCodeAt(pos) !== 38) return false;
+  if (pos + 1 >= max) return false;
+  const ch = state3.src.charCodeAt(pos + 1);
+  if (ch === 35) {
+    const match2 = state3.src.slice(pos).match(DIGITAL_RE);
+    if (match2) {
+      if (!silent) {
+        const code2 = match2[1][0].toLowerCase() === "x" ? parseInt(match2[1].slice(1), 16) : parseInt(match2[1], 10);
+        const token = state3.push("text_special", "", 0);
+        token.content = isValidEntityCode(code2) ? fromCodePoint2(code2) : fromCodePoint2(65533);
+        token.markup = match2[0];
+        token.info = "entity";
+      }
+      state3.pos += match2[0].length;
+      return true;
+    }
+  } else {
+    const match2 = state3.src.slice(pos).match(NAMED_RE);
+    if (match2) {
+      const decoded = decodeHTMLStrict(match2[0]);
+      if (decoded !== match2[0]) {
+        if (!silent) {
+          const token = state3.push("text_special", "", 0);
+          token.content = decoded;
+          token.markup = match2[0];
+          token.info = "entity";
+        }
+        state3.pos += match2[0].length;
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+// ../../../node_modules/markdown-it/lib/rules_inline/balance_pairs.mjs
+function processDelimiters(delimiters) {
+  const openersBottom = {};
+  const max = delimiters.length;
+  if (!max) return;
+  let headerIdx = 0;
+  let lastTokenIdx = -2;
+  const jumps = [];
+  for (let closerIdx = 0; closerIdx < max; closerIdx++) {
+    const closer = delimiters[closerIdx];
+    jumps.push(0);
+    if (delimiters[headerIdx].marker !== closer.marker || lastTokenIdx !== closer.token - 1) {
+      headerIdx = closerIdx;
+    }
+    lastTokenIdx = closer.token;
+    closer.length = closer.length || 0;
+    if (!closer.close) continue;
+    if (!openersBottom.hasOwnProperty(closer.marker)) {
+      openersBottom[closer.marker] = [-1, -1, -1, -1, -1, -1];
+    }
+    const minOpenerIdx = openersBottom[closer.marker][(closer.open ? 3 : 0) + closer.length % 3];
+    let openerIdx = headerIdx - jumps[headerIdx] - 1;
+    let newMinOpenerIdx = openerIdx;
+    for (; openerIdx > minOpenerIdx; openerIdx -= jumps[openerIdx] + 1) {
+      const opener = delimiters[openerIdx];
+      if (opener.marker !== closer.marker) continue;
+      if (opener.open && opener.end < 0) {
+        let isOddMatch = false;
+        if (opener.close || closer.open) {
+          if ((opener.length + closer.length) % 3 === 0) {
+            if (opener.length % 3 !== 0 || closer.length % 3 !== 0) {
+              isOddMatch = true;
+            }
+          }
+        }
+        if (!isOddMatch) {
+          const lastJump = openerIdx > 0 && !delimiters[openerIdx - 1].open ? jumps[openerIdx - 1] + 1 : 0;
+          jumps[closerIdx] = closerIdx - openerIdx + lastJump;
+          jumps[openerIdx] = lastJump;
+          closer.open = false;
+          opener.end = closerIdx;
+          opener.close = false;
+          newMinOpenerIdx = -1;
+          lastTokenIdx = -2;
+          break;
+        }
+      }
+    }
+    if (newMinOpenerIdx !== -1) {
+      openersBottom[closer.marker][(closer.open ? 3 : 0) + (closer.length || 0) % 3] = newMinOpenerIdx;
+    }
+  }
+}
+function link_pairs(state3) {
+  const tokens_meta = state3.tokens_meta;
+  const max = state3.tokens_meta.length;
+  processDelimiters(state3.delimiters);
+  for (let curr = 0; curr < max; curr++) {
+    if (tokens_meta[curr] && tokens_meta[curr].delimiters) {
+      processDelimiters(tokens_meta[curr].delimiters);
+    }
+  }
+}
+
+// ../../../node_modules/markdown-it/lib/rules_inline/fragments_join.mjs
+function fragments_join(state3) {
+  let curr, last;
+  let level = 0;
+  const tokens = state3.tokens;
+  const max = state3.tokens.length;
+  for (curr = last = 0; curr < max; curr++) {
+    if (tokens[curr].nesting < 0) level--;
+    tokens[curr].level = level;
+    if (tokens[curr].nesting > 0) level++;
+    if (tokens[curr].type === "text" && curr + 1 < max && tokens[curr + 1].type === "text") {
+      tokens[curr + 1].content = tokens[curr].content + tokens[curr + 1].content;
+    } else {
+      if (curr !== last) {
+        tokens[last] = tokens[curr];
+      }
+      last++;
+    }
+  }
+  if (curr !== last) {
+    tokens.length = last;
+  }
+}
+
+// ../../../node_modules/markdown-it/lib/parser_inline.mjs
+var _rules3 = [
+  ["text", text2],
+  ["linkify", linkify2],
+  ["newline", newline],
+  ["escape", escape2],
+  ["backticks", backtick],
+  ["strikethrough", strikethrough_default.tokenize],
+  ["emphasis", emphasis_default.tokenize],
+  ["link", link2],
+  ["image", image],
+  ["autolink", autolink],
+  ["html_inline", html_inline],
+  ["entity", entity]
+];
+var _rules22 = [
+  ["balance_pairs", link_pairs],
+  ["strikethrough", strikethrough_default.postProcess],
+  ["emphasis", emphasis_default.postProcess],
+  // rules for pairs separate '**' into its own text tokens, which may be left unused,
+  // rule below merges unused segments back with the rest of the text
+  ["fragments_join", fragments_join]
+];
+function ParserInline() {
+  this.ruler = new ruler_default();
+  for (let i = 0; i < _rules3.length; i++) {
+    this.ruler.push(_rules3[i][0], _rules3[i][1]);
+  }
+  this.ruler2 = new ruler_default();
+  for (let i = 0; i < _rules22.length; i++) {
+    this.ruler2.push(_rules22[i][0], _rules22[i][1]);
+  }
+}
+ParserInline.prototype.skipToken = function(state3) {
+  const pos = state3.pos;
+  const rules = this.ruler.getRules("");
+  const len = rules.length;
+  const maxNesting = state3.md.options.maxNesting;
+  const cache = state3.cache;
+  if (typeof cache[pos] !== "undefined") {
+    state3.pos = cache[pos];
+    return;
+  }
+  let ok = false;
+  if (state3.level < maxNesting) {
+    for (let i = 0; i < len; i++) {
+      state3.level++;
+      ok = rules[i](state3, true);
+      state3.level--;
+      if (ok) {
+        if (pos >= state3.pos) {
+          throw new Error("inline rule didn't increment state.pos");
+        }
+        break;
+      }
+    }
+  } else {
+    state3.pos = state3.posMax;
+  }
+  if (!ok) {
+    state3.pos++;
+  }
+  cache[pos] = state3.pos;
+};
+ParserInline.prototype.tokenize = function(state3) {
+  const rules = this.ruler.getRules("");
+  const len = rules.length;
+  const end = state3.posMax;
+  const maxNesting = state3.md.options.maxNesting;
+  while (state3.pos < end) {
+    const prevPos = state3.pos;
+    let ok = false;
+    if (state3.level < maxNesting) {
+      for (let i = 0; i < len; i++) {
+        ok = rules[i](state3, false);
+        if (ok) {
+          if (prevPos >= state3.pos) {
+            throw new Error("inline rule didn't increment state.pos");
+          }
+          break;
+        }
+      }
+    }
+    if (ok) {
+      if (state3.pos >= end) {
+        break;
+      }
+      continue;
+    }
+    state3.pending += state3.src[state3.pos++];
+  }
+  if (state3.pending) {
+    state3.pushPending();
+  }
+};
+ParserInline.prototype.parse = function(str, md, env, outTokens) {
+  const state3 = new this.State(str, md, env, outTokens);
+  this.tokenize(state3);
+  const rules = this.ruler2.getRules("");
+  const len = rules.length;
+  for (let i = 0; i < len; i++) {
+    rules[i](state3);
+  }
+};
+ParserInline.prototype.State = state_inline_default;
+var parser_inline_default = ParserInline;
+
+// ../../../node_modules/linkify-it/lib/re.mjs
+function re_default(opts) {
+  const re = {};
+  opts = opts || {};
+  re.src_Any = regex_default.source;
+  re.src_Cc = regex_default2.source;
+  re.src_Z = regex_default6.source;
+  re.src_P = regex_default4.source;
+  re.src_ZPCc = [re.src_Z, re.src_P, re.src_Cc].join("|");
+  re.src_ZCc = [re.src_Z, re.src_Cc].join("|");
+  const text_separators = "[><\uFF5C]";
+  re.src_pseudo_letter = "(?:(?!" + text_separators + "|" + re.src_ZPCc + ")" + re.src_Any + ")";
+  re.src_ip4 = "(?:(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";
+  re.src_auth = "(?:(?:(?!" + re.src_ZCc + "|[@/\\[\\]()]).)+@)?";
+  re.src_port = "(?::(?:6(?:[0-4]\\d{3}|5(?:[0-4]\\d{2}|5(?:[0-2]\\d|3[0-5])))|[1-5]?\\d{1,4}))?";
+  re.src_host_terminator = "(?=$|" + text_separators + "|" + re.src_ZPCc + ")(?!" + (opts["---"] ? "-(?!--)|" : "-|") + "_|:\\d|\\.-|\\.(?!$|" + re.src_ZPCc + "))";
+  re.src_path = "(?:[/?#](?:(?!" + re.src_ZCc + "|" + text_separators + `|[()[\\]{}.,"'?!\\-;]).|\\[(?:(?!` + re.src_ZCc + "|\\]).)*\\]|\\((?:(?!" + re.src_ZCc + "|[)]).)*\\)|\\{(?:(?!" + re.src_ZCc + '|[}]).)*\\}|\\"(?:(?!' + re.src_ZCc + `|["]).)+\\"|\\'(?:(?!` + re.src_ZCc + "|[']).)+\\'|\\'(?=" + re.src_pseudo_letter + "|[-])|\\.{2,}[a-zA-Z0-9%/&]|\\.(?!" + re.src_ZCc + "|[.]|$)|" + (opts["---"] ? "\\-(?!--(?:[^-]|$))(?:-*)|" : "\\-+|") + // allow `,,,` in paths
+  ",(?!" + re.src_ZCc + "|$)|;(?!" + re.src_ZCc + "|$)|\\!+(?!" + re.src_ZCc + "|[!]|$)|\\?(?!" + re.src_ZCc + "|[?]|$))+|\\/)?";
+  re.src_email_name = '[\\-;:&=\\+\\$,\\.a-zA-Z0-9_][\\-;:&=\\+\\$,\\"\\.a-zA-Z0-9_]*';
+  re.src_xn = "xn--[a-z0-9\\-]{1,59}";
+  re.src_domain_root = // Allow letters & digits (http://test1)
+  "(?:" + re.src_xn + "|" + re.src_pseudo_letter + "{1,63})";
+  re.src_domain = "(?:" + re.src_xn + "|(?:" + re.src_pseudo_letter + ")|(?:" + re.src_pseudo_letter + "(?:-|" + re.src_pseudo_letter + "){0,61}" + re.src_pseudo_letter + "))";
+  re.src_host = "(?:(?:(?:(?:" + re.src_domain + ")\\.)*" + re.src_domain + "))";
+  re.tpl_host_fuzzy = "(?:" + re.src_ip4 + "|(?:(?:(?:" + re.src_domain + ")\\.)+(?:%TLDS%)))";
+  re.tpl_host_no_ip_fuzzy = "(?:(?:(?:" + re.src_domain + ")\\.)+(?:%TLDS%))";
+  re.src_host_strict = re.src_host + re.src_host_terminator;
+  re.tpl_host_fuzzy_strict = re.tpl_host_fuzzy + re.src_host_terminator;
+  re.src_host_port_strict = re.src_host + re.src_port + re.src_host_terminator;
+  re.tpl_host_port_fuzzy_strict = re.tpl_host_fuzzy + re.src_port + re.src_host_terminator;
+  re.tpl_host_port_no_ip_fuzzy_strict = re.tpl_host_no_ip_fuzzy + re.src_port + re.src_host_terminator;
+  re.tpl_host_fuzzy_test = "localhost|www\\.|\\.\\d{1,3}\\.|(?:\\.(?:%TLDS%)(?:" + re.src_ZPCc + "|>|$))";
+  re.tpl_email_fuzzy = "(^|" + text_separators + '|"|\\(|' + re.src_ZCc + ")(" + re.src_email_name + "@" + re.tpl_host_fuzzy_strict + ")";
+  re.tpl_link_fuzzy = // Fuzzy link can't be prepended with .:/\- and non punctuation.
+  // but can start with > (markdown blockquote)
+  "(^|(?![.:/\\-_@])(?:[$+<=>^`|\uFF5C]|" + re.src_ZPCc + "))((?![$+<=>^`|\uFF5C])" + re.tpl_host_port_fuzzy_strict + re.src_path + ")";
+  re.tpl_link_no_ip_fuzzy = // Fuzzy link can't be prepended with .:/\- and non punctuation.
+  // but can start with > (markdown blockquote)
+  "(^|(?![.:/\\-_@])(?:[$+<=>^`|\uFF5C]|" + re.src_ZPCc + "))((?![$+<=>^`|\uFF5C])" + re.tpl_host_port_no_ip_fuzzy_strict + re.src_path + ")";
+  return re;
+}
+
+// ../../../node_modules/linkify-it/index.mjs
+function assign3(obj) {
+  const sources = Array.prototype.slice.call(arguments, 1);
+  sources.forEach(function(source2) {
+    if (!source2) {
+      return;
+    }
+    Object.keys(source2).forEach(function(key2) {
+      obj[key2] = source2[key2];
+    });
+  });
+  return obj;
+}
+function _class2(obj) {
+  return Object.prototype.toString.call(obj);
+}
+function isString2(obj) {
+  return _class2(obj) === "[object String]";
+}
+function isObject(obj) {
+  return _class2(obj) === "[object Object]";
+}
+function isRegExp(obj) {
+  return _class2(obj) === "[object RegExp]";
+}
+function isFunction(obj) {
+  return _class2(obj) === "[object Function]";
+}
+function escapeRE2(str) {
+  return str.replace(/[.?*+^$[\]\\(){}|-]/g, "\\$&");
+}
+var defaultOptions = {
+  fuzzyLink: true,
+  fuzzyEmail: true,
+  fuzzyIP: false
+};
+function isOptionsObj(obj) {
+  return Object.keys(obj || {}).reduce(function(acc, k) {
+    return acc || defaultOptions.hasOwnProperty(k);
+  }, false);
+}
+var defaultSchemas = {
+  "http:": {
+    validate: function(text3, pos, self2) {
+      const tail = text3.slice(pos);
+      if (!self2.re.http) {
+        self2.re.http = new RegExp(
+          "^\\/\\/" + self2.re.src_auth + self2.re.src_host_port_strict + self2.re.src_path,
+          "i"
+        );
+      }
+      if (self2.re.http.test(tail)) {
+        return tail.match(self2.re.http)[0].length;
+      }
+      return 0;
+    }
+  },
+  "https:": "http:",
+  "ftp:": "http:",
+  "//": {
+    validate: function(text3, pos, self2) {
+      const tail = text3.slice(pos);
+      if (!self2.re.no_http) {
+        self2.re.no_http = new RegExp(
+          "^" + self2.re.src_auth + // Don't allow single-level domains, because of false positives like '//test'
+          // with code comments
+          "(?:localhost|(?:(?:" + self2.re.src_domain + ")\\.)+" + self2.re.src_domain_root + ")" + self2.re.src_port + self2.re.src_host_terminator + self2.re.src_path,
+          "i"
+        );
+      }
+      if (self2.re.no_http.test(tail)) {
+        if (pos >= 3 && text3[pos - 3] === ":") {
+          return 0;
+        }
+        if (pos >= 3 && text3[pos - 3] === "/") {
+          return 0;
+        }
+        return tail.match(self2.re.no_http)[0].length;
+      }
+      return 0;
+    }
+  },
+  "mailto:": {
+    validate: function(text3, pos, self2) {
+      const tail = text3.slice(pos);
+      if (!self2.re.mailto) {
+        self2.re.mailto = new RegExp(
+          "^" + self2.re.src_email_name + "@" + self2.re.src_host_strict,
+          "i"
+        );
+      }
+      if (self2.re.mailto.test(tail)) {
+        return tail.match(self2.re.mailto)[0].length;
+      }
+      return 0;
+    }
+  }
+};
+var tlds_2ch_src_re = "a[cdefgilmnoqrstuwxz]|b[abdefghijmnorstvwyz]|c[acdfghiklmnoruvwxyz]|d[ejkmoz]|e[cegrstu]|f[ijkmor]|g[abdefghilmnpqrstuwy]|h[kmnrtu]|i[delmnoqrst]|j[emop]|k[eghimnprwyz]|l[abcikrstuvy]|m[acdeghklmnopqrstuvwxyz]|n[acefgilopruz]|om|p[aefghklmnrstwy]|qa|r[eosuw]|s[abcdeghijklmnortuvxyz]|t[cdfghjklmnortvwz]|u[agksyz]|v[aceginu]|w[fs]|y[et]|z[amw]";
+var tlds_default = "biz|com|edu|gov|net|org|pro|web|xxx|aero|asia|coop|info|museum|name|shop|\u0440\u0444".split("|");
+function createValidator(re) {
+  return function(text3, pos) {
+    const tail = text3.slice(pos);
+    if (re.test(tail)) {
+      return tail.match(re)[0].length;
+    }
+    return 0;
+  };
+}
+function createNormalizer() {
+  return function(match2, self2) {
+    self2.normalize(match2);
+  };
+}
+function compile(self2) {
+  const re = self2.re = re_default(self2.__opts__);
+  const tlds2 = self2.__tlds__.slice();
+  self2.onCompile();
+  if (!self2.__tlds_replaced__) {
+    tlds2.push(tlds_2ch_src_re);
+  }
+  tlds2.push(re.src_xn);
+  re.src_tlds = tlds2.join("|");
+  function untpl(tpl) {
+    return tpl.replace("%TLDS%", re.src_tlds);
+  }
+  re.email_fuzzy = RegExp(untpl(re.tpl_email_fuzzy), "i");
+  re.email_fuzzy_global = RegExp(untpl(re.tpl_email_fuzzy), "ig");
+  re.link_fuzzy = RegExp(untpl(re.tpl_link_fuzzy), "i");
+  re.link_fuzzy_global = RegExp(untpl(re.tpl_link_fuzzy), "ig");
+  re.link_no_ip_fuzzy = RegExp(untpl(re.tpl_link_no_ip_fuzzy), "i");
+  re.link_no_ip_fuzzy_global = RegExp(untpl(re.tpl_link_no_ip_fuzzy), "ig");
+  re.host_fuzzy_test = RegExp(untpl(re.tpl_host_fuzzy_test), "i");
+  const aliases = [];
+  self2.__compiled__ = {};
+  function schemaError(name, val) {
+    throw new Error('(LinkifyIt) Invalid schema "' + name + '": ' + val);
+  }
+  Object.keys(self2.__schemas__).forEach(function(name) {
+    const val = self2.__schemas__[name];
+    if (val === null) {
+      return;
+    }
+    const compiled = { validate: null, link: null };
+    self2.__compiled__[name] = compiled;
+    if (isObject(val)) {
+      if (isRegExp(val.validate)) {
+        compiled.validate = createValidator(val.validate);
+      } else if (isFunction(val.validate)) {
+        compiled.validate = val.validate;
+      } else {
+        schemaError(name, val);
+      }
+      if (isFunction(val.normalize)) {
+        compiled.normalize = val.normalize;
+      } else if (!val.normalize) {
+        compiled.normalize = createNormalizer();
+      } else {
+        schemaError(name, val);
+      }
+      return;
+    }
+    if (isString2(val)) {
+      aliases.push(name);
+      return;
+    }
+    schemaError(name, val);
+  });
+  aliases.forEach(function(alias) {
+    if (!self2.__compiled__[self2.__schemas__[alias]]) {
+      return;
+    }
+    self2.__compiled__[alias].validate = self2.__compiled__[self2.__schemas__[alias]].validate;
+    self2.__compiled__[alias].normalize = self2.__compiled__[self2.__schemas__[alias]].normalize;
+  });
+  self2.__compiled__[""] = { validate: null, normalize: createNormalizer() };
+  const slist = Object.keys(self2.__compiled__).filter(function(name) {
+    return name.length > 0 && self2.__compiled__[name];
+  }).map(escapeRE2).join("|");
+  self2.re.schema_test = RegExp("(^|(?!_)(?:[><\uFF5C]|" + re.src_ZPCc + "))(" + slist + ")", "i");
+  self2.re.schema_search = RegExp("(^|(?!_)(?:[><\uFF5C]|" + re.src_ZPCc + "))(" + slist + ")", "ig");
+  self2.re.schema_at_start = RegExp("^" + self2.re.schema_search.source, "i");
+  self2.re.pretest = RegExp(
+    "(" + self2.re.schema_test.source + ")|(" + self2.re.host_fuzzy_test.source + ")|@",
+    "i"
+  );
+}
+function Match(text3, schema, index2, lastIndex) {
+  const raw = text3.slice(index2, lastIndex);
+  this.schema = schema.toLowerCase();
+  this.index = index2;
+  this.lastIndex = lastIndex;
+  this.raw = raw;
+  this.text = raw;
+  this.url = raw;
+}
+function LinkifyIt(schemas, options) {
+  if (!(this instanceof LinkifyIt)) {
+    return new LinkifyIt(schemas, options);
+  }
+  if (!options) {
+    if (isOptionsObj(schemas)) {
+      options = schemas;
+      schemas = {};
+    }
+  }
+  this.__opts__ = assign3({}, defaultOptions, options);
+  this.__schemas__ = assign3({}, defaultSchemas, schemas);
+  this.__compiled__ = {};
+  this.__tlds__ = tlds_default;
+  this.__tlds_replaced__ = false;
+  this.re = {};
+  compile(this);
+}
+LinkifyIt.prototype.add = function add(schema, definition) {
+  this.__schemas__[schema] = definition;
+  compile(this);
+  return this;
+};
+LinkifyIt.prototype.set = function set2(options) {
+  this.__opts__ = assign3(this.__opts__, options);
+  return this;
+};
+LinkifyIt.prototype.test = function test(text3) {
+  if (!text3.length) {
+    return false;
+  }
+  let m, re;
+  if (this.re.schema_test.test(text3)) {
+    re = this.re.schema_search;
+    re.lastIndex = 0;
+    while ((m = re.exec(text3)) !== null) {
+      if (this.testSchemaAt(text3, m[2], re.lastIndex)) {
+        return true;
+      }
+    }
+  }
+  if (this.__opts__.fuzzyLink && this.__compiled__["http:"]) {
+    if (text3.search(this.re.host_fuzzy_test) >= 0) {
+      if (text3.match(this.__opts__.fuzzyIP ? this.re.link_fuzzy : this.re.link_no_ip_fuzzy) !== null) {
+        return true;
+      }
+    }
+  }
+  if (this.__opts__.fuzzyEmail && this.__compiled__["mailto:"]) {
+    if (text3.indexOf("@") >= 0) {
+      if (text3.match(this.re.email_fuzzy) !== null) {
+        return true;
+      }
+    }
+  }
+  return false;
+};
+LinkifyIt.prototype.pretest = function pretest(text3) {
+  return this.re.pretest.test(text3);
+};
+LinkifyIt.prototype.testSchemaAt = function testSchemaAt(text3, schema, pos) {
+  if (!this.__compiled__[schema.toLowerCase()]) {
+    return 0;
+  }
+  return this.__compiled__[schema.toLowerCase()].validate(text3, pos, this);
+};
+LinkifyIt.prototype.match = function match(text3) {
+  const result = [];
+  const type_schemed = [];
+  const type_fuzzy_link = [];
+  const type_fuzzy_email = [];
+  let m, len, re;
+  function choose(a, b) {
+    if (!a) {
+      return b;
+    }
+    if (!b) {
+      return a;
+    }
+    if (a.index !== b.index) {
+      return a.index < b.index ? a : b;
+    }
+    return a.lastIndex >= b.lastIndex ? a : b;
+  }
+  if (!text3.length) {
+    return null;
+  }
+  if (this.re.schema_test.test(text3)) {
+    re = this.re.schema_search;
+    re.lastIndex = 0;
+    while ((m = re.exec(text3)) !== null) {
+      len = this.testSchemaAt(text3, m[2], re.lastIndex);
+      if (len) {
+        type_schemed.push({
+          schema: m[2],
+          index: m.index + m[1].length,
+          lastIndex: m.index + m[0].length + len
+        });
+      }
+    }
+  }
+  if (this.__opts__.fuzzyLink && this.__compiled__["http:"]) {
+    re = this.__opts__.fuzzyIP ? this.re.link_fuzzy_global : this.re.link_no_ip_fuzzy_global;
+    re.lastIndex = 0;
+    while ((m = re.exec(text3)) !== null) {
+      type_fuzzy_link.push({
+        schema: "",
+        index: m.index + m[1].length,
+        lastIndex: m.index + m[0].length
+      });
+    }
+  }
+  if (this.__opts__.fuzzyEmail && this.__compiled__["mailto:"]) {
+    re = this.re.email_fuzzy_global;
+    re.lastIndex = 0;
+    while ((m = re.exec(text3)) !== null) {
+      type_fuzzy_email.push({
+        schema: "mailto:",
+        index: m.index + m[1].length,
+        lastIndex: m.index + m[0].length
+      });
+    }
+  }
+  const indexes = [0, 0, 0];
+  let lastIndex = 0;
+  for (; ; ) {
+    const candidates = [
+      type_schemed[indexes[0]],
+      type_fuzzy_email[indexes[1]],
+      type_fuzzy_link[indexes[2]]
+    ];
+    const candidate = choose(choose(candidates[0], candidates[1]), candidates[2]);
+    if (!candidate) {
+      break;
+    }
+    if (candidate === candidates[0]) {
+      indexes[0]++;
+    } else if (candidate === candidates[1]) {
+      indexes[1]++;
+    } else {
+      indexes[2]++;
+    }
+    if (candidate.index < lastIndex) {
+      continue;
+    }
+    const match2 = new Match(text3, candidate.schema, candidate.index, candidate.lastIndex);
+    this.__compiled__[match2.schema].normalize(match2, this);
+    result.push(match2);
+    lastIndex = candidate.lastIndex;
+  }
+  if (result.length) {
+    return result;
+  }
+  return null;
+};
+LinkifyIt.prototype.matchAtStart = function matchAtStart(text3) {
+  if (!text3.length) return null;
+  const m = this.re.schema_at_start.exec(text3);
+  if (!m) return null;
+  const len = this.testSchemaAt(text3, m[2], m[0].length);
+  if (!len) return null;
+  const match2 = new Match(text3, m[2], m.index + m[1].length, m.index + m[0].length + len);
+  this.__compiled__[match2.schema].normalize(match2, this);
+  return match2;
+};
+LinkifyIt.prototype.tlds = function tlds(list2, keepOld) {
+  list2 = Array.isArray(list2) ? list2 : [list2];
+  if (!keepOld) {
+    this.__tlds__ = list2.slice();
+    this.__tlds_replaced__ = true;
+    compile(this);
+    return this;
+  }
+  this.__tlds__ = this.__tlds__.concat(list2).sort().filter(function(el, idx, arr) {
+    return el !== arr[idx - 1];
+  }).reverse();
+  compile(this);
+  return this;
+};
+LinkifyIt.prototype.normalize = function normalize2(match2) {
+  if (!match2.schema) {
+    match2.url = "http://" + match2.url;
+  }
+  if (match2.schema === "mailto:" && !/^mailto:/i.test(match2.url)) {
+    match2.url = "mailto:" + match2.url;
+  }
+};
+LinkifyIt.prototype.onCompile = function onCompile() {
+};
+var linkify_it_default = LinkifyIt;
+
+// ../../../node_modules/punycode.js/punycode.es6.js
+var maxInt = 2147483647;
+var base = 36;
+var tMin = 1;
+var tMax = 26;
+var skew = 38;
+var damp = 700;
+var initialBias = 72;
+var initialN = 128;
+var delimiter = "-";
+var regexPunycode = /^xn--/;
+var regexNonASCII = /[^\0-\x7F]/;
+var regexSeparators = /[\x2E\u3002\uFF0E\uFF61]/g;
+var errors = {
+  "overflow": "Overflow: input needs wider integers to process",
+  "not-basic": "Illegal input >= 0x80 (not a basic code point)",
+  "invalid-input": "Invalid input"
+};
+var baseMinusTMin = base - tMin;
+var floor = Math.floor;
+var stringFromCharCode = String.fromCharCode;
+function error(type) {
+  throw new RangeError(errors[type]);
+}
+function map(array, callback) {
+  const result = [];
+  let length = array.length;
+  while (length--) {
+    result[length] = callback(array[length]);
+  }
+  return result;
+}
+function mapDomain(domain, callback) {
+  const parts = domain.split("@");
+  let result = "";
+  if (parts.length > 1) {
+    result = parts[0] + "@";
+    domain = parts[1];
+  }
+  domain = domain.replace(regexSeparators, ".");
+  const labels = domain.split(".");
+  const encoded = map(labels, callback).join(".");
+  return result + encoded;
+}
+function ucs2decode(string) {
+  const output = [];
+  let counter = 0;
+  const length = string.length;
+  while (counter < length) {
+    const value = string.charCodeAt(counter++);
+    if (value >= 55296 && value <= 56319 && counter < length) {
+      const extra = string.charCodeAt(counter++);
+      if ((extra & 64512) == 56320) {
+        output.push(((value & 1023) << 10) + (extra & 1023) + 65536);
+      } else {
+        output.push(value);
+        counter--;
+      }
+    } else {
+      output.push(value);
+    }
+  }
+  return output;
+}
+var ucs2encode = (codePoints) => String.fromCodePoint(...codePoints);
+var basicToDigit = function(codePoint) {
+  if (codePoint >= 48 && codePoint < 58) {
+    return 26 + (codePoint - 48);
+  }
+  if (codePoint >= 65 && codePoint < 91) {
+    return codePoint - 65;
+  }
+  if (codePoint >= 97 && codePoint < 123) {
+    return codePoint - 97;
+  }
+  return base;
+};
+var digitToBasic = function(digit, flag) {
+  return digit + 22 + 75 * (digit < 26) - ((flag != 0) << 5);
+};
+var adapt = function(delta, numPoints, firstTime) {
+  let k = 0;
+  delta = firstTime ? floor(delta / damp) : delta >> 1;
+  delta += floor(delta / numPoints);
+  for (; delta > baseMinusTMin * tMax >> 1; k += base) {
+    delta = floor(delta / baseMinusTMin);
+  }
+  return floor(k + (baseMinusTMin + 1) * delta / (delta + skew));
+};
+var decode2 = function(input) {
+  const output = [];
+  const inputLength = input.length;
+  let i = 0;
+  let n = initialN;
+  let bias = initialBias;
+  let basic = input.lastIndexOf(delimiter);
+  if (basic < 0) {
+    basic = 0;
+  }
+  for (let j = 0; j < basic; ++j) {
+    if (input.charCodeAt(j) >= 128) {
+      error("not-basic");
+    }
+    output.push(input.charCodeAt(j));
+  }
+  for (let index2 = basic > 0 ? basic + 1 : 0; index2 < inputLength; ) {
+    const oldi = i;
+    for (let w = 1, k = base; ; k += base) {
+      if (index2 >= inputLength) {
+        error("invalid-input");
+      }
+      const digit = basicToDigit(input.charCodeAt(index2++));
+      if (digit >= base) {
+        error("invalid-input");
+      }
+      if (digit > floor((maxInt - i) / w)) {
+        error("overflow");
+      }
+      i += digit * w;
+      const t = k <= bias ? tMin : k >= bias + tMax ? tMax : k - bias;
+      if (digit < t) {
+        break;
+      }
+      const baseMinusT = base - t;
+      if (w > floor(maxInt / baseMinusT)) {
+        error("overflow");
+      }
+      w *= baseMinusT;
+    }
+    const out = output.length + 1;
+    bias = adapt(i - oldi, out, oldi == 0);
+    if (floor(i / out) > maxInt - n) {
+      error("overflow");
+    }
+    n += floor(i / out);
+    i %= out;
+    output.splice(i++, 0, n);
+  }
+  return String.fromCodePoint(...output);
+};
+var encode2 = function(input) {
+  const output = [];
+  input = ucs2decode(input);
+  const inputLength = input.length;
+  let n = initialN;
+  let delta = 0;
+  let bias = initialBias;
+  for (const currentValue of input) {
+    if (currentValue < 128) {
+      output.push(stringFromCharCode(currentValue));
+    }
+  }
+  const basicLength = output.length;
+  let handledCPCount = basicLength;
+  if (basicLength) {
+    output.push(delimiter);
+  }
+  while (handledCPCount < inputLength) {
+    let m = maxInt;
+    for (const currentValue of input) {
+      if (currentValue >= n && currentValue < m) {
+        m = currentValue;
+      }
+    }
+    const handledCPCountPlusOne = handledCPCount + 1;
+    if (m - n > floor((maxInt - delta) / handledCPCountPlusOne)) {
+      error("overflow");
+    }
+    delta += (m - n) * handledCPCountPlusOne;
+    n = m;
+    for (const currentValue of input) {
+      if (currentValue < n && ++delta > maxInt) {
+        error("overflow");
+      }
+      if (currentValue === n) {
+        let q = delta;
+        for (let k = base; ; k += base) {
+          const t = k <= bias ? tMin : k >= bias + tMax ? tMax : k - bias;
+          if (q < t) {
+            break;
+          }
+          const qMinusT = q - t;
+          const baseMinusT = base - t;
+          output.push(
+            stringFromCharCode(digitToBasic(t + qMinusT % baseMinusT, 0))
+          );
+          q = floor(qMinusT / baseMinusT);
+        }
+        output.push(stringFromCharCode(digitToBasic(q, 0)));
+        bias = adapt(delta, handledCPCountPlusOne, handledCPCount === basicLength);
+        delta = 0;
+        ++handledCPCount;
+      }
+    }
+    ++delta;
+    ++n;
+  }
+  return output.join("");
+};
+var toUnicode = function(input) {
+  return mapDomain(input, function(string) {
+    return regexPunycode.test(string) ? decode2(string.slice(4).toLowerCase()) : string;
+  });
+};
+var toASCII = function(input) {
+  return mapDomain(input, function(string) {
+    return regexNonASCII.test(string) ? "xn--" + encode2(string) : string;
+  });
+};
+var punycode = {
+  /**
+   * A string representing the current Punycode.js version number.
+   * @memberOf punycode
+   * @type String
+   */
+  "version": "2.3.1",
+  /**
+   * An object of methods to convert from JavaScript's internal character
+   * representation (UCS-2) to Unicode code points, and back.
+   * @see <https://mathiasbynens.be/notes/javascript-encoding>
+   * @memberOf punycode
+   * @type Object
+   */
+  "ucs2": {
+    "decode": ucs2decode,
+    "encode": ucs2encode
+  },
+  "decode": decode2,
+  "encode": encode2,
+  "toASCII": toASCII,
+  "toUnicode": toUnicode
+};
+var punycode_es6_default = punycode;
+
+// ../../../node_modules/markdown-it/lib/presets/default.mjs
+var default_default = {
+  options: {
+    // Enable HTML tags in source
+    html: false,
+    // Use '/' to close single tags (<br />)
+    xhtmlOut: false,
+    // Convert '\n' in paragraphs into <br>
+    breaks: false,
+    // CSS language prefix for fenced blocks
+    langPrefix: "language-",
+    // autoconvert URL-like texts to links
+    linkify: false,
+    // Enable some language-neutral replacements + quotes beautification
+    typographer: false,
+    // Double + single quotes replacement pairs, when typographer enabled,
+    // and smartquotes on. Could be either a String or an Array.
+    //
+    // For example, you can use '«»„“' for Russian, '„“‚‘' for German,
+    // and ['«\xA0', '\xA0»', '‹\xA0', '\xA0›'] for French (including nbsp).
+    quotes: "\u201C\u201D\u2018\u2019",
+    /* “”‘’ */
+    // Highlighter function. Should return escaped HTML,
+    // or '' if the source string is not changed and should be escaped externaly.
+    // If result starts with <pre... internal wrapper is skipped.
+    //
+    // function (/*str, lang*/) { return ''; }
+    //
+    highlight: null,
+    // Internal protection, recursion limit
+    maxNesting: 100
+  },
+  components: {
+    core: {},
+    block: {},
+    inline: {}
+  }
+};
+
+// ../../../node_modules/markdown-it/lib/presets/zero.mjs
+var zero_default = {
+  options: {
+    // Enable HTML tags in source
+    html: false,
+    // Use '/' to close single tags (<br />)
+    xhtmlOut: false,
+    // Convert '\n' in paragraphs into <br>
+    breaks: false,
+    // CSS language prefix for fenced blocks
+    langPrefix: "language-",
+    // autoconvert URL-like texts to links
+    linkify: false,
+    // Enable some language-neutral replacements + quotes beautification
+    typographer: false,
+    // Double + single quotes replacement pairs, when typographer enabled,
+    // and smartquotes on. Could be either a String or an Array.
+    //
+    // For example, you can use '«»„“' for Russian, '„“‚‘' for German,
+    // and ['«\xA0', '\xA0»', '‹\xA0', '\xA0›'] for French (including nbsp).
+    quotes: "\u201C\u201D\u2018\u2019",
+    /* “”‘’ */
+    // Highlighter function. Should return escaped HTML,
+    // or '' if the source string is not changed and should be escaped externaly.
+    // If result starts with <pre... internal wrapper is skipped.
+    //
+    // function (/*str, lang*/) { return ''; }
+    //
+    highlight: null,
+    // Internal protection, recursion limit
+    maxNesting: 20
+  },
+  components: {
+    core: {
+      rules: [
+        "normalize",
+        "block",
+        "inline",
+        "text_join"
+      ]
+    },
+    block: {
+      rules: [
+        "paragraph"
+      ]
+    },
+    inline: {
+      rules: [
+        "text"
+      ],
+      rules2: [
+        "balance_pairs",
+        "fragments_join"
+      ]
+    }
+  }
+};
+
+// ../../../node_modules/markdown-it/lib/presets/commonmark.mjs
+var commonmark_default = {
+  options: {
+    // Enable HTML tags in source
+    html: true,
+    // Use '/' to close single tags (<br />)
+    xhtmlOut: true,
+    // Convert '\n' in paragraphs into <br>
+    breaks: false,
+    // CSS language prefix for fenced blocks
+    langPrefix: "language-",
+    // autoconvert URL-like texts to links
+    linkify: false,
+    // Enable some language-neutral replacements + quotes beautification
+    typographer: false,
+    // Double + single quotes replacement pairs, when typographer enabled,
+    // and smartquotes on. Could be either a String or an Array.
+    //
+    // For example, you can use '«»„“' for Russian, '„“‚‘' for German,
+    // and ['«\xA0', '\xA0»', '‹\xA0', '\xA0›'] for French (including nbsp).
+    quotes: "\u201C\u201D\u2018\u2019",
+    /* “”‘’ */
+    // Highlighter function. Should return escaped HTML,
+    // or '' if the source string is not changed and should be escaped externaly.
+    // If result starts with <pre... internal wrapper is skipped.
+    //
+    // function (/*str, lang*/) { return ''; }
+    //
+    highlight: null,
+    // Internal protection, recursion limit
+    maxNesting: 20
+  },
+  components: {
+    core: {
+      rules: [
+        "normalize",
+        "block",
+        "inline",
+        "text_join"
+      ]
+    },
+    block: {
+      rules: [
+        "blockquote",
+        "code",
+        "fence",
+        "heading",
+        "hr",
+        "html_block",
+        "lheading",
+        "list",
+        "reference",
+        "paragraph"
+      ]
+    },
+    inline: {
+      rules: [
+        "autolink",
+        "backticks",
+        "emphasis",
+        "entity",
+        "escape",
+        "html_inline",
+        "image",
+        "link",
+        "newline",
+        "text"
+      ],
+      rules2: [
+        "balance_pairs",
+        "emphasis",
+        "fragments_join"
+      ]
+    }
+  }
+};
+
+// ../../../node_modules/markdown-it/lib/index.mjs
+var config = {
+  default: default_default,
+  zero: zero_default,
+  commonmark: commonmark_default
+};
+var BAD_PROTO_RE = /^(vbscript|javascript|file|data):/;
+var GOOD_DATA_RE = /^data:image\/(gif|png|jpeg|webp);/;
+function validateLink(url) {
+  const str = url.trim().toLowerCase();
+  return BAD_PROTO_RE.test(str) ? GOOD_DATA_RE.test(str) : true;
+}
+var RECODE_HOSTNAME_FOR = ["http:", "https:", "mailto:"];
+function normalizeLink(url) {
+  const parsed = parse_default(url, true);
+  if (parsed.hostname) {
+    if (!parsed.protocol || RECODE_HOSTNAME_FOR.indexOf(parsed.protocol) >= 0) {
+      try {
+        parsed.hostname = punycode_es6_default.toASCII(parsed.hostname);
+      } catch (er) {
+      }
+    }
+  }
+  return encode_default(format(parsed));
+}
+function normalizeLinkText(url) {
+  const parsed = parse_default(url, true);
+  if (parsed.hostname) {
+    if (!parsed.protocol || RECODE_HOSTNAME_FOR.indexOf(parsed.protocol) >= 0) {
+      try {
+        parsed.hostname = punycode_es6_default.toUnicode(parsed.hostname);
+      } catch (er) {
+      }
+    }
+  }
+  return decode_default(format(parsed), decode_default.defaultChars + "%");
+}
+function MarkdownIt(presetName, options) {
+  if (!(this instanceof MarkdownIt)) {
+    return new MarkdownIt(presetName, options);
+  }
+  if (!options) {
+    if (!isString(presetName)) {
+      options = presetName || {};
+      presetName = "default";
+    }
+  }
+  this.inline = new parser_inline_default();
+  this.block = new parser_block_default();
+  this.core = new parser_core_default();
+  this.renderer = new renderer_default();
+  this.linkify = new linkify_it_default();
+  this.validateLink = validateLink;
+  this.normalizeLink = normalizeLink;
+  this.normalizeLinkText = normalizeLinkText;
+  this.utils = utils_exports;
+  this.helpers = assign2({}, helpers_exports);
+  this.options = {};
+  this.configure(presetName);
+  if (options) {
+    this.set(options);
+  }
+}
+MarkdownIt.prototype.set = function(options) {
+  assign2(this.options, options);
+  return this;
+};
+MarkdownIt.prototype.configure = function(presets) {
+  const self2 = this;
+  if (isString(presets)) {
+    const presetName = presets;
+    presets = config[presetName];
+    if (!presets) {
+      throw new Error('Wrong `markdown-it` preset "' + presetName + '", check name');
+    }
+  }
+  if (!presets) {
+    throw new Error("Wrong `markdown-it` preset, can't be empty");
+  }
+  if (presets.options) {
+    self2.set(presets.options);
+  }
+  if (presets.components) {
+    Object.keys(presets.components).forEach(function(name) {
+      if (presets.components[name].rules) {
+        self2[name].ruler.enableOnly(presets.components[name].rules);
+      }
+      if (presets.components[name].rules2) {
+        self2[name].ruler2.enableOnly(presets.components[name].rules2);
+      }
+    });
+  }
+  return this;
+};
+MarkdownIt.prototype.enable = function(list2, ignoreInvalid) {
+  let result = [];
+  if (!Array.isArray(list2)) {
+    list2 = [list2];
+  }
+  ["core", "block", "inline"].forEach(function(chain) {
+    result = result.concat(this[chain].ruler.enable(list2, true));
+  }, this);
+  result = result.concat(this.inline.ruler2.enable(list2, true));
+  const missed = list2.filter(function(name) {
+    return result.indexOf(name) < 0;
+  });
+  if (missed.length && !ignoreInvalid) {
+    throw new Error("MarkdownIt. Failed to enable unknown rule(s): " + missed);
+  }
+  return this;
+};
+MarkdownIt.prototype.disable = function(list2, ignoreInvalid) {
+  let result = [];
+  if (!Array.isArray(list2)) {
+    list2 = [list2];
+  }
+  ["core", "block", "inline"].forEach(function(chain) {
+    result = result.concat(this[chain].ruler.disable(list2, true));
+  }, this);
+  result = result.concat(this.inline.ruler2.disable(list2, true));
+  const missed = list2.filter(function(name) {
+    return result.indexOf(name) < 0;
+  });
+  if (missed.length && !ignoreInvalid) {
+    throw new Error("MarkdownIt. Failed to disable unknown rule(s): " + missed);
+  }
+  return this;
+};
+MarkdownIt.prototype.use = function(plugin) {
+  const args = [this].concat(Array.prototype.slice.call(arguments, 1));
+  plugin.apply(plugin, args);
+  return this;
+};
+MarkdownIt.prototype.parse = function(src, env) {
+  if (typeof src !== "string") {
+    throw new Error("Input data should be a String");
+  }
+  const state3 = new this.core.State(src, this, env);
+  this.core.process(state3);
+  return state3.tokens;
+};
+MarkdownIt.prototype.render = function(src, env) {
+  env = env || {};
+  return this.renderer.render(this.parse(src, env), this.options, env);
+};
+MarkdownIt.prototype.parseInline = function(src, env) {
+  const state3 = new this.core.State(src, this, env);
+  state3.inlineMode = true;
+  this.core.process(state3);
+  return state3.tokens;
+};
+MarkdownIt.prototype.renderInline = function(src, env) {
+  env = env || {};
+  return this.renderer.render(this.parseInline(src, env), this.options, env);
+};
+var lib_default = MarkdownIt;
+
+// src/api/content.ts
+function toList2(data) {
+  return Array.isArray(data) ? data : data.results;
+}
+async function fetchMaterials(courseId2) {
+  const data = await apiGet(
+    "/api/content/course_materials/",
+    { course: courseId2, _expand: "textbook", _sort: "position", _page_size: "200" }
+  );
+  return toList2(data);
+}
+async function fetchPageRanges(materialId) {
+  const data = await apiGet(
+    "/api/content/course_material_page_ranges/",
+    { material: materialId, _sort: "position", _page_size: "200" }
+  );
+  return toList2(data);
+}
+async function fetchTextbookPages(textbookId) {
+  const data = await apiGet(
+    "/api/content/textbook_pages/",
+    { textbook: textbookId, _sort: "position", _page_size: "500" }
+  );
+  return toList2(data);
+}
+
+// src/data/course-content.ts
+var markdownRenderer = new lib_default({
+  breaks: true,
+  html: false,
+  linkify: true,
+  typographer: true
+});
+function escapeHtml2(value) {
+  return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+}
+function isSourceContent(content) {
+  return typeof content === "object" && content !== null && "type" in content && content.type === "source" && "source" in content;
+}
+function readPageSource(page) {
+  if (isSourceContent(page.content)) {
+    return page.content.source;
+  }
+  return "";
+}
+function renderPage(page) {
+  const format2 = page.text_format ?? "MD";
+  const source2 = readPageSource(page);
+  let html2;
+  if (format2 === "HTML") {
+    html2 = source2;
+  } else if (format2 === "TEXT") {
+    html2 = `<pre>${escapeHtml2(source2)}</pre>`;
+  } else {
+    html2 = markdownRenderer.render(source2);
+  }
+  return { id: page.id, title: page.name, format: format2, html: html2 };
+}
+function readingOrder(pages) {
+  const byParent = /* @__PURE__ */ new Map();
+  for (const page of pages) {
+    const key2 = page.parent ?? null;
+    const siblings = byParent.get(key2) ?? [];
+    siblings.push(page);
+    byParent.set(key2, siblings);
+  }
+  for (const siblings of byParent.values()) {
+    siblings.sort((a, b) => a.position - b.position);
+  }
+  const ordered = [];
+  const visit = (parentId) => {
+    for (const page of byParent.get(parentId) ?? []) {
+      ordered.push(page);
+      visit(page.id);
+    }
+  };
+  visit(null);
+  if (ordered.length < pages.length) {
+    const seen = new Set(ordered.map((page) => page.id));
+    for (const page of pages) {
+      if (!seen.has(page.id)) {
+        ordered.push(page);
+      }
+    }
+  }
+  return ordered;
+}
+function refId(ref) {
+  return typeof ref === "string" ? ref : ref.id;
+}
+function pagesForMaterial(ordered, ranges) {
+  if (ranges.length === 0) {
+    return ordered;
+  }
+  const indexById = new Map(ordered.map((page, index2) => [page.id, index2]));
+  const selected = [];
+  const seen = /* @__PURE__ */ new Set();
+  for (const range of [...ranges].sort((a, b) => a.position - b.position)) {
+    const startIndex = indexById.get(refId(range.start_page));
+    const endIndex = indexById.get(refId(range.end_page));
+    if (startIndex === void 0 || endIndex === void 0) {
+      continue;
+    }
+    const from = Math.min(startIndex, endIndex);
+    const to = Math.max(startIndex, endIndex);
+    for (let i = from; i <= to; i++) {
+      const page = ordered[i];
+      if (page && !seen.has(page.id)) {
+        seen.add(page.id);
+        selected.push(page);
+      }
+    }
+  }
+  return selected;
+}
+function textbookTitle(material) {
+  if (typeof material.textbook === "string") {
+    return "Material";
+  }
+  return material.textbook.name;
+}
+async function loadCourseContent(courseId2) {
+  const materials = await fetchMaterials(courseId2);
+  materials.sort((a, b) => a.position - b.position);
+  const result = await Promise.all(
+    materials.map(async (material) => {
+      const textbookId = refId(material.textbook);
+      const [ranges, pages] = await Promise.all([
+        fetchPageRanges(material.id),
+        fetchTextbookPages(textbookId)
+      ]);
+      const ordered = readingOrder(pages);
+      const selected = pagesForMaterial(ordered, ranges);
+      return {
+        id: material.id,
+        title: textbookTitle(material),
+        pages: selected.map(renderPage)
+      };
+    })
+  );
+  return result.filter((material) => material.pages.length > 0);
+}
+
+// src/components/pages/ContentPage.svelte
+var root13 = from_html(`<button type="button" class="toc-link svelte-uyhh09"> </button>`);
+var root_111 = from_html(`<p class="toc-group svelte-uyhh09"> </p> <!>`, 1);
+var root_28 = from_html(`<p class="muted svelte-uyhh09">No sections yet.</p>`);
+var root_37 = from_html(`<p class="muted svelte-uyhh09">Loading course content\u2026</p>`);
+var root_46 = from_html(`<p class="error svelte-uyhh09"> </p>`);
+var root_54 = from_html(`<iframe class="html-frame svelte-uyhh09" sandbox=""></iframe>`);
+var root_63 = from_html(`<div class="prose svelte-uyhh09"></div>`);
+var root_72 = from_html(`<section class="block svelte-uyhh09"><h2 class="svelte-uyhh09"> </h2> <!></section>`);
+var root_82 = from_html(`<section class="block svelte-uyhh09"><p class="placeholder-note svelte-uyhh09">\u{1F4DD} No content has been added to this course yet. Once your teacher publishes course
+                    material in the teacher area, it will appear here.</p> <div class="actions svelte-uyhh09"><button type="button" class="btn btn-ghost">Ask the tutor</button></div></section>`);
+var root_92 = from_html(`<div class="content-screen svelte-uyhh09"><aside class="toc svelte-uyhh09"><button type="button" class="back svelte-uyhh09">\u2190 Back to chat</button> <p class="toc-label svelte-uyhh09">On this page</p> <nav class="toc-nav svelte-uyhh09" aria-label="Table of contents"><!></nav></aside> <main class="article svelte-uyhh09"><header class="article-head svelte-uyhh09"><p class="eyebrow svelte-uyhh09">Course content</p> <h1 class="article-title svelte-uyhh09"> </h1></header> <!></main></div>`);
+var $$css13 = {
+  hash: "svelte-uyhh09",
+  code: '.content-screen.svelte-uyhh09 {flex:1;min-height:0;overflow:hidden;display:grid;grid-template-columns:15rem minmax(0, 1fr);grid-template-rows:minmax(0, 1fr);width:100%;}\r\n\r\n    /* Sidebar stays put; it never scrolls. */.toc.svelte-uyhh09 {min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:1rem;padding:1.5rem 1rem;border-right:1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);background:color-mix(in oklab, var(--color-base-100) 60%, transparent);}.back.svelte-uyhh09 {align-self:flex-start;background:none;border:none;cursor:pointer;font-weight:600;color:var(--color-primary);}.back.svelte-uyhh09:focus-visible {outline:2px solid var(--color-primary);outline-offset:2px;}.toc-label.svelte-uyhh09 {font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:color-mix(in oklab, var(--color-base-content) 55%, transparent);}.toc-nav.svelte-uyhh09 {display:flex;flex-direction:column;gap:0.15rem;min-height:0;overflow-y:auto;}.toc-group.svelte-uyhh09 {margin-top:0.6rem;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:color-mix(in oklab, var(--color-base-content) 70%, transparent);}.toc-link.svelte-uyhh09 {text-align:left;padding:0.4rem 0.6rem;border-radius:0.5rem;border:none;background:transparent;color:color-mix(in oklab, var(--color-base-content) 75%, transparent);cursor:pointer;}.toc-link.svelte-uyhh09:hover {background:color-mix(in oklab, var(--color-primary) 14%, transparent);color:var(--color-base-content);}.article.svelte-uyhh09 {min-height:0;overflow-y:auto;padding:2.5rem 0;}\r\n\r\n    /* Content text spans ~90% of the content view. */.article.svelte-uyhh09 > :where(.svelte-uyhh09) {width:90%;margin-left:auto;margin-right:auto;}.article-head.svelte-uyhh09 {margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);}.eyebrow.svelte-uyhh09 {font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--color-primary);}.article-title.svelte-uyhh09 {font-size:clamp(2rem, 4vw, 2.8rem);font-weight:800;color:var(--color-base-content);text-shadow:0 0 22px color-mix(in oklab, var(--color-primary) 30%, transparent);}.placeholder-note.svelte-uyhh09 {margin-top:0.5rem;font-size:0.85rem;color:color-mix(in oklab, var(--color-base-content) 60%, transparent);}.block.svelte-uyhh09 {margin-bottom:2.25rem;line-height:1.7;color:color-mix(in oklab, var(--color-base-content) 90%, transparent);}.block.svelte-uyhh09 h2:where(.svelte-uyhh09) {font-size:1.5rem;font-weight:700;margin-bottom:0.6rem;color:var(--color-base-content);}.error.svelte-uyhh09 {color:var(--color-error, crimson);}.muted.svelte-uyhh09 {color:color-mix(in oklab, var(--color-base-content) 60%, transparent);font-size:0.9rem;}\r\n\r\n    /* Rendered Markdown / plain-text content. Styling targets the injected HTML. */.prose.svelte-uyhh09 h1,\r\n    .prose.svelte-uyhh09 h2,\r\n    .prose.svelte-uyhh09 h3 {font-weight:700;margin:1rem 0 0.5rem;}.prose.svelte-uyhh09 h1 {font-size:1.6rem;}.prose.svelte-uyhh09 h2 {font-size:1.3rem;}.prose.svelte-uyhh09 h3 {font-size:1.1rem;}.prose.svelte-uyhh09 p {margin:0.5rem 0;}.prose.svelte-uyhh09 ul,\r\n    .prose.svelte-uyhh09 ol {margin:0.5rem 0 0.5rem 1.5rem;}.prose.svelte-uyhh09 li {margin:0.2rem 0;}.prose.svelte-uyhh09 a {color:var(--color-primary);text-decoration:underline;}.prose.svelte-uyhh09 pre,\r\n    .prose.svelte-uyhh09 code {font-family:ui-monospace, "SF Mono", Menlo, monospace;font-size:0.9rem;}.prose.svelte-uyhh09 pre {margin-top:0.75rem;padding:1rem 1.25rem;border-radius:0.75rem;overflow-x:auto;background:color-mix(in oklab, var(--color-base-content) 8%, transparent);border:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);}.prose.svelte-uyhh09 blockquote {margin:0.75rem 0;padding:0.5rem 1rem;border-left:3px solid var(--color-primary);background:color-mix(in oklab, var(--color-primary) 8%, transparent);}.html-frame.svelte-uyhh09 {width:100%;min-height:24rem;border:1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);border-radius:0.5rem;background:var(--color-base-100);}.actions.svelte-uyhh09 {display:flex;gap:0.75rem;margin-top:1rem;}\r\n\r\n    @media (max-width: 48rem) {.content-screen.svelte-uyhh09 {grid-template-columns:1fr;}.toc.svelte-uyhh09 {display:none;}\r\n    }'
+};
+function ContentPage($$anchor, $$props) {
+  push($$props, true);
+  append_styles($$anchor, $$css13);
+  let params = prop($$props, "params", 7);
+  let state3 = state(proxy({
+    isLoading: true,
+    errorMessage: "",
+    user: null,
+    stats: null,
+    skills: [],
+    courses: []
+  }));
+  let materials = state(proxy([]));
+  let contentLoading = state(true);
+  let contentError = state("");
+  onMount(() => {
+    const unsubscribe = dashboardStore.subscribe((value) => {
+      set(state3, value, true);
+    });
+    if (get2(state3).courses.length === 0) {
+      dashboardStore.refresh();
+    }
+    return unsubscribe;
+  });
+  user_effect(() => {
+    const courseId2 = params()?.id;
+    if (!courseId2) {
+      set(materials, [], true);
+      set(contentLoading, false);
+      return;
+    }
+    set(contentLoading, true);
+    set(contentError, "");
+    loadCourseContent(courseId2).then((result) => {
+      set(materials, result, true);
+    }).catch((error2) => {
+      set(contentError, error2 instanceof Error ? error2.message : String(error2), true);
+    }).finally(() => {
+      set(contentLoading, false);
+    });
+  });
+  const courseTitle = user_derived(() => get2(state3).courses.find((course) => course.id === params()?.id)?.name ?? "Course");
+  const hasContent = user_derived(() => get2(materials).some((material) => material.pages.length > 0));
+  function anchor(pageId) {
+    return `page-${pageId}`;
+  }
+  function scrollTo2(id) {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  var $$exports = {
+    get params() {
+      return params();
+    },
+    set params($$value) {
+      params($$value);
+      flushSync();
+    }
+  };
+  var div = root_92();
+  var aside = child(div);
+  var button = child(aside);
+  var nav = sibling(button, 4);
+  var node = child(nav);
+  {
+    var consequent_1 = ($$anchor2) => {
+      var fragment = comment();
+      var node_1 = first_child(fragment);
+      each(node_1, 17, () => get2(materials), (material) => material.id, ($$anchor3, material) => {
+        var fragment_1 = comment();
+        var node_2 = first_child(fragment_1);
+        {
+          var consequent = ($$anchor4) => {
+            var fragment_2 = root_111();
+            var p = first_child(fragment_2);
+            var text3 = child(p, true);
+            reset(p);
+            var node_3 = sibling(p, 2);
+            each(node_3, 17, () => get2(material).pages, (page) => page.id, ($$anchor5, page) => {
+              var button_1 = root13();
+              var text_1 = child(button_1, true);
+              reset(button_1);
+              template_effect(() => set_text(text_1, get2(page).title));
+              delegated("click", button_1, () => scrollTo2(anchor(get2(page).id)));
+              append($$anchor5, button_1);
+            });
+            template_effect(() => set_text(text3, get2(material).title));
+            append($$anchor4, fragment_2);
+          };
+          if_block(node_2, ($$render) => {
+            if (get2(material).pages.length > 0) $$render(consequent);
+          });
+        }
+        append($$anchor3, fragment_1);
+      });
+      append($$anchor2, fragment);
+    };
+    var alternate = ($$anchor2) => {
+      var p_1 = root_28();
+      append($$anchor2, p_1);
+    };
+    if_block(node, ($$render) => {
+      if (get2(hasContent)) $$render(consequent_1);
+      else $$render(alternate, -1);
+    });
+  }
+  reset(nav);
+  reset(aside);
+  var main = sibling(aside, 2);
+  var header = child(main);
+  var h1 = sibling(child(header), 2);
+  var text_2 = child(h1, true);
+  reset(h1);
+  reset(header);
+  var node_4 = sibling(header, 2);
+  {
+    var consequent_2 = ($$anchor2) => {
+      var p_2 = root_37();
+      append($$anchor2, p_2);
+    };
+    var consequent_3 = ($$anchor2) => {
+      var p_3 = root_46();
+      var text_3 = child(p_3, true);
+      reset(p_3);
+      template_effect(() => set_text(text_3, get2(contentError)));
+      append($$anchor2, p_3);
+    };
+    var consequent_5 = ($$anchor2) => {
+      var fragment_3 = comment();
+      var node_5 = first_child(fragment_3);
+      each(node_5, 17, () => get2(materials), (material) => material.id, ($$anchor3, material) => {
+        var fragment_4 = comment();
+        var node_6 = first_child(fragment_4);
+        each(node_6, 17, () => get2(material).pages, (page) => page.id, ($$anchor4, page) => {
+          var section = root_72();
+          var h2 = child(section);
+          var text_4 = child(h2, true);
+          reset(h2);
+          var node_7 = sibling(h2, 2);
+          {
+            var consequent_4 = ($$anchor5) => {
+              var iframe = root_54();
+              template_effect(() => {
+                set_attribute2(iframe, "title", get2(page).title);
+                set_attribute2(iframe, "srcdoc", get2(page).html);
+              });
+              append($$anchor5, iframe);
+            };
+            var alternate_1 = ($$anchor5) => {
+              var div_1 = root_63();
+              html(div_1, () => get2(page).html, true);
+              reset(div_1);
+              append($$anchor5, div_1);
+            };
+            if_block(node_7, ($$render) => {
+              if (get2(page).format === "HTML") $$render(consequent_4);
+              else $$render(alternate_1, -1);
+            });
+          }
+          reset(section);
+          template_effect(
+            ($0) => {
+              set_attribute2(section, "id", $0);
+              set_text(text_4, get2(page).title);
+            },
+            [() => anchor(get2(page).id)]
+          );
+          append($$anchor4, section);
+        });
+        append($$anchor3, fragment_4);
+      });
+      append($$anchor2, fragment_3);
+    };
+    var alternate_2 = ($$anchor2) => {
+      var section_1 = root_82();
+      var div_2 = sibling(child(section_1), 2);
+      var button_2 = child(div_2);
+      reset(div_2);
+      reset(section_1);
+      delegated("click", button_2, () => push2(`/chat/${params()?.id ?? ""}`));
+      append($$anchor2, section_1);
+    };
+    if_block(node_4, ($$render) => {
+      if (get2(contentLoading)) $$render(consequent_2);
+      else if (get2(contentError)) $$render(consequent_3, 1);
+      else if (get2(hasContent)) $$render(consequent_5, 2);
+      else $$render(alternate_2, -1);
+    });
+  }
+  reset(main);
+  reset(div);
+  template_effect(() => set_text(text_2, get2(courseTitle)));
+  delegated("click", button, () => push2(`/chat/${params()?.id ?? ""}`));
+  append($$anchor, div);
+  return pop($$exports);
+}
+delegate(["click"]);
+create_custom_element(ContentPage, { params: {} }, [], [], { mode: "open" });
+
+// src/components/routes.ts
+var routes_default = {
+  "/": DashboardPage,
+  "/profile": ProfileEditPage,
+  "/chat/:id": CourseChatPage,
+  "/quiz/:id": QuizPage,
+  "/content/:id": ContentPage,
+  "*": DashboardPage
+};
+
+// src/components/DashboardApp.svelte
+var root14 = from_html(`<div><!> <main class="shell-content svelte-1w96du5"><!></main> <footer class="shell-footer svelte-1w96du5"><span>Copyright 2026 | OpenBook</span></footer> <!></div>`);
+var $$css14 = {
+  hash: "svelte-1w96du5",
+  code: "\r\n    /* Lock the shell to the viewport so only inner page areas scroll. */.shell.svelte-1w96du5 {flex:1;height:100vh;min-height:0;overflow:hidden;display:flex;flex-direction:column;transition:padding-right 0.25s ease;}\r\n\r\n    /* Make room for the docked chat sidebar so nothing is hidden behind it. */.shell.chat-docked.svelte-1w96du5 {padding-right:min(28rem, 100vw);}.shell-content.svelte-1w96du5 {flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;}.shell-footer.svelte-1w96du5 {margin-top:auto;padding:1rem 1.5rem 1.5rem;text-align:center;font-size:0.75rem;letter-spacing:0.08em;text-transform:uppercase;color:color-mix(in oklab, var(--color-base-content) 60%, transparent);border-top:1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);}"
+};
+function DashboardApp($$anchor, $$props) {
+  push($$props, true);
+  append_styles($$anchor, $$css14);
+  let state3 = state(proxy({
+    isLoading: true,
+    errorMessage: "",
+    user: null,
+    stats: null,
+    skills: [],
+    courses: []
+  }));
+  let chatDocked = state(false);
+  const onChatPage = user_derived(() => (router.location ?? "").startsWith("/chat"));
+  onMount(() => {
+    return dashboardStore.subscribe((value) => {
+      set(state3, value, true);
+    });
+  });
+  var div = root14();
+  let classes;
+  var node = child(div);
+  DashboardHeader(node, {
+    get user() {
+      return get2(state3).user;
+    }
+  });
+  var main = sibling(node, 2);
+  var node_1 = child(main);
+  Router(node_1, {
+    get routes() {
+      return routes_default;
+    }
+  });
+  reset(main);
+  var node_2 = sibling(main, 4);
+  {
+    var consequent = ($$anchor2) => {
+      ChatWidget($$anchor2, { onSidebarChange: (docked) => set(chatDocked, docked, true) });
+    };
+    if_block(node_2, ($$render) => {
+      if (!get2(onChatPage)) $$render(consequent);
+    });
+  }
+  reset(div);
+  template_effect(() => classes = set_class(div, 1, "shell svelte-1w96du5", null, classes, { "chat-docked": get2(chatDocked) && !get2(onChatPage) }));
+  append($$anchor, div);
+  pop();
+}
+create_custom_element(DashboardApp, {}, [], [], { mode: "open" });
+
+// src/index.ts
+initTheme();
+mount(DashboardApp, { target: document.body });
 //# sourceMappingURL=bundle.js.map

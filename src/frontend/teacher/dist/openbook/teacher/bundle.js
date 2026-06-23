@@ -7217,9 +7217,9 @@ async function addMaterial(courseId, textbookId, position) {
     position
   });
 }
-async function updateMaterialPosition(id, position) {
-  return apiSend("PATCH", `/api/content/course_materials/${encodeURIComponent(id)}/`, {
-    position
+async function moveMaterial(id, direction) {
+  return apiSend("POST", `/api/content/course_materials/${encodeURIComponent(id)}/move/`, {
+    direction
   });
 }
 async function deleteMaterial(id) {
@@ -14067,18 +14067,14 @@ function ContentPanel($$anchor, $$props) {
     }
   }
   async function move2(index2, direction) {
-    const target = index2 + direction;
-    const a = get2(materials)[index2];
-    const b = get2(materials)[target];
-    if (!a || !b) {
+    const material = get2(materials)[index2];
+    const target = get2(materials)[index2 + direction];
+    if (!material || !target) {
       return;
     }
     set(error2, "");
     try {
-      await Promise.all([
-        updateMaterialPosition(a.id, b.position),
-        updateMaterialPosition(b.id, a.position)
-      ]);
+      await moveMaterial(material.id, direction === -1 ? "up" : "down");
       await load();
     } catch (e) {
       set(error2, e instanceof Error ? e.message : String(e), true);
