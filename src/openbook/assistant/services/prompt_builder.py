@@ -36,18 +36,26 @@ class PromptBuilder:
 
     def build_quiz_generation_prompt(
         self,
-        document_context: str,
+        document_context: str = "",
+        course_context: str = "",
         learning_context: str = "",
         question_count: int = 5,
     ) -> str:
-        """Build a prompt for future structured quiz generation."""
+        """Build a prompt for structured course quiz generation."""
         prompt_parts = [
             "Du bist ein Quizgenerator fuer einen OpenBook-Kurs.",
-            f"Erzeuge {question_count} Multiple-Choice-Fragen aus dem Dokumentkontext.",
-            "Gib ausschliesslich valides JSON zurueck.",
+            f"Erzeuge exakt {question_count} Multiple-Choice-Fragen.",
+            "Nutze vorrangig den Dokumentkontext.",
+            "Wenn kein Dokumentkontext vorhanden ist, nutze den Kurskontext.",
+            "Jede Frage muss vier Antwortoptionen haben.",
+            "Genau eine Antwortoption pro Frage muss correct=true haben.",
+            "Gib ausschliesslich valides JSON ohne Markdown-Codeblock zurueck.",
             (
-                "Schema: {\"questions\":[{\"question\":\"...\","
-                "\"answers\":[{\"text\":\"...\",\"correct\":true}]}]}"
+                "Schema: {\"questions\":[{\"prompt\":\"...\","
+                "\"options\":[{\"text\":\"...\",\"correct\":true},"
+                "{\"text\":\"...\",\"correct\":false},"
+                "{\"text\":\"...\",\"correct\":false},"
+                "{\"text\":\"...\",\"correct\":false}]}]}"
             ),
         ]
 
@@ -57,5 +65,10 @@ class PromptBuilder:
             )
             prompt_parts.append(learning_context)
 
-        prompt_parts.append(f"Dokumentkontext:\n{document_context}")
+        if document_context:
+            prompt_parts.append(f"Dokumentkontext:\n{document_context}")
+
+        if course_context:
+            prompt_parts.append(f"Kurskontext:\n{course_context}")
+
         return "\n\n".join(prompt_parts).strip()

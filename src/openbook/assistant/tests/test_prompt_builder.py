@@ -30,9 +30,14 @@ class PromptBuilder_Tests(SimpleTestCase):
         """Quiz prompts should ask the model for structured JSON."""
         prompt = PromptBuilder().build_quiz_generation_prompt(
             document_context="HTML Grundlagen",
+            course_context="Kurs: Web Basics",
             question_count=3,
         )
 
-        self.assertIn("Erzeuge 3 Multiple-Choice-Fragen", prompt)
+        self.assertIn("Erzeuge exakt 3 Multiple-Choice-Fragen", prompt)
+        self.assertIn("HTML Grundlagen", prompt)
+        self.assertIn("Kurs: Web Basics", prompt)
+        self.assertIn("prompt", prompt)
+        self.assertIn("options", prompt)
         self.assertIn("valide", prompt)
         self.assertIn("JSON", prompt)
