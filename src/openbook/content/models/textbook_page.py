@@ -52,6 +52,14 @@ class TextbookPage(UUIDMixin, NameDescriptionMixin, CreatedModifiedByMixin):
         help_text=_("DOM-like content tree with text and interactive components."),
     )
 
+    skills = models.ManyToManyField(
+        "openbook_gamification.Skill",
+        verbose_name=_("Skills"),
+        related_name="textbook_pages",
+        blank=True,
+        help_text=_("Skills trained by this page. Quiz points earned here advance these skills."),
+    )
+
     class Meta:
         verbose_name = _("Textbook Page")
         verbose_name_plural = _("Textbook Pages")

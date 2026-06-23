@@ -30,6 +30,8 @@ class CourseEventType(models.TextChoices):
     streak are updated alongside the per-course progress.
     """
     COURSE_POINTS_AWARDED = "COURSE_POINTS_AWARDED", _("Course Points Awarded")
+    QUIZ_POINTS_AWARDED   = "QUIZ_POINTS_AWARDED",   _("Quiz Points Awarded")
+    CHAT_POINTS_AWARDED   = "CHAT_POINTS_AWARDED",   _("Chat Points Awarded")
 
 
 class StreakEventType(models.TextChoices):

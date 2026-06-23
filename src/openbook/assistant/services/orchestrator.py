@@ -56,6 +56,10 @@ class AssistantOrchestrator:
         course_obj = self._resolve_course(course)
         self._check_chat_permission(user=user, course=course_obj)
 
+        # Asking a question in a course chat earns a small (daily-capped) reward.
+        if course_obj is not None:
+            self._award_chat_question_reward(user=user, course=course_obj)
+
         learning_context = ""
         if course_obj is not None:
             learning_context = self.learning_context_service.get_prompt_context(
@@ -122,13 +126,24 @@ class AssistantOrchestrator:
         course_obj = self._resolve_required_course(course)
         page_obj = self._resolve_page(page)
         self._check_chat_permission(user=user, course=course_obj)
-        return self.learning_context_service.record_quiz_result(
+        quiz_result = self.learning_context_service.record_quiz_result(
             user=user,
             course=course_obj,
             page=page_obj,
             score=score,
             attempts=attempts,
         )
+
+        # Reward correct answers: course points (and the page's skills) scale with the
+        # score, and only an improvement over the best previous score is paid out.
+        self._award_quiz_rewards(
+            user=user,
+            course=course_obj,
+            page=page_obj,
+            score=score,
+        )
+
+        return quiz_result
 
     def generate_quiz(
         self,
@@ -171,6 +186,55 @@ class AssistantOrchestrator:
             context_source=context_source,
             sources=rag_context.sources,
         )
+
+    def _award_chat_question_reward(
+        self,
+        user: AbstractUser | AnonymousUser | None,
+        course: Course,
+    ) -> None:
+        """Grant the (daily-capped) chat reward for asking a course question."""
+        if user is None or not getattr(user, "is_authenticated", False):
+            return
+
+        # Keep gamification a soft dependency: never let a reward error break chat.
+        try:
+            from openbook.gamification.services import award_chat_question_reward
+        except ImportError:
+            return
+
+        try:
+            award_chat_question_reward(account_id=user.pk, course_id=course.pk)
+        except Exception:
+            pass
+
+    def _award_quiz_rewards(
+        self,
+        user: AbstractUser | AnonymousUser | None,
+        course: Course,
+        page: TextbookPage,
+        score: float,
+    ) -> None:
+        """Grant course points and skill progress for a quiz attempt on a page."""
+        if user is None or not getattr(user, "is_authenticated", False):
+            return
+
+        try:
+            from openbook.gamification.services import award_quiz_rewards
+        except ImportError:
+            return
+
+        skill_ids = list(page.skills.values_list("id", flat=True))
+
+        try:
+            award_quiz_rewards(
+                account_id = user.pk,
+                course_id  = course.pk,
+                page_id    = page.pk,
+                score      = score,
+                skill_ids  = skill_ids,
+            )
+        except Exception:
+            pass
 
     def _resolve_course(self, course: Course | UUID | str | None) -> Course | None:
         """Return a Course instance for supported course identifiers."""
