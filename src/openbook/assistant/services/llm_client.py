@@ -79,6 +79,14 @@ class LLM_Client:
             learning_context=learning_context,
         )
 
+    def retrieve_rag_context(self, query: str, course=None, limit: int = 3):
+        """Retrieve matching RAG context without calling the chat model."""
+        return self._get_rag_client().retrieve_document_context(
+            query=query,
+            course=course,
+            limit=limit,
+        )
+
     def _get_rag_client(self):
         """Create the RAG client lazily to avoid circular service initialization."""
         if not hasattr(self, "rag_client"):

@@ -45,6 +45,14 @@ class RagQueryResult:
     sources: tuple[RagSource, ...]
 
 
+@dataclass(frozen=True)
+class RagContext:
+    """Document context retrieved from the assistant vector index."""
+
+    context: str
+    sources: tuple[RagSource, ...]
+
+
 class RagClient:
     def __init__(
         self,
@@ -170,6 +178,38 @@ class RagClient:
         learning_context: str = "",
     ) -> RagQueryResult:
         """Run a RAG query and return the generated answer with used sources."""
+        rag_context = self.retrieve_document_context(
+            query=query,
+            course=course,
+            limit=3,
+        )
+
+        if not rag_context.context:
+            return self._perform_unindexed_query(query, course=course)
+
+        prompt = self.prompt_builder.build_course_question_prompt(
+            query=query,
+            document_context=rag_context.context,
+            learning_context=learning_context,
+        )
+        answer = self.assistant.get_user_message(prompt)
+        return RagQueryResult(answer=answer, sources=rag_context.sources)
+
+    def retrieve_document_context(
+        self,
+        query: str,
+        course: "Course | None" = None,
+        limit: int = 3,
+    ) -> RagContext:
+        """Retrieve matching document chunks without calling the chat model."""
+        try:
+            context_limit = int(limit)
+        except (TypeError, ValueError) as error:
+            raise ValueError("RAG context limit must be an integer.") from error
+
+        if context_limit < 1:
+            raise ValueError("RAG context limit must be at least 1.")
+
         connection = get_vector_connection()
         if connection is None:
             raise RuntimeError("RAG vector search currently requires Django's SQLite backend.")
@@ -186,7 +226,7 @@ class RagClient:
             chunk_queryset = chunk_queryset.filter(parent__course=course)
 
         if not chunk_queryset.exists():
-            return self._perform_unindexed_query(query, course=course)
+            return RagContext(context="", sources=())
 
         query_embedding = self.assistant.get_embedding(query)
 
@@ -200,7 +240,7 @@ class RagClient:
                 WHERE embedding MATCH %s
                     AND course_id = %s
                 ORDER BY distance
-                LIMIT 3
+                LIMIT {context_limit}
                 """,
                 [serialize_float32(query_embedding), course_id],
             )
@@ -217,26 +257,22 @@ class RagClient:
             if chunk_id in chunks_by_id
         ]
         top_contexts = [chunk.content for chunk in top_chunks]
-        if not top_contexts:
-            raise RuntimeError("No matching assistant context was found.")
 
-        context = "\n\n".join(top_contexts)
-        prompt = self.prompt_builder.build_course_question_prompt(
-            query=query,
-            document_context=context,
-            learning_context=learning_context,
+        if not top_contexts:
+            return RagContext(context="", sources=())
+
+        return RagContext(
+            context="\n\n".join(top_contexts),
+            sources=tuple(
+                RagSource(
+                    chunk_id=str(chunk.id),
+                    document_id=str(chunk.parent_id),
+                    document_title=chunk.parent.title,
+                    position=chunk.position,
+                )
+                for chunk in top_chunks
+            ),
         )
-        answer = self.assistant.get_user_message(prompt)
-        sources = tuple(
-            RagSource(
-                chunk_id=str(chunk.id),
-                document_id=str(chunk.parent_id),
-                document_title=chunk.parent.title,
-                position=chunk.position,
-            )
-            for chunk in top_chunks
-        )
-        return RagQueryResult(answer=answer, sources=sources)
 
     def _perform_unindexed_query(
         self,

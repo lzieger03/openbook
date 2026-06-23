@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     "openbook.ai",
     "openbook.content",
     "openbook.learning",
-    "openbook.quiz",
     "openbook.assistant",
     "openbook.gamification",
 

@@ -17,6 +17,10 @@ from openbook.ai.consumers.chat import ChatConsumer
 from openbook.ai.messages.chat import LearningPageCompleted
 from openbook.ai.messages.chat import LearningPageOpened
 from openbook.ai.messages.chat import LearningQuizResult
+from openbook.ai.messages.chat import QuizStart
+from openbook.assistant.services.quiz_generation import GeneratedQuiz
+from openbook.assistant.services.quiz_generation import GeneratedQuizOption
+from openbook.assistant.services.quiz_generation import GeneratedQuizQuestion
 
 
 class ChatConsumerLearningEvent_Tests(SimpleTestCase):
@@ -106,4 +110,50 @@ class ChatConsumerLearningEvent_Tests(SimpleTestCase):
         )
 
         self.assertFalse(response.payload.success)
+        self.assertIn("course-scoped", response.payload.message)
+
+    def test_handle_quiz_start(self):
+        """Quiz-start events should be delegated to the orchestrator."""
+        course_id = uuid4()
+        consumer = self._consumer(course_id=course_id)
+        generated_quiz = GeneratedQuiz(
+            context_source="course_context",
+            questions=(
+                GeneratedQuizQuestion(
+                    prompt="What is HTML?",
+                    options=(
+                        GeneratedQuizOption(text="Markup language", correct=True),
+                        GeneratedQuizOption(text="Database", correct=False),
+                        GeneratedQuizOption(text="Server", correct=False),
+                        GeneratedQuizOption(text="Image format", correct=False),
+                    ),
+                ),
+            ),
+        )
+
+        with patch("openbook.ai.consumers.chat.AssistantOrchestrator") as orchestrator:
+            orchestrator.return_value.generate_quiz.return_value = generated_quiz
+            response = async_to_sync(consumer.handle_quiz_start)(
+                QuizStart(payload={"question_count": 1}),
+            )
+
+        orchestrator.return_value.generate_quiz.assert_called_once_with(
+            user=consumer.scope["user"],
+            course=course_id,
+            question_count=1,
+        )
+        self.assertEqual(response.payload.context_source, "course_context")
+        self.assertEqual(response.payload.questions[0].prompt, "What is HTML?")
+        self.assertTrue(response.payload.questions[0].options[0].correct)
+
+    def test_quiz_start_requires_course_route(self):
+        """Quiz generation should fail on the global chat route."""
+        consumer = self._consumer()
+
+        response = async_to_sync(consumer.handle_quiz_start)(
+            QuizStart(payload={"question_count": 1}),
+        )
+
+        self.assertFalse(response.payload.success)
+        self.assertEqual(response.payload.event, "quiz_start")
         self.assertIn("course-scoped", response.payload.message)
