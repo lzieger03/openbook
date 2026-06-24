@@ -151,17 +151,17 @@ deleted from here after a confirmation step.
     </header>
 
     {#if state.isLoading}
-        <div class="status" role="status" aria-live="polite">
+        <div class="status-box" role="status" aria-live="polite">
             <span class="loading loading-spinner loading-lg"></span>
             <p>Loading your courses…</p>
         </div>
     {:else if state.errorMessage}
-        <div class="status" role="alert">
+        <div class="status-box" role="alert">
             <p class="error">{state.errorMessage}</p>
             <button type="button" class="btn btn-sm" onclick={() => teacherStore.refresh()}>Retry</button>
         </div>
     {:else if state.courses.length === 0}
-        <div class="status">
+        <div class="status-box">
             <p>No courses yet. Create your first course to get started.</p>
             <button type="button" class="btn btn-primary btn-sm" onclick={openCreate}>+ New course</button>
         </div>
@@ -348,12 +348,14 @@ deleted from here after a confirmation step.
         color: color-mix(in oklab, var(--color-base-content) 60%, transparent);
     }
 
-    .status {
+    .status-box {
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: center;
         gap: 1rem;
-        padding: 4rem 0;
+        padding: 4rem 1rem;
+        text-align: center;
         color: color-mix(in oklab, var(--color-base-content) 70%, transparent);
     }
 

@@ -52,12 +52,12 @@ with loading / error / content states.
     </header>
 
     {#if state.isLoading}
-        <div class="status" role="status" aria-live="polite">
+        <div class="status-box" role="status" aria-live="polite">
             <span class="loading loading-spinner loading-lg"></span>
             <p>Loading your dashboard…</p>
         </div>
     {:else if state.errorMessage}
-        <div class="status" role="alert">
+        <div class="status-box" role="alert">
             <p class="error">{state.errorMessage}</p>
             <button type="button" class="btn btn-primary btn-sm" onclick={() => dashboardStore.refresh()}>
                 Retry
@@ -160,12 +160,15 @@ with loading / error / content states.
         background: color-mix(in oklab, var(--color-base-content) 20%, transparent);
     }
 
-    .status {
+    .status-box {
+        flex: 1;
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: center;
         gap: 1rem;
-        padding: 4rem 0;
+        padding: 4rem 1rem;
+        text-align: center;
         color: color-mix(in oklab, var(--color-base-content) 70%, transparent);
     }
 

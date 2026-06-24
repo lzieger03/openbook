@@ -63,11 +63,11 @@ page ranges). The active course id comes from the route parameter.
     </nav>
 
     {#if isLoading}
-        <div class="status" role="status" aria-live="polite">
+        <div class="status-box" role="status" aria-live="polite">
             <span class="loading loading-spinner loading-lg"></span>
         </div>
     {:else if errorMessage}
-        <div class="status" role="alert">
+        <div class="status-box" role="alert">
             <p class="error">{errorMessage}</p>
             <button type="button" class="btn btn-sm" onclick={load}>Retry</button>
         </div>
@@ -124,12 +124,14 @@ page ranges). The active course id comes from the route parameter.
         margin-top: 0.5rem;
     }
 
-    .status {
+    .status-box {
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: center;
         gap: 1rem;
-        padding: 4rem 0;
+        padding: 4rem 1rem;
+        text-align: center;
         color: color-mix(in oklab, var(--color-base-content) 70%, transparent);
     }
 

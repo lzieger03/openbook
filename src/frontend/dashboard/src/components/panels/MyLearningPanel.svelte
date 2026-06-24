@@ -42,6 +42,10 @@ keep the streak).
 
     const isEmpty = $derived(courses.length === 0);
 
+    // Show only a few skill tags per course and collapse the rest into a "+N" badge so
+    // courses that train many skills don't blow up the card.
+    const maxVisibleSkills = 3;
+
     // A single recommended next step on the "Path" tab. `progress` adds a bar;
     // `course` makes the card clickable (opens that course's tutor page).
     interface Recommendation {
@@ -184,9 +188,20 @@ keep the streak).
 
                         {#if course.skills.length > 0}
                             <div class="course-tags">
-                                {#each course.skills as skill (skill.id)}
+                                {#each course.skills.slice(0, maxVisibleSkills) as skill (skill.id)}
                                     <span class="tag">{skill.name}</span>
                                 {/each}
+                                {#if course.skills.length > maxVisibleSkills}
+                                    <span
+                                        class="tag tag-more"
+                                        title={course.skills
+                                            .slice(maxVisibleSkills)
+                                            .map((skill) => skill.name)
+                                            .join(", ")}
+                                    >
+                                        +{course.skills.length - maxVisibleSkills}
+                                    </span>
+                                {/if}
                             </div>
                         {/if}
                     </button>
@@ -320,7 +335,7 @@ keep the streak).
     /* Fixed name + percent columns => the 1fr bar column is identical on every row. */
     .course-head {
         display: grid;
-        grid-template-columns: 14rem 1fr 3.5rem auto;
+        grid-template-columns: minmax(0, 14rem) 1fr 3.5rem auto;
         align-items: center;
         gap: 1rem;
     }
@@ -391,6 +406,15 @@ keep the streak).
         color: color-mix(in oklab, var(--color-base-content) 75%, transparent);
         background: color-mix(in oklab, var(--color-base-content) 10%, transparent);
         border: 1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);
+    }
+
+    /* Collapsed-overflow badge ("+N"); hint at the hidden skills via its tooltip. */
+    .tag-more {
+        cursor: default;
+        font-weight: 700;
+        color: var(--color-primary);
+        background: color-mix(in oklab, var(--color-primary) 14%, transparent);
+        border-color: color-mix(in oklab, var(--color-primary) 30%, transparent);
     }
 
     .empty {
@@ -543,5 +567,47 @@ keep the streak).
         border-radius: 999px;
         color: var(--color-primary);
         background: color-mix(in oklab, var(--color-primary) 14%, transparent);
+    }
+
+    /* On narrow screens the progress bar drops onto its own full-width line below the
+       course name so nothing is squeezed or clipped. */
+    @media (max-width: 38rem) {
+        .panel {
+            padding: 1.1rem;
+            border-radius: 1rem;
+        }
+
+        .panel-head {
+            flex-wrap: wrap;
+        }
+
+        .course-head {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.4rem 0.75rem;
+        }
+
+        .course-title {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        .course-name {
+            font-size: 1.2rem;
+        }
+
+        .course-percent {
+            order: 2;
+        }
+
+        .course-go {
+            order: 3;
+        }
+
+        .course-bar {
+            order: 4;
+            flex: 1 1 100%;
+        }
     }
 </style>

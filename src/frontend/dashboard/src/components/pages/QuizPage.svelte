@@ -40,7 +40,16 @@ assistant backend through the existing course chat WebSocket channel.
         courses: [],
     });
 
-    const quiz = createQuizStore(() => params?.id);
+    let reward = $state<{pointsAwarded: number; skillsAdvanced: string[]} | null>(null);
+
+    const quiz = createQuizStore(() => params?.id, {
+        // Once the backend confirms the quiz result, show what was earned and reload the
+        // dashboard data so the new course and skill points are reflected immediately.
+        onResultRecorded: (summary) => {
+            reward = summary;
+            dashboardStore.refresh();
+        },
+    });
     let quizState = $state<QuizState>({
         connection: "disconnected",
         isLoading: false,
@@ -145,6 +154,7 @@ assistant backend through the existing course chat WebSocket channel.
         score = 0;
         finished = false;
         resultSubmitted = false;
+        reward = null;
     }
 
     async function loadTextbooks(): Promise<void> {
@@ -285,6 +295,24 @@ assistant backend through the existing course chat WebSocket channel.
             <p class="result-text">
                 {score === questions.length ? "Perfect score." : "Keep practising."}
             </p>
+
+            {#if reward}
+                {#if reward.pointsAwarded > 0}
+                    <div class="reward" role="status">
+                        <span class="reward-points">+{reward.pointsAwarded} points</span>
+                        {#if reward.skillsAdvanced.length > 0}
+                            <span class="reward-skills">
+                                Skill progress:
+                                {#each reward.skillsAdvanced as skill (skill)}
+                                    <span class="reward-skill">{skill}</span>
+                                {/each}
+                            </span>
+                        {/if}
+                    </div>
+                {:else}
+                    <p class="reward-none">No new points — beat your previous best score to earn more.</p>
+                {/if}
+            {/if}
             <div class="result-actions">
                 <button type="button" class="btn btn-primary" onclick={restart}>Try again</button>
                 <button type="button" class="btn btn-outline" onclick={() => loadQuiz()}>New quiz</button>
@@ -636,6 +664,48 @@ assistant backend through the existing course chat WebSocket channel.
         font-size: 1.2rem;
         font-weight: 600;
         color: color-mix(in oklab, var(--color-base-content) 80%, transparent);
+    }
+
+    .reward {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .reward-points {
+        font-size: 1.4rem;
+        font-weight: 800;
+        padding: 0.25rem 1rem;
+        border-radius: 999px;
+        color: var(--color-primary-content);
+        background: var(--color-primary);
+        box-shadow: 0 0 16px color-mix(in oklab, var(--color-primary) 50%, transparent);
+    }
+
+    .reward-skills {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        font-size: 0.9rem;
+        color: color-mix(in oklab, var(--color-base-content) 70%, transparent);
+    }
+
+    .reward-skill {
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 0.1rem 0.6rem;
+        border-radius: 999px;
+        color: var(--color-primary);
+        background: color-mix(in oklab, var(--color-primary) 14%, transparent);
+        border: 1px solid color-mix(in oklab, var(--color-primary) 30%, transparent);
+    }
+
+    .reward-none {
+        font-size: 0.9rem;
+        color: color-mix(in oklab, var(--color-base-content) 60%, transparent);
     }
 
     .result-actions {

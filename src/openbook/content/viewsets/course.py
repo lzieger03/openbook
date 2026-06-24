@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from django_filters.filterset               import FilterSet
 from drf_spectacular.utils                  import extend_schema
+from rest_framework                         import serializers
 from rest_framework.viewsets                import ModelViewSet
 
 from openbook.drf.flex_serializers          import FlexFieldsModelSerializer
@@ -26,6 +27,23 @@ class CourseSerializer(ScopedRolesSerializerMixin, FlexFieldsModelSerializer):
     created_by  = UserField(read_only=True)
     modified_by = UserField(read_only=True)
 
+    # Skills a learner can earn in this course: the union of the skills trained by the
+    # pages of every textbook in the course. Derived (read-only) from the page-level
+    # assignment so the dashboard shows exactly what quizzes here can award.
+    skills      = serializers.SerializerMethodField()
+
+    def get_skills(self, obj):
+        from openbook.gamification.models import Skill
+        from openbook.gamification.viewsets.skill import SkillSerializer
+
+        earnable = (
+            Skill.objects
+            .filter(textbook_pages__textbook__used_in_courses__course=obj)
+            .distinct()
+            .order_by("name")
+        )
+        return SkillSerializer(earnable, many=True, context=self.context).data
+
     class Meta:
         model = Course
 
@@ -40,7 +58,7 @@ class CourseSerializer(ScopedRolesSerializerMixin, FlexFieldsModelSerializer):
 
         read_only_fields = [
             "id",
-            "materials",
+            "materials", "skills",
             *ScopedRolesSerializerMixin.Meta.read_only_fields,
             "created_at", "modified_at",
         ]
@@ -49,7 +67,6 @@ class CourseSerializer(ScopedRolesSerializerMixin, FlexFieldsModelSerializer):
             **ScopedRolesSerializerMixin.Meta.expandable_fields,
             "group":       "openbook.content.viewsets.library_group.LibraryGroupSerializer",
             "materials":   ("openbook.content.viewsets.course_material.CourseMaterialSerializer", {"many": True}),
-            "skills":      ("openbook.gamification.viewsets.skill.SkillSerializer", {"many": True}),
             "created_by":  "openbook.auth.viewsets.user.UserSerializer",
             "modified_by": "openbook.auth.viewsets.user.UserSerializer",
         }

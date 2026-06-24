@@ -26,6 +26,14 @@ from openbook.assistant.services.quiz_generation import GeneratedQuizQuestion
 class ChatConsumerLearningEvent_Tests(SimpleTestCase):
     """Tests for learning progress WebSocket events."""
 
+    def test_consumer_does_not_camelize_messages(self):
+        """
+        Outgoing fields must stay snake_case. The frontend reads snake_case keys (e.g.
+        ``page_id``, ``points_awarded``); chanx's camelCase conversion would rename them
+        and silently break quiz anchoring and point awarding.
+        """
+        self.assertFalse(ChatConsumer().should_camelize)
+
     def _consumer(self, course_id=None) -> ChatConsumer:
         """Return a ChatConsumer with a minimal test scope."""
         consumer = ChatConsumer()
@@ -82,6 +90,10 @@ class ChatConsumerLearningEvent_Tests(SimpleTestCase):
         consumer = self._consumer(course_id=course_id)
 
         with patch("openbook.ai.consumers.chat.AssistantOrchestrator") as orchestrator:
+            orchestrator.return_value.record_quiz_result.return_value = {
+                "points_awarded": 40,
+                "skills_advanced": ["HTML", "CSS"],
+            }
             response = async_to_sync(consumer.handle_learning_quiz_result)(
                 LearningQuizResult(
                     payload={
@@ -93,6 +105,8 @@ class ChatConsumerLearningEvent_Tests(SimpleTestCase):
             )
 
         self.assertTrue(response.payload.success)
+        self.assertEqual(response.payload.points_awarded, 40)
+        self.assertEqual(response.payload.skills_advanced, ["HTML", "CSS"])
         orchestrator.return_value.record_quiz_result.assert_called_once_with(
             user=consumer.scope["user"],
             course=course_id,

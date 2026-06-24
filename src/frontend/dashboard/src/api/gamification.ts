@@ -128,9 +128,9 @@ export async function fetchSkillProgress(username?: string | null): Promise<Skil
 
 export async function fetchCourseProgress(username?: string | null): Promise<CourseProgressDto[]> {
     const query: Record<string, string> = {
-        // Expand the course and, nested, its skills so the dashboard can show the skills
-        // each course teaches.
-        _expand: "course,course.skills",
+        // Expand the course; its `skills` (the earnable skills derived from the course's
+        // pages) are a read-only field included automatically with the expanded course.
+        _expand: "course",
         _page_size: "100",
         _sort: "course__name",
     };

@@ -206,10 +206,10 @@ class AssistantOrchestrator_Tests(TestCase):
         )
 
     def test_record_quiz_result(self):
-        """Quiz-result events should be delegated to the learning context service."""
+        """Quiz-result events should be delegated and return the awarded points."""
         self.learning_context_service.record_quiz_result.return_value = "quiz result"
 
-        quiz_result = self.orchestrator.record_quiz_result(
+        result = self.orchestrator.record_quiz_result(
             user=self.owner,
             course=self.course,
             page=self.page,
@@ -217,7 +217,9 @@ class AssistantOrchestrator_Tests(TestCase):
             attempts=3,
         )
 
-        self.assertEqual(quiz_result, "quiz result")
+        self.assertEqual(result["quiz_result"], "quiz result")
+        self.assertIn("points_awarded", result)
+        self.assertIn("skills_advanced", result)
         self.learning_context_service.record_quiz_result.assert_called_once_with(
             user=self.owner,
             course=self.course,

@@ -84,7 +84,15 @@ interface LearningEventStatus {
         event: string;
         success: boolean;
         message: string;
+        points_awarded?: number;
+        skills_advanced?: string[];
     };
+}
+
+/** What the learner earned from a submitted quiz, passed to {@link QuizStoreOptions.onResultRecorded}. */
+export interface QuizRewardSummary {
+    pointsAwarded: number;
+    skillsAdvanced: string[];
 }
 
 type SentMessages = QuizStart | LearningQuizResult;
@@ -92,6 +100,16 @@ type SentMessages = QuizStart | LearningQuizResult;
 type ReceivedMessages = QuizGenerated | LearningEventStatus;
 
 type CourseIdSource = string | (() => string | undefined);
+
+/** Options for {@link createQuizStore}. */
+export interface QuizStoreOptions {
+    /**
+     * Called once the backend has acknowledged a submitted quiz result (points and
+     * skill progress have been awarded). Receives what the learner earned so the UI can
+     * show it; the dashboard also uses this to refresh so the new totals show up.
+     */
+    onResultRecorded?: (reward: QuizRewardSummary) => void;
+}
 
 export interface QuizStore {
     subscribe: (run: (value: QuizState) => void) => () => void;
@@ -114,7 +132,7 @@ function initialState(): QuizState {
     };
 }
 
-export function createQuizStore(courseId: CourseIdSource): QuizStore {
+export function createQuizStore(courseId: CourseIdSource, options: QuizStoreOptions = {}): QuizStore {
     const {subscribe, update} = writable<QuizState>(initialState());
 
     let socket: WebSocketClient<SentMessages, ReceivedMessages> | undefined;
@@ -164,15 +182,29 @@ export function createQuizStore(courseId: CourseIdSource): QuizStore {
             });
 
             socket.setMessageHandler("learning_event_status", (message: LearningEventStatus) => {
-                if (message.payload.event !== "quiz_start") {
+                const {event, success, message: detail} = message.payload;
+
+                if (event === "quiz_start") {
+                    update((state) => ({
+                        ...state,
+                        isLoading: false,
+                        errorMessage: success ? "" : detail,
+                    }));
                     return;
                 }
 
-                update((state) => ({
-                    ...state,
-                    isLoading: false,
-                    errorMessage: message.payload.success ? "" : message.payload.message,
-                }));
+                if (event === "learning_quiz_result") {
+                    if (success) {
+                        // Points and skill progress were awarded server-side; hand the
+                        // earned amounts to the UI and let the dashboard refresh.
+                        options.onResultRecorded?.({
+                            pointsAwarded: message.payload.points_awarded ?? 0,
+                            skillsAdvanced: message.payload.skills_advanced ?? [],
+                        });
+                    } else {
+                        console.error("[quiz] Awarding quiz points failed:", detail);
+                    }
+                }
             });
         }
 
@@ -219,14 +251,21 @@ export function createQuizStore(courseId: CourseIdSource): QuizStore {
      * score is normalized to 0–1. Does nothing if the quiz has no anchor page.
      */
     async function submitResult(score: number, attempts?: number): Promise<void> {
-        if (!socket || !currentPageId) {
+        if (!currentPageId) {
+            // No anchor page means the quiz wasn't tied to a textbook page, so the
+            // backend has nothing to attach the score (and points) to.
+            console.warn("[quiz] Result not submitted: this quiz has no anchor page.");
             return;
         }
 
         const normalized = Math.max(0, Math.min(1, score));
 
         try {
-            await socket.send({
+            // The socket may have gone idle while the learner worked through the quiz.
+            // Re-establish it first (a no-op when already connected) so the result is
+            // actually delivered instead of being queued on a dead socket and lost.
+            await connect();
+            await socket?.send({
                 action: "learning_quiz_result",
                 payload: {
                     page_id: currentPageId,
@@ -234,8 +273,9 @@ export function createQuizStore(courseId: CourseIdSource): QuizStore {
                     attempts: attempts ?? null,
                 },
             });
-        } catch {
+        } catch (error) {
             // Awarding points is best-effort; never break the quiz UI over it.
+            console.error("[quiz] Failed to submit quiz result:", error);
         }
     }
 

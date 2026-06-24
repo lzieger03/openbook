@@ -158,7 +158,9 @@ four stat tiles (current streak, longest streak, total points, level).
 
     .stat-grid {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        /* Auto-fit so the four stat tiles wrap to 2 (or 1) columns instead of being
+           squeezed on narrow screens. */
+        grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
         gap: 0.75rem;
     }
 </style>

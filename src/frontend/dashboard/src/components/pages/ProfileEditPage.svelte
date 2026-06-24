@@ -132,12 +132,12 @@ Username is read-only; e-mail becomes active only after the verification link.
     </header>
 
     {#if isLoading}
-        <div class="status" role="status" aria-live="polite">
+        <div class="status-box" role="status" aria-live="polite">
             <span class="loading loading-spinner loading-lg"></span>
             <p>Loading your profile…</p>
         </div>
     {:else if errorMessage && !username}
-        <div class="status" role="alert">
+        <div class="status-box" role="alert">
             <p class="error">{errorMessage}</p>
         </div>
     {:else}
@@ -328,12 +328,14 @@ Username is read-only; e-mail becomes active only after the verification link.
         font-weight: 600;
     }
 
-    .status {
+    .status-box {
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: center;
         gap: 1rem;
-        padding: 4rem 0;
+        padding: 4rem 1rem;
+        text-align: center;
         color: color-mix(in oklab, var(--color-base-content) 70%, transparent);
     }
 

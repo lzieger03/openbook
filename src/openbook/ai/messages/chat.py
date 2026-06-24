@@ -145,10 +145,15 @@ class LearningQuizResultPayload(BaseModel):
 class LearningEventStatusPayload(BaseModel):
     """
     Payload acknowledging a learning progress event.
+
+    For a ``learning_quiz_result`` event, ``points_awarded`` and ``skills_advanced``
+    report what the learner just earned so the UI can show immediate feedback.
     """
-    event:   str
-    success: bool
-    message: str = ""
+    event:           str
+    success:         bool
+    message:         str = ""
+    points_awarded:  int = 0
+    skills_advanced: list[str] = Field(default_factory=list)
 
 class QuizStartPayload(BaseModel):
     """
