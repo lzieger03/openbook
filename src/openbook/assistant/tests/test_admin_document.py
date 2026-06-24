@@ -18,12 +18,14 @@ from django.test import override_settings
 from openbook.admin import admin_site
 from openbook.assistant.admin.document import AssistantDocumentAdmin
 from openbook.assistant.models.document import AssistantDocument
+from openbook.auth.middleware.current_user import reset_current_user
 
 
 class AssistantDocumentAdmin_Tests(TestCase):
     """Tests for assistant document admin behavior."""
 
     def setUp(self):
+        reset_current_user()
         self.admin = AssistantDocumentAdmin(AssistantDocument, admin_site)
         self.request = RequestFactory().post("/admin/")
 

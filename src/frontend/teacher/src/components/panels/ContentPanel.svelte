@@ -28,6 +28,7 @@ in the course.
         fetchTextbookPages,
         fetchTextbooks,
         moveMaterial,
+        uploadTextbookFile,
         updateTextbookPage,
     } from "../../api/content.js";
     import type {SourceContent, TextbookDto, TextbookPageDto} from "../../api/content.js";
@@ -49,6 +50,7 @@ in the course.
     let newMaterialDescription = $state("");
     let newMaterialFormat = $state<TextFormat>("MD");
     let creatingMaterial = $state(false);
+    let uploadingMaterialFile = $state(false);
     let materialMessage = $state("");
 
     // Per-material page editing (one material expanded at a time).
@@ -167,6 +169,41 @@ in the course.
             error = e instanceof Error ? e.message : String(e);
         } finally {
             creatingMaterial = false;
+        }
+    }
+
+    async function onUploadMaterialFile(event: Event): Promise<void> {
+        const input = event.currentTarget as HTMLInputElement;
+        const file = input.files?.[0];
+
+        if (!file) {
+            return;
+        }
+
+        uploadingMaterialFile = true;
+        error = "";
+        materialMessage = "";
+
+        try {
+            const result = await uploadTextbookFile(courseId, file, {
+                name: newMaterialName,
+                slug: newMaterialSlug,
+                description: newMaterialDescription,
+            });
+            await load();
+            resetMaterialForm();
+            materialMessage = "Material uploaded.";
+            expandedId = null;
+
+            const material = materials.find((candidate) => candidate.id === result.material);
+            if (material) {
+                await toggleExpand(material);
+            }
+        } catch (e) {
+            error = e instanceof Error ? e.message : String(e);
+        } finally {
+            uploadingMaterialFile = false;
+            input.value = "";
         }
     }
 
@@ -444,6 +481,17 @@ in the course.
                         {#if creatingMaterial}<span class="loading loading-spinner loading-sm"></span>{/if}
                         Create material
                     </button>
+                    <label class="btn btn-ghost" class:btn-disabled={uploadingMaterialFile}>
+                        {#if uploadingMaterialFile}<span class="loading loading-spinner loading-sm"></span>{/if}
+                        Upload file
+                        <input
+                            class="sr-only"
+                            type="file"
+                            accept=".md,.markdown,.html,.htm,.txt,text/markdown,text/html,text/plain"
+                            disabled={uploadingMaterialFile}
+                            onchange={onUploadMaterialFile}
+                        />
+                    </label>
                 </div>
             </section>
 

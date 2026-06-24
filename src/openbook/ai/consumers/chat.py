@@ -141,19 +141,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         await self.send_message(user_message)
 
         response_id = str(uuid4())
-        await self.send_message(ChatMessage(
-            payload = ChatMessagePayload(
-                id         = response_id,
-                datetime   = datetime.now(UTC),
-                sender     = "assistant",
-                type       = "status",
-                severity   = "info",
-                guardRails = {"findings": "none", "explanation": ""},
-                format     = "markdown",
-                content    = "Ich pruefe den Dokumentkontext und formuliere eine Antwort.",
-                finished   = False,
-            ),
-        ))
 
         try:
             response_string = await sync_to_async(self._answer_chat_query)(

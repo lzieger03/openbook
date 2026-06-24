@@ -13,6 +13,9 @@ from django.utils.translation          import gettext_lazy as _
 
 from openbook.admin                    import CustomModelAdmin
 from openbook.admin                    import ImportExportModelResource
+from openbook.assistant.services.textbook_sync import (
+    TextbookDocumentSyncService,
+)
 from openbook.auth.admin.mixins.audit  import created_modified_by_fields
 from openbook.auth.admin.mixins.audit  import created_modified_by_fieldset
 from openbook.auth.admin.mixins.audit  import created_modified_by_filter
@@ -63,3 +66,40 @@ class CourseMaterialAdmin(CustomModelAdmin):
             "fields": ["course", "textbook", "position"],
         }),
     ]
+
+    def save_model(self, request, obj, form, change) -> None:
+        """Sync derived documents when course material is saved."""
+        previous_material = None
+
+        if change and obj.pk:
+            previous_material = CourseMaterial.objects.get(pk=obj.pk)
+
+        super().save_model(request, obj, form, change)
+        sync_service = TextbookDocumentSyncService()
+
+        if (
+            previous_material
+            and (
+                previous_material.course_id != obj.course_id
+                or previous_material.textbook_id != obj.textbook_id
+            )
+        ):
+            sync_service.delete_course_textbook_document(
+                textbook=previous_material.textbook,
+                course=previous_material.course,
+            )
+
+        sync_service.sync_textbook_for_course(
+            textbook=obj.textbook,
+            course=obj.course,
+        )
+
+    def delete_model(self, request, obj) -> None:
+        """Delete derived documents when course material is removed."""
+        course = obj.course
+        textbook = obj.textbook
+        super().delete_model(request, obj)
+        TextbookDocumentSyncService().delete_course_textbook_document(
+            textbook=textbook,
+            course=course,
+        )
