@@ -14,6 +14,9 @@ from unfold.admin import TabularInline
 
 from openbook.admin import CustomModelAdmin
 from openbook.admin import ImportExportModelResource
+from openbook.assistant.services.textbook_sync import (
+    TextbookDocumentSyncService,
+)
 from openbook.auth.admin.mixins.audit import created_modified_by_fields
 from openbook.auth.admin.mixins.audit import created_modified_by_fieldset
 from openbook.auth.admin.mixins.audit import created_modified_by_filter
@@ -40,6 +43,7 @@ class AssistantDocumentResource(ImportExportModelResource):
             "id",
             "delete",
             "course",
+            "textbook",
             "title",
             "file_data",
             "file_name",
@@ -71,6 +75,7 @@ class AssistantDocumentAdmin(CustomModelAdmin):
     list_display = [
         "title",
         "course",
+        "textbook",
         "file_name",
         "file_size",
         "mime_type",
@@ -78,10 +83,10 @@ class AssistantDocumentAdmin(CustomModelAdmin):
         "chunk_count",
         *created_modified_by_fields,
     ]
-    list_display_links = ["title", "course", "file_name"]
-    list_filter = ["course", "mime_type", "index_status", *created_modified_by_filter]
-    list_select_related = ["course", *created_modified_by_related]
-    search_fields = ["title", "file_name", "course__name"]
+    list_display_links = ["title", "course", "textbook", "file_name"]
+    list_filter = ["course", "textbook", "mime_type", "index_status", *created_modified_by_filter]
+    list_select_related = ["course", "textbook", *created_modified_by_related]
+    search_fields = ["title", "file_name", "course__name", "textbook__name"]
     ordering = ["course", "title", "file_name"]
     readonly_fields = [
         "file_name",
@@ -98,7 +103,7 @@ class AssistantDocumentAdmin(CustomModelAdmin):
 
     fieldsets = [
         (None, {
-            "fields": ["course", "title", "file_data"],
+            "fields": ["course", "textbook", "title", "file_data"],
         }),
         (_("File Metadata"), {
             "classes": ["tab"],
@@ -118,7 +123,7 @@ class AssistantDocumentAdmin(CustomModelAdmin):
 
     add_fieldsets = [
         (None, {
-            "fields": ["course", "title", "file_data"],
+            "fields": ["course", "textbook", "title", "file_data"],
         }),
     ]
 
@@ -130,7 +135,7 @@ class AssistantDocumentAdmin(CustomModelAdmin):
             return
 
         if not obj.file_data:
-            obj.chunks.all().delete()
+            TextbookDocumentSyncService().clear_document_index(obj)
             obj.index_status = AssistantDocument.IndexStatusChoices.PENDING
             obj.index_error = ""
             obj.chunk_count = 0
@@ -147,11 +152,13 @@ class AssistantDocumentAdmin(CustomModelAdmin):
             return
 
         if not getattr(settings, "MISTRAL_API_KEY", ""):
+            TextbookDocumentSyncService().clear_document_index(obj)
             obj.mark_index_failed("MISTRAL_API_KEY is not set.")
             obj.save(
                 update_fields=[
                     "index_status",
                     "index_error",
+                    "chunk_count",
                     "indexed_at",
                     "modified_at",
                 ]
@@ -171,6 +178,17 @@ class AssistantDocumentAdmin(CustomModelAdmin):
         try:
             LLM_Client()._get_rag_client().index_document(obj)
         except Exception as error:
+            TextbookDocumentSyncService().clear_document_index(obj)
+            obj.mark_index_failed(error)
+            obj.save(
+                update_fields=[
+                    "index_status",
+                    "index_error",
+                    "chunk_count",
+                    "indexed_at",
+                    "modified_at",
+                ]
+            )
             self.message_user(
                 request,
                 _("Document saved, but indexing failed: %(error)s") % {"error": error},

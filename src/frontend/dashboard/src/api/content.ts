@@ -58,6 +58,17 @@ export interface CourseMaterialDto {
     page_ranges: string[];
 }
 
+export interface AssistantDocumentDto {
+    id: string;
+    course: string | null;
+    textbook: string | null;
+    title: string;
+    file_name: string;
+    mime_type: string;
+    download_url: string;
+    index_status: string;
+}
+
 interface Paginated<T> {
     results: T[];
 }
@@ -89,6 +100,18 @@ export async function fetchTextbookPages(textbookId: string): Promise<TextbookPa
     const data = await apiGet<TextbookPageDto[] | Paginated<TextbookPageDto>>(
         "/api/content/textbook_pages/",
         {textbook: textbookId, _sort: "position", _page_size: "500"},
+    );
+    return toList(data);
+}
+
+/** Downloadable source documents generated from one textbook in one course. */
+export async function fetchTextbookDocuments(
+    courseId: string,
+    textbookId: string,
+): Promise<AssistantDocumentDto[]> {
+    const data = await apiGet<AssistantDocumentDto[] | Paginated<AssistantDocumentDto>>(
+        "/api/assistant/documents/",
+        {course: courseId, textbook: textbookId, _sort: "title", _page_size: "20"},
     );
     return toList(data);
 }

@@ -13,6 +13,9 @@ from django.utils.translation          import gettext_lazy as _
 
 from openbook.admin                    import CustomModelAdmin
 from openbook.admin                    import ImportExportModelResource
+from openbook.assistant.services.textbook_sync import (
+    TextbookDocumentSyncService,
+)
 from openbook.auth.admin.mixins.audit  import created_modified_by_fields
 from openbook.auth.admin.mixins.audit  import created_modified_by_fieldset
 from openbook.auth.admin.mixins.audit  import created_modified_by_filter
@@ -73,3 +76,8 @@ class TextbookAdmin(CustomModelAdmin):
             "fields": ["description", "text_format"],
         }),
     ]
+
+    def save_related(self, request, form, formsets, change) -> None:
+        """Sync derived assistant documents after textbook or inline changes."""
+        super().save_related(request, form, formsets, change)
+        TextbookDocumentSyncService().sync_textbook(form.instance)

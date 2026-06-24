@@ -17,6 +17,9 @@ from rest_framework.decorators          import action
 from rest_framework.response            import Response
 from rest_framework.viewsets            import ModelViewSet
 
+from openbook.assistant.services.textbook_sync import (
+    TextbookDocumentSyncService,
+)
 from openbook.auth.filters.mixins.audit import CreatedModifiedByFilterMixin
 from openbook.auth.serializers.user     import UserField
 from openbook.drf.flex_serializers      import FlexFieldsModelSerializer
@@ -82,6 +85,44 @@ class CourseMaterialViewSet(AllowAnonymousListRetrieveViewSetMixin, ModelViewSet
     serializer_class = CourseMaterialSerializer
     ordering         = ["course", "position"]
     search_fields    = ["course__name", "textbook__name"]
+
+    def perform_create(self, serializer) -> None:
+        """Sync a textbook document when it is attached to a course."""
+        material = serializer.save()
+        TextbookDocumentSyncService().sync_textbook_for_course(
+            textbook=material.textbook,
+            course=material.course,
+        )
+
+    def perform_update(self, serializer) -> None:
+        """Keep derived documents aligned when material ownership changes."""
+        previous_course = serializer.instance.course
+        previous_textbook = serializer.instance.textbook
+        material = serializer.save()
+
+        sync_service = TextbookDocumentSyncService()
+        if (
+            previous_course.id != material.course_id
+            or previous_textbook.id != material.textbook_id
+        ):
+            sync_service.delete_course_textbook_document(
+                textbook=previous_textbook,
+                course=previous_course,
+            )
+            sync_service.sync_textbook_for_course(
+                textbook=material.textbook,
+                course=material.course,
+            )
+
+    def perform_destroy(self, instance) -> None:
+        """Delete the derived document when a textbook leaves a course."""
+        course = instance.course
+        textbook = instance.textbook
+        instance.delete()
+        TextbookDocumentSyncService().delete_course_textbook_document(
+            textbook=textbook,
+            course=course,
+        )
 
     @extend_schema(
         request={

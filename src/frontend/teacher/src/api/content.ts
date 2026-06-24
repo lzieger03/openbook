@@ -61,6 +61,13 @@ export interface PageRangeDto {
     position: number;
 }
 
+export interface TextbookUploadResult {
+    textbook: string;
+    material: string;
+    document: string;
+    index_status: string;
+}
+
 interface Paginated<T> {
     results: T[];
 }
@@ -94,6 +101,36 @@ export async function createTextbook(fields: {
         ...payloadFields,
         slug,
     });
+}
+
+export async function uploadTextbookFile(
+    courseId: string,
+    file: File,
+    fields: {
+        name?: string;
+        slug?: string;
+        description?: string;
+    } = {},
+): Promise<TextbookUploadResult> {
+    const form = new FormData();
+    form.append("file", file);
+
+    if (fields.name?.trim()) {
+        form.append("name", fields.name.trim());
+    }
+    if (fields.slug?.trim()) {
+        form.append("slug", fields.slug.trim());
+    }
+    if (fields.description?.trim()) {
+        form.append("description", fields.description.trim());
+    }
+
+    return apiSend<TextbookUploadResult>(
+        "POST",
+        `/api/content/courses/${encodeURIComponent(courseId)}/upload_textbook/`,
+        form,
+        {formData: true},
+    );
 }
 
 export async function fetchTextbookPages(textbookId: string): Promise<TextbookPageDto[]> {

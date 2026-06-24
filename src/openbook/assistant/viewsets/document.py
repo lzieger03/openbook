@@ -8,15 +8,25 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from django.conf import settings
+from django.http import FileResponse
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django_filters.filterset import FilterSet
+from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema
 from rest_framework import serializers
+from rest_framework.decorators import action
+from rest_framework.exceptions import NotFound
 from rest_framework.viewsets import ModelViewSet
 
 from openbook.auth.filters.mixins.audit import CreatedModifiedByFilterMixin
 from openbook.auth.serializers.user import UserField
+from openbook.assistant.services.textbook_sync import (
+    TextbookDocumentSyncService,
+)
 from openbook.drf.flex_serializers import FlexFieldsModelSerializer
 from openbook.drf.viewsets import ModelViewSetMixin
 from openbook.drf.viewsets import with_flex_fields_parameters
@@ -29,6 +39,7 @@ class AssistantDocumentSerializer(FlexFieldsModelSerializer):
 
     created_by = UserField(read_only=True)
     modified_by = UserField(read_only=True)
+    download_url = serializers.SerializerMethodField()
 
     class Meta:
         model = AssistantDocument
@@ -36,11 +47,13 @@ class AssistantDocumentSerializer(FlexFieldsModelSerializer):
         fields = [
             "id",
             "course",
+            "textbook",
             "title",
             "file_data",
             "file_name",
             "file_size",
             "mime_type",
+            "download_url",
             "index_status",
             "index_error",
             "indexed_at",
@@ -57,6 +70,7 @@ class AssistantDocumentSerializer(FlexFieldsModelSerializer):
             "file_name",
             "file_size",
             "mime_type",
+            "download_url",
             "index_status",
             "index_error",
             "indexed_at",
@@ -68,6 +82,7 @@ class AssistantDocumentSerializer(FlexFieldsModelSerializer):
 
         expandable_fields = {
             "course": "openbook.content.viewsets.course.CourseSerializer",
+            "textbook": "openbook.content.viewsets.textbook.TextbookSerializer",
             "created_by": "openbook.auth.viewsets.user.UserSerializer",
             "modified_by": "openbook.auth.viewsets.user.UserSerializer",
         }
@@ -83,12 +98,26 @@ class AssistantDocumentSerializer(FlexFieldsModelSerializer):
 
         return attrs
 
+    def get_download_url(self, obj: AssistantDocument) -> str:
+        """Return the authenticated download URL for this document."""
+        if not obj.file_data:
+            return ""
+
+        path = reverse("assistant-document-download", args=[obj.pk])
+        request = self.context.get("request")
+
+        if request is None:
+            return path
+
+        return request.build_absolute_uri(path)
+
 
 class AssistantDocumentFilter(CreatedModifiedByFilterMixin, FilterSet):
     class Meta:
         model = AssistantDocument
         fields = {
             "course": ["exact", "isnull"],
+            "textbook": ["exact", "isnull"],
             "title": ["exact"],
             "file_name": ["exact"],
             "mime_type": ["exact"],
@@ -111,7 +140,24 @@ class AssistantDocumentViewSet(ModelViewSetMixin, ModelViewSet):
     serializer_class = AssistantDocumentSerializer
     filterset_class = AssistantDocumentFilter
     ordering = ["course", "title", "file_name"]
-    search_fields = ["title", "file_name", "course__name"]
+    search_fields = ["title", "file_name", "course__name", "textbook__name"]
+
+    @extend_schema(responses=OpenApiTypes.BINARY)
+    @action(detail=True, methods=["get"])
+    def download(self, request, *args, **kwargs):
+        """Download the current file backing an assistant document."""
+        document = self.get_object()
+
+        if not document.file_data:
+            raise NotFound(_("This document has no downloadable file."))
+
+        filename = Path(document.file_name or document.file_data.name).name
+        document.file_data.open("rb")
+        return FileResponse(
+            document.file_data,
+            as_attachment=True,
+            filename=filename,
+        )
 
     def perform_create(self, serializer) -> None:
         """Save the upload and start synchronous indexing when configured."""
@@ -129,7 +175,7 @@ class AssistantDocumentViewSet(ModelViewSetMixin, ModelViewSet):
     def _index_document_if_possible(self, document: AssistantDocument) -> None:
         """Index document contents or store a configuration error."""
         if not document.file_data:
-            document.chunks.all().delete()
+            TextbookDocumentSyncService().clear_document_index(document)
             document.index_status = AssistantDocument.IndexStatusChoices.PENDING
             document.index_error = ""
             document.chunk_count = 0
@@ -146,11 +192,13 @@ class AssistantDocumentViewSet(ModelViewSetMixin, ModelViewSet):
             return
 
         if not getattr(settings, "MISTRAL_API_KEY", ""):
+            TextbookDocumentSyncService().clear_document_index(document)
             document.mark_index_failed("MISTRAL_API_KEY is not set.")
             document.save(
                 update_fields=[
                     "index_status",
                     "index_error",
+                    "chunk_count",
                     "indexed_at",
                     "modified_at",
                 ]
@@ -162,11 +210,13 @@ class AssistantDocumentViewSet(ModelViewSetMixin, ModelViewSet):
         try:
             LLM_Client()._get_rag_client().index_document(document)
         except Exception as error:
+            TextbookDocumentSyncService().clear_document_index(document)
             document.mark_index_failed(error)
             document.save(
                 update_fields=[
                     "index_status",
                     "index_error",
+                    "chunk_count",
                     "indexed_at",
                     "modified_at",
                 ]

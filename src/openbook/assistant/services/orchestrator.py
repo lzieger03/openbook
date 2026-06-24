@@ -56,27 +56,20 @@ class AssistantOrchestrator:
         course_obj = self._resolve_course(course)
         self._check_chat_permission(user=user, course=course_obj)
 
+        if course_obj is None:
+            return self.llm_client.get_user_message(query)
+
         learning_context = ""
-        if course_obj is not None:
-            learning_context = self.learning_context_service.get_prompt_context(
-                user=user,
-                course=course_obj,
-            )
+        learning_context = self.learning_context_service.get_prompt_context(
+            user=user,
+            course=course_obj,
+        )
 
-        try:
-            return self.llm_client.perform_rag_query(
-                query,
-                course=course_obj,
-                learning_context=learning_context,
-            )
-        except RuntimeError as error:
-            if str(error) in {
-                "No global assistant documents have been indexed yet.",
-                "No assistant documents have been indexed for this course yet.",
-            }:
-                return self.llm_client.get_user_message(query)
-
-            raise
+        return self.llm_client.perform_rag_query(
+            query,
+            course=course_obj,
+            learning_context=learning_context,
+        )
 
     def record_page_opened(
         self,

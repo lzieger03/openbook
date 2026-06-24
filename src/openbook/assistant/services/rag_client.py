@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from django.core.files import File
+from django.db import DatabaseError
 from django.db import transaction
 from sqlite_vec import serialize_float32
 
@@ -99,9 +100,11 @@ class RagClient:
                     "index_status",
                     "index_error",
                     "embedding_model",
+                    "chunk_count",
                     "modified_at",
                 ]
             )
+            self.clear_document_index(document, using=database_alias)
 
             document.file_data.open("rb")
             try:
@@ -122,9 +125,6 @@ class RagClient:
                 )
 
             with transaction.atomic(using=database_alias):
-                document.chunks.all().delete()
-                delete_document_vectors(document.id, using=database_alias)
-
                 for indexed_chunk in indexed_chunks:
                     document_chunk = AssistantDocumentChunk.objects.using(database_alias).create(
                         parent=document,
@@ -152,6 +152,7 @@ class RagClient:
                 update_fields=[
                     "index_status",
                     "index_error",
+                    "chunk_count",
                     "indexed_at",
                     "modified_at",
                 ]
@@ -185,7 +186,11 @@ class RagClient:
         )
 
         if not rag_context.context:
-            return self._perform_unindexed_query(query, course=course)
+            return self._perform_unindexed_query(
+                query,
+                course=course,
+                learning_context=learning_context,
+            )
 
         prompt = self.prompt_builder.build_course_question_prompt(
             query=query,
@@ -212,39 +217,44 @@ class RagClient:
 
         connection = get_vector_connection()
         if connection is None:
-            raise RuntimeError("RAG vector search currently requires Django's SQLite backend.")
+            return RagContext(context="", sources=())
 
         chunk_queryset = AssistantDocumentChunk.objects.filter(
             parent__index_status=AssistantDocument.IndexStatusChoices.INDEXED,
         ).select_related("parent")
-        course_id = ""
+        indexed_chunk_count = chunk_queryset.count()
 
         if course is None:
             chunk_queryset = chunk_queryset.filter(parent__course__isnull=True)
         else:
-            course_id = str(course.id)
             chunk_queryset = chunk_queryset.filter(parent__course=course)
 
         if not chunk_queryset.exists():
             return RagContext(context="", sources=())
 
         query_embedding = self.assistant.get_embedding(query)
+        search_limit = self._vector_search_limit(
+            indexed_chunk_count=indexed_chunk_count,
+            context_limit=context_limit,
+        )
 
-        with connection.cursor() as cursor:
-            cursor.execute(
-                f"""
-                SELECT
-                    chunk_id,
-                    distance
-                FROM {DOCUMENTS_TABLE}
-                WHERE embedding MATCH %s
-                    AND course_id = %s
-                ORDER BY distance
-                LIMIT {context_limit}
-                """,
-                [serialize_float32(query_embedding), course_id],
-            )
-            rows = cursor.fetchall()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    f"""
+                    SELECT
+                        chunk_id,
+                        distance
+                    FROM {DOCUMENTS_TABLE}
+                    WHERE embedding MATCH %s
+                    ORDER BY distance
+                    LIMIT {search_limit}
+                    """,
+                    [serialize_float32(query_embedding)],
+                )
+                rows = cursor.fetchall()
+        except DatabaseError:
+            return RagContext(context="", sources=())
 
         chunk_ids = [row[0] for row in rows]
         chunks_by_id = {
@@ -255,7 +265,7 @@ class RagClient:
             chunks_by_id[chunk_id]
             for chunk_id in chunk_ids
             if chunk_id in chunks_by_id
-        ]
+        ][:context_limit]
         top_contexts = [chunk.content for chunk in top_chunks]
 
         if not top_contexts:
@@ -278,31 +288,39 @@ class RagClient:
         self,
         query: str,
         course: "Course | None" = None,
+        learning_context: str = "",
     ) -> RagQueryResult:
-        """Answer without document context when no assistant documents are indexed yet."""
-        if course is None:
-            context_note = (
-                "Es sind noch keine globalen OpenBook-Assistant-Dokumente indexiert."
-            )
-        else:
-            context_note = (
-                f"Es sind noch keine OpenBook-Assistant-Dokumente fuer den Kurs "
-                f'"{course.name}" indexiert.'
-            )
+        """Answer without document context when no current chunks are available."""
+        prompt_parts = ["Du bist ein hilfreicher Assistent."]
 
-        prompt = f"""
-            Du bist ein hilfreicher Assistent.
-            {context_note}
-            Beantworte die folgende Frage deshalb mit allgemeinem Wissen.
-            Weise kurz darauf hin, dass die Antwort noch nicht auf indexierten
-            OpenBook-Dokumenten basiert.
+        if course is not None:
+            prompt_parts.append(f"Der Nutzer arbeitet im Kurs \"{course.name}\".")
 
-            Frage: {query}
-        """.strip()
+        if learning_context:
+            prompt_parts.append("Beruecksichtige diesen Lernstand des Nutzers:")
+            prompt_parts.append(learning_context)
+
+        prompt_parts.append(f"Frage: {query}")
+        prompt = "\n\n".join(prompt_parts).strip()
+
         return RagQueryResult(
             answer=self.assistant.get_user_message(prompt),
             sources=(),
         )
+
+    def _vector_search_limit(self, indexed_chunk_count: int, context_limit: int) -> int:
+        """Return enough vector candidates to filter the course scope afterwards."""
+        return max(context_limit, indexed_chunk_count)
+
+    def clear_document_index(
+        self,
+        document: AssistantDocument,
+        using: str = "default",
+    ) -> None:
+        """Remove all persisted chunks and vector rows for one document."""
+        with transaction.atomic(using=using):
+            document.chunks.all().delete()
+            delete_document_vectors(document.id, using=using)
 
     def _insert_vector_index(
         self,

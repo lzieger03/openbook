@@ -80,7 +80,9 @@ a friendly placeholder is shown instead.
         state.courses.find((course) => course.id === params?.id)?.name ?? "Course",
     );
 
-    const hasContent = $derived(materials.some((material) => material.pages.length > 0));
+    const hasContent = $derived(
+        materials.some((material) => material.pages.length > 0 || material.documents.length > 0),
+    );
 
     /** A stable DOM/anchor id for a page section. */
     function anchor(pageId: string): string {
@@ -127,6 +129,22 @@ a friendly placeholder is shown instead.
             <p class="error">{contentError}</p>
         {:else if hasContent}
             {#each materials as material (material.id)}
+                {#if material.documents.length > 0}
+                    <section class="block downloads">
+                        <h2>{material.title}</h2>
+                        <div class="download-list">
+                            {#each material.documents as document (document.id)}
+                                <a class="download-link" href={document.downloadUrl} download>
+                                    <span>{document.title}</span>
+                                    {#if document.fileName}
+                                        <small>{document.fileName}</small>
+                                    {/if}
+                                </a>
+                            {/each}
+                        </div>
+                    </section>
+                {/if}
+
                 {#each material.pages as page (page.id)}
                     <section id={anchor(page.id)} class="block">
                         <h2>{page.title}</h2>
@@ -281,6 +299,41 @@ a friendly placeholder is shown instead.
         font-weight: 700;
         margin-bottom: 0.6rem;
         color: var(--color-base-content);
+    }
+
+    .downloads {
+        padding-bottom: 1rem;
+        border-bottom: 1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);
+    }
+
+    .download-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .download-link {
+        display: inline-flex;
+        flex-direction: column;
+        gap: 0.15rem;
+        max-width: 20rem;
+        padding: 0.65rem 0.85rem;
+        border: 1px solid color-mix(in oklab, var(--color-primary) 35%, transparent);
+        border-radius: 0.5rem;
+        color: var(--color-primary);
+        text-decoration: none;
+        background: color-mix(in oklab, var(--color-primary) 8%, transparent);
+    }
+
+    .download-link:hover {
+        background: color-mix(in oklab, var(--color-primary) 14%, transparent);
+    }
+
+    .download-link small {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: color-mix(in oklab, var(--color-base-content) 60%, transparent);
     }
 
     .error {

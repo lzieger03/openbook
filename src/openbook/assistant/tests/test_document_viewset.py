@@ -8,6 +8,7 @@
 
 import tempfile
 
+from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.test import override_settings
@@ -21,6 +22,7 @@ from openbook.auth.models.user import User
 from openbook.auth.utils import permission_for_perm_string
 from openbook.content.models.course import Course
 from openbook.content.models.library_group import LibraryGroup
+from openbook.content.models.textbook import Textbook
 
 
 class AssistantDocument_ViewSet_Tests(TestCase):
@@ -58,9 +60,20 @@ class AssistantDocument_ViewSet_Tests(TestCase):
         self.course.public_permissions.add(
             permission_for_perm_string("openbook_content.view_course")
         )
+        self.textbook = Textbook.objects.create(
+            name="Textbook",
+            slug="textbook",
+            group=self.library_group,
+        )
         self.document = AssistantDocument.objects.create(
             course=self.course,
+            textbook=self.textbook,
             title="Guide",
+        )
+        self.document.file_data.save(
+            "guide.md",
+            ContentFile(b"Download content"),
+            save=True,
         )
 
     def test_list_visible_with_course_view_permission(self):
@@ -75,6 +88,32 @@ class AssistantDocument_ViewSet_Tests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 1)
         self.assertEqual(response.data["results"][0]["id"], str(self.document.id))
+        self.assertEqual(str(response.data["results"][0]["textbook"]), str(self.textbook.id))
+        self.assertTrue(response.data["results"][0]["download_url"])
+
+    def test_list_filter_by_textbook(self):
+        """Course viewers should filter assistant documents by textbook."""
+        self.client.login(username="student", password="password")
+
+        response = self.client.get(
+            reverse("assistant-document-list"),
+            query_params={"textbook": str(self.textbook.id)},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"][0]["id"], str(self.document.id))
+
+    def test_download_visible_with_course_view_permission(self):
+        """Course viewers should download generated textbook documents."""
+        self.client.login(username="student", password="password")
+
+        response = self.client.get(
+            reverse("assistant-document-download", args=[str(self.document.id)]),
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(b"".join(response.streaming_content), b"Download content")
 
     def test_create_ok_for_course_owner(self):
         """Course owner should upload assistant documents."""

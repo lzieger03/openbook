@@ -12,6 +12,9 @@ from django_filters.filterset           import FilterSet
 from drf_spectacular.utils              import extend_schema
 from rest_framework.viewsets            import ModelViewSet
 
+from openbook.assistant.services.textbook_sync import (
+    TextbookDocumentSyncService,
+)
 from openbook.auth.filters.mixins.audit import CreatedModifiedByFilterMixin
 from openbook.auth.serializers.user     import UserField
 from openbook.drf.flex_serializers      import FlexFieldsModelSerializer
@@ -78,3 +81,8 @@ class TextbookViewSet(AllowAnonymousListRetrieveViewSetMixin, ModelViewSetMixin,
     serializer_class = TextbookSerializer
     ordering         = ["group", "name"]
     search_fields    = ["slug", "name", "description"]
+
+    def perform_update(self, serializer) -> None:
+        """Sync derived assistant documents when textbook metadata changes."""
+        textbook = serializer.save()
+        TextbookDocumentSyncService().sync_textbook(textbook)
