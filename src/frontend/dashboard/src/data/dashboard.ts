@@ -60,12 +60,18 @@ export interface DashboardSkill {
     progress: number;
 }
 
+export interface DashboardCourseSkill {
+    id: string;
+    name: string;
+}
+
 export interface DashboardCourse {
     id: string;
     name: string;
     level: number;
     points: number;
     progress: number;
+    skills: DashboardCourseSkill[];
 }
 
 export interface DashboardLeaderboardEntry {
@@ -172,6 +178,15 @@ function courseId(course: string | CourseDto): string {
     return typeof course === "string" ? course : course.id;
 }
 
+/** The skills a course teaches, available only when the course was expanded. */
+function courseSkills(course: string | CourseDto): DashboardCourseSkill[] {
+    if (typeof course === "string" || !course.skills) {
+        return [];
+    }
+
+    return course.skills.map((skill) => ({id: skill.id, name: skill.name}));
+}
+
 function mapCourses(records: CourseProgressDto[]): DashboardCourse[] {
     return records.map((record) => ({
         id: courseId(record.course),
@@ -179,6 +194,7 @@ function mapCourses(records: CourseProgressDto[]): DashboardCourse[] {
         level: toNumber(record.course_level, 1),
         points: toNumber(record.course_points),
         progress: clampPercent(toNumber(record.course_progress)),
+        skills: courseSkills(record.course),
     }));
 }
 

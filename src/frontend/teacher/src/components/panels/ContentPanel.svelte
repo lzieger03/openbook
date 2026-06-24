@@ -22,15 +22,17 @@ in the course.
     import type {CourseMaterialView} from "../../data/teacher.js";
     import {
         addMaterial,
+        createSkill,
         createTextbook,
         createTextbookPage,
         deleteMaterial,
+        fetchSkills,
         fetchTextbookPages,
         fetchTextbooks,
         moveMaterial,
         updateTextbookPage,
     } from "../../api/content.js";
-    import type {SourceContent, TextbookDto, TextbookPageDto} from "../../api/content.js";
+    import type {SkillDto, SourceContent, TextbookDto, TextbookPageDto} from "../../api/content.js";
     import {slugify} from "../../api/courses.js";
     import type {TextFormat} from "../../api/courses.js";
 
@@ -68,6 +70,37 @@ in the course.
     let newPageName = $state("");
     let creatingPage = $state(false);
 
+    // Skill tagging: the global catalog plus the ids selected for the current page.
+    let skillCatalog = $state<SkillDto[]>([]);
+    let pageSkillIds = $state<string[]>([]);
+    // Searchable picker state (the catalog can grow large, so we filter instead of
+    // listing every skill).
+    let skillSearch = $state("");
+    let creatingSkill = $state(false);
+
+    // Skills currently attached to the edited page, shown as removable chips.
+    const selectedSkills = $derived(skillCatalog.filter((skill) => pageSkillIds.includes(skill.id)));
+
+    // Unselected skills matching the search term (capped so the dropdown stays small).
+    const skillMatches = $derived.by(() => {
+        const term = skillSearch.trim().toLowerCase();
+        if (!term) {
+            return [];
+        }
+        return skillCatalog
+            .filter((skill) => !pageSkillIds.includes(skill.id) && skill.name.toLowerCase().includes(term))
+            .slice(0, 8);
+    });
+
+    // Offer to create a skill when the search term matches no existing skill by name.
+    const canCreateSkill = $derived.by(() => {
+        const term = skillSearch.trim();
+        if (!term) {
+            return false;
+        }
+        return !skillCatalog.some((skill) => skill.name.toLowerCase() === term.toLowerCase());
+    });
+
     const markdownRenderer = new MarkdownIt({
         breaks: true,
         html: false,
@@ -83,7 +116,11 @@ in the course.
         error = "";
 
         try {
-            [materials, textbooks] = await Promise.all([loadMaterials(courseId), fetchTextbooks()]);
+            [materials, textbooks, skillCatalog] = await Promise.all([
+                loadMaterials(courseId),
+                fetchTextbooks(),
+                fetchSkills(),
+            ]);
             if (textbooks.length > 0 && textbooks[0] && !newTextbookId) {
                 newTextbookId = textbooks[0].id;
             }
@@ -232,6 +269,45 @@ in the course.
         editorMode = "edit";
         editorMessage = "";
         newPageName = "";
+        pageSkillIds = [];
+        skillSearch = "";
+    }
+
+    /** Toggle a skill on the page currently being edited. */
+    function togglePageSkill(skillId: string): void {
+        pageSkillIds = pageSkillIds.includes(skillId)
+            ? pageSkillIds.filter((id) => id !== skillId)
+            : [...pageSkillIds, skillId];
+    }
+
+    /** Attach a skill from the search results and reset the search field. */
+    function addPageSkill(skillId: string): void {
+        if (!pageSkillIds.includes(skillId)) {
+            pageSkillIds = [...pageSkillIds, skillId];
+        }
+        skillSearch = "";
+    }
+
+    /** Create a new skill from the current search term, then attach it to the page. */
+    async function createAndAddSkill(): Promise<void> {
+        const name = skillSearch.trim();
+        if (!name || creatingSkill) {
+            return;
+        }
+
+        creatingSkill = true;
+        error = "";
+
+        try {
+            const skill = await createSkill(name);
+            // Keep the catalog sorted by name like fetchSkills returns it.
+            skillCatalog = [...skillCatalog, skill].sort((a, b) => a.name.localeCompare(b.name));
+            addPageSkill(skill.id);
+        } catch (e) {
+            error = e instanceof Error ? e.message : String(e);
+        } finally {
+            creatingSkill = false;
+        }
     }
 
     function isSourceContent(content: TextbookPageDto["content"]): content is SourceContent {
@@ -268,6 +344,8 @@ in the course.
         pageTextFormat = page.text_format ?? "MD";
         editorSource = readPageSource(page);
         editorFilename = isSourceContent(page.content) ? (page.content.filename ?? "") : "";
+        pageSkillIds = [...(page.skills ?? [])];
+        skillSearch = "";
         editorMessage = "";
     }
 
@@ -302,6 +380,7 @@ in the course.
                 name,
                 text_format: pageTextFormat,
                 content: makeContent(),
+                skills: pageSkillIds,
             });
             pages = await fetchTextbookPages(material.textbookId);
             selectPage(created.id);
@@ -333,6 +412,7 @@ in the course.
                 name: pageName.trim(),
                 text_format: pageTextFormat,
                 content: makeContent(),
+                skills: pageSkillIds,
             });
             pages = pages.map((page) => (page.id === updated.id ? updated : page));
             selectPage(updated.id);
@@ -546,6 +626,69 @@ in the course.
                                                     <option value="TEXT">Plain text</option>
                                                 </select>
                                             </label>
+                                        </div>
+
+                                        <div class="form-control w-full mt-3">
+                                            <span class="label-text">Skills trained by this page</span>
+
+                                            {#if selectedSkills.length > 0}
+                                                <div class="skill-tags">
+                                                    {#each selectedSkills as skill (skill.id)}
+                                                        <span class="skill-tag selected">
+                                                            {skill.name}
+                                                            <button
+                                                                type="button"
+                                                                class="skill-remove"
+                                                                disabled={!selectedPage}
+                                                                aria-label={`Remove ${skill.name}`}
+                                                                onclick={() => togglePageSkill(skill.id)}
+                                                            >
+                                                                ×
+                                                            </button>
+                                                        </span>
+                                                    {/each}
+                                                </div>
+                                            {/if}
+
+                                            <input
+                                                class="input input-bordered input-sm w-full mt-2"
+                                                type="text"
+                                                bind:value={skillSearch}
+                                                disabled={!selectedPage}
+                                                placeholder="Search skills, or type a new name to create one…"
+                                            />
+
+                                            {#if selectedPage && skillSearch.trim()}
+                                                <div class="skill-results">
+                                                    {#each skillMatches as skill (skill.id)}
+                                                        <button
+                                                            type="button"
+                                                            class="skill-result"
+                                                            onclick={() => addPageSkill(skill.id)}
+                                                        >
+                                                            {skill.name}
+                                                        </button>
+                                                    {/each}
+
+                                                    {#if canCreateSkill}
+                                                        <button
+                                                            type="button"
+                                                            class="skill-result create"
+                                                            disabled={creatingSkill}
+                                                            onclick={createAndAddSkill}
+                                                        >
+                                                            {#if creatingSkill}<span class="loading loading-spinner loading-xs"></span>{/if}
+                                                            + Create “{skillSearch.trim()}”
+                                                        </button>
+                                                    {:else if skillMatches.length === 0}
+                                                        <p class="muted skill-hint">No matching skills.</p>
+                                                    {/if}
+                                                </div>
+                                            {/if}
+
+                                            <p class="muted skill-hint">
+                                                Quiz points earned on this textbook advance the selected skills.
+                                            </p>
                                         </div>
 
                                         <div class="editor-tabs mt-3">
@@ -773,6 +916,92 @@ in the course.
     .muted {
         color: color-mix(in oklab, var(--color-base-content) 60%, transparent);
         font-size: 0.85rem;
+    }
+
+    .skill-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-top: 0.35rem;
+    }
+
+    /* Selected skills shown as chips with an inline remove button. */
+    .skill-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.8rem;
+        padding: 0.2rem 0.7rem;
+        border-radius: 999px;
+        color: var(--color-base-content);
+        background: color-mix(in oklab, var(--color-base-content) 8%, transparent);
+        border: 1px solid color-mix(in oklab, var(--color-base-content) 15%, transparent);
+    }
+
+    .skill-tag.selected {
+        color: var(--color-primary-content);
+        background: var(--color-primary);
+        border-color: var(--color-primary);
+    }
+
+    .skill-remove {
+        display: grid;
+        place-items: center;
+        width: 1.1rem;
+        height: 1.1rem;
+        border-radius: 999px;
+        line-height: 1;
+        cursor: pointer;
+        color: inherit;
+        background: color-mix(in oklab, currentColor 18%, transparent);
+    }
+
+    .skill-remove:hover:not(:disabled) {
+        background: color-mix(in oklab, currentColor 32%, transparent);
+    }
+
+    .skill-remove:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* Search-result dropdown for adding / creating skills. */
+    .skill-results {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-top: 0.5rem;
+    }
+
+    .skill-result {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.7rem;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        color: var(--color-base-content);
+        background: color-mix(in oklab, var(--color-base-content) 6%, transparent);
+        border: 1px solid color-mix(in oklab, var(--color-base-content) 15%, transparent);
+        transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .skill-result:hover:not(:disabled) {
+        border-color: color-mix(in oklab, var(--color-primary) 45%, transparent);
+        background: color-mix(in oklab, var(--color-primary) 10%, transparent);
+    }
+
+    .skill-result.create {
+        color: var(--color-primary);
+        border-color: color-mix(in oklab, var(--color-primary) 40%, transparent);
+        border-style: dashed;
+    }
+
+    .skill-result:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .skill-hint {
+        margin-top: 0.35rem;
     }
 
     @media (max-width: 48rem) {

@@ -43,6 +43,13 @@ export interface TextbookPageDto {
     text_format: TextFormat;
     position: number;
     content: SourceContent | Record<string, unknown>;
+    // Skill ids trained by this page. Quiz points earned on the textbook advance these.
+    skills?: string[];
+}
+
+export interface SkillDto {
+    id: string;
+    name: string;
 }
 
 export interface CourseMaterialDto {
@@ -112,6 +119,7 @@ export async function createTextbookPage(fields: {
     description?: string;
     text_format: TextFormat;
     content: SourceContent;
+    skills?: string[];
 }): Promise<TextbookPageDto> {
     return apiSend<TextbookPageDto>("POST", "/api/content/textbook_pages/", {
         parent: null,
@@ -127,9 +135,24 @@ export async function updateTextbookPage(
         description?: string;
         text_format?: TextFormat;
         content?: SourceContent;
+        skills?: string[];
     },
 ): Promise<TextbookPageDto> {
     return apiSend<TextbookPageDto>("PATCH", `/api/content/textbook_pages/${encodeURIComponent(id)}/`, fields);
+}
+
+/** The global skill catalog, used to tag textbook pages with the skills they train. */
+export async function fetchSkills(): Promise<SkillDto[]> {
+    const data = await apiGet<SkillDto[] | Paginated<SkillDto>>("/api/gamification/skills/", {
+        _page_size: "200",
+        _sort: "name",
+    });
+    return toList(data);
+}
+
+/** Create a new skill in the global catalog so it can be assigned to pages. */
+export async function createSkill(name: string): Promise<SkillDto> {
+    return apiSend<SkillDto>("POST", "/api/gamification/skills/", {name: name.trim()});
 }
 
 /* ---- Course materials -------------------------------------------------- */

@@ -49,6 +49,8 @@ export interface CourseDto {
     id: string;
     name: string;
     slug?: string;
+    // Skills this course teaches; only present when expanded via `course.skills`.
+    skills?: SkillDto[];
 }
 
 export interface CourseProgressDto {
@@ -125,7 +127,13 @@ export async function fetchSkillProgress(username?: string | null): Promise<Skil
 }
 
 export async function fetchCourseProgress(username?: string | null): Promise<CourseProgressDto[]> {
-    const query: Record<string, string> = {_expand: "course", _page_size: "100", _sort: "course__name"};
+    const query: Record<string, string> = {
+        // Expand the course and, nested, its skills so the dashboard can show the skills
+        // each course teaches.
+        _expand: "course,course.skills",
+        _page_size: "100",
+        _sort: "course__name",
+    };
 
     // Scope to the current user so staff accounts do not see everyone's progress.
     if (username) {

@@ -28,6 +28,7 @@ assistant backend through the existing course chat WebSocket channel.
     interface TextbookChoice {
         id: string;
         name: string;
+        skills: {id: string; name: string}[];
     }
 
     let state = $state<DashboardState>({
@@ -164,7 +165,11 @@ assistant backend through the existing course chat WebSocket channel.
             for (const material of materials) {
                 // Only materials whose textbook reference was expanded are usable.
                 if (material.textbook && typeof material.textbook === "object") {
-                    choices.push({id: material.textbook.id, name: material.textbook.name});
+                    choices.push({
+                        id: material.textbook.id,
+                        name: material.textbook.name,
+                        skills: (material.textbook.skills ?? []).map((skill) => ({id: skill.id, name: skill.name})),
+                    });
                 }
             }
 
@@ -242,6 +247,13 @@ assistant backend through the existing course chat WebSocket channel.
                         <button type="button" class="textbook-card" onclick={() => chooseTextbook(book.id)}>
                             <span class="textbook-icon" aria-hidden="true">📘</span>
                             <span class="textbook-name">{book.name}</span>
+                            {#if book.skills.length > 0}
+                                <span class="textbook-skills">
+                                    {#each book.skills as skill (skill.id)}
+                                        <span class="textbook-skill">{skill.name}</span>
+                                    {/each}
+                                </span>
+                            {/if}
                         </button>
                     {/each}
                 </div>
@@ -418,6 +430,7 @@ assistant backend through the existing course chat WebSocket channel.
     .textbook-card {
         display: flex;
         align-items: center;
+        flex-wrap: wrap;
         gap: 1rem;
         min-height: 4.5rem;
         padding: 1.2rem 1.4rem;
@@ -451,6 +464,25 @@ assistant backend through the existing course chat WebSocket channel.
     .textbook-name {
         flex: 1 1 auto;
         overflow-wrap: anywhere;
+    }
+
+    /* Skills wrap onto their own line(s) below the icon + name. */
+    .textbook-skills {
+        flex: 1 0 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        margin-left: 2.6rem;
+    }
+
+    .textbook-skill {
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 0.1rem 0.55rem;
+        border-radius: 999px;
+        color: var(--color-primary);
+        background: color-mix(in oklab, var(--color-primary) 14%, transparent);
+        border: 1px solid color-mix(in oklab, var(--color-primary) 30%, transparent);
     }
 
     .status-card {

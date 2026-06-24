@@ -34,6 +34,7 @@ class TextbookPageSerializer(FlexFieldsModelSerializer):
             "position",
             "name", "description", "text_format",
             "content",
+            "skills",
             "created_by", "created_at", "modified_by", "modified_at",
         ]
 
@@ -47,6 +48,7 @@ class TextbookPageSerializer(FlexFieldsModelSerializer):
             "textbook":    "openbook.content.viewsets.textbook.TextbookSerializer",
             "parent":      "openbook.content.viewsets.textbook_page.TextbookPageSerializer",
             "children":    ("openbook.content.viewsets.textbook_page.TextbookPageSerializer", {"many": True}),
+            "skills":      ("openbook.gamification.viewsets.skill.SkillSerializer", {"many": True}),
             "created_by":  "openbook.auth.viewsets.user.UserSerializer",
             "modified_by": "openbook.auth.viewsets.user.UserSerializer",
         }

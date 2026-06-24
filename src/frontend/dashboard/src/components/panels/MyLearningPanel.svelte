@@ -19,9 +19,6 @@ The "Next Steps" tab is a "what next?" guide rather than another list: it
 synthesises courses, skills and stats into a short, prioritised set of
 recommended next steps (finish a course, level up a skill, reach the next level,
 keep the streak).
-
-Note: the backend has no course -> skill relation yet, so the skill tags are
-placeholders derived from the available skill names until that data exists.
 -->
 <script lang="ts">
     import ProgressBar from "../basic/ProgressBar.svelte";
@@ -141,21 +138,6 @@ placeholders derived from the available skill names until that data exists.
         {title: "CSS selectors", due: "Due in 2 days"},
         {title: "JS functions", due: "New"},
     ];
-
-    // Placeholder tag pool: real skills if known, otherwise a generic sample.
-    const fallbackPool = ["Grundlagen", "HTML", "CSS", "JavaScript", "SQL", "Datenmodellierung"];
-    const tagPool = $derived(skills.length > 0 ? skills.map((skill) => skill.name) : fallbackPool);
-
-    // Deterministic placeholder tags per course (rotates through the pool).
-    function courseTags(index: number): string[] {
-        const pool = tagPool;
-        if (pool.length === 0) {
-            return [];
-        }
-
-        const count = Math.min(3, pool.length);
-        return Array.from({length: count}, (_, offset) => pool[(index + offset) % pool.length]);
-    }
 </script>
 
 <!-- Shared inner markup for a recommendation, rendered inside either a button or a div. -->
@@ -186,10 +168,13 @@ placeholders derived from the available skill names until that data exists.
             {#if isEmpty}
                 <p class="empty">No courses in progress yet. Enrol in a course to see it here.</p>
             {:else}
-                {#each courses as course, index (course.id)}
+                {#each courses as course (course.id)}
                     <button type="button" class="course-card" onclick={() => onCourseOpen?.(course)}>
                         <div class="course-head">
-                            <span class="course-name">{course.name}</span>
+                            <span class="course-title">
+                                <span class="course-name">{course.name}</span>
+                                <span class="course-level">Level {course.level}</span>
+                            </span>
                             <span class="course-bar">
                                 <ProgressBar value={course.progress} label={`${course.name} progress`} />
                             </span>
@@ -197,11 +182,13 @@ placeholders derived from the available skill names until that data exists.
                             <span class="course-go" aria-hidden="true">›</span>
                         </div>
 
-                        <div class="course-tags">
-                            {#each courseTags(index) as tag (tag)}
-                                <span class="tag">{tag}</span>
-                            {/each}
-                        </div>
+                        {#if course.skills.length > 0}
+                            <div class="course-tags">
+                                {#each course.skills as skill (skill.id)}
+                                    <span class="tag">{skill.name}</span>
+                                {/each}
+                            </div>
+                        {/if}
                     </button>
                 {/each}
             {/if}
@@ -338,6 +325,14 @@ placeholders derived from the available skill names until that data exists.
         gap: 1rem;
     }
 
+    /* Name stacked over its level badge, sharing the first (14rem) grid column. */
+    .course-title {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        min-width: 0;
+    }
+
     .course-name {
         font-size: 1.6rem;
         font-weight: 700;
@@ -345,6 +340,18 @@ placeholders derived from the available skill names until that data exists.
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+
+    .course-level {
+        align-self: flex-start;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        padding: 0.1rem 0.55rem;
+        border-radius: 999px;
+        color: var(--color-primary);
+        background: color-mix(in oklab, var(--color-primary) 14%, transparent);
+        border: 1px solid color-mix(in oklab, var(--color-primary) 30%, transparent);
     }
 
     .course-bar {

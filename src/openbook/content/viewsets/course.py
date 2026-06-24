@@ -33,7 +33,7 @@ class CourseSerializer(ScopedRolesSerializerMixin, FlexFieldsModelSerializer):
             "id", "slug",
             "name", "description", "text_format",
             "group", "is_template",
-            "materials",
+            "materials", "skills",
             *ScopedRolesSerializerMixin.Meta.fields,
             "created_by", "created_at", "modified_by", "modified_at",
         ]
@@ -49,6 +49,7 @@ class CourseSerializer(ScopedRolesSerializerMixin, FlexFieldsModelSerializer):
             **ScopedRolesSerializerMixin.Meta.expandable_fields,
             "group":       "openbook.content.viewsets.library_group.LibraryGroupSerializer",
             "materials":   ("openbook.content.viewsets.course_material.CourseMaterialSerializer", {"many": True}),
+            "skills":      ("openbook.gamification.viewsets.skill.SkillSerializer", {"many": True}),
             "created_by":  "openbook.auth.viewsets.user.UserSerializer",
             "modified_by": "openbook.auth.viewsets.user.UserSerializer",
         }
