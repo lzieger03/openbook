@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from django_filters.filterset           import FilterSet
 from drf_spectacular.utils              import extend_schema
+from rest_framework                     import serializers
 from rest_framework.viewsets            import ModelViewSet
 
 from openbook.assistant.services.textbook_sync import (
@@ -28,6 +29,22 @@ class TextbookSerializer(FlexFieldsModelSerializer):
     created_by  = UserField(read_only=True)
     modified_by = UserField(read_only=True)
 
+    # Skills are assigned per page (TextbookPage.skills); a textbook trains the union of
+    # the skills of all its pages. Exposed read-only so the dashboard/quiz overview can
+    # show "which skills does this textbook teach" without an extra request per page.
+    skills      = serializers.SerializerMethodField()
+
+    def get_skills(self, obj):
+        from openbook.gamification.viewsets.skill import SkillSerializer
+
+        seen = {}
+        for page in obj.pages.all():
+            for skill in page.skills.all():
+                seen.setdefault(skill.id, skill)
+
+        ordered = sorted(seen.values(), key=lambda skill: skill.name.lower())
+        return SkillSerializer(ordered, many=True, context=self.context).data
+
     class Meta:
         model = Textbook
 
@@ -36,12 +53,14 @@ class TextbookSerializer(FlexFieldsModelSerializer):
             "name", "description", "text_format",
             "group",
             "pages", "used_in_courses", "library_links",
+            "skills",
             "created_by", "created_at", "modified_by", "modified_at",
         ]
 
         read_only_fields = [
             "id",
             "pages", "used_in_courses", "library_links",
+            "skills",
             "created_at", "modified_at",
         ]
 
@@ -76,7 +95,9 @@ class TextbookFilter(CreatedModifiedByFilterMixin, FilterSet):
 class TextbookViewSet(AllowAnonymousListRetrieveViewSetMixin, ModelViewSetMixin, ModelViewSet):
     __doc__ = "Textbooks"
 
-    queryset         = Textbook.objects.all()
+    # Prefetch page skills so TextbookSerializer.get_skills does not run one query per
+    # textbook (and per page) when listing textbooks.
+    queryset         = Textbook.objects.prefetch_related("pages__skills")
     filterset_class  = TextbookFilter
     serializer_class = TextbookSerializer
     ordering         = ["group", "name"]

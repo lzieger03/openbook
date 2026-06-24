@@ -142,7 +142,7 @@ sidebar, minimised icon) can be layered on later.
         </div>
 
         <div class="composer">
-            <span class="status" class:online={connected}>
+            <span class="conn-status" class:online={connected}>
                 <span class="status-dot" aria-hidden="true"></span>
                 {statusLabel}
             </span>
@@ -356,7 +356,7 @@ sidebar, minimised icon) can be layered on later.
         padding: 1rem clamp(1rem, 6vw, 6rem) 1.25rem;
     }
 
-    .status {
+    .conn-status {
         align-self: center;
         display: inline-flex;
         align-items: center;
@@ -374,7 +374,7 @@ sidebar, minimised icon) can be layered on later.
         background: color-mix(in oklab, var(--color-base-content) 40%, transparent);
     }
 
-    .status.online {
+    .conn-status.online {
         color: var(--color-success);
     }
 
@@ -421,7 +421,7 @@ sidebar, minimised icon) can be layered on later.
         color: color-mix(in oklab, var(--color-base-content) 75%, transparent);
     }
 
-    .status.online .status-dot {
+    .conn-status.online .status-dot {
         background: var(--color-success);
         box-shadow: 0 0 10px color-mix(in oklab, var(--color-success) 70%, transparent);
     }

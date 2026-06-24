@@ -89,6 +89,13 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     Websocket consumer for chatting with the AI assistant.
     """
 
+    # The frontend speaks snake_case (matching the Pydantic payload field names), so
+    # disable chanx's automatic camelCase conversion. With it on, multi-word outgoing
+    # fields like ``page_id`` were sent as ``pageId`` and silently missed by the
+    # frontend — which left quizzes without an anchor page and thus never awarded any
+    # points or skills. Single-word chat fields hid the bug.
+    camelize = False
+
     def __init__(self, *args, **kwargs):
         """
         Initialize object with a simply in-memory chat history. Note: In future
@@ -211,16 +218,31 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         message: LearningQuizResult,
     ) -> LearningEventStatus:
         """
-        Store the current user's quiz result for a course page.
+        Store the current user's quiz result for a course page and acknowledge the
+        points and skills the learner just earned.
         """
-        return await self._run_learning_event(
-            event="learning_quiz_result",
-            callback=lambda: self._record_quiz_result(
+        try:
+            reward = await sync_to_async(self._record_quiz_result)(
                 page_id=message.payload.page_id,
                 score=message.payload.score,
                 attempts=message.payload.attempts,
-            ),
-        )
+            )
+            return LearningEventStatus(
+                payload=LearningEventStatusPayload(
+                    event="learning_quiz_result",
+                    success=True,
+                    points_awarded=reward.get("points_awarded", 0),
+                    skills_advanced=reward.get("skills_advanced", []),
+                ),
+            )
+        except Exception as error:
+            return LearningEventStatus(
+                payload=LearningEventStatusPayload(
+                    event="learning_quiz_result",
+                    success=False,
+                    message=str(error),
+                ),
+            )
 
     @ws_handler(
         summary     = "Generate Quiz",
@@ -236,11 +258,14 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         try:
             quiz = await sync_to_async(self._generate_quiz)(
                 question_count=message.payload.question_count,
+                textbook_id=message.payload.textbook_id,
             )
             return QuizGenerated(
                 payload=QuizGeneratedPayload(
                     course_id=self._get_required_course_id(),
                     context_source=quiz.context_source,
+                    textbook_id=quiz.textbook_id,
+                    page_id=quiz.page_id,
                     questions=[
                         QuizQuestionPayload(
                             prompt=question.prompt,
@@ -301,13 +326,14 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         )
         return str(answer or "")
 
-    def _generate_quiz(self, question_count: int):
+    def _generate_quiz(self, question_count: int, textbook_id=None):
         """Run the blocking quiz generation stack outside the async event loop."""
         course_id = self._get_required_course_id()
         return AssistantOrchestrator().generate_quiz(
             user=self.scope.get("user"),
             course=course_id,
             question_count=question_count,
+            textbook=textbook_id,
         )
 
     def _record_page_opened(self, page_id: UUID) -> None:
@@ -333,10 +359,10 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         page_id: UUID,
         score: float,
         attempts: int | None,
-    ) -> None:
-        """Store the current user's quiz result for a course page."""
+    ) -> dict:
+        """Store the current user's quiz result and return the awarded points/skills."""
         course_id = self._get_required_course_id()
-        AssistantOrchestrator().record_quiz_result(
+        return AssistantOrchestrator().record_quiz_result(
             user=self.scope.get("user"),
             course=course_id,
             page=page_id,

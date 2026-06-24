@@ -10,10 +10,10 @@ License, or (at your option) any later version.
 
 <!--
 @component
-Content tab: manage the ordered course materials (each linking a textbook) and,
-per material, the textbook pages and their content. Materials can be added,
-reordered (by swapping positions) and removed. The whole linked textbook is used
-in the course.
+Content tab: add textbooks to a course and write their pages. Designed to be
+straightforward — one input adds a textbook; clicking a textbook opens a simple
+two-pane editor (a list of its pages on the left, the page editor on the right).
+Attaching an existing textbook is a secondary, collapsed option.
 -->
 <script lang="ts">
     import MarkdownIt from "markdown-it";
@@ -22,16 +22,17 @@ in the course.
     import type {CourseMaterialView} from "../../data/teacher.js";
     import {
         addMaterial,
+        createSkill,
         createTextbook,
         createTextbookPage,
         deleteMaterial,
+        fetchSkills,
         fetchTextbookPages,
         fetchTextbooks,
         moveMaterial,
-        uploadTextbookFile,
         updateTextbookPage,
     } from "../../api/content.js";
-    import type {SourceContent, TextbookDto, TextbookPageDto} from "../../api/content.js";
+    import type {SkillDto, SourceContent, TextbookDto, TextbookPageDto} from "../../api/content.js";
     import {slugify} from "../../api/courses.js";
     import type {TextFormat} from "../../api/courses.js";
 
@@ -41,24 +42,22 @@ in the course.
     let textbooks = $state<TextbookDto[]>([]);
     let isLoading = $state(true);
     let error = $state("");
+    let message = $state("");
 
-    // Add-material form.
-    let newTextbookId = $state("");
-    let addingMaterial = $state(false);
-    let newMaterialName = $state("");
-    let newMaterialSlug = $state("");
-    let newMaterialDescription = $state("");
-    let newMaterialFormat = $state<TextFormat>("MD");
-    let creatingMaterial = $state(false);
-    let uploadingMaterialFile = $state(false);
-    let materialMessage = $state("");
+    // Add-textbook form (just a name — slug/format/description use sensible defaults).
+    let newTextbookName = $state("");
+    let creatingTextbook = $state(false);
 
-    // Per-material page editing (one material expanded at a time).
+    // Attach-existing form (secondary option).
+    let attachTextbookId = $state("");
+    let attaching = $state(false);
+
+    // Per-textbook page editing (one textbook expanded at a time).
     let expandedId = $state<string | null>(null);
     let pagesLoading = $state(false);
     let pages = $state<TextbookPageDto[]>([]);
 
-    // Page source editing.
+    // Page editing.
     let selectedPageId = $state("");
     let pageName = $state("");
     let pageTextFormat = $state<TextFormat>("MD");
@@ -70,6 +69,34 @@ in the course.
     let newPageName = $state("");
     let creatingPage = $state(false);
 
+    // Skill tagging: the global catalog plus the ids selected for the current page.
+    let skillCatalog = $state<SkillDto[]>([]);
+    let pageSkillIds = $state<string[]>([]);
+    let skillSearch = $state("");
+    let creatingSkill = $state(false);
+
+    const selectedSkills = $derived(skillCatalog.filter((skill) => pageSkillIds.includes(skill.id)));
+
+    // Unselected skills matching the search term (capped so the dropdown stays small).
+    const skillMatches = $derived.by(() => {
+        const term = skillSearch.trim().toLowerCase();
+        if (!term) {
+            return [];
+        }
+        return skillCatalog
+            .filter((skill) => !pageSkillIds.includes(skill.id) && skill.name.toLowerCase().includes(term))
+            .slice(0, 8);
+    });
+
+    // Offer to create a skill when the search term matches no existing skill by name.
+    const canCreateSkill = $derived.by(() => {
+        const term = skillSearch.trim();
+        if (!term) {
+            return false;
+        }
+        return !skillCatalog.some((skill) => skill.name.toLowerCase() === term.toLowerCase());
+    });
+
     const markdownRenderer = new MarkdownIt({
         breaks: true,
         html: false,
@@ -78,17 +105,22 @@ in the course.
     });
 
     const selectedPage = $derived(pages.find((page) => page.id === selectedPageId) ?? null);
-    const newMaterialSlugPlaceholder = $derived(slugify(newMaterialName));
+
+    // Textbooks not yet part of this course, offered under "attach existing".
+    const attachableTextbooks = $derived(
+        textbooks.filter((textbook) => !materials.some((material) => material.textbookId === textbook.id)),
+    );
 
     async function load(): Promise<void> {
         isLoading = true;
         error = "";
 
         try {
-            [materials, textbooks] = await Promise.all([loadMaterials(courseId), fetchTextbooks()]);
-            if (textbooks.length > 0 && textbooks[0] && !newTextbookId) {
-                newTextbookId = textbooks[0].id;
-            }
+            [materials, textbooks, skillCatalog] = await Promise.all([
+                loadMaterials(courseId),
+                fetchTextbooks(),
+                fetchSkills(),
+            ]);
         } catch (e) {
             error = e instanceof Error ? e.message : String(e);
         } finally {
@@ -105,61 +137,35 @@ in the course.
         return materials.reduce((max, m) => Math.max(max, m.position), 0) + 1;
     }
 
-    async function onAddMaterial(): Promise<void> {
-        if (!newTextbookId) {
-            return;
-        }
-
-        addingMaterial = true;
-        error = "";
-        materialMessage = "";
-
-        try {
-            await addMaterial(courseId, newTextbookId, nextPosition());
-            await load();
-        } catch (e) {
-            error = e instanceof Error ? e.message : String(e);
-        } finally {
-            addingMaterial = false;
-        }
-    }
-
-    function resetMaterialForm(): void {
-        newMaterialName = "";
-        newMaterialSlug = "";
-        newMaterialDescription = "";
-        newMaterialFormat = "MD";
-    }
-
-    async function onCreateMaterial(): Promise<void> {
-        if (!newMaterialName.trim()) {
-            error = "Please enter a material name.";
+    /** Create a brand-new textbook from just a name and open it for editing. */
+    async function onCreateTextbook(): Promise<void> {
+        const name = newTextbookName.trim();
+        if (!name) {
             return;
         }
         if (!courseGroupId) {
-            error = "This course has no library group. Choose one in Overview before creating material.";
+            error = "This course has no library group. Choose one in Overview first.";
             return;
         }
 
-        creatingMaterial = true;
+        creatingTextbook = true;
         error = "";
-        materialMessage = "";
+        message = "";
 
         try {
             const textbook = await createTextbook({
-                name: newMaterialName.trim(),
-                slug: newMaterialSlug.trim() || newMaterialSlugPlaceholder,
-                description: newMaterialDescription.trim(),
-                text_format: newMaterialFormat,
+                name,
+                slug: slugify(name),
+                description: "",
+                text_format: "MD",
                 group: courseGroupId,
             });
             await addMaterial(courseId, textbook.id, nextPosition());
 
             textbooks = [...textbooks, textbook].sort((a, b) => a.name.localeCompare(b.name));
             materials = await loadMaterials(courseId);
-            newTextbookId = textbook.id;
-            resetMaterialForm();
-            materialMessage = "Material created.";
+            newTextbookName = "";
+            message = `Added “${textbook.name}”. Now add some pages.`;
 
             const material = materials.find((candidate) => candidate.textbookId === textbook.id);
             if (material) {
@@ -168,50 +174,41 @@ in the course.
         } catch (e) {
             error = e instanceof Error ? e.message : String(e);
         } finally {
-            creatingMaterial = false;
+            creatingTextbook = false;
         }
     }
 
-    async function onUploadMaterialFile(event: Event): Promise<void> {
-        const input = event.currentTarget as HTMLInputElement;
-        const file = input.files?.[0];
-
-        if (!file) {
+    /** Attach an existing textbook to this course. */
+    async function onAttachTextbook(): Promise<void> {
+        if (!attachTextbookId) {
             return;
         }
 
-        uploadingMaterialFile = true;
+        attaching = true;
         error = "";
-        materialMessage = "";
+        message = "";
 
         try {
-            const result = await uploadTextbookFile(courseId, file, {
-                name: newMaterialName,
-                slug: newMaterialSlug,
-                description: newMaterialDescription,
-            });
+            await addMaterial(courseId, attachTextbookId, nextPosition());
             await load();
-            resetMaterialForm();
-            materialMessage = "Material uploaded.";
-            expandedId = null;
-
-            const material = materials.find((candidate) => candidate.id === result.material);
-            if (material) {
-                await toggleExpand(material);
-            }
+            message = "Textbook attached.";
+            attachTextbookId = "";
         } catch (e) {
             error = e instanceof Error ? e.message : String(e);
         } finally {
-            uploadingMaterialFile = false;
-            input.value = "";
+            attaching = false;
         }
     }
 
-    async function onDeleteMaterial(id: string): Promise<void> {
+    async function onRemoveTextbook(material: CourseMaterialView): Promise<void> {
+        if (!confirm(`Remove “${material.textbookName}” from this course?`)) {
+            return;
+        }
+
         error = "";
         try {
-            await deleteMaterial(id);
-            if (expandedId === id) {
+            await deleteMaterial(material.id);
+            if (expandedId === material.id) {
                 expandedId = null;
             }
             await load();
@@ -220,7 +217,7 @@ in the course.
         }
     }
 
-    /** Move a material one step up or down to reorder the list. */
+    /** Move a textbook one step up or down to reorder the reading list. */
     async function move(index: number, direction: -1 | 1): Promise<void> {
         const material = materials[index];
         const target = materials[index + direction];
@@ -269,6 +266,44 @@ in the course.
         editorMode = "edit";
         editorMessage = "";
         newPageName = "";
+        pageSkillIds = [];
+        skillSearch = "";
+    }
+
+    /** Toggle a skill on the page currently being edited. */
+    function togglePageSkill(skillId: string): void {
+        pageSkillIds = pageSkillIds.includes(skillId)
+            ? pageSkillIds.filter((id) => id !== skillId)
+            : [...pageSkillIds, skillId];
+    }
+
+    /** Attach a skill from the search results and reset the search field. */
+    function addPageSkill(skillId: string): void {
+        if (!pageSkillIds.includes(skillId)) {
+            pageSkillIds = [...pageSkillIds, skillId];
+        }
+        skillSearch = "";
+    }
+
+    /** Create a new skill from the current search term, then attach it to the page. */
+    async function createAndAddSkill(): Promise<void> {
+        const name = skillSearch.trim();
+        if (!name || creatingSkill) {
+            return;
+        }
+
+        creatingSkill = true;
+        error = "";
+
+        try {
+            const skill = await createSkill(name);
+            skillCatalog = [...skillCatalog, skill].sort((a, b) => a.name.localeCompare(b.name));
+            addPageSkill(skill.id);
+        } catch (e) {
+            error = e instanceof Error ? e.message : String(e);
+        } finally {
+            creatingSkill = false;
+        }
     }
 
     function isSourceContent(content: TextbookPageDto["content"]): content is SourceContent {
@@ -305,6 +340,9 @@ in the course.
         pageTextFormat = page.text_format ?? "MD";
         editorSource = readPageSource(page);
         editorFilename = isSourceContent(page.content) ? (page.content.filename ?? "") : "";
+        pageSkillIds = [...(page.skills ?? [])];
+        skillSearch = "";
+        editorMode = "edit";
         editorMessage = "";
     }
 
@@ -324,7 +362,6 @@ in the course.
     async function onCreatePage(material: CourseMaterialView): Promise<void> {
         const name = newPageName.trim();
         if (!name) {
-            error = "Please enter a page name.";
             return;
         }
 
@@ -337,13 +374,14 @@ in the course.
                 textbook: material.textbookId,
                 position: nextPagePosition(),
                 name,
-                text_format: pageTextFormat,
-                content: makeContent(),
+                text_format: "MD",
+                content: {type: "source", format: "MD", source: ""},
+                skills: [],
             });
             pages = await fetchTextbookPages(material.textbookId);
             selectPage(created.id);
             newPageName = "";
-            editorMessage = "Page created.";
+            editorMessage = "Page created — write its content below.";
         } catch (e) {
             error = e instanceof Error ? e.message : String(e);
         } finally {
@@ -353,11 +391,10 @@ in the course.
 
     async function onSavePage(): Promise<void> {
         if (!selectedPageId) {
-            error = "Please select a page.";
             return;
         }
         if (!pageName.trim()) {
-            error = "Page name is required.";
+            error = "Page title is required.";
             return;
         }
 
@@ -370,10 +407,11 @@ in the course.
                 name: pageName.trim(),
                 text_format: pageTextFormat,
                 content: makeContent(),
+                skills: pageSkillIds,
             });
             pages = pages.map((page) => (page.id === updated.id ? updated : page));
             selectPage(updated.id);
-            editorMessage = "Page saved.";
+            editorMessage = "Saved.";
         } catch (e) {
             error = e instanceof Error ? e.message : String(e);
         } finally {
@@ -429,197 +467,252 @@ in the course.
 <div class="card bg-base-100 shadow-sm">
     <div class="card-body">
         <h2 class="card-title">Course content</h2>
-        <p class="muted">Attach textbooks to this course and edit their pages and content.</p>
+        <p class="muted">Add textbooks and write their pages. Learners read them top to bottom.</p>
 
         {#if error}
             <div class="alert alert-error"><span>{error}</span></div>
         {/if}
-
-        {#if materialMessage}
-            <div class="alert alert-success"><span>{materialMessage}</span></div>
+        {#if message}
+            <div class="alert alert-success"><span>{message}</span></div>
         {/if}
 
-        <div class="material-tools">
-            <section class="material-create" aria-labelledby="create-material-title">
-                <div class="section-head">
-                    <h3 id="create-material-title">Create material</h3>
-                </div>
+        <!-- Primary action: add a textbook with just a name. -->
+        <div class="add-textbook">
+            <input
+                class="input input-bordered flex-1"
+                type="text"
+                bind:value={newTextbookName}
+                placeholder="New textbook name, e.g. Chapter 1: HTML Basics"
+                disabled={creatingTextbook}
+                onkeydown={(event) => {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                        onCreateTextbook();
+                    }
+                }}
+            />
+            <button
+                type="button"
+                class="btn btn-primary"
+                onclick={onCreateTextbook}
+                disabled={creatingTextbook || !newTextbookName.trim() || !courseGroupId}
+            >
+                {#if creatingTextbook}<span class="loading loading-spinner loading-sm"></span>{/if}
+                + Add textbook
+            </button>
+        </div>
 
-                <div class="material-form-grid">
-                    <label class="form-control w-full">
-                        <span class="label-text">Material name</span>
-                        <input class="input input-bordered w-full" type="text" bind:value={newMaterialName} placeholder="e.g. Chapter 1" />
-                    </label>
-
-                    <label class="form-control w-full">
-                        <span class="label-text">Slug</span>
-                        <input class="input input-bordered w-full" type="text" bind:value={newMaterialSlug} placeholder={newMaterialSlugPlaceholder} />
-                    </label>
-
-                    <label class="form-control w-full">
-                        <span class="label-text">Format</span>
-                        <select class="select select-bordered w-full" bind:value={newMaterialFormat}>
-                            <option value="MD">Markdown</option>
-                            <option value="HTML">HTML</option>
-                            <option value="TEXT">Plain text</option>
-                        </select>
-                    </label>
-
-                    <label class="form-control w-full material-description">
-                        <span class="label-text">Description</span>
-                        <textarea class="textarea textarea-bordered w-full" rows="3" bind:value={newMaterialDescription}></textarea>
-                    </label>
-                </div>
-
-                <div class="tool-actions">
-                    <button
-                        type="button"
-                        class="btn btn-primary"
-                        onclick={onCreateMaterial}
-                        disabled={creatingMaterial || !newMaterialName.trim() || !courseGroupId}
-                    >
-                        {#if creatingMaterial}<span class="loading loading-spinner loading-sm"></span>{/if}
-                        Create material
-                    </button>
-                    <label class="btn btn-ghost" class:btn-disabled={uploadingMaterialFile}>
-                        {#if uploadingMaterialFile}<span class="loading loading-spinner loading-sm"></span>{/if}
-                        Upload file
-                        <input
-                            class="sr-only"
-                            type="file"
-                            accept=".md,.markdown,.html,.htm,.txt,text/markdown,text/html,text/plain"
-                            disabled={uploadingMaterialFile}
-                            onchange={onUploadMaterialFile}
-                        />
-                    </label>
-                </div>
-            </section>
-
-            <section class="material-attach" aria-labelledby="attach-material-title">
-                <div class="section-head">
-                    <h3 id="attach-material-title">Attach existing textbook</h3>
-                </div>
-
-                <div class="add-row">
-                    <select class="select select-bordered" bind:value={newTextbookId}>
-                        {#each textbooks as textbook (textbook.id)}
+        {#if attachableTextbooks.length > 0}
+            <details class="attach">
+                <summary>Or attach an existing textbook</summary>
+                <div class="attach-row">
+                    <select class="select select-bordered flex-1" bind:value={attachTextbookId}>
+                        <option value="">Choose a textbook…</option>
+                        {#each attachableTextbooks as textbook (textbook.id)}
                             <option value={textbook.id}>{textbook.name}</option>
                         {/each}
                     </select>
-                    <button type="button" class="btn btn-ghost" onclick={onAddMaterial} disabled={addingMaterial || !newTextbookId}>
-                        {#if addingMaterial}<span class="loading loading-spinner loading-sm"></span>{/if}
+                    <button
+                        type="button"
+                        class="btn btn-ghost"
+                        onclick={onAttachTextbook}
+                        disabled={attaching || !attachTextbookId}
+                    >
+                        {#if attaching}<span class="loading loading-spinner loading-sm"></span>{/if}
                         Attach
                     </button>
                 </div>
-            </section>
-        </div>
+            </details>
+        {/if}
 
         {#if isLoading}
-            <span class="loading loading-spinner"></span>
+            <div class="center-row"><span class="loading loading-spinner"></span></div>
         {:else if materials.length === 0}
-            <p class="muted">No materials yet. Create material above to start building this course.</p>
+            <div class="empty">
+                <p class="empty-title">No content yet</p>
+                <p class="muted">Type a name above and hit “Add textbook” to create your first one.</p>
+            </div>
         {:else}
-            <ol class="material-list">
+            <ol class="tb-list">
                 {#each materials as material, index (material.id)}
-                    <li class="material">
-                        <div class="material-head">
-                            <span class="pos">{index + 1}</span>
-                            <span class="name">{material.textbookName}</span>
+                    {@const open = expandedId === material.id}
+                    <li class="tb" class:open>
+                        <div class="tb-head">
+                            <button type="button" class="tb-main" onclick={() => toggleExpand(material)}>
+                                <span class="tb-index">{index + 1}</span>
+                                <span class="tb-name">{material.textbookName}</span>
+                                <span class="chev" aria-hidden="true">{open ? "▾" : "▸"}</span>
+                            </button>
 
-                            <span class="material-actions">
+                            <span class="tb-actions">
                                 <button type="button" class="btn btn-xs btn-ghost" disabled={index === 0} onclick={() => move(index, -1)} aria-label="Move up">↑</button>
                                 <button type="button" class="btn btn-xs btn-ghost" disabled={index === materials.length - 1} onclick={() => move(index, 1)} aria-label="Move down">↓</button>
-                                <button type="button" class="btn btn-xs btn-ghost" onclick={() => toggleExpand(material)}>
-                                    {expandedId === material.id ? "Hide pages" : "Edit pages"}
-                                </button>
-                                <button type="button" class="btn btn-xs btn-ghost text-error" onclick={() => onDeleteMaterial(material.id)}>Remove</button>
+                                <button type="button" class="btn btn-xs btn-ghost text-error" onclick={() => onRemoveTextbook(material)} aria-label="Remove textbook">Remove</button>
                             </span>
                         </div>
 
-                        {#if expandedId === material.id}
-                            <div class="ranges">
+                        {#if open}
+                            <div class="tb-body">
                                 {#if pagesLoading}
-                                    <span class="loading loading-spinner loading-sm"></span>
+                                    <div class="center-row"><span class="loading loading-spinner loading-sm"></span></div>
                                 {:else}
-                                    <div class="page-editor">
-                                        <div class="editor-head">
-                                            <div>
-                                                <h3>Page editor</h3>
-                                                <p class="muted">Edit Markdown, HTML, or plain text content for the selected textbook page.</p>
-                                            </div>
-                                            <label class="btn btn-sm btn-ghost">
-                                                Import file
-                                                <input class="sr-only" type="file" accept=".md,.markdown,.html,.htm,.txt,text/markdown,text/html,text/plain" onchange={onFileSelected} />
-                                            </label>
-                                        </div>
-
-                                        {#if editorMessage}
-                                            <div class="alert alert-success alert-sm"><span>{editorMessage}</span></div>
-                                        {/if}
-
-                                        <div class="editor-grid">
-                                            <label class="form-control w-full">
-                                                <span class="label-text">Existing page</span>
-                                                <select class="select select-bordered select-sm" bind:value={selectedPageId} onchange={(event) => selectPage(event.currentTarget.value)}>
-                                                    <option value="">Select page</option>
+                                    <div class="editor-layout">
+                                        <!-- Left: page list + add page -->
+                                        <aside class="page-list">
+                                            <div class="page-list-title">Pages</div>
+                                            {#if pages.length === 0}
+                                                <p class="muted page-empty">No pages yet.</p>
+                                            {:else}
+                                                <ul class="pages">
                                                     {#each pages as page (page.id)}
-                                                        <option value={page.id}>{page.name}</option>
+                                                        <li>
+                                                            <button
+                                                                type="button"
+                                                                class="page-item"
+                                                                class:active={page.id === selectedPageId}
+                                                                onclick={() => selectPage(page.id)}
+                                                            >
+                                                                {page.name}
+                                                            </button>
+                                                        </li>
                                                     {/each}
-                                                </select>
-                                            </label>
+                                                </ul>
+                                            {/if}
 
-                                            <label class="form-control w-full">
-                                                <span class="label-text">Create page</span>
-                                                <div class="join w-full">
-                                                    <input class="input input-bordered input-sm join-item flex-1" type="text" bind:value={newPageName} placeholder="New page title" />
-                                                    <button type="button" class="btn btn-sm btn-primary join-item" onclick={() => onCreatePage(material)} disabled={creatingPage || !newPageName.trim()}>
-                                                        {#if creatingPage}<span class="loading loading-spinner loading-xs"></span>{/if}
-                                                        Add
+                                            <div class="add-page">
+                                                <input
+                                                    class="input input-bordered input-sm flex-1"
+                                                    type="text"
+                                                    bind:value={newPageName}
+                                                    placeholder="New page title"
+                                                    onkeydown={(event) => {
+                                                        if (event.key === "Enter") {
+                                                            event.preventDefault();
+                                                            onCreatePage(material);
+                                                        }
+                                                    }}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-sm btn-primary"
+                                                    onclick={() => onCreatePage(material)}
+                                                    disabled={creatingPage || !newPageName.trim()}
+                                                    aria-label="Add page"
+                                                >
+                                                    {#if creatingPage}<span class="loading loading-spinner loading-xs"></span>{:else}+{/if}
+                                                </button>
+                                            </div>
+                                        </aside>
+
+                                        <!-- Right: page editor -->
+                                        <div class="editor">
+                                            {#if !selectedPage}
+                                                <div class="editor-placeholder">
+                                                    <p class="muted">
+                                                        {pages.length === 0
+                                                            ? "Add your first page on the left to start writing."
+                                                            : "Select a page on the left, or add a new one."}
+                                                    </p>
+                                                </div>
+                                            {:else}
+                                                {#if editorMessage}
+                                                    <div class="alert alert-success alert-sm"><span>{editorMessage}</span></div>
+                                                {/if}
+
+                                                <div class="editor-row">
+                                                    <label class="form-control flex-1">
+                                                        <span class="label-text">Page title</span>
+                                                        <input class="input input-bordered input-sm w-full" type="text" bind:value={pageName} />
+                                                    </label>
+                                                    <label class="form-control format-control">
+                                                        <span class="label-text">Format</span>
+                                                        <select class="select select-bordered select-sm" bind:value={pageTextFormat}>
+                                                            <option value="MD">Markdown</option>
+                                                            <option value="HTML">HTML</option>
+                                                            <option value="TEXT">Plain text</option>
+                                                        </select>
+                                                    </label>
+                                                </div>
+
+                                                <div class="form-control w-full">
+                                                    <span class="label-text">Skills trained by this page</span>
+
+                                                    {#if selectedSkills.length > 0}
+                                                        <div class="skill-tags">
+                                                            {#each selectedSkills as skill (skill.id)}
+                                                                <span class="skill-tag selected">
+                                                                    {skill.name}
+                                                                    <button
+                                                                        type="button"
+                                                                        class="skill-remove"
+                                                                        aria-label={`Remove ${skill.name}`}
+                                                                        onclick={() => togglePageSkill(skill.id)}
+                                                                    >
+                                                                        ×
+                                                                    </button>
+                                                                </span>
+                                                            {/each}
+                                                        </div>
+                                                    {/if}
+
+                                                    <input
+                                                        class="input input-bordered input-sm w-full mt-2"
+                                                        type="text"
+                                                        bind:value={skillSearch}
+                                                        placeholder="Search skills, or type a new name to create one…"
+                                                    />
+
+                                                    {#if skillSearch.trim()}
+                                                        <div class="skill-results">
+                                                            {#each skillMatches as skill (skill.id)}
+                                                                <button type="button" class="skill-result" onclick={() => addPageSkill(skill.id)}>
+                                                                    {skill.name}
+                                                                </button>
+                                                            {/each}
+
+                                                            {#if canCreateSkill}
+                                                                <button type="button" class="skill-result create" disabled={creatingSkill} onclick={createAndAddSkill}>
+                                                                    {#if creatingSkill}<span class="loading loading-spinner loading-xs"></span>{/if}
+                                                                    + Create “{skillSearch.trim()}”
+                                                                </button>
+                                                            {:else if skillMatches.length === 0}
+                                                                <p class="muted skill-hint">No matching skills.</p>
+                                                            {/if}
+                                                        </div>
+                                                    {/if}
+                                                </div>
+
+                                                <div class="editor-toolbar">
+                                                    <div class="editor-tabs">
+                                                        <button type="button" class="btn btn-sm" class:btn-primary={editorMode === "edit"} onclick={() => (editorMode = "edit")}>Write</button>
+                                                        <button type="button" class="btn btn-sm" class:btn-primary={editorMode === "preview"} onclick={() => (editorMode = "preview")}>Preview</button>
+                                                    </div>
+                                                    <label class="btn btn-sm btn-ghost">
+                                                        Import file
+                                                        <input class="sr-only" type="file" accept=".md,.markdown,.html,.htm,.txt,text/markdown,text/html,text/plain" onchange={onFileSelected} />
+                                                    </label>
+                                                </div>
+
+                                                {#if editorMode === "edit"}
+                                                    <textarea
+                                                        class="textarea textarea-bordered editor-source"
+                                                        bind:value={editorSource}
+                                                        placeholder="Write Markdown, HTML, or import a .md/.html/.txt file."
+                                                    ></textarea>
+                                                {:else if pageTextFormat === "HTML"}
+                                                    <iframe class="preview-frame" title="HTML preview" sandbox="" srcdoc={previewHtml}></iframe>
+                                                {:else}
+                                                    <div class="preview-prose">{@html previewHtml}</div>
+                                                {/if}
+
+                                                <div class="editor-actions">
+                                                    <span class="muted">{editorFilename ? `Imported from ${editorFilename}` : ""}</span>
+                                                    <button type="button" class="btn btn-sm btn-primary" onclick={onSavePage} disabled={editorSaving}>
+                                                        {#if editorSaving}<span class="loading loading-spinner loading-xs"></span>{/if}
+                                                        Save page
                                                     </button>
                                                 </div>
-                                            </label>
-                                        </div>
-
-                                        <div class="editor-grid mt-3">
-                                            <label class="form-control w-full">
-                                                <span class="label-text">Page title</span>
-                                                <input class="input input-bordered input-sm w-full" type="text" bind:value={pageName} disabled={!selectedPage} />
-                                            </label>
-
-                                            <label class="form-control w-full">
-                                                <span class="label-text">Format</span>
-                                                <select class="select select-bordered select-sm w-full" bind:value={pageTextFormat}>
-                                                    <option value="MD">Markdown</option>
-                                                    <option value="HTML">HTML</option>
-                                                    <option value="TEXT">Plain text</option>
-                                                </select>
-                                            </label>
-                                        </div>
-
-                                        <div class="editor-tabs mt-3">
-                                            <button type="button" class="btn btn-sm" class:btn-primary={editorMode === "edit"} onclick={() => (editorMode = "edit")}>Edit</button>
-                                            <button type="button" class="btn btn-sm" class:btn-primary={editorMode === "preview"} onclick={() => (editorMode = "preview")}>Preview</button>
-                                        </div>
-
-                                        {#if editorMode === "edit"}
-                                            <textarea
-                                                class="textarea textarea-bordered editor-source"
-                                                bind:value={editorSource}
-                                                disabled={!selectedPage}
-                                                placeholder="Write Markdown, HTML, or import a .md/.html/.txt file."
-                                            ></textarea>
-                                        {:else if pageTextFormat === "HTML"}
-                                            <iframe class="preview-frame" title="HTML preview" sandbox="" srcdoc={previewHtml}></iframe>
-                                        {:else}
-                                            <div class="preview-prose">{@html previewHtml}</div>
-                                        {/if}
-
-                                        <div class="editor-actions">
-                                            <span class="muted">{editorFilename ? `Imported from ${editorFilename}` : "Content is stored on the selected textbook page."}</span>
-                                            <button type="button" class="btn btn-sm btn-primary" onclick={onSavePage} disabled={editorSaving || !selectedPage}>
-                                                {#if editorSaving}<span class="loading loading-spinner loading-xs"></span>{/if}
-                                                Save page
-                                            </button>
+                                            {/if}
                                         </div>
                                     </div>
                                 {/if}
@@ -633,81 +726,106 @@ in the course.
 </div>
 
 <style>
-    .material-tools {
-        display: grid;
-        grid-template-columns: minmax(0, 2fr) minmax(16rem, 1fr);
-        gap: 1rem;
-        margin: 0.75rem 0 1rem;
+    .muted {
+        color: color-mix(in oklab, var(--color-base-content) 60%, transparent);
+        font-size: 0.85rem;
     }
 
-    .material-create,
-    .material-attach {
-        min-width: 0;
-        padding: 1rem;
-        border: 1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);
-        border-radius: 0.5rem;
-    }
+    /* --- Add textbook --------------------------------------------------- */
 
-    .section-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
-        margin-bottom: 0.75rem;
-    }
-
-    .section-head h3 {
-        font-weight: 700;
-    }
-
-    .material-form-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0.75rem;
-    }
-
-    .material-description {
-        grid-column: 1 / -1;
-    }
-
-    .tool-actions {
-        display: flex;
-        justify-content: flex-end;
-        margin-top: 0.75rem;
-    }
-
-    .add-row {
+    .add-textbook {
         display: flex;
         gap: 0.5rem;
+        margin: 0.75rem 0 0.25rem;
     }
 
-    .add-row select {
-        min-width: 0;
-        flex: 1 1 auto;
+    .attach {
+        margin-bottom: 0.5rem;
     }
 
-    .material-list {
+    .attach summary {
+        cursor: pointer;
+        font-size: 0.85rem;
+        color: color-mix(in oklab, var(--color-base-content) 70%, transparent);
+        padding: 0.25rem 0;
+        width: fit-content;
+    }
+
+    .attach-row {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .center-row {
+        display: flex;
+        justify-content: center;
+        padding: 1.5rem 0;
+    }
+
+    .empty {
+        text-align: center;
+        padding: 2.5rem 1rem;
+        border: 1px dashed color-mix(in oklab, var(--color-base-content) 18%, transparent);
+        border-radius: 0.75rem;
+        margin-top: 0.5rem;
+    }
+
+    .empty-title {
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+    }
+
+    /* --- Textbook list -------------------------------------------------- */
+
+    .tb-list {
         list-style: none;
-        margin: 0;
+        margin: 0.75rem 0 0;
         padding: 0;
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 0.6rem;
     }
 
-    .material {
+    .tb {
         border: 1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);
-        border-radius: 0.6rem;
-        padding: 0.6rem 0.8rem;
+        border-radius: 0.75rem;
+        overflow: hidden;
     }
 
-    .material-head {
+    .tb.open {
+        border-color: color-mix(in oklab, var(--color-primary) 40%, transparent);
+    }
+
+    .tb-head {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.6rem 0.5rem 0.4rem;
+    }
+
+    /* The textbook title row is one big toggle button. */
+    .tb-main {
+        flex: 1 1 auto;
+        min-width: 0;
         display: flex;
         align-items: center;
         gap: 0.75rem;
+        padding: 0.35rem 0.5rem;
+        border-radius: 0.5rem;
+        background: none;
+        border: 0;
+        cursor: pointer;
+        text-align: left;
+        transition: background 0.15s ease;
     }
 
-    .pos {
+    .tb-main:hover {
+        background: color-mix(in oklab, var(--color-base-content) 6%, transparent);
+    }
+
+    .tb-index {
+        flex: 0 0 auto;
         display: grid;
         place-items: center;
         width: 1.6rem;
@@ -719,51 +837,137 @@ in the course.
         color: var(--color-primary);
     }
 
-    .name {
+    .tb-name {
+        flex: 1 1 auto;
+        min-width: 0;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .chev {
+        flex: 0 0 auto;
+        color: color-mix(in oklab, var(--color-base-content) 55%, transparent);
+    }
+
+    .tb-actions {
+        flex: 0 0 auto;
+        display: flex;
+        gap: 0.15rem;
+    }
+
+    .tb-body {
+        padding: 0 0.6rem 0.75rem;
+        border-top: 1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);
+    }
+
+    /* --- Two-pane editor ------------------------------------------------ */
+
+    .editor-layout {
+        display: grid;
+        grid-template-columns: minmax(11rem, 14rem) minmax(0, 1fr);
+        gap: 1rem;
+        margin-top: 0.75rem;
+    }
+
+    .page-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+
+    .page-list-title {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: color-mix(in oklab, var(--color-base-content) 55%, transparent);
+    }
+
+    .page-empty {
+        margin: 0.25rem 0;
+    }
+
+    .pages {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+    }
+
+    .page-item {
+        width: 100%;
+        text-align: left;
+        padding: 0.4rem 0.6rem;
+        border-radius: 0.5rem;
+        border: 1px solid transparent;
+        background: none;
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: var(--color-base-content);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .page-item:hover {
+        background: color-mix(in oklab, var(--color-base-content) 6%, transparent);
+    }
+
+    .page-item.active {
+        background: color-mix(in oklab, var(--color-primary) 14%, transparent);
+        border-color: color-mix(in oklab, var(--color-primary) 35%, transparent);
         font-weight: 600;
     }
 
-    .material-actions {
-        margin-left: auto;
+    .add-page {
         display: flex;
-        gap: 0.25rem;
+        gap: 0.35rem;
+        margin-top: 0.25rem;
     }
 
-    .ranges {
-        margin-top: 0.75rem;
-        padding-top: 0.75rem;
-        border-top: 1px dashed color-mix(in oklab, var(--color-base-content) 15%, transparent);
-    }
-
-    .page-editor {
-        margin-top: 1rem;
-        padding-top: 1rem;
-        border-top: 1px dashed color-mix(in oklab, var(--color-base-content) 15%, transparent);
+    .editor {
+        min-width: 0;
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
     }
 
-    .editor-head {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 1rem;
-    }
-
-    .editor-head h3 {
-        font-weight: 700;
-    }
-
-    .editor-grid {
+    .editor-placeholder {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        place-items: center;
+        min-height: 12rem;
+        border: 1px dashed color-mix(in oklab, var(--color-base-content) 18%, transparent);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        text-align: center;
+    }
+
+    .editor-row {
+        display: flex;
         gap: 0.75rem;
+        align-items: flex-end;
+    }
+
+    .format-control {
+        flex: 0 0 auto;
+        width: 10rem;
+    }
+
+    .editor-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
     }
 
     .editor-tabs {
         display: flex;
-        gap: 0.5rem;
+        gap: 0.4rem;
     }
 
     .editor-source,
@@ -818,32 +1022,108 @@ in the course.
         gap: 1rem;
     }
 
-    .muted {
-        color: color-mix(in oklab, var(--color-base-content) 60%, transparent);
-        font-size: 0.85rem;
+    /* --- Skills picker -------------------------------------------------- */
+
+    .skill-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-top: 0.35rem;
     }
 
+    .skill-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.8rem;
+        padding: 0.2rem 0.7rem;
+        border-radius: 999px;
+        color: var(--color-base-content);
+        background: color-mix(in oklab, var(--color-base-content) 8%, transparent);
+        border: 1px solid color-mix(in oklab, var(--color-base-content) 15%, transparent);
+    }
+
+    .skill-tag.selected {
+        color: var(--color-primary-content);
+        background: var(--color-primary);
+        border-color: var(--color-primary);
+    }
+
+    .skill-remove {
+        display: grid;
+        place-items: center;
+        width: 1.1rem;
+        height: 1.1rem;
+        border-radius: 999px;
+        line-height: 1;
+        cursor: pointer;
+        color: inherit;
+        background: color-mix(in oklab, currentColor 18%, transparent);
+    }
+
+    .skill-remove:hover {
+        background: color-mix(in oklab, currentColor 32%, transparent);
+    }
+
+    .skill-results {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-top: 0.5rem;
+    }
+
+    .skill-result {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.7rem;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        color: var(--color-base-content);
+        background: color-mix(in oklab, var(--color-base-content) 6%, transparent);
+        border: 1px solid color-mix(in oklab, var(--color-base-content) 15%, transparent);
+        transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .skill-result:hover:not(:disabled) {
+        border-color: color-mix(in oklab, var(--color-primary) 45%, transparent);
+        background: color-mix(in oklab, var(--color-primary) 10%, transparent);
+    }
+
+    .skill-result.create {
+        color: var(--color-primary);
+        border-color: color-mix(in oklab, var(--color-primary) 40%, transparent);
+        border-style: dashed;
+    }
+
+    .skill-result:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .skill-hint {
+        margin-top: 0.35rem;
+    }
+
+    /* --- Responsive ----------------------------------------------------- */
+
     @media (max-width: 48rem) {
-        .material-tools,
-        .material-form-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .add-row,
-        .material-head,
-        .editor-head,
+        .add-textbook,
+        .attach-row,
+        .editor-row,
         .editor-actions {
-            align-items: stretch;
             flex-direction: column;
+            align-items: stretch;
         }
 
-        .material-actions {
-            margin-left: 0;
-            flex-wrap: wrap;
+        .format-control {
+            width: 100%;
         }
 
-        .editor-grid {
+        .editor-layout {
             grid-template-columns: 1fr;
+        }
+
+        .tb-actions {
+            flex-wrap: wrap;
         }
     }
 </style>

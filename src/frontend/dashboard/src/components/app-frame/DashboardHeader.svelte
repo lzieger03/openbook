@@ -42,11 +42,47 @@ Top application bar: brand on the left, user avatar and a status pill on the rig
     <div class="header-right">
         <button
             type="button"
-            class="theme-toggle"
+            class="theme-switch"
+            role="switch"
+            aria-checked={$theme === "dark"}
             aria-label={$theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            title={$theme === "dark" ? "Dark mode" : "Light mode"}
             onclick={toggleTheme}
         >
-            {$theme === "dark" ? "☀️" : "🌙"}
+            <span class="switch-track">
+                <span class="switch-thumb">
+                    {#if $theme === "dark"}
+                        <!-- Moon -->
+                        <svg class="switch-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path
+                                fill="currentColor"
+                                d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"
+                            />
+                        </svg>
+                    {:else}
+                        <!-- Sun -->
+                        <svg
+                            class="switch-icon"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            aria-hidden="true"
+                        >
+                            <circle cx="12" cy="12" r="4.2" fill="currentColor" stroke="none" />
+                            <line x1="12" y1="2.5" x2="12" y2="5" />
+                            <line x1="12" y1="19" x2="12" y2="21.5" />
+                            <line x1="2.5" y1="12" x2="5" y2="12" />
+                            <line x1="19" y1="12" x2="21.5" y2="12" />
+                            <line x1="5.3" y1="5.3" x2="7" y2="7" />
+                            <line x1="17" y1="17" x2="18.7" y2="18.7" />
+                            <line x1="18.7" y1="5.3" x2="17" y2="7" />
+                            <line x1="7" y1="17" x2="5.3" y2="18.7" />
+                        </svg>
+                    {/if}
+                </span>
+            </span>
         </button>
         <span class="avatar-mark" aria-hidden="true">
             {#if user?.avatarUrl}
@@ -102,23 +138,63 @@ Top application bar: brand on the left, user avatar and a status pill on the rig
         gap: 0.85rem;
     }
 
-    .theme-toggle {
-        display: grid;
-        place-items: center;
-        width: 2rem;
-        height: 2rem;
-        border-radius: 999px;
-        font-size: 1rem;
+    /* Pill toggle: a sun knob (light, left) that slides to a moon knob (dark, right). */
+    .theme-switch {
+        padding: 0;
+        border: 0;
+        background: none;
+        line-height: 0;
         cursor: pointer;
-        background: color-mix(in oklab, var(--color-base-200) 70%, transparent);
-        border: 1px solid color-mix(in oklab, var(--color-base-content) 18%, transparent);
+        border-radius: 999px;
     }
 
-    .theme-toggle:hover {
+    .switch-track {
+        display: block;
+        position: relative;
+        width: 3.5rem;
+        height: 1.9rem;
+        border-radius: 999px;
+        background: color-mix(in oklab, #f6c453 50%, var(--color-base-200));
+        border: 1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);
+        transition: background 0.25s ease, border-color 0.25s ease;
+    }
+
+    .theme-switch[aria-checked="true"] .switch-track {
+        background: #0e2a40;
+        border-color: color-mix(in oklab, #38bdf8 35%, transparent);
+    }
+
+    .switch-thumb {
+        position: absolute;
+        top: 50%;
+        left: 0.2rem;
+        transform: translateY(-50%);
+        display: grid;
+        place-items: center;
+        width: 1.45rem;
+        height: 1.45rem;
+        border-radius: 999px;
+        background: #f0b429;
+        color: #fff;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+        transition: transform 0.25s ease, background 0.25s ease;
+    }
+
+    .theme-switch[aria-checked="true"] .switch-thumb {
+        transform: translate(1.6rem, -50%);
+        background: #38bdf8;
+    }
+
+    .switch-icon {
+        width: 0.95rem;
+        height: 0.95rem;
+    }
+
+    .theme-switch:hover .switch-track {
         border-color: color-mix(in oklab, var(--color-primary) 50%, transparent);
     }
 
-    .theme-toggle:focus-visible {
+    .theme-switch:focus-visible {
         outline: 2px solid var(--color-primary);
         outline-offset: 2px;
     }
@@ -164,11 +240,22 @@ Top application bar: brand on the left, user avatar and a status pill on the rig
         box-shadow: 0 0 12px color-mix(in oklab, var(--color-success) 70%, transparent);
     }
 
-    @media (max-width: 40rem) {
+    /* On narrow screens keep the header a single row but drop the secondary,
+       space-hungry items so the brand, theme toggle and avatar always fit. */
+    @media (max-width: 48rem) {
         .app-header {
-            flex-direction: column;
-            gap: 0.75rem;
-            text-align: center;
+            padding: 0.65rem 1rem;
+        }
+
+        .page-label,
+        .status-pill {
+            display: none;
+        }
+    }
+
+    @media (max-width: 30rem) {
+        .brand-text {
+            display: none;
         }
     }
 </style>

@@ -66,6 +66,23 @@ class CourseSerializer(ScopedRolesSerializerMixin, FlexFieldsModelSerializer):
     created_by  = UserField(read_only=True)
     modified_by = UserField(read_only=True)
 
+    # Skills a learner can earn in this course: the union of the skills trained by the
+    # pages of every textbook in the course. Derived (read-only) from the page-level
+    # assignment so the dashboard shows exactly what quizzes here can award.
+    skills      = serializers.SerializerMethodField()
+
+    def get_skills(self, obj):
+        from openbook.gamification.models import Skill
+        from openbook.gamification.viewsets.skill import SkillSerializer
+
+        earnable = (
+            Skill.objects
+            .filter(textbook_pages__textbook__used_in_courses__course=obj)
+            .distinct()
+            .order_by("name")
+        )
+        return SkillSerializer(earnable, many=True, context=self.context).data
+
     class Meta:
         model = Course
 
@@ -73,14 +90,14 @@ class CourseSerializer(ScopedRolesSerializerMixin, FlexFieldsModelSerializer):
             "id", "slug",
             "name", "description", "text_format",
             "group", "is_template",
-            "materials",
+            "materials", "skills",
             *ScopedRolesSerializerMixin.Meta.fields,
             "created_by", "created_at", "modified_by", "modified_at",
         ]
 
         read_only_fields = [
             "id",
-            "materials",
+            "materials", "skills",
             *ScopedRolesSerializerMixin.Meta.read_only_fields,
             "created_at", "modified_at",
         ]

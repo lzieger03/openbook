@@ -145,16 +145,26 @@ class LearningQuizResultPayload(BaseModel):
 class LearningEventStatusPayload(BaseModel):
     """
     Payload acknowledging a learning progress event.
+
+    For a ``learning_quiz_result`` event, ``points_awarded`` and ``skills_advanced``
+    report what the learner just earned so the UI can show immediate feedback.
     """
-    event:   str
-    success: bool
-    message: str = ""
+    event:           str
+    success:         bool
+    message:         str = ""
+    points_awarded:  int = 0
+    skills_advanced: list[str] = Field(default_factory=list)
 
 class QuizStartPayload(BaseModel):
     """
     Payload for requesting a generated quiz for the current course channel.
+
+    ``textbook_id`` optionally narrows the quiz to a single textbook of the course so
+    the learner can choose which textbook to be quizzed on. When omitted, the quiz is
+    generated from the whole course as before.
     """
     question_count: int = Field(default=5, ge=1, le=10)
+    textbook_id:    UUID | None = None
 
 class QuizAnswerOptionPayload(BaseModel):
     """
@@ -183,11 +193,17 @@ class QuizSourcePayload(BaseModel):
 class QuizGeneratedPayload(BaseModel):
     """
     Generated quiz questions for the current course.
+
+    ``textbook_id`` echoes the textbook the quiz was scoped to (if any). ``page_id`` is
+    the textbook page the result should be anchored to: the client sends it back in a
+    ``learning_quiz_result`` message so the score can be stored and points awarded.
     """
     course_id:      UUID
     context_source: Literal["rag_documents", "course_context"]
     questions:      list[QuizQuestionPayload]
     sources:        list[QuizSourcePayload] = Field(default_factory=list)
+    textbook_id:    UUID | None = None
+    page_id:        UUID | None = None
 
 class ChatInput(BaseMessage):
     """

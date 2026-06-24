@@ -74,6 +74,13 @@ progress bar towards the next level — styled like the course list.
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
+        /* Firefox: keep the track transparent so the bar only shows on hover. */
+        scrollbar-width: thin;
+        scrollbar-color: transparent transparent;
+    }
+
+    .panel-body:hover {
+        scrollbar-color: color-mix(in oklab, var(--color-base-content) 20%, transparent) transparent;
     }
 
     .panel-body::-webkit-scrollbar {
@@ -82,6 +89,10 @@ progress bar towards the next level — styled like the course list.
 
     .panel-body::-webkit-scrollbar-thumb {
         border-radius: 999px;
+        background: transparent;
+    }
+
+    .panel-body:hover::-webkit-scrollbar-thumb {
         background: color-mix(in oklab, var(--color-base-content) 20%, transparent);
     }
 

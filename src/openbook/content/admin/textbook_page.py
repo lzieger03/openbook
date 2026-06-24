@@ -42,6 +42,7 @@ class TextbookPageAdmin(CustomModelAdmin):
     search_fields       = ["name", "textbook__name", "parent__name"]
     ordering            = ["textbook_id", "parent_id", "position", "name"]
     readonly_fields     = ["content", *created_modified_by_fields]
+    filter_horizontal   = ["skills"]
 
     fieldsets = [
         (None, {
@@ -50,6 +51,10 @@ class TextbookPageAdmin(CustomModelAdmin):
         (_("Description"), {
             "classes": ["tab"],
             "fields": ["description", "text_format"],
+        }),
+        (_("Skills"), {
+            "classes": ["tab"],
+            "fields": ["skills"],
         }),
         (_("Content"), {
             "classes": ["tab"],
@@ -65,6 +70,10 @@ class TextbookPageAdmin(CustomModelAdmin):
         (_("Description"), {
             "classes": ["tab"],
             "fields": ["description", "text_format"],
+        }),
+        (_("Skills"), {
+            "classes": ["tab"],
+            "fields": ["skills"],
         }),
     ]
 

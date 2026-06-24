@@ -20,6 +20,7 @@ with loading / error / content states.
     import type {DashboardState} from "../../stores/dashboard.store.js";
     import MyLearningPanel from "../panels/MyLearningPanel.svelte";
     import StatsPanel from "../panels/StatsPanel.svelte";
+    import LeaderboardPanel from "../panels/LeaderboardPanel.svelte";
     import SkillMatrixPanel from "../panels/SkillMatrixPanel.svelte";
 
     let state = $state<DashboardState>({
@@ -29,6 +30,7 @@ with loading / error / content states.
         stats: null,
         skills: [],
         courses: [],
+        leaderboard: [],
     });
 
     onMount(() => {
@@ -50,12 +52,12 @@ with loading / error / content states.
     </header>
 
     {#if state.isLoading}
-        <div class="status" role="status" aria-live="polite">
+        <div class="status-box" role="status" aria-live="polite">
             <span class="loading loading-spinner loading-lg"></span>
             <p>Loading your dashboard…</p>
         </div>
     {:else if state.errorMessage}
-        <div class="status" role="alert">
+        <div class="status-box" role="alert">
             <p class="error">{state.errorMessage}</p>
             <button type="button" class="btn btn-primary btn-sm" onclick={() => dashboardStore.refresh()}>
                 Retry
@@ -67,11 +69,13 @@ with loading / error / content states.
                 <MyLearningPanel
                     courses={state.courses}
                     skills={state.skills}
+                    stats={state.stats}
                     onCourseOpen={(course) => push(`/chat/${course.id}`)}
                 />
             </div>
             <div class="grid-side">
                 <StatsPanel user={state.user} stats={state.stats} onProfile={() => push("/profile")} />
+                <LeaderboardPanel entries={state.leaderboard} />
                 <SkillMatrixPanel skills={state.skills} />
             </div>
         </div>
@@ -121,19 +125,50 @@ with loading / error / content states.
         min-height: 0;
     }
 
+    /* The side column scrolls as one unit; its panels keep their natural height
+       (no per-panel scroll) so My Stats, Leaderboard and Skills move together. */
     .grid-side {
         display: flex;
         flex-direction: column;
         gap: 1.25rem;
         min-height: 0;
+        overflow-y: auto;
+        padding-right: 0.5rem;
+        /* Firefox: keep the track transparent so the bar only shows on hover. */
+        scrollbar-width: thin;
+        scrollbar-color: transparent transparent;
     }
 
-    .status {
+    .grid-side:hover {
+        scrollbar-color: color-mix(in oklab, var(--color-base-content) 20%, transparent) transparent;
+    }
+
+    .grid-side > :global(.card) {
+        flex: 0 0 auto;
+    }
+
+    .grid-side::-webkit-scrollbar {
+        width: 0.5rem;
+    }
+
+    .grid-side::-webkit-scrollbar-thumb {
+        border-radius: 999px;
+        background: transparent;
+    }
+
+    .grid-side:hover::-webkit-scrollbar-thumb {
+        background: color-mix(in oklab, var(--color-base-content) 20%, transparent);
+    }
+
+    .status-box {
+        flex: 1;
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: center;
         gap: 1rem;
-        padding: 4rem 0;
+        padding: 4rem 1rem;
+        text-align: center;
         color: color-mix(in oklab, var(--color-base-content) 70%, transparent);
     }
 

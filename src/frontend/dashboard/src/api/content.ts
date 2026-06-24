@@ -25,10 +25,18 @@ export interface SourceContent {
     filename?: string;
 }
 
+export interface TextbookSkillDto {
+    id: string;
+    name: string;
+    icon_path?: string;
+}
+
 export interface TextbookDto {
     id: string;
     name: string;
     slug: string;
+    // Union of the skills trained by the textbook's pages (read-only, always present).
+    skills?: TextbookSkillDto[];
 }
 
 export interface TextbookPageDto {

@@ -17,6 +17,7 @@ import {
     fetchAccountProgress,
     fetchCourseProgress,
     fetchCurrentUser,
+    fetchLeaderboard,
     fetchSkillProgress,
     fetchStreak,
 } from "../api/gamification.js";
@@ -25,6 +26,7 @@ import type {
     CourseDto,
     CourseProgressDto,
     CurrentUserDto,
+    LeaderboardEntryDto,
     SkillDto,
     SkillProgressDto,
     StreakDto,
@@ -58,12 +60,27 @@ export interface DashboardSkill {
     progress: number;
 }
 
+export interface DashboardCourseSkill {
+    id: string;
+    name: string;
+}
+
 export interface DashboardCourse {
     id: string;
     name: string;
     level: number;
     points: number;
     progress: number;
+    skills: DashboardCourseSkill[];
+}
+
+export interface DashboardLeaderboardEntry {
+    rank: number;
+    username: string;
+    fullName: string;
+    level: number;
+    points: number;
+    isCurrentUser: boolean;
 }
 
 export interface DashboardData {
@@ -71,6 +88,7 @@ export interface DashboardData {
     stats: DashboardStats | null;
     skills: DashboardSkill[];
     courses: DashboardCourse[];
+    leaderboard: DashboardLeaderboardEntry[];
 }
 
 function toNumber(value: number | string | undefined | null, fallback = 0): number {
@@ -160,6 +178,15 @@ function courseId(course: string | CourseDto): string {
     return typeof course === "string" ? course : course.id;
 }
 
+/** The skills a course teaches, available only when the course was expanded. */
+function courseSkills(course: string | CourseDto): DashboardCourseSkill[] {
+    if (typeof course === "string" || !course.skills) {
+        return [];
+    }
+
+    return course.skills.map((skill) => ({id: skill.id, name: skill.name}));
+}
+
 function mapCourses(records: CourseProgressDto[]): DashboardCourse[] {
     return records.map((record) => ({
         id: courseId(record.course),
@@ -167,6 +194,18 @@ function mapCourses(records: CourseProgressDto[]): DashboardCourse[] {
         level: toNumber(record.course_level, 1),
         points: toNumber(record.course_points),
         progress: clampPercent(toNumber(record.course_progress)),
+        skills: courseSkills(record.course),
+    }));
+}
+
+function mapLeaderboard(records: LeaderboardEntryDto[]): DashboardLeaderboardEntry[] {
+    return records.map((record) => ({
+        rank: toNumber(record.rank, 1),
+        username: record.username,
+        fullName: record.full_name || record.username,
+        level: toNumber(record.level, 1),
+        points: toNumber(record.point_total),
+        isCurrentUser: Boolean(record.is_current_user),
     }));
 }
 
@@ -176,11 +215,12 @@ export async function loadDashboardData(): Promise<DashboardData> {
     const user = await fetchCurrentUser();
     const username = user?.username ?? null;
 
-    const [progress, streak, skills, courses] = await Promise.all([
+    const [progress, streak, skills, courses, leaderboard] = await Promise.all([
         fetchAccountProgress(),
         fetchStreak(),
         fetchSkillProgress(username),
         fetchCourseProgress(username),
+        fetchLeaderboard(),
     ]);
 
     // Defence in depth: even if the server returns other accounts' rows (e.g. for
@@ -193,5 +233,6 @@ export async function loadDashboardData(): Promise<DashboardData> {
         stats: mapStats(progress, streak),
         skills: mapSkills(ownSkills),
         courses: mapCourses(ownCourses),
+        leaderboard: mapLeaderboard(leaderboard),
     };
 }

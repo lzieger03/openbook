@@ -185,10 +185,10 @@ class AssistantOrchestrator_Tests(TestCase):
         )
 
     def test_record_quiz_result(self):
-        """Quiz-result events should be delegated to the learning context service."""
+        """Quiz-result events should be delegated and return the awarded points."""
         self.learning_context_service.record_quiz_result.return_value = "quiz result"
 
-        quiz_result = self.orchestrator.record_quiz_result(
+        result = self.orchestrator.record_quiz_result(
             user=self.owner,
             course=self.course,
             page=self.page,
@@ -196,7 +196,9 @@ class AssistantOrchestrator_Tests(TestCase):
             attempts=3,
         )
 
-        self.assertEqual(quiz_result, "quiz result")
+        self.assertEqual(result["quiz_result"], "quiz result")
+        self.assertIn("points_awarded", result)
+        self.assertIn("skills_advanced", result)
         self.learning_context_service.record_quiz_result.assert_called_once_with(
             user=self.owner,
             course=self.course,
@@ -259,6 +261,43 @@ class AssistantOrchestrator_Tests(TestCase):
         self.assertIn("Kurskontext:", prompt)
         self.assertIn("Course", prompt)
         self.assertIn("HTML structures web pages.", prompt)
+
+    def test_generate_quiz_scoped_to_textbook_anchors_page(self):
+        """A textbook-scoped quiz reports the textbook and a page to anchor the result to."""
+        self.page.content = {
+            "type": "source",
+            "format": "MD",
+            "source": "# HTML Basics\nHTML structures web pages.",
+        }
+        self.page.save(update_fields=["content"])
+        self.llm_client.retrieve_rag_context.return_value = RagContext(context="", sources=())
+        self.llm_client.get_user_message.return_value = self._quiz_response()
+
+        quiz = self.orchestrator.generate_quiz(
+            user=self.owner,
+            course=self.course,
+            question_count=1,
+            textbook=self.textbook,
+        )
+
+        self.assertEqual(quiz.textbook_id, str(self.textbook.id))
+        self.assertEqual(quiz.page_id, str(self.page.id))
+
+    def test_generate_quiz_rejects_textbook_not_in_course(self):
+        """Choosing a textbook that is not part of the course is rejected."""
+        other_textbook = Textbook.objects.create(
+            name="Other",
+            slug="other",
+            group=self.library_group,
+        )
+
+        with self.assertRaises(ValueError):
+            self.orchestrator.generate_quiz(
+                user=self.owner,
+                course=self.course,
+                question_count=1,
+                textbook=other_textbook,
+            )
 
     def test_record_page_opened_denied(self):
         """Learning-state writes should require course access."""

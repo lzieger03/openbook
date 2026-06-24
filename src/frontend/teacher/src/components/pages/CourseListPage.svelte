@@ -151,17 +151,17 @@ deleted from here after a confirmation step.
     </header>
 
     {#if state.isLoading}
-        <div class="status" role="status" aria-live="polite">
+        <div class="status-box" role="status" aria-live="polite">
             <span class="loading loading-spinner loading-lg"></span>
             <p>Loading your courses…</p>
         </div>
     {:else if state.errorMessage}
-        <div class="status" role="alert">
+        <div class="status-box" role="alert">
             <p class="error">{state.errorMessage}</p>
             <button type="button" class="btn btn-sm" onclick={() => teacherStore.refresh()}>Retry</button>
         </div>
     {:else if state.courses.length === 0}
-        <div class="status">
+        <div class="status-box">
             <p>No courses yet. Create your first course to get started.</p>
             <button type="button" class="btn btn-primary btn-sm" onclick={openCreate}>+ New course</button>
         </div>
@@ -216,33 +216,8 @@ deleted from here after a confirmation step.
             <input class="input input-bordered w-full" type="text" bind:value={name} placeholder="e.g. Introduction to Databases" />
         </label>
 
-        <label class="form-control w-full mt-3">
-            <span class="label-text">Course slug</span>
-            <input class="input input-bordered w-full" type="text" bind:value={slug} placeholder={slugify(name)} />
-        </label>
-
-        <label class="form-control w-full mt-3">
-            <span class="label-text">Description</span>
-            <textarea class="textarea textarea-bordered w-full" rows="3" bind:value={description}></textarea>
-        </label>
-
-        <div class="settings-grid mt-3">
-            <label class="form-control w-full">
-                <span class="label-text">Text format</span>
-                <select class="select select-bordered w-full" bind:value={textFormat}>
-                    <option value="MD">Markdown</option>
-                    <option value="HTML">HTML</option>
-                    <option value="TEXT">Plain text</option>
-                </select>
-            </label>
-
-            <label class="label cursor-pointer justify-start gap-3">
-                <input class="checkbox checkbox-primary" type="checkbox" bind:checked={isTemplate} />
-                <span class="label-text">Template course</span>
-            </label>
-        </div>
-
         <div class="divider my-4">Library group</div>
+        <p class="modal-hint">Every course lives in a library group. Pick an existing one or create a new one.</p>
 
         <div class="join w-full">
             <button
@@ -274,27 +249,60 @@ deleted from here after a confirmation step.
                 <span class="label-text">Group name</span>
                 <input class="input input-bordered w-full" type="text" bind:value={groupName} placeholder="e.g. Web Development" />
             </label>
-
-            <label class="form-control w-full mt-3">
-                <span class="label-text">Group slug</span>
-                <input class="input input-bordered w-full" type="text" bind:value={groupSlug} placeholder={slugify(groupName)} />
-            </label>
-
-            <label class="form-control w-full mt-3">
-                <span class="label-text">Parent group</span>
-                <select class="select select-bordered w-full" bind:value={groupParentId}>
-                    <option value="">No parent</option>
-                    {#each groups as group (group.id)}
-                        <option value={group.id}>{group.name}</option>
-                    {/each}
-                </select>
-            </label>
-
-            <label class="form-control w-full mt-3">
-                <span class="label-text">Group description</span>
-                <textarea class="textarea textarea-bordered w-full" rows="3" bind:value={groupDescription}></textarea>
-            </label>
         {/if}
+
+        <!-- Everything below is optional; sensible defaults are used otherwise. -->
+        <details class="advanced">
+            <summary>Advanced settings</summary>
+
+            <label class="form-control w-full mt-3">
+                <span class="label-text">Course slug</span>
+                <input class="input input-bordered w-full" type="text" bind:value={slug} placeholder={slugify(name)} />
+            </label>
+
+            <label class="form-control w-full mt-3">
+                <span class="label-text">Description</span>
+                <textarea class="textarea textarea-bordered w-full" rows="3" bind:value={description}></textarea>
+            </label>
+
+            <div class="settings-grid mt-3">
+                <label class="form-control w-full">
+                    <span class="label-text">Text format</span>
+                    <select class="select select-bordered w-full" bind:value={textFormat}>
+                        <option value="MD">Markdown</option>
+                        <option value="HTML">HTML</option>
+                        <option value="TEXT">Plain text</option>
+                    </select>
+                </label>
+
+                <label class="label cursor-pointer justify-start gap-3">
+                    <input class="checkbox checkbox-primary" type="checkbox" bind:checked={isTemplate} />
+                    <span class="label-text">Template course</span>
+                </label>
+            </div>
+
+            {#if groupMode === "new"}
+                <label class="form-control w-full mt-3">
+                    <span class="label-text">Group slug</span>
+                    <input class="input input-bordered w-full" type="text" bind:value={groupSlug} placeholder={slugify(groupName)} />
+                </label>
+
+                <label class="form-control w-full mt-3">
+                    <span class="label-text">Parent group</span>
+                    <select class="select select-bordered w-full" bind:value={groupParentId}>
+                        <option value="">No parent</option>
+                        {#each groups as group (group.id)}
+                            <option value={group.id}>{group.name}</option>
+                        {/each}
+                    </select>
+                </label>
+
+                <label class="form-control w-full mt-3">
+                    <span class="label-text">Group description</span>
+                    <textarea class="textarea textarea-bordered w-full" rows="3" bind:value={groupDescription}></textarea>
+                </label>
+            {/if}
+        </details>
     {/snippet}
 
     {#snippet actions()}
@@ -348,12 +356,14 @@ deleted from here after a confirmation step.
         color: color-mix(in oklab, var(--color-base-content) 60%, transparent);
     }
 
-    .status {
+    .status-box {
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: center;
         gap: 1rem;
-        padding: 4rem 0;
+        padding: 4rem 1rem;
+        text-align: center;
         color: color-mix(in oklab, var(--color-base-content) 70%, transparent);
     }
 
@@ -368,6 +378,27 @@ deleted from here after a confirmation step.
         grid-template-columns: minmax(0, 1fr) auto;
         align-items: end;
         gap: 1rem;
+    }
+
+    .modal-hint {
+        font-size: 0.85rem;
+        color: color-mix(in oklab, var(--color-base-content) 60%, transparent);
+        margin: -0.5rem 0 0.75rem;
+    }
+
+    .advanced {
+        margin-top: 1rem;
+        border-top: 1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);
+        padding-top: 0.5rem;
+    }
+
+    .advanced summary {
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: color-mix(in oklab, var(--color-base-content) 75%, transparent);
+        padding: 0.25rem 0;
+        list-style: revert;
     }
 
     @media (max-width: 42rem) {

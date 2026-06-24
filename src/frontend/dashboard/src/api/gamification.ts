@@ -49,6 +49,8 @@ export interface CourseDto {
     id: string;
     name: string;
     slug?: string;
+    // Skills this course teaches; only present when expanded via `course.skills`.
+    skills?: SkillDto[];
 }
 
 export interface CourseProgressDto {
@@ -59,6 +61,15 @@ export interface CourseProgressDto {
     course_level?: number;
     // DecimalField: serialized as a string such as "15.00".
     course_progress?: number | string;
+}
+
+export interface LeaderboardEntryDto {
+    rank: number;
+    username: string;
+    full_name: string;
+    level: number;
+    point_total: number;
+    is_current_user: boolean;
 }
 
 export interface CurrentUserDto {
@@ -116,7 +127,13 @@ export async function fetchSkillProgress(username?: string | null): Promise<Skil
 }
 
 export async function fetchCourseProgress(username?: string | null): Promise<CourseProgressDto[]> {
-    const query: Record<string, string> = {_expand: "course", _page_size: "100", _sort: "course__name"};
+    const query: Record<string, string> = {
+        // Expand the course; its `skills` (the earnable skills derived from the course's
+        // pages) are a read-only field included automatically with the expanded course.
+        _expand: "course",
+        _page_size: "100",
+        _sort: "course__name",
+    };
 
     // Scope to the current user so staff accounts do not see everyone's progress.
     if (username) {
@@ -126,6 +143,13 @@ export async function fetchCourseProgress(username?: string | null): Promise<Cou
     const data = await apiGet<CourseProgressDto[] | Paginated<CourseProgressDto>>(
         "/api/gamification/course_progress/",
         query,
+    );
+    return toList(data);
+}
+
+export async function fetchLeaderboard(): Promise<LeaderboardEntryDto[]> {
+    const data = await apiGet<LeaderboardEntryDto[] | Paginated<LeaderboardEntryDto>>(
+        "/api/gamification/account_progress/leaderboard/",
     );
     return toList(data);
 }
