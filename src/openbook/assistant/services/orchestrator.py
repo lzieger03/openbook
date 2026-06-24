@@ -65,6 +65,9 @@ class AssistantOrchestrator:
         if course_obj is not None:
             self._award_chat_question_reward(user=user, course=course_obj)
 
+        if course_obj is None:
+            return self.llm_client.get_user_message(query)
+
         learning_context = ""
         if course_obj is not None:
             learning_context = self.learning_context_service.get_prompt_context(

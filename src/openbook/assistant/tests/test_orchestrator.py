@@ -89,33 +89,15 @@ class AssistantOrchestrator_Tests(TestCase):
         """
 
     def test_answer_global_query(self):
-        """Global chat should not require a course permission check."""
-        answer = self.orchestrator.answer("Question?", user=self.student)
-
-        self.assertEqual(answer, "answer")
-        self.llm_client.perform_rag_query.assert_called_once_with(
-            "Question?",
-            course=None,
-            learning_context="",
-        )
-        self.learning_context_service.get_prompt_context.assert_not_called()
-
-    def test_answer_global_query_falls_back_without_global_documents(self):
-        """Global chat should still answer when no global RAG documents exist."""
-        self.llm_client.perform_rag_query.side_effect = RuntimeError(
-            "No global assistant documents have been indexed yet."
-        )
+        """Global chat should use the LLM directly without RAG."""
         self.llm_client.get_user_message.return_value = "direct answer"
 
         answer = self.orchestrator.answer("Question?", user=self.student)
 
         self.assertEqual(answer, "direct answer")
-        self.llm_client.perform_rag_query.assert_called_once_with(
-            "Question?",
-            course=None,
-            learning_context="",
-        )
         self.llm_client.get_user_message.assert_called_once_with("Question?")
+        self.llm_client.perform_rag_query.assert_not_called()
+        self.learning_context_service.get_prompt_context.assert_not_called()
 
     def test_answer_global_query_denied_for_anonymous_user(self):
         """Global chat should require authentication."""
@@ -150,12 +132,9 @@ class AssistantOrchestrator_Tests(TestCase):
                 course=self.course,
             )
 
-    def test_answer_course_query_falls_back_without_course_documents(self):
-        """Course chat should answer directly when no course RAG documents exist."""
-        self.llm_client.perform_rag_query.side_effect = RuntimeError(
-            "No assistant documents have been indexed for this course yet."
-        )
-        self.llm_client.get_user_message.return_value = "direct course answer"
+    def test_answer_course_query_uses_rag_client_fallback(self):
+        """Course chat fallback should stay inside the RAG client service."""
+        self.llm_client.perform_rag_query.return_value = "direct course answer"
 
         answer = self.orchestrator.answer(
             "Question?",
@@ -169,7 +148,7 @@ class AssistantOrchestrator_Tests(TestCase):
             course=self.course,
             learning_context="learning context",
         )
-        self.llm_client.get_user_message.assert_called_once_with("Question?")
+        self.llm_client.get_user_message.assert_not_called()
 
     def test_record_page_opened(self):
         """Page-open events should be delegated to the learning context service."""

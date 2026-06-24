@@ -7,6 +7,7 @@
 # License, or (at your option) any later version.
 
 from django.db import models
+from django.db.models import Q
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 from django.utils import timezone
@@ -41,6 +42,16 @@ class AssistantDocument(
         null=True,
         blank=True,
         help_text=_("Course that owns this assistant document. Empty documents are global."),
+    )
+
+    textbook = models.ForeignKey(
+        "openbook_content.Textbook",
+        verbose_name=_("Textbook"),
+        on_delete=models.CASCADE,
+        related_name="assistant_documents",
+        null=True,
+        blank=True,
+        help_text=_("Textbook this assistant document was generated from."),
     )
 
     title = models.CharField(
@@ -88,7 +99,16 @@ class AssistantDocument(
         ordering = ("course", "title", "file_name")
         indexes = [
             models.Index(fields=("course", "index_status")),
+            models.Index(fields=("textbook", "index_status")),
+            models.Index(fields=("course", "textbook", "index_status")),
             models.Index(fields=("title", "file_name")),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=("course", "textbook"),
+                condition=Q(textbook__isnull=False),
+                name="openbook_assistant_unique_course_textbook_document",
+            ),
         ]
 
     def calc_file_path_hook(self, filename):
@@ -123,6 +143,7 @@ class AssistantDocument(
         self.index_status = self.IndexStatusChoices.INDEXING
         self.index_error = ""
         self.embedding_model = embedding_model
+        self.chunk_count = 0
 
     def mark_indexed(self, chunk_count: int) -> None:
         """Set successful index state."""

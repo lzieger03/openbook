@@ -40,6 +40,11 @@ class LearningState(UUIDMixin):
         blank=True,
     )
 
+    is_completed = models.BooleanField(
+        verbose_name=_("Is Completed"),
+        default=False,
+    )
+
     last_accessed = models.DateTimeField(
         verbose_name=_("Last Accessed"),
         auto_now=True,

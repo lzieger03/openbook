@@ -11,11 +11,12 @@ class LearningStateSerializer(FlexFieldsModelSerializer):
         fields = [
             "id",
             "user", "course", "last_page", "completed_pages",
-            "last_accessed",
+            "is_completed", "last_accessed",
         ]
         read_only_fields = [
             "id",
             "user",
+            "is_completed",
             "last_accessed",
         ]
         expandable_fields = {

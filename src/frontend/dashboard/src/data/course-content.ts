@@ -17,8 +17,8 @@
 
 import MarkdownIt from "markdown-it";
 
-import {fetchMaterials, fetchPageRanges, fetchTextbookPages} from "../api/content.js";
-import type {CourseMaterialDto, PageRangeDto, SourceContent, TextbookPageDto, TextFormat} from "../api/content.js";
+import {fetchMaterials, fetchPageRanges, fetchTextbookDocuments, fetchTextbookPages} from "../api/content.js";
+import type {AssistantDocumentDto, CourseMaterialDto, PageRangeDto, SourceContent, TextbookPageDto, TextFormat} from "../api/content.js";
 
 export interface ContentPageView {
     id: string;
@@ -32,7 +32,15 @@ export interface ContentPageView {
 export interface ContentMaterialView {
     id: string;
     title: string;
+    documents: ContentDocumentView[];
     pages: ContentPageView[];
+}
+
+export interface ContentDocumentView {
+    id: string;
+    title: string;
+    fileName: string;
+    downloadUrl: string;
 }
 
 const markdownRenderer = new MarkdownIt({
@@ -173,6 +181,19 @@ function textbookTitle(material: CourseMaterialDto): string {
     return material.textbook.name;
 }
 
+function renderDocument(document: AssistantDocumentDto): ContentDocumentView | null {
+    if (!document.download_url) {
+        return null;
+    }
+
+    return {
+        id: document.id,
+        title: document.title || document.file_name || "Download",
+        fileName: document.file_name.split(/[\\/]/).pop() ?? document.file_name,
+        downloadUrl: document.download_url,
+    };
+}
+
 /** Load and render the full readable content of a course, grouped by material. */
 export async function loadCourseContent(courseId: string): Promise<ContentMaterialView[]> {
     const materials = await fetchMaterials(courseId);
@@ -181,9 +202,10 @@ export async function loadCourseContent(courseId: string): Promise<ContentMateri
     const result = await Promise.all(
         materials.map(async (material) => {
             const textbookId = refId(material.textbook);
-            const [ranges, pages] = await Promise.all([
+            const [ranges, pages, documents] = await Promise.all([
                 fetchPageRanges(material.id),
                 fetchTextbookPages(textbookId),
+                fetchTextbookDocuments(courseId, textbookId),
             ]);
 
             const ordered = readingOrder(pages);
@@ -192,11 +214,14 @@ export async function loadCourseContent(courseId: string): Promise<ContentMateri
             return {
                 id: material.id,
                 title: textbookTitle(material),
+                documents: documents
+                    .map(renderDocument)
+                    .filter((document): document is ContentDocumentView => document !== null),
                 pages: selected.map(renderPage),
             };
         }),
     );
 
-    // Drop materials that resolved to no pages so the UI only shows real content.
-    return result.filter((material) => material.pages.length > 0);
+    // Drop materials that resolved to no pages or downloads so the UI only shows real content.
+    return result.filter((material) => material.pages.length > 0 || material.documents.length > 0);
 }
