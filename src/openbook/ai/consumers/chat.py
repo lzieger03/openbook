@@ -249,11 +249,14 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         try:
             quiz = await sync_to_async(self._generate_quiz)(
                 question_count=message.payload.question_count,
+                textbook_id=message.payload.textbook_id,
             )
             return QuizGenerated(
                 payload=QuizGeneratedPayload(
                     course_id=self._get_required_course_id(),
                     context_source=quiz.context_source,
+                    textbook_id=quiz.textbook_id,
+                    page_id=quiz.page_id,
                     questions=[
                         QuizQuestionPayload(
                             prompt=question.prompt,
@@ -314,13 +317,14 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         )
         return str(answer or "")
 
-    def _generate_quiz(self, question_count: int):
+    def _generate_quiz(self, question_count: int, textbook_id=None):
         """Run the blocking quiz generation stack outside the async event loop."""
         course_id = self._get_required_course_id()
         return AssistantOrchestrator().generate_quiz(
             user=self.scope.get("user"),
             course=course_id,
             question_count=question_count,
+            textbook=textbook_id,
         )
 
     def _record_page_opened(self, page_id: UUID) -> None:

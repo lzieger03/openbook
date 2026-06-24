@@ -141,6 +141,7 @@ class ChatConsumerLearningEvent_Tests(SimpleTestCase):
             user=consumer.scope["user"],
             course=course_id,
             question_count=1,
+            textbook=None,
         )
         self.assertEqual(response.payload.context_source, "course_context")
         self.assertEqual(response.payload.questions[0].prompt, "What is HTML?")

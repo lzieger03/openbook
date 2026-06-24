@@ -17,12 +17,18 @@ assistant backend through the existing course chat WebSocket channel.
     import {onMount} from "svelte";
     import {push} from "svelte-spa-router";
 
+    import {fetchMaterials} from "../../api/content.js";
     import {dashboardStore} from "../../stores/dashboard.store.js";
     import type {DashboardState} from "../../stores/dashboard.store.js";
     import {createQuizStore} from "../../stores/quiz.store.js";
     import type {QuizState} from "../../stores/quiz.store.js";
 
     let {params}: {params?: {id?: string}} = $props();
+
+    interface TextbookChoice {
+        id: string;
+        name: string;
+    }
 
     let state = $state<DashboardState>({
         isLoading: true,
@@ -51,6 +57,13 @@ assistant backend through the existing course chat WebSocket channel.
     let finished = $state(false);
     let timer: ReturnType<typeof setTimeout> | null = null;
 
+    // Textbook selection step shown before a quiz is generated.
+    let textbooks = $state<TextbookChoice[]>([]);
+    let textbooksLoading = $state(true);
+    let textbooksError = $state("");
+    let selectedTextbookId = $state<string | null>(null);
+    let resultSubmitted = $state(false);
+
     onMount(() => {
         const unsubscribeDashboard = dashboardStore.subscribe((value) => {
             state = value;
@@ -64,7 +77,7 @@ assistant backend through the existing course chat WebSocket channel.
             quizState = value;
         });
 
-        void loadQuiz();
+        void loadTextbooks();
 
         return () => {
             unsubscribeDashboard();
@@ -78,6 +91,10 @@ assistant backend through the existing course chat WebSocket channel.
 
     const courseTitle = $derived(
         state.courses.find((course) => course.id === params?.id)?.name ?? "Course",
+    );
+    const selecting = $derived(selectedTextbookId === null);
+    const selectedTextbookName = $derived(
+        textbooks.find((book) => book.id === selectedTextbookId)?.name ?? "",
     );
     const questions = $derived(quizState.questions);
     const current = $derived(questions[index] ?? null);
@@ -97,6 +114,11 @@ assistant backend through the existing course chat WebSocket channel.
         timer = null;
         if (index >= questions.length - 1) {
             finished = true;
+            if (!resultSubmitted) {
+                resultSubmitted = true;
+                const normalized = questions.length ? score / questions.length : 0;
+                void quiz.submitResult(normalized, 1);
+            }
         } else {
             index += 1;
             selected = null;
@@ -121,6 +143,51 @@ assistant backend through the existing course chat WebSocket channel.
         selected = null;
         score = 0;
         finished = false;
+        resultSubmitted = false;
+    }
+
+    async function loadTextbooks(): Promise<void> {
+        const courseId = params?.id;
+        if (!courseId) {
+            textbooksLoading = false;
+            textbooksError = "No course selected.";
+            return;
+        }
+
+        textbooksLoading = true;
+        textbooksError = "";
+
+        try {
+            const materials = await fetchMaterials(courseId);
+            const choices: TextbookChoice[] = [];
+
+            for (const material of materials) {
+                // Only materials whose textbook reference was expanded are usable.
+                if (material.textbook && typeof material.textbook === "object") {
+                    choices.push({id: material.textbook.id, name: material.textbook.name});
+                }
+            }
+
+            textbooks = choices;
+        } catch (error) {
+            textbooksError = error instanceof Error ? error.message : String(error);
+        } finally {
+            textbooksLoading = false;
+        }
+    }
+
+    async function chooseTextbook(textbookId: string): Promise<void> {
+        selectedTextbookId = textbookId;
+        await loadQuiz();
+    }
+
+    function backToSelection(): void {
+        if (timer) {
+            clearTimeout(timer);
+            timer = null;
+        }
+        restart();
+        selectedTextbookId = null;
     }
 
     async function loadQuiz(): Promise<void> {
@@ -129,8 +196,12 @@ assistant backend through the existing course chat WebSocket channel.
             timer = null;
         }
 
+        if (!selectedTextbookId) {
+            return;
+        }
+
         restart();
-        await quiz.requestQuiz(5);
+        await quiz.requestQuiz(5, selectedTextbookId);
     }
 </script>
 
@@ -139,14 +210,44 @@ assistant backend through the existing course chat WebSocket channel.
         <button type="button" class="content-btn" onclick={() => window.history.back()}>
             Back
         </button>
-        {#if !finished}
+        {#if !selecting && !finished}
             <div class="progress-track" aria-hidden="true">
                 <div class="progress-fill" style="width: {progressPct}%"></div>
             </div>
         {/if}
     </header>
 
-    {#if isBusy}
+    {#if selecting}
+        <section class="stage select-stage">
+            <h1 class="course">{courseTitle}</h1>
+            <p class="select-hint">Choose a textbook to be quizzed on.</p>
+
+            {#if textbooksLoading}
+                <div class="status-card">
+                    <span class="loader" aria-hidden="true"></span>
+                    <p>Loading textbooks...</p>
+                </div>
+            {:else if textbooksError}
+                <div class="status-card error-card" role="alert">
+                    <p>{textbooksError}</p>
+                    <button type="button" class="btn btn-primary" onclick={() => loadTextbooks()}>Retry</button>
+                </div>
+            {:else if textbooks.length === 0}
+                <div class="status-card">
+                    <p>This course has no textbooks to quiz on yet.</p>
+                </div>
+            {:else}
+                <div class="textbook-list">
+                    {#each textbooks as book (book.id)}
+                        <button type="button" class="textbook-card" onclick={() => chooseTextbook(book.id)}>
+                            <span class="textbook-icon" aria-hidden="true">📘</span>
+                            <span class="textbook-name">{book.name}</span>
+                        </button>
+                    {/each}
+                </div>
+            {/if}
+        </section>
+    {:else if isBusy}
         <section class="stage status-stage" aria-live="polite">
             <h1 class="course">{courseTitle}</h1>
             <div class="status-card">
@@ -165,6 +266,9 @@ assistant backend through the existing course chat WebSocket channel.
     {:else if finished}
         <section class="stage result">
             <h1 class="course">{courseTitle}</h1>
+            {#if selectedTextbookName}
+                <span class="progress-pill">{selectedTextbookName}</span>
+            {/if}
             <div class="score-ring">{score}/{questions.length}</div>
             <p class="result-text">
                 {score === questions.length ? "Perfect score." : "Keep practising."}
@@ -172,6 +276,7 @@ assistant backend through the existing course chat WebSocket channel.
             <div class="result-actions">
                 <button type="button" class="btn btn-primary" onclick={restart}>Try again</button>
                 <button type="button" class="btn btn-outline" onclick={() => loadQuiz()}>New quiz</button>
+                <button type="button" class="btn btn-outline" onclick={backToSelection}>Change textbook</button>
                 <button type="button" class="btn btn-ghost" onclick={() => push("/")}>Back to Dashboard</button>
             </div>
         </section>
@@ -288,6 +393,64 @@ assistant backend through the existing course chat WebSocket channel.
 
     .status-stage {
         max-width: 34rem;
+    }
+
+    .select-stage {
+        justify-content: flex-start;
+        padding-top: 2.5rem;
+    }
+
+    .select-hint {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: color-mix(in oklab, var(--color-base-content) 80%, transparent);
+        margin: 0;
+    }
+
+    .textbook-list {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+        gap: 1.1rem;
+        margin-top: 0.5rem;
+    }
+
+    .textbook-card {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        min-height: 4.5rem;
+        padding: 1.2rem 1.4rem;
+        border-radius: 1rem;
+        cursor: pointer;
+        text-align: left;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--color-base-content);
+        background: color-mix(in oklab, var(--color-base-100) 82%, transparent);
+        border: 1px solid color-mix(in oklab, var(--color-primary) 28%, transparent);
+        transition: transform 0.12s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 6px 18px color-mix(in oklab, var(--color-base-content) 12%, transparent);
+    }
+
+    .textbook-card:hover {
+        transform: translateY(-3px);
+        border-color: color-mix(in oklab, var(--color-primary) 60%, transparent);
+    }
+
+    .textbook-card:focus-visible {
+        outline: 3px solid var(--color-primary);
+        outline-offset: 3px;
+    }
+
+    .textbook-icon {
+        font-size: 1.6rem;
+        flex: 0 0 auto;
+    }
+
+    .textbook-name {
+        flex: 1 1 auto;
+        overflow-wrap: anywhere;
     }
 
     .status-card {

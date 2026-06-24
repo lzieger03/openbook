@@ -44,12 +44,25 @@ export interface QuizState {
     questions: QuizQuestion[];
     contextSource: QuizContextSource | null;
     sources: QuizSource[];
+    // Textbook the current quiz is scoped to and the page its result anchors to.
+    textbookId: string | null;
+    pageId: string | null;
 }
 
 interface QuizStart {
     action: "quiz_start";
     payload: {
         question_count: number;
+        textbook_id?: string;
+    };
+}
+
+interface LearningQuizResult {
+    action: "learning_quiz_result";
+    payload: {
+        page_id: string;
+        score: number;
+        attempts: number | null;
     };
 }
 
@@ -60,6 +73,8 @@ interface QuizGenerated {
         context_source: QuizContextSource;
         questions: QuizQuestion[];
         sources: QuizSource[];
+        textbook_id: string | null;
+        page_id: string | null;
     };
 }
 
@@ -72,7 +87,7 @@ interface LearningEventStatus {
     };
 }
 
-type SentMessages = QuizStart;
+type SentMessages = QuizStart | LearningQuizResult;
 
 type ReceivedMessages = QuizGenerated | LearningEventStatus;
 
@@ -82,7 +97,8 @@ export interface QuizStore {
     subscribe: (run: (value: QuizState) => void) => () => void;
     connect: () => Promise<void>;
     disconnect: () => Promise<void>;
-    requestQuiz: (questionCount?: number) => Promise<void>;
+    requestQuiz: (questionCount?: number, textbookId?: string) => Promise<void>;
+    submitResult: (score: number, attempts?: number) => Promise<void>;
 }
 
 function initialState(): QuizState {
@@ -93,6 +109,8 @@ function initialState(): QuizState {
         questions: [],
         contextSource: null,
         sources: [],
+        textbookId: null,
+        pageId: null,
     };
 }
 
@@ -100,6 +118,8 @@ export function createQuizStore(courseId: CourseIdSource): QuizStore {
     const {subscribe, update} = writable<QuizState>(initialState());
 
     let socket: WebSocketClient<SentMessages, ReceivedMessages> | undefined;
+    // Anchor page for the active quiz, used when submitting the result.
+    let currentPageId: string | null = null;
 
     function resolveCourseId(): string {
         const resolvedCourseId = typeof courseId === "function" ? courseId() : courseId;
@@ -130,6 +150,7 @@ export function createQuizStore(courseId: CourseIdSource): QuizStore {
             });
 
             socket.setMessageHandler("quiz_generated", (message: QuizGenerated) => {
+                currentPageId = message.payload.page_id;
                 update((state) => ({
                     ...state,
                     isLoading: false,
@@ -137,6 +158,8 @@ export function createQuizStore(courseId: CourseIdSource): QuizStore {
                     questions: message.payload.questions,
                     contextSource: message.payload.context_source,
                     sources: message.payload.sources,
+                    textbookId: message.payload.textbook_id,
+                    pageId: message.payload.page_id,
                 }));
             });
 
@@ -160,7 +183,8 @@ export function createQuizStore(courseId: CourseIdSource): QuizStore {
         await socket?.disconnect();
     }
 
-    async function requestQuiz(questionCount = 5): Promise<void> {
+    async function requestQuiz(questionCount = 5, textbookId?: string): Promise<void> {
+        currentPageId = null;
         update((state) => ({
             ...state,
             isLoading: true,
@@ -168,6 +192,8 @@ export function createQuizStore(courseId: CourseIdSource): QuizStore {
             questions: [],
             contextSource: null,
             sources: [],
+            textbookId: textbookId ?? null,
+            pageId: null,
         }));
 
         try {
@@ -177,11 +203,39 @@ export function createQuizStore(courseId: CourseIdSource): QuizStore {
 
             await socket?.send({
                 action: "quiz_start",
-                payload: {question_count: questionCount},
+                payload: {
+                    question_count: questionCount,
+                    ...(textbookId ? {textbook_id: textbookId} : {}),
+                },
             });
         } catch (error) {
             const message = error instanceof Error ? error.message : String(error);
             update((state) => ({...state, isLoading: false, errorMessage: message}));
+        }
+    }
+
+    /**
+     * Submit the finished quiz score so the backend stores it and awards points. The
+     * score is normalized to 0–1. Does nothing if the quiz has no anchor page.
+     */
+    async function submitResult(score: number, attempts?: number): Promise<void> {
+        if (!socket || !currentPageId) {
+            return;
+        }
+
+        const normalized = Math.max(0, Math.min(1, score));
+
+        try {
+            await socket.send({
+                action: "learning_quiz_result",
+                payload: {
+                    page_id: currentPageId,
+                    score: normalized,
+                    attempts: attempts ?? null,
+                },
+            });
+        } catch {
+            // Awarding points is best-effort; never break the quiz UI over it.
         }
     }
 
@@ -190,5 +244,6 @@ export function createQuizStore(courseId: CourseIdSource): QuizStore {
         connect,
         disconnect,
         requestQuiz,
+        submitResult,
     };
 }

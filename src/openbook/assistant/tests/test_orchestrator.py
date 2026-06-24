@@ -281,6 +281,43 @@ class AssistantOrchestrator_Tests(TestCase):
         self.assertIn("Course", prompt)
         self.assertIn("HTML structures web pages.", prompt)
 
+    def test_generate_quiz_scoped_to_textbook_anchors_page(self):
+        """A textbook-scoped quiz reports the textbook and a page to anchor the result to."""
+        self.page.content = {
+            "type": "source",
+            "format": "MD",
+            "source": "# HTML Basics\nHTML structures web pages.",
+        }
+        self.page.save(update_fields=["content"])
+        self.llm_client.retrieve_rag_context.return_value = RagContext(context="", sources=())
+        self.llm_client.get_user_message.return_value = self._quiz_response()
+
+        quiz = self.orchestrator.generate_quiz(
+            user=self.owner,
+            course=self.course,
+            question_count=1,
+            textbook=self.textbook,
+        )
+
+        self.assertEqual(quiz.textbook_id, str(self.textbook.id))
+        self.assertEqual(quiz.page_id, str(self.page.id))
+
+    def test_generate_quiz_rejects_textbook_not_in_course(self):
+        """Choosing a textbook that is not part of the course is rejected."""
+        other_textbook = Textbook.objects.create(
+            name="Other",
+            slug="other",
+            group=self.library_group,
+        )
+
+        with self.assertRaises(ValueError):
+            self.orchestrator.generate_quiz(
+                user=self.owner,
+                course=self.course,
+                question_count=1,
+                textbook=other_textbook,
+            )
+
     def test_record_page_opened_denied(self):
         """Learning-state writes should require course access."""
         with self.assertRaises(PermissionDenied):

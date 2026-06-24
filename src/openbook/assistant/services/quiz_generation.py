@@ -42,6 +42,9 @@ class GeneratedQuiz:
     questions: tuple[GeneratedQuizQuestion, ...]
     context_source: QuizContextSource
     sources: tuple[RagSource, ...] = ()
+    # Optional textbook the quiz was scoped to and the page the result anchors to.
+    textbook_id: str | None = None
+    page_id: str | None = None
 
 
 class QuizResponseParser:
