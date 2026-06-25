@@ -96,7 +96,7 @@ sidebar, minimised icon) can be layered on later.
     // Side navigation. "Quizzes" is wired; the rest are placeholders for now.
     // "Chats" is its own expandable section below the nav.
     const navItems = $derived<Array<{icon: string; label: string; to?: string}>>([
-        {icon: "🎮", label: "Games"},
+        {icon: "🎮", label: "Games", to: `/games/${params?.id ?? ""}`},
         {icon: "🧠", label: "Quizzes", to: `/quiz/${params?.id ?? ""}`},
         {icon: "🎓", label: "Exams"},
     ]);

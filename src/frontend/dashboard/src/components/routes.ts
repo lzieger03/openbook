@@ -14,6 +14,10 @@ import ProfileEditPage from "./pages/ProfileEditPage.svelte";
 import CourseChatPage from "./pages/CourseChatPage.svelte";
 import QuizPage from "./pages/QuizPage.svelte";
 import ContentPage from "./pages/ContentPage.svelte";
+import GamesPage from "./pages/GamesPage.svelte";
+import MemoryGamePage from "./pages/MemoryGamePage.svelte";
+import FlashcardsGamePage from "./pages/FlashcardsGamePage.svelte";
+import HangmanGamePage from "./pages/HangmanGamePage.svelte";
 
 export default {
     "/": DashboardPage,
@@ -21,5 +25,9 @@ export default {
     "/chat/:id": CourseChatPage,
     "/quiz/:id": QuizPage,
     "/content/:id": ContentPage,
+    "/games/:id": GamesPage,
+    "/games/:id/memory": MemoryGamePage,
+    "/games/:id/flashcards": FlashcardsGamePage,
+    "/games/:id/hangman": HangmanGamePage,
     "*": DashboardPage,
 };
