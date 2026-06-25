@@ -1,5 +1,7 @@
 # OpenBook: Interactive Online Textbooks - Server
 # © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
+# Ledejna Salihi (@LedejnaSalihi)
+# Lars Zieger (@lzieger03)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as

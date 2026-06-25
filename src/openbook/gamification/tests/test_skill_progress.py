@@ -1,5 +1,7 @@
 # OpenBook: Interactive Online Textbooks - Server
 # © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
+# Ledejna Salihi (@LedejnaSalihi)
+# Lars Zieger (@lzieger03)
 
 from django.db import IntegrityError
 from django.test import RequestFactory

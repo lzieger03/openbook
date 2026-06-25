@@ -1,5 +1,7 @@
 # OpenBook: Interactive Online Textbooks - Server
 # © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
+# Ledejna Salihi (@LedejnaSalihi)
+# Lars Zieger (@lzieger03)
 
 from django.core.management.base import BaseCommand
 

@@ -1,5 +1,7 @@
 # OpenBook: Interactive Online Textbooks - Server
 # © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
+# Ledejna Salihi (@LedejnaSalihi)
+# Lars Zieger (@lzieger03)
 
 from django_filters.filters import CharFilter
 from django_filters.filterset import FilterSet
