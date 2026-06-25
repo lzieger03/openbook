@@ -11,6 +11,7 @@ from __future__ import annotations
 import typing
 
 from .viewsets.document import AssistantDocumentViewSet
+from .viewsets.exam_attempt import ExamAttemptViewSet
 
 if typing.TYPE_CHECKING:
     from rest_framework.routers import DefaultRouter
@@ -21,4 +22,9 @@ def register_api_routes(router: "DefaultRouter", prefix: str) -> None:
         f"{prefix}/documents",
         AssistantDocumentViewSet,
         basename="assistant-document",
+    )
+    router.register(
+        f"{prefix}/exam_attempts",
+        ExamAttemptViewSet,
+        basename="assistant-exam-attempt",
     )

@@ -8,6 +8,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from asgiref.sync             import sync_to_async
 from chanx.channels.websocket import AsyncJsonWebsocketConsumer
 from chanx.core.decorators    import channel, ws_handler
@@ -35,6 +37,7 @@ from ..messages.chat          import (
     ExamGradedPayload,
     ExamQuestionPayload,
     ExamQuestionResultPayload,
+    ExamResume,
     ExamStart,
     ExamSubmit,
     GetChatHistory,
@@ -58,6 +61,11 @@ from ..messages.chat          import (
 # WebSocket ``ChatMessage`` *message* class above).
 from openbook.assistant.models import ChatMessage as ChatMessageModel
 from openbook.assistant.models import ChatSession as ChatSessionModel
+from openbook.assistant.models import ExamAttempt as ExamAttemptModel
+from openbook.assistant.services.exam_generation import deserialize_generated_exam
+from openbook.assistant.services.exam_generation import serialize_generated_exam
+
+logger = logging.getLogger(__name__)
 
 # =============================================================================
 # FÜR DAS KI-TEAM:
@@ -125,6 +133,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         # The exam most recently generated on this connection, kept so the answers can
         # be graded server-side without ever sending the correct answers to the client.
         self._active_exam = None
+        # The saved ExamAttempt this exam belongs to (set when resuming a saved exam, or
+        # after the first grade persists a freshly generated one). Drives create-vs-update.
+        self._active_exam_id: str | None = None
 
     @ws_handler(
         summary     = "Handle Ping Requests",
@@ -530,33 +541,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 textbook_id=message.payload.textbook_id,
             )
             self._active_exam = exam
-            return ExamGenerated(
-                payload=ExamGeneratedPayload(
-                    course_id=self._get_required_course_id(),
-                    context_source=exam.context_source,
-                    textbook_id=exam.textbook_id,
-                    page_id=exam.page_id,
-                    questions=[
-                        ExamQuestionPayload(
-                            id=question.id,
-                            kind=question.kind,
-                            prompt=question.prompt,
-                            max_points=question.max_points,
-                            options=[option.text for option in question.options],
-                        )
-                        for question in exam.questions
-                    ],
-                    sources=[
-                        QuizSourcePayload(
-                            chunk_id=source.chunk_id,
-                            document_id=source.document_id,
-                            document_title=source.document_title,
-                            position=source.position,
-                        )
-                        for source in exam.sources
-                    ],
-                ),
-            )
+            self._active_exam_id = None  # a fresh exam, not yet saved
+            return self._exam_generated_message(exam)
         except Exception as error:
             return LearningEventStatus(
                 payload=LearningEventStatusPayload(
@@ -565,6 +551,59 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                     message=str(error),
                 ),
             )
+
+    @ws_handler(
+        summary     = "Resume Exam",
+        description = "Replay a previously saved exam with the same questions",
+    )
+    async def handle_exam_resume(
+        self,
+        message: ExamResume,
+    ) -> ExamGenerated | LearningEventStatus:
+        """Load a saved exam into this connection so it can be taken again."""
+        exam = await sync_to_async(self._load_saved_exam)(str(message.payload.exam_id))
+        if exam is None:
+            return LearningEventStatus(
+                payload=LearningEventStatusPayload(
+                    event="exam_resume",
+                    success=False,
+                    message="Exam not found.",
+                ),
+            )
+
+        self._active_exam = exam
+        self._active_exam_id = str(message.payload.exam_id)
+        return self._exam_generated_message(exam)
+
+    def _exam_generated_message(self, exam) -> ExamGenerated:
+        """Build the client-facing ``exam_generated`` message (no server-side answers)."""
+        return ExamGenerated(
+            payload=ExamGeneratedPayload(
+                course_id=self._get_required_course_id(),
+                context_source=exam.context_source,
+                textbook_id=exam.textbook_id,
+                page_id=exam.page_id,
+                questions=[
+                    ExamQuestionPayload(
+                        id=question.id,
+                        kind=question.kind,
+                        prompt=question.prompt,
+                        max_points=question.max_points,
+                        options=[option.text for option in question.options],
+                    )
+                    for question in exam.questions
+                ],
+                sources=[
+                    QuizSourcePayload(
+                        chunk_id=source.chunk_id,
+                        document_id=source.document_id,
+                        document_title=source.document_title,
+                        position=source.position,
+                    )
+                    for source in getattr(exam, "sources", ())
+                ],
+            ),
+        )
 
     @ws_handler(
         summary     = "Grade Exam",
@@ -668,14 +707,82 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         )
 
     def _grade_exam(self, answers) -> dict:
-        """Grade the active exam against the submitted answers and award rewards."""
+        """Grade the active exam against the submitted answers, award rewards, and save it."""
         course_id = self._get_required_course_id()
-        return AssistantOrchestrator().grade_exam(
+        graded = AssistantOrchestrator().grade_exam(
             user=self.scope.get("user"),
             course=course_id,
             exam=self._active_exam,
             answers=[answer.model_dump() for answer in answers],
         )
+        try:
+            self._persist_exam(graded.get("graded_exam"))
+        except Exception:
+            logger.exception("Failed to save exam attempt")
+        return graded
+
+    def _exam_title(self, exam) -> str:
+        """A readable title for a saved exam (the textbook's name, else 'Exam')."""
+        if getattr(exam, "textbook_id", None):
+            from openbook.content.models import Textbook
+            textbook = Textbook.objects.filter(pk=exam.textbook_id).first()
+            if textbook:
+                return textbook.name
+        return "Exam"
+
+    def _persist_exam(self, graded_exam) -> None:
+        """Create or update the saved ExamAttempt for the current (graded) exam."""
+        user = self.scope.get("user")
+        if user is None or not getattr(user, "is_authenticated", False) or self._active_exam is None or graded_exam is None:
+            return
+
+        result = {
+            "score":            graded_exam.score,
+            "total_points":     graded_exam.total_points,
+            "max_points":       graded_exam.max_points,
+            "overall_feedback": graded_exam.overall_feedback,
+            "results": [
+                {
+                    "question_id":    item.question_id,
+                    "kind":           item.kind,
+                    "prompt":         item.prompt,
+                    "your_answer":    item.your_answer,
+                    "awarded_points": item.awarded_points,
+                    "max_points":     item.max_points,
+                    "feedback":       item.feedback,
+                    "correct":        item.correct,
+                    "correct_answer": item.correct_answer,
+                }
+                for item in graded_exam.results
+            ],
+        }
+
+        attempt = None
+        if self._active_exam_id:
+            attempt = ExamAttemptModel.objects.filter(pk=self._active_exam_id, user=user).first()
+
+        if attempt is None:
+            attempt = ExamAttemptModel(
+                user=user,
+                course_id=self._get_required_course_id(),
+                textbook_id=getattr(self._active_exam, "textbook_id", None) or None,
+                title=self._exam_title(self._active_exam),
+                exam=serialize_generated_exam(self._active_exam),
+            )
+
+        attempt.result       = result
+        attempt.total_points = graded_exam.total_points
+        attempt.max_points   = graded_exam.max_points
+        attempt.score        = graded_exam.score
+        attempt.save()
+        self._active_exam_id = str(attempt.id)
+
+    def _load_saved_exam(self, exam_id: str):
+        """Reconstruct a saved exam (with answers) for the current user, or None."""
+        attempt = ExamAttemptModel.objects.filter(pk=exam_id, user=self.scope.get("user")).first()
+        if attempt is None or not attempt.exam:
+            return None
+        return deserialize_generated_exam(attempt.exam)
 
     def _record_page_opened(self, page_id: UUID) -> None:
         """Store that the current user opened a course page."""

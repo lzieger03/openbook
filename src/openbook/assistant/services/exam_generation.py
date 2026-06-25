@@ -232,3 +232,54 @@ class ExamGradingParser:
             }
 
         return graded
+
+
+# --- Persistence helpers (for saving/replaying exams) -----------------------------
+
+def serialize_generated_exam(exam: GeneratedExam) -> dict:
+    """Serialize a generated exam (incl. server-side answers) to a JSON-safe dict."""
+    return {
+        "context_source": exam.context_source,
+        "textbook_id": exam.textbook_id,
+        "page_id": exam.page_id,
+        "questions": [
+            {
+                "id": question.id,
+                "kind": question.kind,
+                "prompt": question.prompt,
+                "max_points": question.max_points,
+                "expected": question.expected,
+                "options": [
+                    {"text": option.text, "correct": option.correct}
+                    for option in question.options
+                ],
+            }
+            for question in exam.questions
+        ],
+    }
+
+
+def deserialize_generated_exam(data: dict) -> GeneratedExam:
+    """Reconstruct a :class:`GeneratedExam` from :func:`serialize_generated_exam`."""
+    questions = tuple(
+        GeneratedExamQuestion(
+            id=str(raw.get("id") or uuid4()),
+            kind="multiple_choice" if raw.get("kind") == "multiple_choice" else "free_text",
+            prompt=raw.get("prompt", ""),
+            max_points=int(raw.get("max_points", 0) or 0),
+            expected=raw.get("expected", "") or "",
+            options=tuple(
+                GeneratedExamOption(text=option.get("text", ""), correct=bool(option.get("correct")))
+                for option in raw.get("options", [])
+            ),
+        )
+        for raw in data.get("questions", [])
+    )
+
+    context_source = "rag_documents" if data.get("context_source") == "rag_documents" else "course_context"
+    return GeneratedExam(
+        questions=questions,
+        context_source=context_source,
+        textbook_id=data.get("textbook_id"),
+        page_id=data.get("page_id"),
+    )

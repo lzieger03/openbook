@@ -22,6 +22,8 @@ the LLM and multiple choice by comparison, then awards points and skills like a 
     import {push} from "svelte-spa-router";
 
     import {fetchMaterials} from "../../api/content.js";
+    import {fetchExamAttempts, deleteExamAttempt} from "../../api/exams.js";
+    import type {ExamAttemptDto} from "../../api/exams.js";
     import {dashboardStore} from "../../stores/dashboard.store.js";
     import type {DashboardState} from "../../stores/dashboard.store.js";
     import {createExamStore} from "../../stores/exam.store.js";
@@ -46,8 +48,10 @@ the LLM and multiple choice by comparison, then awards points and skills like a 
 
     const exam = createExamStore(() => params?.id, {
         onResultRecorded: () => {
-            // Points/skills were awarded server-side; refresh the dashboard totals.
+            // Points/skills were awarded server-side; refresh the dashboard totals and
+            // the exam history (a new/updated attempt was just saved).
             dashboardStore.refresh();
+            void loadAttempts();
         },
     });
     let examState = $state<ExamState>({
@@ -75,6 +79,10 @@ the LLM and multiple choice by comparison, then awards points and skills like a 
     let textbooksError = $state("");
     let selectedTextbookId = $state<string | null>(null);
 
+    // Saved exam history (review / repeat / delete).
+    let attempts = $state<ExamAttemptDto[]>([]);
+    let deletingAttemptId = $state<string | null>(null);
+
     onMount(() => {
         const unsubscribeDashboard = dashboardStore.subscribe((value) => {
             state = value;
@@ -89,6 +97,7 @@ the LLM and multiple choice by comparison, then awards points and skills like a 
         });
 
         void loadTextbooks();
+        void loadAttempts();
 
         return () => {
             unsubscribeDashboard();
@@ -200,6 +209,66 @@ the LLM and multiple choice by comparison, then awards points and skills like a 
         resetAnswers();
         void loadExam();
     }
+
+    // ── Exam history ───────────────────────────────────────────────────────────
+    async function loadAttempts(): Promise<void> {
+        const courseId = params?.id;
+        if (!courseId) {
+            return;
+        }
+        try {
+            attempts = await fetchExamAttempts(courseId);
+        } catch {
+            // History is non-critical; leave whatever we had.
+        }
+    }
+
+    /** Mark that we're now in a taking/result view (leave the textbook selection). */
+    function enterFromHistory(attempt: ExamAttemptDto): void {
+        resetAnswers();
+        // Use the saved exam's textbook so "New exam" regenerates on the right one;
+        // fall back to a sentinel so the selection screen is left either way.
+        selectedTextbookId = attempt.textbook ?? "history";
+    }
+
+    /** Re-take a saved exam with the same questions. */
+    function repeatAttempt(attempt: ExamAttemptDto): void {
+        enterFromHistory(attempt);
+        void exam.resumeExam(attempt.id);
+    }
+
+    /** Review a saved exam's last graded result without re-taking it. */
+    function reviewAttempt(attempt: ExamAttemptDto): void {
+        if (!attempt.result) {
+            return;
+        }
+        enterFromHistory(attempt);
+        exam.showResult(attempt.result);
+    }
+
+    async function onDeleteAttempt(attempt: ExamAttemptDto): Promise<void> {
+        if (!confirm(`Delete the exam “${attempt.title}”? This cannot be undone.`)) {
+            return;
+        }
+        deletingAttemptId = attempt.id;
+        try {
+            await deleteExamAttempt(attempt.id);
+            attempts = attempts.filter((item) => item.id !== attempt.id);
+        } catch (error) {
+            textbooksError = error instanceof Error ? error.message : String(error);
+        } finally {
+            deletingAttemptId = null;
+        }
+    }
+
+    function attemptScore(attempt: ExamAttemptDto): number {
+        return attempt.max_points > 0 ? Math.round((attempt.total_points / attempt.max_points) * 100) : 0;
+    }
+
+    function formatDate(iso: string): string {
+        const date = new Date(iso);
+        return Number.isFinite(date.getTime()) ? date.toLocaleDateString() : "";
+    }
 </script>
 
 <div class="exam">
@@ -245,6 +314,40 @@ the LLM and multiple choice by comparison, then awards points and skills like a 
                         </button>
                     {/each}
                 </div>
+            {/if}
+
+            {#if attempts.length > 0}
+                <section class="history" aria-labelledby="exam-history-title">
+                    <h2 id="exam-history-title" class="history-title">Your exams</h2>
+                    <ul class="history-list">
+                        {#each attempts as attempt (attempt.id)}
+                            <li class="history-item">
+                                <span class="hi-score" class:graded={attempt.result}>
+                                    {attempt.result ? `${attemptScore(attempt)}%` : "—"}
+                                </span>
+                                <span class="hi-main">
+                                    <span class="hi-title">{attempt.title}</span>
+                                    <span class="hi-meta">{formatDate(attempt.updated_at)}</span>
+                                </span>
+                                <span class="hi-actions">
+                                    {#if attempt.result}
+                                        <button type="button" class="btn btn-xs btn-ghost" onclick={() => reviewAttempt(attempt)}>Review</button>
+                                    {/if}
+                                    <button type="button" class="btn btn-xs btn-primary" onclick={() => repeatAttempt(attempt)}>Repeat</button>
+                                    <button
+                                        type="button"
+                                        class="btn btn-xs btn-ghost text-error"
+                                        disabled={deletingAttemptId === attempt.id}
+                                        aria-label={`Delete exam ${attempt.title}`}
+                                        onclick={() => onDeleteAttempt(attempt)}
+                                    >
+                                        {#if deletingAttemptId === attempt.id}<span class="loading loading-spinner loading-xs"></span>{:else}✕{/if}
+                                    </button>
+                                </span>
+                            </li>
+                        {/each}
+                    </ul>
+                </section>
             {/if}
         </section>
     {:else if isBusy}
@@ -871,6 +974,100 @@ the LLM and multiple choice by comparison, then awards points and skills like a 
     @keyframes spin {
         to {
             transform: rotate(360deg);
+        }
+    }
+
+    /* --- Exam history --------------------------------------------------------- */
+    .history {
+        width: 100%;
+        margin-top: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+
+    .history-title {
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: color-mix(in oklab, var(--color-base-content) 55%, transparent);
+    }
+
+    .history-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .history-item {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        padding: 0.6rem 0.85rem;
+        border-radius: 0.75rem;
+        background: color-mix(in oklab, var(--color-base-100) 82%, transparent);
+        border: 1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);
+    }
+
+    .hi-score {
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        min-width: 2.8rem;
+        height: 2.8rem;
+        padding: 0 0.4rem;
+        border-radius: 0.6rem;
+        font-weight: 800;
+        font-size: 0.85rem;
+        color: color-mix(in oklab, var(--color-base-content) 55%, transparent);
+        background: color-mix(in oklab, var(--color-base-content) 8%, transparent);
+    }
+
+    .hi-score.graded {
+        color: var(--color-primary);
+        background: color-mix(in oklab, var(--color-primary) 14%, transparent);
+        border: 1px solid color-mix(in oklab, var(--color-primary) 30%, transparent);
+    }
+
+    .hi-main {
+        flex: 1 1 auto;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.1rem;
+    }
+
+    .hi-title {
+        font-weight: 700;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: var(--color-base-content);
+    }
+
+    .hi-meta {
+        font-size: 0.75rem;
+        color: color-mix(in oklab, var(--color-base-content) 55%, transparent);
+    }
+
+    .hi-actions {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    @media (max-width: 34rem) {
+        .history-item {
+            flex-wrap: wrap;
+        }
+        .hi-actions {
+            width: 100%;
+            justify-content: flex-end;
         }
     }
 </style>
