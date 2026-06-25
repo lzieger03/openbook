@@ -39,11 +39,33 @@ README-websocket-api.md.
 
     // AI chat over WebSocket; connect lazily the first time the panel is opened.
     const chat = createAiChatStore();
-    let chatState = $state<AiChatState>({connection: "disconnected", errorMessage: "", messages: []});
+    let chatState = $state<AiChatState>({
+        connection: "disconnected",
+        errorMessage: "",
+        messages: [],
+        sessions: [],
+        activeSessionId: null,
+        awaitingResponse: false,
+    });
     let draft = $state("");
     let connectStarted = false;
+    // The scrollable message area; kept pinned to the bottom on new content.
+    let bodyEl = $state<HTMLDivElement>();
 
     const connected = $derived(chatState.connection === "connected");
+
+    // Auto-scroll to the latest message / typing indicator whenever they change.
+    $effect(() => {
+        void chatState.messages.length;
+        void chatState.awaitingResponse;
+
+        const el = bodyEl;
+        if (el) {
+            requestAnimationFrame(() => {
+                el.scrollTop = el.scrollHeight;
+            });
+        }
+    });
 
     function ensureConnected(): void {
         if (!connectStarted) {
@@ -158,7 +180,7 @@ README-websocket-api.md.
             </div>
         </header>
 
-        <div class="panel-body">
+        <div class="panel-body" bind:this={bodyEl}>
             <div class="message">
                 <img class="avatar" src="logo.png" alt="ElisaAI" />
                 <div class="bubble">
@@ -180,6 +202,17 @@ README-websocket-api.md.
                     {/if}
                 </div>
             {/each}
+
+            {#if chatState.awaitingResponse}
+                <div class="message" aria-live="polite">
+                    <img class="avatar" src="logo.png" alt="ElisaAI" />
+                    <div class="bubble typing" aria-label="ElisaAI is typing">
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                    </div>
+                </div>
+            {/if}
         </div>
 
         <div class="composer">
@@ -361,6 +394,41 @@ README-websocket-api.md.
         color: var(--color-base-content);
         background: color-mix(in oklab, var(--color-primary) 12%, transparent);
         border: 1px solid color-mix(in oklab, var(--color-primary) 28%, transparent);
+    }
+
+    /* Animated "assistant is typing" indicator. */
+    .bubble.typing {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.28rem;
+        padding: 0.7rem 0.85rem;
+    }
+
+    .typing-dot {
+        width: 0.45rem;
+        height: 0.45rem;
+        border-radius: 999px;
+        background: color-mix(in oklab, var(--color-base-content) 55%, transparent);
+        animation: typing-bounce 1.2s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(2) {
+        animation-delay: 0.18s;
+    }
+
+    .typing-dot:nth-child(3) {
+        animation-delay: 0.36s;
+    }
+
+    @keyframes typing-bounce {
+        0%, 60%, 100% {
+            transform: translateY(0);
+            opacity: 0.5;
+        }
+        30% {
+            transform: translateY(-0.25rem);
+            opacity: 1;
+        }
     }
 
     /* Rendered Markdown content inside a chat bubble. */
