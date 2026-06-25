@@ -97,6 +97,13 @@ interface ExamSubmit {
     };
 }
 
+interface ExamResume {
+    action: "exam_resume";
+    payload: {
+        exam_id: string;
+    };
+}
+
 interface ExamGenerated {
     action: "exam_generated";
     payload: {
@@ -129,7 +136,7 @@ export interface ExamRewardSummary {
     skillsAdvanced: string[];
 }
 
-type SentMessages = ExamStart | ExamSubmit;
+type SentMessages = ExamStart | ExamSubmit | ExamResume;
 type ReceivedMessages = ExamGenerated | ExamGraded | LearningEventStatus;
 
 type CourseIdSource = string | (() => string | undefined);
@@ -144,7 +151,9 @@ export interface ExamStore {
     connect: () => Promise<void>;
     disconnect: () => Promise<void>;
     requestExam: (questionCount?: number, textbookId?: string) => Promise<void>;
+    resumeExam: (examId: string) => Promise<void>;
     submitExam: (answers: ExamAnswer[]) => Promise<void>;
+    showResult: (result: ExamResult) => void;
 }
 
 function initialState(): ExamState {
@@ -278,6 +287,40 @@ export function createExamStore(courseId: CourseIdSource, options: ExamStoreOpti
         }
     }
 
+    /** Replay a saved exam (same questions) so the learner can take it again. */
+    async function resumeExam(examId: string): Promise<void> {
+        update((state) => ({
+            ...state,
+            isLoading: true,
+            isGrading: false,
+            errorMessage: "",
+            questions: [],
+            result: null,
+        }));
+
+        try {
+            if (!socket) {
+                await connect();
+            }
+            await socket?.send({action: "exam_resume", payload: {exam_id: examId}});
+        } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            update((state) => ({...state, isLoading: false, errorMessage: message}));
+        }
+    }
+
+    /** Show a previously graded result (from the saved history) without re-grading. */
+    function showResult(result: ExamResult): void {
+        update((state) => ({
+            ...state,
+            isLoading: false,
+            isGrading: false,
+            errorMessage: "",
+            questions: [],
+            result,
+        }));
+    }
+
     async function submitExam(answers: ExamAnswer[]): Promise<void> {
         update((state) => ({...state, isGrading: true, errorMessage: ""}));
 
@@ -300,6 +343,8 @@ export function createExamStore(courseId: CourseIdSource, options: ExamStoreOpti
         connect,
         disconnect,
         requestExam,
+        resumeExam,
         submitExam,
+        showResult,
     };
 }

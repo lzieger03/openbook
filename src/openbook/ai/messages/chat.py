@@ -283,6 +283,10 @@ class ExamSubmitPayload(BaseModel):
     """Payload submitting a learner's exam answers for grading."""
     answers: list[ExamAnswerPayload] = Field(default_factory=list)
 
+class ExamResumePayload(BaseModel):
+    """Payload to replay a previously saved exam (same questions)."""
+    exam_id: UUID
+
 class ExamQuestionResultPayload(BaseModel):
     """The grading outcome for a single exam question, shown to the learner."""
     question_id:    str
@@ -431,6 +435,13 @@ class ExamSubmit(BaseMessage):
     """
     action:  Literal["exam_submit"] = "exam_submit"
     payload: ExamSubmitPayload
+
+class ExamResume(BaseMessage):
+    """
+    Message sent by the client to replay a saved exam (same questions, fresh attempt).
+    """
+    action:  Literal["exam_resume"] = "exam_resume"
+    payload: ExamResumePayload
 
 class ExamGraded(BaseMessage):
     """
