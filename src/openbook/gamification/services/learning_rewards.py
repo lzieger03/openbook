@@ -51,6 +51,13 @@ QUIZ_MAX_COURSE_POINTS = 50
 # a 40-point quiz improvement advances each trained skill by 20 % (= one fifth level).
 QUIZ_SKILL_PROGRESS_PER_POINT = 0.5
 
+# Maximum course points a single textbook exam can be worth (at a perfect score). Exams
+# are worth more than a quiz because they cover the whole textbook and are AI-graded.
+EXAM_MAX_COURSE_POINTS = 100
+
+# Percentage points of skill progress granted per earned course exam point.
+EXAM_SKILL_PROGRESS_PER_POINT = 0.5
+
 # Course points granted for asking one question in the course chat.
 CHAT_QUESTION_POINTS = 5
 
@@ -121,6 +128,77 @@ def award_quiz_rewards(account_id, course_id, page_id, score, skill_ids=None) ->
 
     skill_amount     = delta * QUIZ_SKILL_PROGRESS_PER_POINT
     skills_advanced  = []
+
+    if skill_amount > 0:
+        for skill_id in skill_ids:
+            award_skill_progress(account_id, skill_id, skill_amount)
+            skills_advanced.append(str(skill_id))
+
+    return {
+        "points_awarded":  delta,
+        "skills_advanced": skills_advanced,
+        "course_progress": get_course_progress_state(account_id, course_id),
+    }
+
+
+def _exam_points_already_awarded(account_id, page_id) -> int:
+    """
+    Return the course points already paid out for this account's exam on ``page_id``.
+
+    Like the quiz high-water mark, but tracked separately under the exam event type so
+    exam points are awarded independently of quiz points for the same page.
+    """
+    total = (
+        RewardEventLog.objects
+        .filter(
+            account_id       = account_id,
+            event_type       = CourseEventType.EXAM_POINTS_AWARDED,
+            context__page_id = str(page_id),
+        )
+        .aggregate(total=Sum("points_delta"))
+        .get("total")
+    )
+    return total or 0
+
+
+@transaction.atomic
+def award_exam_rewards(account_id, course_id, page_id, score, skill_ids=None) -> dict:
+    """
+    Reward an exam attempt on a course textbook (anchored to its first page).
+
+    Works like :func:`award_quiz_rewards` but with its own, higher point ceiling and a
+    separate high-water mark, so exam points add to the course progress, the overall
+    account total and the course skills on top of any quiz points already earned. Only
+    the improvement over the best previously rewarded exam score for this page is paid.
+    """
+    score = max(0.0, min(float(score), 1.0))
+    skill_ids = list(skill_ids or [])
+
+    target_points = round(score * EXAM_MAX_COURSE_POINTS)
+    already        = _exam_points_already_awarded(account_id, page_id)
+    delta          = target_points - already
+
+    if delta <= 0:
+        return {
+            "points_awarded":  0,
+            "skills_advanced": [],
+            "course_progress": get_course_progress_state(account_id, course_id),
+        }
+
+    award_course_points(
+        account_id,
+        course_id,
+        delta,
+        event_type = CourseEventType.EXAM_POINTS_AWARDED,
+        context    = {
+            "page_id": str(page_id),
+            "score":   score,
+            "source":  "exam",
+        },
+    )
+
+    skill_amount    = delta * EXAM_SKILL_PROGRESS_PER_POINT
+    skills_advanced = []
 
     if skill_amount > 0:
         for skill_id in skill_ids:

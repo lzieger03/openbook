@@ -4,6 +4,7 @@
 from .course import award_course_points
 from .course import get_course_progress_state
 from .learning_rewards import award_chat_question_reward
+from .learning_rewards import award_exam_rewards
 from .learning_rewards import award_quiz_rewards
 from .skill import award_skill_progress
 from .skill import get_skill_progress_state

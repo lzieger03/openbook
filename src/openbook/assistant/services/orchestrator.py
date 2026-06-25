@@ -240,42 +240,33 @@ class AssistantOrchestrator:
         textbook: Textbook | UUID | str | None = None,
     ) -> GeneratedExam:
         """
-        Generate a mixed free-text + multiple-choice exam from RAG documents or the
-        course content fallback. Mirrors :meth:`generate_quiz`: when ``textbook`` is
-        given the exam is narrowed to it and anchored to its first page so the result
-        can award points and skills.
+        Generate a mixed free-text + multiple-choice exam **strictly** from the pages of
+        the selected textbook.
+
+        Unlike the quiz, the exam deliberately does not use course-wide RAG documents or
+        other course content: it is built only from the authored text of the chosen
+        textbook's pages, so the exam can never test anything outside that textbook. A
+        textbook is therefore required, and the result is anchored to its first page so
+        points and skills can be awarded.
         """
         course_obj = self._resolve_required_course(course)
         self._check_chat_permission(user=user, course=course_obj)
 
         material = self._resolve_course_material(course=course_obj, textbook=textbook)
+        if material is None or not material.textbook_id:
+            raise ValueError("An exam requires a textbook to be selected.")
 
         question_count = max(1, min(int(question_count), 10))
-        learning_context = self.learning_context_service.get_prompt_context(
-            user=user,
-            course=course_obj,
-        )
-        rag_context = self.llm_client.retrieve_rag_context(
-            query=self._build_exam_query(
-                course=course_obj,
-                question_count=question_count,
-                material=material,
-            ),
-            course=course_obj,
-            limit=5,
-        )
 
-        course_context = ""
-        context_source = "rag_documents"
-
-        if not rag_context.context:
-            context_source = "course_context"
-            course_context = self._build_course_context(course_obj, material=material)
+        # Context is exclusively the selected textbook's page content – nothing else.
+        textbook_context = self._build_textbook_pages_context(material)
+        if not textbook_context.strip():
+            raise ValueError("The selected textbook has no page content to build an exam from.")
 
         prompt = self.prompt_builder.build_exam_generation_prompt(
-            document_context=rag_context.context,
-            course_context=course_context,
-            learning_context=learning_context,
+            document_context="",
+            course_context=textbook_context,
+            learning_context="",
             question_count=question_count,
         )
         response = self.llm_client.get_user_message(prompt)
@@ -284,9 +275,9 @@ class AssistantOrchestrator:
 
         return GeneratedExam(
             questions=self.exam_generation_parser.parse(str(response or "")),
-            context_source=context_source,
-            sources=rag_context.sources,
-            textbook_id=str(material.textbook_id) if material else None,
+            context_source="course_context",
+            sources=(),
+            textbook_id=str(material.textbook_id),
             page_id=str(anchor_page.id) if anchor_page else None,
         )
 
@@ -300,9 +291,10 @@ class AssistantOrchestrator:
         """
         Grade a submitted exam: multiple-choice locally, free text via the LLM.
 
-        Stores the normalized score on the exam's anchor page and awards points/skills
-        through the shared quiz-reward path. Returns the graded exam together with the
-        ``points_awarded`` and ``skills_advanced`` granted.
+        Awards course points and skill progress through the dedicated exam reward path
+        (anchored to the textbook's first page), so the points show up in the course
+        progress, the overall total and the course skills. Returns the graded exam
+        together with the ``points_awarded`` and ``skills_advanced`` granted.
         """
         course_obj = self._resolve_required_course(course)
         self._check_chat_permission(user=user, course=course_obj)
@@ -352,15 +344,15 @@ class AssistantOrchestrator:
             score=score,
         )
 
-        # Reuse the quiz reward path so the exam grants course points and skill progress.
+        # Award course points and skill progress via the dedicated exam reward path so
+        # the points land in the course progress, the overall total and the skills.
         reward: dict[str, Any] = {"points_awarded": 0, "skills_advanced": []}
         if exam.page_id:
-            reward = self.record_quiz_result(
+            reward = self._award_exam_rewards(
                 user=user,
                 course=course_obj,
-                page=exam.page_id,
+                page=self._resolve_page(exam.page_id),
                 score=score,
-                attempts=1,
             )
 
         return {
@@ -553,6 +545,63 @@ class AssistantOrchestrator:
             "skills_advanced": [skill_names.get(str(skill_id), str(skill_id)) for skill_id in advanced],
         }
 
+    def _award_exam_rewards(
+        self,
+        user: AbstractUser | AnonymousUser | None,
+        course: Course,
+        page: TextbookPage,
+        score: float,
+    ) -> dict[str, Any]:
+        """
+        Grant course points and skill progress for an exam attempt on a textbook.
+
+        Mirrors :meth:`_award_quiz_rewards` but feeds the dedicated exam reward path, so
+        exam points add to the course progress, the overall account total and the course
+        skills independently of any quiz points. Returns ``{"points_awarded": int,
+        "skills_advanced": [skill names]}`` (empty for anonymous users / nothing new).
+        """
+        empty: dict[str, Any] = {"points_awarded": 0, "skills_advanced": []}
+
+        if user is None or not getattr(user, "is_authenticated", False):
+            return empty
+
+        try:
+            from openbook.gamification.models import Skill
+            from openbook.gamification.services import award_exam_rewards
+        except ImportError:
+            return empty
+
+        # The exam covers the whole textbook, so advance every skill any of its pages
+        # trains (deduplicated).
+        skills = list(
+            Skill.objects
+            .filter(textbook_pages__textbook_id=page.textbook_id)
+            .distinct()
+        )
+        skill_ids   = [skill.pk for skill in skills]
+        skill_names = {str(skill.pk): skill.name for skill in skills}
+
+        try:
+            result = award_exam_rewards(
+                account_id = user.pk,
+                course_id  = course.pk,
+                page_id    = page.pk,
+                score      = score,
+                skill_ids  = skill_ids,
+            )
+        except Exception:
+            logger.exception(
+                "Failed to award exam rewards for account=%s course=%s page=%s",
+                user.pk, course.pk, page.pk,
+            )
+            return empty
+
+        advanced = result.get("skills_advanced", []) or []
+        return {
+            "points_awarded":  result.get("points_awarded", 0),
+            "skills_advanced": [skill_names.get(str(skill_id), str(skill_id)) for skill_id in advanced],
+        }
+
     def _resolve_course(self, course: Course | UUID | str | None) -> Course | None:
         """Return a Course instance for supported course identifiers."""
         if course is None or isinstance(course, Course):
@@ -607,24 +656,6 @@ class AssistantOrchestrator:
             f'"{course.name}".'
         )
 
-    def _build_exam_query(
-        self,
-        course: Course,
-        question_count: int,
-        material: CourseMaterial | None = None,
-    ) -> str:
-        """Build the retrieval query used to find relevant exam source documents."""
-        if material is not None and material.textbook_id:
-            return (
-                f"Erzeuge {question_count} Pruefungsfragen zum Lehrbuch "
-                f'"{material.textbook.name}" aus dem Kurs "{course.name}".'
-            )
-
-        return (
-            f"Erzeuge {question_count} Pruefungsfragen fuer den Kurs "
-            f'"{course.name}".'
-        )
-
     def _build_course_context(self, course: Course, material: CourseMaterial | None = None) -> str:
         """
         Build fallback context from course metadata, skills and authored content.
@@ -666,6 +697,23 @@ class AssistantOrchestrator:
                 page_text = self._extract_page_text(page)
                 if page_text:
                     parts.append(f"Seite: {page.name}\n{page_text}")
+
+        return self._truncate_context("\n\n".join(parts))
+
+    def _build_textbook_pages_context(self, material: CourseMaterial) -> str:
+        """
+        Build exam context from only the selected textbook's pages.
+
+        Includes the textbook name and the authored text of each selected page – and
+        nothing else (no course description, no other materials, no skills), so the exam
+        is based purely on the content of the clicked textbook's pages.
+        """
+        parts = [f"Lehrbuch: {material.textbook.name}"]
+
+        for page in self._pages_for_material(material):
+            page_text = self._extract_page_text(page)
+            if page_text:
+                parts.append(f"Seite: {page.name}\n{page_text}")
 
         return self._truncate_context("\n\n".join(parts))
 

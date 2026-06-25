@@ -89,7 +89,11 @@ class PromptBuilder:
             "Mische offene Freitextfragen (kind=\"free_text\") und "
             "Multiple-Choice-Fragen (kind=\"multiple_choice\").",
             "Strebe etwa die Haelfte Freitext und die Haelfte Multiple-Choice an.",
-            "Nutze vorrangig den Dokumentkontext; sonst den Kurskontext.",
+            "Stelle die Fragen AUSSCHLIESSLICH zum bereitgestellten Kurskontext "
+            "(dem Inhalt der Lehrbuchseiten).",
+            "Verwende keinerlei Wissen ausserhalb dieses Kontexts und erfinde keine "
+            "Inhalte. Jede Frage und jede Loesung muss sich allein aus dem Kontext "
+            "beantworten lassen.",
             "Jede Frage braucht ein Feld max_points (ganze Zahl zwischen 5 und 20).",
             "Freitextfragen brauchen ein Feld expected mit einer kurzen Musterloesung.",
             "Multiple-Choice-Fragen brauchen vier options; genau eine mit correct=true.",

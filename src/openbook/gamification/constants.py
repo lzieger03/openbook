@@ -31,6 +31,7 @@ class CourseEventType(models.TextChoices):
     """
     COURSE_POINTS_AWARDED = "COURSE_POINTS_AWARDED", _("Course Points Awarded")
     QUIZ_POINTS_AWARDED   = "QUIZ_POINTS_AWARDED",   _("Quiz Points Awarded")
+    EXAM_POINTS_AWARDED   = "EXAM_POINTS_AWARDED",   _("Exam Points Awarded")
     CHAT_POINTS_AWARDED   = "CHAT_POINTS_AWARDED",   _("Chat Points Awarded")
 
 
