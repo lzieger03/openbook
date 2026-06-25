@@ -263,6 +263,8 @@ assistant backend through the existing course chat WebSocket channel.
                                         <span class="textbook-skill">{skill.name}</span>
                                     {/each}
                                 </span>
+                            {:else}
+                                <span class="textbook-skills empty">No skills yet</span>
                             {/if}
                         </button>
                     {/each}
@@ -450,33 +452,36 @@ assistant backend through the existing course chat WebSocket channel.
     .textbook-list {
         width: 100%;
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+        /* Equal-height rows so every card lines up regardless of skill count. */
+        grid-auto-rows: 1fr;
         gap: 1.1rem;
         margin-top: 0.5rem;
     }
 
+    /* Uniform vertical card: icon badge on top, name, skills pinned to the bottom. */
     .textbook-card {
         display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
-        min-height: 4.5rem;
-        padding: 1.2rem 1.4rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.85rem;
+        height: 100%;
+        padding: 1.25rem;
         border-radius: 1rem;
         cursor: pointer;
         text-align: left;
-        font-size: 1.1rem;
-        font-weight: 700;
         color: var(--color-base-content);
         background: color-mix(in oklab, var(--color-base-100) 82%, transparent);
-        border: 1px solid color-mix(in oklab, var(--color-primary) 28%, transparent);
-        transition: transform 0.12s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-        box-shadow: 0 6px 18px color-mix(in oklab, var(--color-base-content) 12%, transparent);
+        border: 1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);
+        transition: transform 0.12s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        box-shadow: 0 4px 14px color-mix(in oklab, var(--color-base-content) 10%, transparent);
     }
 
     .textbook-card:hover {
         transform: translateY(-3px);
-        border-color: color-mix(in oklab, var(--color-primary) 60%, transparent);
+        background: color-mix(in oklab, var(--color-primary) 8%, transparent);
+        border-color: color-mix(in oklab, var(--color-primary) 55%, transparent);
+        box-shadow: 0 10px 24px color-mix(in oklab, var(--color-primary) 22%, transparent);
     }
 
     .textbook-card:focus-visible {
@@ -484,29 +489,44 @@ assistant backend through the existing course chat WebSocket channel.
         outline-offset: 3px;
     }
 
+    /* Icon sits in a soft rounded badge for a consistent header on every card. */
     .textbook-icon {
-        font-size: 1.6rem;
         flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        width: 2.6rem;
+        height: 2.6rem;
+        border-radius: 0.8rem;
+        font-size: 1.4rem;
+        background: color-mix(in oklab, var(--color-primary) 16%, transparent);
+        border: 1px solid color-mix(in oklab, var(--color-primary) 28%, transparent);
     }
 
     .textbook-name {
-        flex: 1 1 auto;
+        font-size: 1.1rem;
+        font-weight: 700;
+        line-height: 1.3;
         overflow-wrap: anywhere;
     }
 
-    /* Skills wrap onto their own line(s) below the icon + name. */
+    /* Tags pinned to the bottom (margin-top:auto) so cards stay visually aligned. */
     .textbook-skills {
-        flex: 1 0 100%;
+        margin-top: auto;
         display: flex;
         flex-wrap: wrap;
         gap: 0.35rem;
-        margin-left: 2.6rem;
+    }
+
+    .textbook-skills.empty {
+        font-size: 0.72rem;
+        font-weight: 500;
+        color: color-mix(in oklab, var(--color-base-content) 45%, transparent);
     }
 
     .textbook-skill {
-        font-size: 0.7rem;
+        font-size: 0.72rem;
         font-weight: 600;
-        padding: 0.1rem 0.55rem;
+        padding: 0.12rem 0.6rem;
         border-radius: 999px;
         color: var(--color-primary);
         background: color-mix(in oklab, var(--color-primary) 14%, transparent);
