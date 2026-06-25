@@ -39,7 +39,13 @@ README-websocket-api.md.
 
     // AI chat over WebSocket; connect lazily the first time the panel is opened.
     const chat = createAiChatStore();
-    let chatState = $state<AiChatState>({connection: "disconnected", errorMessage: "", messages: []});
+    let chatState = $state<AiChatState>({
+        connection: "disconnected",
+        errorMessage: "",
+        messages: [],
+        sessions: [],
+        activeSessionId: null,
+    });
     let draft = $state("");
     let connectStarted = false;
 

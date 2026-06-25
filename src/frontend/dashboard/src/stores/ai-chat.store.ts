@@ -55,6 +55,38 @@ export interface ChatMessagePayload {
 
 export interface ChatHistoryPayload {
     messages: ChatMessagePayload[];
+    session_id: string | null;
+}
+
+export interface ChatSessionSummary {
+    id: string;
+    title: string;
+    updated_at: string;
+}
+
+export interface ListChatSessions {
+    action: "list_chat_sessions";
+    payload: null;
+}
+
+export interface OpenChatSession {
+    action: "open_chat_session";
+    payload: {session_id: string | null};
+}
+
+export interface ChatSessionList {
+    action: "chat_session_list";
+    payload: {sessions: ChatSessionSummary[]};
+}
+
+export interface RenameChatSession {
+    action: "rename_chat_session";
+    payload: {session_id: string; title: string};
+}
+
+export interface DeleteChatSession {
+    action: "delete_chat_session";
+    payload: {session_id: string};
 }
 
 export interface ChatInput {
@@ -116,13 +148,17 @@ export interface LearningEventStatus {
 /** Messages the client sends to the server. */
 export type SentMessages =
     | GetChatHistory
+    | ListChatSessions
+    | OpenChatSession
+    | RenameChatSession
+    | DeleteChatSession
     | ChatInput
     | LearningPageOpened
     | LearningPageCompleted
     | LearningQuizResult;
 
 /** Messages the server sends to the client. */
-export type ReceivedMessages = ChatHistory | ChatMessage | LearningEventStatus;
+export type ReceivedMessages = ChatHistory | ChatSessionList | ChatMessage | LearningEventStatus;
 
 // ── Store ─────────────────────────────────────────────────────────────────────
 
@@ -130,6 +166,8 @@ export interface AiChatState {
     connection: WSConnectionStatus;
     errorMessage: string;
     messages: ChatMessagePayload[];
+    sessions: ChatSessionSummary[];
+    activeSessionId: string | null;
 }
 
 export interface AiChatStore {
@@ -138,6 +176,11 @@ export interface AiChatStore {
     disconnect: () => Promise<void>;
     retry: () => Promise<void>;
     getChatHistory: () => Promise<void>;
+    listSessions: () => Promise<void>;
+    openSession: (sessionId: string | null) => Promise<void>;
+    newChat: () => Promise<void>;
+    renameSession: (sessionId: string, title: string) => Promise<void>;
+    deleteSession: (sessionId: string) => Promise<void>;
     sendChatInput: (format: ChatMessageFormat, content: string) => Promise<void>;
     recordPageOpened: (pageId: string) => Promise<void>;
     markPageCompleted: (pageId: string) => Promise<void>;
@@ -155,12 +198,40 @@ export function createAiChatStore(courseId?: CourseIdSource): AiChatStore {
         connection: "disconnected",
         errorMessage: "",
         messages: [],
+        sessions: [],
+        activeSessionId: null,
     });
 
     let socket: WebSocketClient<SentMessages, ReceivedMessages> | undefined;
 
     async function getChatHistory(): Promise<void> {
         await socket?.send({action: "get_chat_history", payload: null});
+    }
+
+    async function listSessions(): Promise<void> {
+        await socket?.send({action: "list_chat_sessions", payload: null});
+    }
+
+    /** Open a saved session, or start a fresh chat when sessionId is null. */
+    async function openSession(sessionId: string | null): Promise<void> {
+        await socket?.send({action: "open_chat_session", payload: {session_id: sessionId}});
+    }
+
+    /** Start a new, empty chat (persisted once the first message is sent). */
+    async function newChat(): Promise<void> {
+        // Optimistically clear so the UI feels instant; the server confirms via chat_history.
+        update((state) => ({...state, messages: [], activeSessionId: null}));
+        await openSession(null);
+    }
+
+    /** Rename a saved chat session; the server replies with the refreshed list. */
+    async function renameSession(sessionId: string, title: string): Promise<void> {
+        await socket?.send({action: "rename_chat_session", payload: {session_id: sessionId, title}});
+    }
+
+    /** Delete a saved chat session; the server replies with the refreshed list. */
+    async function deleteSession(sessionId: string): Promise<void> {
+        await socket?.send({action: "delete_chat_session", payload: {session_id: sessionId}});
     }
 
     async function connect(): Promise<void> {
@@ -178,6 +249,7 @@ export function createAiChatStore(courseId?: CourseIdSource): AiChatStore {
                     errorMessage: status === "connected" ? "" : state.errorMessage,
                 }));
                 if (status === "connected") {
+                    void listSessions();
                     void getChatHistory();
                 }
             });
@@ -188,7 +260,30 @@ export function createAiChatStore(courseId?: CourseIdSource): AiChatStore {
             });
 
             socket.setMessageHandler("chat_history", (message: ChatHistory) => {
-                update((state) => ({...state, messages: message.payload.messages}));
+                update((state) => ({
+                    ...state,
+                    messages: message.payload.messages,
+                    activeSessionId: message.payload.session_id,
+                }));
+            });
+
+            socket.setMessageHandler("chat_session_list", (message: ChatSessionList) => {
+                update((state) => {
+                    const sessions = message.payload.sessions;
+                    const exists = (id: string | null) => sessions.some((s) => s.id === id);
+
+                    // Adopt the newest session as active only right after a fresh chat's
+                    // first message (there are already messages but no active id yet).
+                    // Otherwise keep the current active id if it still exists, else clear.
+                    let activeSessionId = state.activeSessionId;
+                    if (activeSessionId === null && state.messages.length > 0 && sessions.length > 0) {
+                        activeSessionId = sessions[0]!.id;
+                    } else if (activeSessionId !== null && !exists(activeSessionId)) {
+                        activeSessionId = null;
+                    }
+
+                    return {...state, sessions, activeSessionId};
+                });
             });
 
             // Streaming message: replace by id if it exists, otherwise append.
@@ -258,6 +353,11 @@ export function createAiChatStore(courseId?: CourseIdSource): AiChatStore {
         disconnect,
         retry,
         getChatHistory,
+        listSessions,
+        openSession,
+        newChat,
+        renameSession,
+        deleteSession,
         sendChatInput,
         recordPageOpened,
         markPageCompleted,

@@ -124,9 +124,40 @@ class ChatMessagePayload(BaseModel):
 
 class ChatHistoryPayload(BaseModel):
     """
-    Payload containing the full chat history.
+    Payload containing the full chat history of one session. ``session_id`` is the
+    session the messages belong to (null when starting a fresh, unsaved chat).
     """
-    messages: list[ChatMessagePayload]
+    messages:   list[ChatMessagePayload]
+    session_id: str | None = None
+
+class OpenChatSessionPayload(BaseModel):
+    """
+    Payload to open a saved chat session (or start a new one when ``session_id`` is null).
+    """
+    session_id: UUID | None = None
+
+class ChatSessionPayload(BaseModel):
+    """
+    Summary of one saved chat session, shown in the chat sidebar.
+    """
+    id:         str
+    title:      str
+    updated_at: datetime
+
+class ChatSessionListPayload(BaseModel):
+    """
+    Payload listing the learner's saved chat sessions for the current course.
+    """
+    sessions: list[ChatSessionPayload]
+
+class RenameChatSessionPayload(BaseModel):
+    """Payload to rename a saved chat session."""
+    session_id: UUID
+    title:      str
+
+class DeleteChatSessionPayload(BaseModel):
+    """Payload to delete a saved chat session."""
+    session_id: UUID
 
 class LearningPagePayload(BaseModel):
     """
@@ -234,6 +265,37 @@ class ChatHistory(BaseMessage):
     """
     action:  Literal["chat_history"] = "chat_history"
     payload: ChatHistoryPayload
+
+class ListChatSessions(BaseMessage):
+    """
+    Message sent by the client to list its saved chat sessions for the current course.
+    """
+    action:  Literal["list_chat_sessions"] = "list_chat_sessions"
+    payload: None = None
+
+class OpenChatSession(BaseMessage):
+    """
+    Message sent by the client to open a saved chat session (or start a new one).
+    """
+    action:  Literal["open_chat_session"] = "open_chat_session"
+    payload: OpenChatSessionPayload
+
+class ChatSessionList(BaseMessage):
+    """
+    The learner's saved chat sessions for the current course.
+    """
+    action:  Literal["chat_session_list"] = "chat_session_list"
+    payload: ChatSessionListPayload
+
+class RenameChatSession(BaseMessage):
+    """Message sent by the client to rename a saved chat session."""
+    action:  Literal["rename_chat_session"] = "rename_chat_session"
+    payload: RenameChatSessionPayload
+
+class DeleteChatSession(BaseMessage):
+    """Message sent by the client to delete a saved chat session."""
+    action:  Literal["delete_chat_session"] = "delete_chat_session"
+    payload: DeleteChatSessionPayload
 
 class LearningPageOpened(BaseMessage):
     """

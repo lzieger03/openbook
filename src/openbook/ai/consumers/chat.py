@@ -24,12 +24,19 @@ from ..messages.chat          import (
     ChatInput,
     ChatMessage,
     ChatMessagePayload,
+    ChatSessionList,
+    ChatSessionListPayload,
+    ChatSessionPayload,
+    DeleteChatSession,
     GetChatHistory,
     LearningEventStatus,
     LearningEventStatusPayload,
     LearningPageCompleted,
     LearningPageOpened,
     LearningQuizResult,
+    ListChatSessions,
+    OpenChatSession,
+    RenameChatSession,
     QuizAnswerOptionPayload,
     QuizGenerated,
     QuizGeneratedPayload,
@@ -37,6 +44,11 @@ from ..messages.chat          import (
     QuizSourcePayload,
     QuizStart,
 )
+
+# DB models for persisted chat history (aliased so they don't clash with the
+# WebSocket ``ChatMessage`` *message* class above).
+from openbook.assistant.models import ChatMessage as ChatMessageModel
+from openbook.assistant.models import ChatSession as ChatSessionModel
 
 # =============================================================================
 # FÜR DAS KI-TEAM:
@@ -97,12 +109,10 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     camelize = False
 
     def __init__(self, *args, **kwargs):
-        """
-        Initialize object with a simply in-memory chat history. Note: In future
-        versions this should be replaced with a persisted chat memory.
-        """
+        """Track which saved chat session this connection is currently writing to."""
         super().__init__(*args, **kwargs)
-        self.chat_history: list[ChatMessagePayload] = []
+        # The active ChatSession id; None means "a fresh chat not yet saved".
+        self.session_id: str | None = None
 
     @ws_handler(
         summary     = "Handle Ping Requests",
@@ -117,9 +127,68 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     )
     async def handle_get_chat_history(self, message: GetChatHistory) -> ChatHistory:
         """
-        Return the whole chat history to the client.
+        Return the active session's history. With no active session yet, fall back to
+        the learner's most recent session for this course (so a returning user keeps
+        their last conversation) or an empty history.
         """
-        return ChatHistory(payload=ChatHistoryPayload(messages=self.chat_history))
+        session_id, messages = await sync_to_async(self._load_active_history)()
+        self.session_id = session_id
+        return ChatHistory(payload=ChatHistoryPayload(messages=messages, session_id=session_id))
+
+    @ws_handler(
+        summary     = "List Chat Sessions",
+        description = "List the learner's saved chat sessions for this course",
+    )
+    async def handle_list_chat_sessions(self, message: ListChatSessions) -> ChatSessionList:
+        """Return the learner's saved sessions (newest first) for the sidebar."""
+        sessions = await sync_to_async(self._session_summaries)()
+        return ChatSessionList(payload=ChatSessionListPayload(sessions=sessions))
+
+    @ws_handler(
+        summary     = "Open Chat Session",
+        description = "Open a saved chat session, or start a new (unsaved) one",
+    )
+    async def handle_open_chat_session(self, message: OpenChatSession) -> ChatHistory:
+        """
+        Switch the active session. A null ``session_id`` starts a fresh chat that is
+        only persisted once the learner sends the first message.
+        """
+        requested = message.payload.session_id
+        session_id, messages = await sync_to_async(self._open_session)(requested)
+        self.session_id = session_id
+        return ChatHistory(payload=ChatHistoryPayload(messages=messages, session_id=session_id))
+
+    @ws_handler(
+        summary     = "Rename Chat Session",
+        description = "Rename one of the learner's saved chat sessions",
+    )
+    async def handle_rename_chat_session(self, message: RenameChatSession) -> ChatSessionList:
+        """Rename a session (if owned) and return the refreshed session list."""
+        await sync_to_async(self._rename_session)(
+            message.payload.session_id, message.payload.title,
+        )
+        sessions = await sync_to_async(self._session_summaries)()
+        return ChatSessionList(payload=ChatSessionListPayload(sessions=sessions))
+
+    @ws_handler(
+        summary     = "Delete Chat Session",
+        description = "Delete one of the learner's saved chat sessions",
+    )
+    async def handle_delete_chat_session(self, message: DeleteChatSession) -> ChatSessionList:
+        """
+        Delete a session (if owned). If it was the active one, clear the conversation
+        first, then return the refreshed session list.
+        """
+        deleted_active = await sync_to_async(self._delete_session)(message.payload.session_id)
+
+        if deleted_active:
+            self.session_id = None
+            await self.send_message(
+                ChatHistory(payload=ChatHistoryPayload(messages=[], session_id=None)),
+            )
+
+        sessions = await sync_to_async(self._session_summaries)()
+        return ChatSessionList(payload=ChatSessionListPayload(sessions=sessions))
 
     @ws_handler(
         summary     = "Handle Chat Input",
@@ -127,27 +196,21 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     )
     async def handle_chat_input(self, message: ChatInput) -> ChatMessage:
         """
-        Handle incoming chat message sent by the user.
+        Handle an incoming user message: echo it, answer it, and persist both turns to
+        the active session (creating one on the first message of a fresh chat).
         """
-        # Log user message in the chat history and send it back to the client,
-        # so that the client knows the full message details and that it was received.
-        user_message = ChatMessage(
-            payload = ChatMessagePayload(
-                datetime   = datetime.now(UTC),
-                sender     = "user",
-                type       = "normal",
-                severity   = "info",
-                guardRails = {"findings": "none", "explanation": ""},
-                format     = message.payload.format,
-                content    = message.payload.content,
-                finished   = True,
-            ),
+        # Echo the user message so the client sees it was received.
+        user_payload = ChatMessagePayload(
+            datetime   = datetime.now(UTC),
+            sender     = "user",
+            type       = "normal",
+            severity   = "info",
+            guardRails = {"findings": "none", "explanation": ""},
+            format     = message.payload.format,
+            content    = message.payload.content,
+            finished   = True,
         )
-
-        self.chat_history.append(user_message.payload)
-        await self.send_message(user_message)
-
-        response_id = str(uuid4())
+        await self.send_message(ChatMessage(payload=user_payload))
 
         try:
             response_string = await sync_to_async(self._answer_chat_query)(
@@ -160,22 +223,160 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             response_type     = "system"
             response_severity = "error"
 
-        response_message = ChatMessage(
-            payload = ChatMessagePayload(
-                id         = response_id,
-                datetime   = datetime.now(UTC),
-                sender     = "assistant",
-                type       = response_type,
-                severity   = response_severity,
-                guardRails = {"findings": "none", "explanation": ""},
-                format     = "markdown",
-                content    = response_string,
-                finished   = True,
-            ),
+        assistant_payload = ChatMessagePayload(
+            id         = str(uuid4()),
+            datetime   = datetime.now(UTC),
+            sender     = "assistant",
+            type       = response_type,
+            severity   = response_severity,
+            guardRails = {"findings": "none", "explanation": ""},
+            format     = "markdown",
+            content    = response_string,
+            finished   = True,
         )
 
-        self.chat_history.append(response_message.payload)
-        return response_message
+        # Persist both turns. Creating a new session here means the sidebar needs a
+        # refresh, so push the updated session list to the client.
+        session_id, created_new = await sync_to_async(self._persist_turn)(
+            user_payload, assistant_payload, message.payload.content,
+        )
+        self.session_id = session_id
+
+        if created_new:
+            sessions = await sync_to_async(self._session_summaries)()
+            await self.send_message(ChatSessionList(payload=ChatSessionListPayload(sessions=sessions)))
+
+        return ChatMessage(payload=assistant_payload)
+
+    # ------------------------------------------------------------------ helpers
+
+    def _course_id(self):
+        """Course id from the course-scoped route, or None on the global chat route."""
+        return self.scope.get("url_route", {}).get("kwargs", {}).get("course_id")
+
+    @staticmethod
+    def _make_title(content: str) -> str:
+        """Build a short sidebar title from the first user message."""
+        first_line = (content or "").strip().splitlines()[0] if content.strip() else ""
+        title = first_line[:60].strip()
+        return title or "Neuer Chat"
+
+    @staticmethod
+    def _payloads_for(session: ChatSessionModel) -> list[ChatMessagePayload]:
+        """Replay a session's stored messages as WebSocket payloads."""
+        return [
+            ChatMessagePayload(
+                id         = str(row.id),
+                datetime   = row.created_at,
+                sender     = row.sender,
+                type       = row.type,
+                severity   = row.severity,
+                guardRails = row.guard_rails or {"findings": "none", "explanation": ""},
+                format     = row.format,
+                content    = row.content,
+                finished   = row.finished,
+            )
+            for row in session.messages.all()
+        ]
+
+    def _session_summaries(self) -> list[ChatSessionPayload]:
+        """Saved sessions of the current user+course, newest first."""
+        user = self.scope.get("user")
+        if user is None or not getattr(user, "is_authenticated", False):
+            return []
+
+        sessions = ChatSessionModel.objects.filter(user=user, course_id=self._course_id())
+        return [
+            ChatSessionPayload(id=str(s.id), title=s.title or "Neuer Chat", updated_at=s.updated_at)
+            for s in sessions
+        ]
+
+    def _load_active_history(self):
+        """(session_id, messages) for the active session, else the latest, else empty."""
+        if self.session_id:
+            session = ChatSessionModel.objects.filter(pk=self.session_id).first()
+            if session is not None:
+                return str(session.id), self._payloads_for(session)
+
+        user = self.scope.get("user")
+        if user is None or not getattr(user, "is_authenticated", False):
+            return None, []
+
+        latest = (
+            ChatSessionModel.objects
+            .filter(user=user, course_id=self._course_id())
+            .first()
+        )
+        if latest is None:
+            return None, []
+
+        return str(latest.id), self._payloads_for(latest)
+
+    def _open_session(self, session_id):
+        """Validate ownership and return (session_id, messages); None starts a fresh chat."""
+        if session_id is None:
+            return None, []
+
+        user = self.scope.get("user")
+        session = ChatSessionModel.objects.filter(
+            pk=session_id, user=user, course_id=self._course_id(),
+        ).first()
+
+        if session is None:
+            # Unknown / not owned -> behave like a fresh chat instead of leaking state.
+            return None, []
+
+        return str(session.id), self._payloads_for(session)
+
+    def _rename_session(self, session_id, title) -> None:
+        """Set a new title on an owned session (trimmed, capped to the model length)."""
+        user = self.scope.get("user")
+        clean = (title or "").strip()[:120] or "Neuer Chat"
+        ChatSessionModel.objects.filter(pk=session_id, user=user).update(title=clean)
+
+    def _delete_session(self, session_id) -> bool:
+        """Delete an owned session. Returns whether it was the active session."""
+        user = self.scope.get("user")
+        was_active = str(session_id) == str(self.session_id)
+        ChatSessionModel.objects.filter(pk=session_id, user=user).delete()
+        return was_active
+
+    def _persist_turn(self, user_payload, assistant_payload, source_text):
+        """Persist a user+assistant turn; create the session on the first message."""
+        user = self.scope.get("user")
+        if user is None or not getattr(user, "is_authenticated", False):
+            return None, False  # Anonymous chats are not saved.
+
+        created_new = False
+        session = None
+
+        if self.session_id:
+            session = ChatSessionModel.objects.filter(
+                pk=self.session_id, user=user,
+            ).first()
+
+        if session is None:
+            session = ChatSessionModel.objects.create(
+                user=user,
+                course_id=self._course_id(),
+                title=self._make_title(source_text),
+            )
+            created_new = True
+
+        for payload, sender in ((user_payload, "user"), (assistant_payload, "assistant")):
+            ChatMessageModel.objects.create(
+                session    = session,
+                sender     = sender,
+                type       = payload.type,
+                severity   = payload.severity,
+                format     = payload.format,
+                content    = payload.content,
+                guard_rails= payload.guardRails.model_dump() if hasattr(payload.guardRails, "model_dump") else dict(payload.guardRails),
+                finished   = payload.finished,
+            )
+
+        session.save(update_fields=["updated_at"])  # bump ordering
+        return str(session.id), created_new
 
     @ws_handler(
         summary     = "Handle Page Opened",
