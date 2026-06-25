@@ -13,6 +13,7 @@ import DashboardPage from "./pages/DashboardPage.svelte";
 import ProfileEditPage from "./pages/ProfileEditPage.svelte";
 import CourseChatPage from "./pages/CourseChatPage.svelte";
 import QuizPage from "./pages/QuizPage.svelte";
+import ExamPage from "./pages/ExamPage.svelte";
 import ContentPage from "./pages/ContentPage.svelte";
 import GamesPage from "./pages/GamesPage.svelte";
 import MemoryGamePage from "./pages/MemoryGamePage.svelte";
@@ -24,6 +25,7 @@ export default {
     "/profile": ProfileEditPage,
     "/chat/:id": CourseChatPage,
     "/quiz/:id": QuizPage,
+    "/exam/:id": ExamPage,
     "/content/:id": ContentPage,
     "/games/:id": GamesPage,
     "/games/:id/memory": MemoryGamePage,

@@ -25,6 +25,13 @@ from openbook.content.models import TextbookPage
 from openbook.learning.models import LearningState
 from openbook.learning.models import QuizResult
 
+from .exam_generation import _clamp_points
+from .exam_generation import ExamGenerationParser
+from .exam_generation import ExamGradingParser
+from .exam_generation import GeneratedExam
+from .exam_generation import GeneratedExamQuestion
+from .exam_generation import GradedExam
+from .exam_generation import GradedExamQuestion
 from .learning_context import LearningContextService
 from .llm_client import LLM_Client
 from .prompt_builder import PromptBuilder
@@ -45,11 +52,15 @@ class AssistantOrchestrator:
         learning_context_service: LearningContextService | None = None,
         prompt_builder: PromptBuilder | None = None,
         quiz_response_parser: QuizResponseParser | None = None,
+        exam_generation_parser: ExamGenerationParser | None = None,
+        exam_grading_parser: ExamGradingParser | None = None,
     ):
         self.llm_client = llm_client or LLM_Client()
         self.learning_context_service = learning_context_service or LearningContextService()
         self.prompt_builder = prompt_builder or PromptBuilder()
         self.quiz_response_parser = quiz_response_parser or QuizResponseParser()
+        self.exam_generation_parser = exam_generation_parser or ExamGenerationParser()
+        self.exam_grading_parser = exam_grading_parser or ExamGradingParser()
 
     def answer(
         self,
@@ -221,6 +232,220 @@ class AssistantOrchestrator:
             page_id=str(anchor_page.id) if anchor_page else None,
         )
 
+    def generate_exam(
+        self,
+        user: AbstractUser | AnonymousUser | None,
+        course: Course | UUID | str,
+        question_count: int = 5,
+        textbook: Textbook | UUID | str | None = None,
+    ) -> GeneratedExam:
+        """
+        Generate a mixed free-text + multiple-choice exam from RAG documents or the
+        course content fallback. Mirrors :meth:`generate_quiz`: when ``textbook`` is
+        given the exam is narrowed to it and anchored to its first page so the result
+        can award points and skills.
+        """
+        course_obj = self._resolve_required_course(course)
+        self._check_chat_permission(user=user, course=course_obj)
+
+        material = self._resolve_course_material(course=course_obj, textbook=textbook)
+
+        question_count = max(1, min(int(question_count), 10))
+        learning_context = self.learning_context_service.get_prompt_context(
+            user=user,
+            course=course_obj,
+        )
+        rag_context = self.llm_client.retrieve_rag_context(
+            query=self._build_exam_query(
+                course=course_obj,
+                question_count=question_count,
+                material=material,
+            ),
+            course=course_obj,
+            limit=5,
+        )
+
+        course_context = ""
+        context_source = "rag_documents"
+
+        if not rag_context.context:
+            context_source = "course_context"
+            course_context = self._build_course_context(course_obj, material=material)
+
+        prompt = self.prompt_builder.build_exam_generation_prompt(
+            document_context=rag_context.context,
+            course_context=course_context,
+            learning_context=learning_context,
+            question_count=question_count,
+        )
+        response = self.llm_client.get_user_message(prompt)
+
+        anchor_page = self._anchor_page_for_material(material)
+
+        return GeneratedExam(
+            questions=self.exam_generation_parser.parse(str(response or "")),
+            context_source=context_source,
+            sources=rag_context.sources,
+            textbook_id=str(material.textbook_id) if material else None,
+            page_id=str(anchor_page.id) if anchor_page else None,
+        )
+
+    def grade_exam(
+        self,
+        user: AbstractUser | AnonymousUser | None,
+        course: Course | UUID | str,
+        exam: GeneratedExam,
+        answers: list[dict],
+    ) -> dict[str, Any]:
+        """
+        Grade a submitted exam: multiple-choice locally, free text via the LLM.
+
+        Stores the normalized score on the exam's anchor page and awards points/skills
+        through the shared quiz-reward path. Returns the graded exam together with the
+        ``points_awarded`` and ``skills_advanced`` granted.
+        """
+        course_obj = self._resolve_required_course(course)
+        self._check_chat_permission(user=user, course=course_obj)
+
+        answer_by_id = {str(answer.get("question_id")): answer for answer in answers}
+
+        # Grade the multiple-choice questions immediately; collect free text for the LLM.
+        graded_by_id: dict[str, GradedExamQuestion] = {}
+        free_text_items: list[dict] = []
+        free_text_answers: dict[str, str] = {}
+
+        for question in exam.questions:
+            answer = answer_by_id.get(question.id, {})
+
+            if question.kind == "multiple_choice":
+                graded_by_id[question.id] = self._grade_choice_question(question, answer)
+            else:
+                student_answer = str(answer.get("text") or "").strip()
+                free_text_answers[question.id] = student_answer
+                free_text_items.append({
+                    "question_id": question.id,
+                    "prompt": question.prompt,
+                    "expected": question.expected,
+                    "max_points": question.max_points,
+                    "answer": student_answer,
+                })
+
+        verdicts = self._grade_free_text(free_text_items)
+        for question in exam.questions:
+            if question.kind != "multiple_choice":
+                graded_by_id[question.id] = self._grade_free_text_question(
+                    question,
+                    student_answer=free_text_answers.get(question.id, ""),
+                    verdict=verdicts.get(question.id, {}),
+                )
+
+        # Keep the graded questions in the exam's original order.
+        results = tuple(graded_by_id[question.id] for question in exam.questions)
+        total_points = sum(result.awarded_points for result in results)
+        max_points = sum(result.max_points for result in results)
+        score = (total_points / max_points) if max_points else 0.0
+
+        graded_exam = GradedExam(
+            results=results,
+            total_points=total_points,
+            max_points=max_points,
+            score=score,
+        )
+
+        # Reuse the quiz reward path so the exam grants course points and skill progress.
+        reward: dict[str, Any] = {"points_awarded": 0, "skills_advanced": []}
+        if exam.page_id:
+            reward = self.record_quiz_result(
+                user=user,
+                course=course_obj,
+                page=exam.page_id,
+                score=score,
+                attempts=1,
+            )
+
+        return {
+            "graded_exam":     graded_exam,
+            "points_awarded":  reward.get("points_awarded", 0),
+            "skills_advanced": reward.get("skills_advanced", []),
+        }
+
+    def _grade_choice_question(
+        self,
+        question: GeneratedExamQuestion,
+        answer: dict,
+    ) -> GradedExamQuestion:
+        """Grade one multiple-choice question by comparing the picked option."""
+        selected_index = answer.get("selected_index")
+        correct_index = next(
+            (index for index, option in enumerate(question.options) if option.correct),
+            None,
+        )
+        is_correct = (
+            isinstance(selected_index, int)
+            and 0 <= selected_index < len(question.options)
+            and question.options[selected_index].correct
+        )
+        your_answer = (
+            question.options[selected_index].text
+            if isinstance(selected_index, int) and 0 <= selected_index < len(question.options)
+            else ""
+        )
+        correct_answer = (
+            question.options[correct_index].text if correct_index is not None else ""
+        )
+
+        return GradedExamQuestion(
+            question_id=question.id,
+            kind="multiple_choice",
+            prompt=question.prompt,
+            your_answer=your_answer,
+            awarded_points=question.max_points if is_correct else 0,
+            max_points=question.max_points,
+            feedback="Richtig." if is_correct else f"Richtige Antwort: {correct_answer}",
+            correct=is_correct,
+            correct_answer=correct_answer,
+        )
+
+    def _grade_free_text_question(
+        self,
+        question: GeneratedExamQuestion,
+        student_answer: str,
+        verdict: dict,
+    ) -> GradedExamQuestion:
+        """Turn the LLM verdict for one free-text question into a graded result."""
+        awarded = _clamp_points(verdict.get("awarded_points", 0), question.max_points)
+        feedback = verdict.get("feedback") or ""
+        if not student_answer:
+            awarded = 0
+            feedback = feedback or "Keine Antwort abgegeben."
+
+        return GradedExamQuestion(
+            question_id=question.id,
+            kind="free_text",
+            prompt=question.prompt,
+            your_answer=student_answer,
+            awarded_points=awarded,
+            max_points=question.max_points,
+            feedback=feedback,
+            correct=None,
+            correct_answer=question.expected,
+        )
+
+    def _grade_free_text(self, items: list[dict]) -> dict[str, dict]:
+        """Ask the LLM to grade all free-text answers; tolerate grading failures."""
+        if not items:
+            return {}
+
+        try:
+            prompt = self.prompt_builder.build_exam_grading_prompt(items)
+            response = self.llm_client.get_user_message(prompt)
+            return self.exam_grading_parser.parse(str(response or ""))
+        except Exception:
+            # Grading is best-effort: if the LLM/parser fails, award zero with a notice
+            # rather than failing the whole submission.
+            logger.exception("Failed to grade free-text exam answers")
+            return {}
+
     def _resolve_course_material(
         self,
         course: Course,
@@ -379,6 +604,24 @@ class AssistantOrchestrator:
 
         return (
             f"Erzeuge {question_count} Multiple-Choice-Quizfragen fuer den Kurs "
+            f'"{course.name}".'
+        )
+
+    def _build_exam_query(
+        self,
+        course: Course,
+        question_count: int,
+        material: CourseMaterial | None = None,
+    ) -> str:
+        """Build the retrieval query used to find relevant exam source documents."""
+        if material is not None and material.textbook_id:
+            return (
+                f"Erzeuge {question_count} Pruefungsfragen zum Lehrbuch "
+                f'"{material.textbook.name}" aus dem Kurs "{course.name}".'
+            )
+
+        return (
+            f"Erzeuge {question_count} Pruefungsfragen fuer den Kurs "
             f'"{course.name}".'
         )
 

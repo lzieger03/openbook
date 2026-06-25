@@ -28,6 +28,15 @@ from ..messages.chat          import (
     ChatSessionListPayload,
     ChatSessionPayload,
     DeleteChatSession,
+    ExamAnswerPayload,
+    ExamGenerated,
+    ExamGeneratedPayload,
+    ExamGraded,
+    ExamGradedPayload,
+    ExamQuestionPayload,
+    ExamQuestionResultPayload,
+    ExamStart,
+    ExamSubmit,
     GetChatHistory,
     LearningEventStatus,
     LearningEventStatusPayload,
@@ -113,6 +122,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         super().__init__(*args, **kwargs)
         # The active ChatSession id; None means "a fresh chat not yet saved".
         self.session_id: str | None = None
+        # The exam most recently generated on this connection, kept so the answers can
+        # be graded server-side without ever sending the correct answers to the client.
+        self._active_exam = None
 
     @ws_handler(
         summary     = "Handle Ping Requests",
@@ -500,6 +512,114 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 ),
             )
 
+    @ws_handler(
+        summary     = "Generate Exam",
+        description = "Generate a mixed free-text + multiple-choice course exam",
+    )
+    async def handle_exam_start(
+        self,
+        message: ExamStart,
+    ) -> ExamGenerated | LearningEventStatus:
+        """
+        Generate exam questions for the current course and remember them on the
+        connection so the submitted answers can be graded against them.
+        """
+        try:
+            exam = await sync_to_async(self._generate_exam)(
+                question_count=message.payload.question_count,
+                textbook_id=message.payload.textbook_id,
+            )
+            self._active_exam = exam
+            return ExamGenerated(
+                payload=ExamGeneratedPayload(
+                    course_id=self._get_required_course_id(),
+                    context_source=exam.context_source,
+                    textbook_id=exam.textbook_id,
+                    page_id=exam.page_id,
+                    questions=[
+                        ExamQuestionPayload(
+                            id=question.id,
+                            kind=question.kind,
+                            prompt=question.prompt,
+                            max_points=question.max_points,
+                            options=[option.text for option in question.options],
+                        )
+                        for question in exam.questions
+                    ],
+                    sources=[
+                        QuizSourcePayload(
+                            chunk_id=source.chunk_id,
+                            document_id=source.document_id,
+                            document_title=source.document_title,
+                            position=source.position,
+                        )
+                        for source in exam.sources
+                    ],
+                ),
+            )
+        except Exception as error:
+            return LearningEventStatus(
+                payload=LearningEventStatusPayload(
+                    event="exam_start",
+                    success=False,
+                    message=str(error),
+                ),
+            )
+
+    @ws_handler(
+        summary     = "Grade Exam",
+        description = "Grade submitted exam answers and award points/skills",
+    )
+    async def handle_exam_submit(
+        self,
+        message: ExamSubmit,
+    ) -> ExamGraded | LearningEventStatus:
+        """Grade the answers for the connection's active exam and award rewards."""
+        if self._active_exam is None:
+            return LearningEventStatus(
+                payload=LearningEventStatusPayload(
+                    event="exam_submit",
+                    success=False,
+                    message="No active exam to grade. Generate an exam first.",
+                ),
+            )
+
+        try:
+            graded = await sync_to_async(self._grade_exam)(message.payload.answers)
+            exam_result = graded["graded_exam"]
+            return ExamGraded(
+                payload=ExamGradedPayload(
+                    score=exam_result.score,
+                    total_points=exam_result.total_points,
+                    max_points=exam_result.max_points,
+                    overall_feedback=exam_result.overall_feedback,
+                    points_awarded=graded.get("points_awarded", 0),
+                    skills_advanced=graded.get("skills_advanced", []),
+                    results=[
+                        ExamQuestionResultPayload(
+                            question_id=result.question_id,
+                            kind=result.kind,
+                            prompt=result.prompt,
+                            your_answer=result.your_answer,
+                            awarded_points=result.awarded_points,
+                            max_points=result.max_points,
+                            feedback=result.feedback,
+                            correct=result.correct,
+                            correct_answer=result.correct_answer,
+                        )
+                        for result in exam_result.results
+                    ],
+                ),
+            )
+        except Exception as error:
+            return LearningEventStatus(
+                payload=LearningEventStatusPayload(
+                    event="exam_submit",
+                    success=False,
+                    message=str(error),
+                ),
+            )
+
     async def _run_learning_event(self, event: str, callback) -> LearningEventStatus:
         """Run a blocking learning event and convert the result into an acknowledgement."""
         try:
@@ -535,6 +655,26 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             course=course_id,
             question_count=question_count,
             textbook=textbook_id,
+        )
+
+    def _generate_exam(self, question_count: int, textbook_id=None):
+        """Run the blocking exam generation stack outside the async event loop."""
+        course_id = self._get_required_course_id()
+        return AssistantOrchestrator().generate_exam(
+            user=self.scope.get("user"),
+            course=course_id,
+            question_count=question_count,
+            textbook=textbook_id,
+        )
+
+    def _grade_exam(self, answers) -> dict:
+        """Grade the active exam against the submitted answers and award rewards."""
+        course_id = self._get_required_course_id()
+        return AssistantOrchestrator().grade_exam(
+            user=self.scope.get("user"),
+            course=course_id,
+            exam=self._active_exam,
+            answers=[answer.model_dump() for answer in answers],
         )
 
     def _record_page_opened(self, page_id: UUID) -> None:

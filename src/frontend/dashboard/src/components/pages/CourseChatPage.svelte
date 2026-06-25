@@ -98,7 +98,7 @@ sidebar, minimised icon) can be layered on later.
     const navItems = $derived<Array<{icon: string; label: string; to?: string}>>([
         {icon: "🎮", label: "Games", to: `/games/${params?.id ?? ""}`},
         {icon: "🧠", label: "Quizzes", to: `/quiz/${params?.id ?? ""}`},
-        {icon: "🎓", label: "Exams"},
+        {icon: "🎓", label: "Exams", to: `/exam/${params?.id ?? ""}`},
     ]);
 
     function onSelectSession(sessionId: string): void {
