@@ -33,7 +33,9 @@ Attaching an existing textbook is a secondary, collapsed option.
         fetchTextbookPages,
         fetchTextbooks,
         moveMaterial,
+        updateTextbook,
         updateTextbookPage,
+        uploadTextbookFile,
     } from "../../api/content.js";
     import type {SkillDto, SourceContent, TextbookDto, TextbookPageDto} from "../../api/content.js";
     import {slugify} from "../../api/courses.js";
@@ -51,9 +53,17 @@ Attaching an existing textbook is a secondary, collapsed option.
     let newTextbookName = $state("");
     let creatingTextbook = $state(false);
 
+    // Upload-script: turn one whole document into a textbook with one page per chapter.
+    let uploadingScript = $state(false);
+
     // Attach-existing form (secondary option).
     let attachTextbookId = $state("");
     let attaching = $state(false);
+
+    // Inline textbook renaming (one at a time, keyed by course-material id).
+    let renamingId = $state<string | null>(null);
+    let renameValue = $state("");
+    let renameSaving = $state(false);
 
     // Per-textbook page editing (one textbook expanded at a time).
     let expandedId = $state<string | null>(null);
@@ -182,6 +192,47 @@ Attaching an existing textbook is a secondary, collapsed option.
         }
     }
 
+    /**
+     * Upload a whole script and let the server split it into chapters, creating a
+     * textbook with one page per chapter. The new textbook is then opened so the
+     * teacher can review and edit the generated chapters.
+     */
+    async function onUploadScript(event: Event): Promise<void> {
+        const input = event.currentTarget as HTMLInputElement;
+        const file = input.files?.[0];
+        if (!file) {
+            return;
+        }
+        if (!courseGroupId) {
+            error = "This course has no library group. Choose one in Overview first.";
+            input.value = "";
+            return;
+        }
+
+        uploadingScript = true;
+        error = "";
+        message = "";
+
+        try {
+            const result = await uploadTextbookFile(courseId, file);
+            materials = await loadMaterials(courseId);
+            textbooks = await fetchTextbooks();
+
+            const created = materials.find((candidate) => candidate.textbookId === result.textbook);
+            if (created) {
+                await toggleExpand(created);
+            }
+
+            const count = result.pages_created ?? 0;
+            message = `Imported “${file.name}” — created ${count} ${count === 1 ? "chapter" : "chapters"}.`;
+        } catch (e) {
+            error = e instanceof Error ? e.message : String(e);
+        } finally {
+            uploadingScript = false;
+            input.value = "";
+        }
+    }
+
     /** Attach an existing textbook to this course. */
     async function onAttachTextbook(): Promise<void> {
         if (!attachTextbookId) {
@@ -201,6 +252,42 @@ Attaching an existing textbook is a secondary, collapsed option.
             error = e instanceof Error ? e.message : String(e);
         } finally {
             attaching = false;
+        }
+    }
+
+    /** Begin renaming a textbook (prefills the input with its current name). */
+    function startRename(material: CourseMaterialView): void {
+        renamingId = material.id;
+        renameValue = material.textbookName;
+    }
+
+    function cancelRename(): void {
+        renamingId = null;
+        renameValue = "";
+    }
+
+    /** Persist a renamed textbook and refresh the affected lists. */
+    async function saveRename(material: CourseMaterialView): Promise<void> {
+        const name = renameValue.trim();
+        if (!name || name === material.textbookName) {
+            cancelRename();
+            return;
+        }
+
+        renameSaving = true;
+        error = "";
+        message = "";
+
+        try {
+            await updateTextbook(material.textbookId, {name});
+            materials = await loadMaterials(courseId);
+            textbooks = (await fetchTextbooks()).sort((a, b) => a.name.localeCompare(b.name));
+            message = `Renamed to “${name}”.`;
+            cancelRename();
+        } catch (e) {
+            error = e instanceof Error ? e.message : String(e);
+        } finally {
+            renameSaving = false;
         }
     }
 
@@ -536,6 +623,39 @@ Attaching an existing textbook is a secondary, collapsed option.
             </button>
         </div>
 
+        <!-- Power action: upload a whole script and auto-build a chapter per heading. -->
+        <div class="upload-script">
+            <label class="upload-script-btn" class:busy={uploadingScript}>
+                <span class="upload-icon" aria-hidden="true">
+                    {#if uploadingScript}
+                        <span class="loading loading-spinner loading-sm"></span>
+                    {:else}
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 15V4" />
+                            <path d="m7.5 8.5 4.5-4.5 4.5 4.5" />
+                            <path d="M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3" />
+                        </svg>
+                    {/if}
+                </span>
+                <span class="upload-text">
+                    <span class="upload-title">
+                        {uploadingScript ? "Extracting chapters…" : "Upload a script"}
+                    </span>
+                    <span class="upload-sub">
+                        Drops a whole document in and splits it into chapters automatically.
+                    </span>
+                </span>
+                <input
+                    class="sr-only"
+                    type="file"
+                    accept=".md,.markdown,.html,.htm,.txt,text/markdown,text/html,text/plain"
+                    disabled={uploadingScript || !courseGroupId}
+                    onchange={onUploadScript}
+                />
+            </label>
+            <p class="muted upload-hint">Supported formats: Markdown, HTML and plain text (.md, .html, .txt).</p>
+        </div>
+
         {#if attachableTextbooks.length > 0}
             <details class="attach">
                 <summary>Or attach an existing textbook</summary>
@@ -572,17 +692,50 @@ Attaching an existing textbook is a secondary, collapsed option.
                     {@const open = expandedId === material.id}
                     <li class="tb" class:open>
                         <div class="tb-head">
-                            <button type="button" class="tb-main" onclick={() => toggleExpand(material)}>
-                                <span class="tb-index">{index + 1}</span>
-                                <span class="tb-name">{material.textbookName}</span>
-                                <span class="chev" aria-hidden="true">{open ? "▾" : "▸"}</span>
-                            </button>
+                            {#if renamingId === material.id}
+                                <div class="tb-rename">
+                                    <span class="tb-index">{index + 1}</span>
+                                    <!-- svelte-ignore a11y_autofocus -->
+                                    <input
+                                        class="input input-bordered input-sm flex-1"
+                                        type="text"
+                                        bind:value={renameValue}
+                                        autofocus
+                                        disabled={renameSaving}
+                                        onkeydown={(event) => {
+                                            if (event.key === "Enter") {
+                                                event.preventDefault();
+                                                saveRename(material);
+                                            } else if (event.key === "Escape") {
+                                                cancelRename();
+                                            }
+                                        }}
+                                    />
+                                    <button
+                                        type="button"
+                                        class="btn btn-xs btn-primary"
+                                        onclick={() => saveRename(material)}
+                                        disabled={renameSaving || !renameValue.trim()}
+                                    >
+                                        {#if renameSaving}<span class="loading loading-spinner loading-xs"></span>{/if}
+                                        Save
+                                    </button>
+                                    <button type="button" class="btn btn-xs btn-ghost" onclick={cancelRename} disabled={renameSaving}>Cancel</button>
+                                </div>
+                            {:else}
+                                <button type="button" class="tb-main" onclick={() => toggleExpand(material)}>
+                                    <span class="tb-index">{index + 1}</span>
+                                    <span class="tb-name">{material.textbookName}</span>
+                                    <span class="chev" aria-hidden="true">{open ? "▾" : "▸"}</span>
+                                </button>
 
-                            <span class="tb-actions">
-                                <button type="button" class="btn btn-xs btn-ghost" disabled={index === 0} onclick={() => move(index, -1)} aria-label="Move up">↑</button>
-                                <button type="button" class="btn btn-xs btn-ghost" disabled={index === materials.length - 1} onclick={() => move(index, 1)} aria-label="Move down">↓</button>
-                                <button type="button" class="btn btn-xs btn-ghost text-error" onclick={() => onRemoveTextbook(material)} aria-label="Remove textbook">Remove</button>
-                            </span>
+                                <span class="tb-actions">
+                                    <button type="button" class="btn btn-xs btn-ghost" disabled={index === 0} onclick={() => move(index, -1)} aria-label="Move up">↑</button>
+                                    <button type="button" class="btn btn-xs btn-ghost" disabled={index === materials.length - 1} onclick={() => move(index, 1)} aria-label="Move down">↓</button>
+                                    <button type="button" class="btn btn-xs btn-ghost" onclick={() => startRename(material)} aria-label="Rename textbook">Rename</button>
+                                    <button type="button" class="btn btn-xs btn-ghost text-error" onclick={() => onRemoveTextbook(material)} aria-label="Remove textbook">Remove</button>
+                                </span>
+                            {/if}
                         </div>
 
                         {#if open}
@@ -812,6 +965,84 @@ Attaching an existing textbook is a secondary, collapsed option.
         margin-top: 0.5rem;
     }
 
+    /* --- Upload script -------------------------------------------------- */
+
+    .upload-script {
+        margin: 0.25rem 0 0.75rem;
+    }
+
+    /* A dashed "drop zone" style label that doubles as the file picker button. */
+    .upload-script-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1.5px dashed color-mix(in oklab, var(--color-primary) 45%, transparent);
+        border-radius: 0.75rem;
+        background: color-mix(in oklab, var(--color-primary) 7%, transparent);
+        cursor: pointer;
+        text-align: left;
+        transition: background 0.18s ease, border-color 0.18s ease, transform 0.12s ease;
+    }
+
+    .upload-script-btn:hover {
+        background: color-mix(in oklab, var(--color-primary) 13%, transparent);
+        border-color: var(--color-primary);
+        transform: translateY(-1px);
+    }
+
+    .upload-script-btn:focus-within {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+    }
+
+    .upload-script-btn.busy {
+        cursor: progress;
+        opacity: 0.85;
+    }
+
+    .upload-icon {
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        width: 2.4rem;
+        height: 2.4rem;
+        border-radius: 0.6rem;
+        color: var(--color-primary-content);
+        background: var(--color-primary);
+    }
+
+    .upload-icon svg {
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+
+    .upload-script-btn:hover .upload-icon svg {
+        transform: translateY(-1px);
+        transition: transform 0.18s ease;
+    }
+
+    .upload-text {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+
+    .upload-title {
+        font-weight: 700;
+        color: var(--color-primary);
+    }
+
+    .upload-sub {
+        font-size: 0.85rem;
+        color: color-mix(in oklab, var(--color-base-content) 65%, transparent);
+    }
+
+    .upload-hint {
+        margin-top: 0.35rem;
+    }
+
     .center-row {
         display: flex;
         justify-content: center;
@@ -910,6 +1141,15 @@ Attaching an existing textbook is a secondary, collapsed option.
         flex: 0 0 auto;
         display: flex;
         gap: 0.15rem;
+    }
+
+    /* Inline rename row: index chip + text field + Save/Cancel, filling the head. */
+    .tb-rename {
+        flex: 1 1 auto;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.1rem 0.25rem;
     }
 
     .tb-body {
