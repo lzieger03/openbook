@@ -24,6 +24,7 @@ sidebar, minimised icon) can be layered on later.
     import type {DashboardState} from "../../stores/dashboard.store.js";
     import {createAiChatStore} from "../../stores/ai-chat.store.js";
     import type {AiChatState} from "../../stores/ai-chat.store.js";
+    import {renderMarkdown} from "../../data/markdown.js";
 
     let {params}: {params?: {id?: string}} = $props();
 
@@ -136,7 +137,12 @@ sidebar, minimised icon) can be layered on later.
                     {#if message.sender === "assistant"}
                         <img class="avatar" src="logo.png" alt="ElisaAI assistant" />
                     {/if}
-                    <div class="bubble" class:user={message.sender === "user"}>{message.content}</div>
+                    {#if message.format === "markdown"}
+                        <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+                        <div class="bubble md" class:user={message.sender === "user"}>{@html renderMarkdown(message.content)}</div>
+                    {:else}
+                        <div class="bubble" class:user={message.sender === "user"}>{message.content}</div>
+                    {/if}
                 </div>
             {/each}
         </div>
@@ -346,6 +352,80 @@ sidebar, minimised icon) can be layered on later.
         border-color: transparent;
         border-top-left-radius: 1rem;
         border-bottom-right-radius: 0.25rem;
+    }
+
+    /* Rendered Markdown content: the HTML structure provides the spacing, so drop the
+       raw-text pre-wrap and style the injected elements. */
+    .bubble.md {
+        white-space: normal;
+    }
+
+    .bubble.md :global(:first-child) {
+        margin-top: 0;
+    }
+
+    .bubble.md :global(:last-child) {
+        margin-bottom: 0;
+    }
+
+    .bubble.md :global(h1),
+    .bubble.md :global(h2),
+    .bubble.md :global(h3) {
+        font-weight: 700;
+        line-height: 1.3;
+        margin: 0.9rem 0 0.4rem;
+    }
+
+    .bubble.md :global(h1) { font-size: 1.3rem; }
+    .bubble.md :global(h2) { font-size: 1.15rem; }
+    .bubble.md :global(h3) { font-size: 1.05rem; }
+
+    .bubble.md :global(p) {
+        margin: 0.5rem 0;
+    }
+
+    .bubble.md :global(ul),
+    .bubble.md :global(ol) {
+        margin: 0.5rem 0 0.5rem 1.4rem;
+    }
+
+    .bubble.md :global(li) {
+        margin: 0.2rem 0;
+    }
+
+    .bubble.md :global(a) {
+        color: var(--color-primary);
+        text-decoration: underline;
+    }
+
+    .bubble.md :global(code) {
+        font-family: ui-monospace, "SF Mono", Menlo, Monaco, monospace;
+        font-size: 0.85em;
+        padding: 0.1rem 0.35rem;
+        border-radius: 0.35rem;
+        background: color-mix(in oklab, var(--color-base-content) 12%, transparent);
+    }
+
+    .bubble.md :global(pre) {
+        margin: 0.6rem 0;
+        padding: 0.85rem 1rem;
+        border-radius: 0.6rem;
+        overflow-x: auto;
+        background: color-mix(in oklab, var(--color-base-content) 12%, transparent);
+        border: 1px solid color-mix(in oklab, var(--color-base-content) 14%, transparent);
+    }
+
+    .bubble.md :global(pre code) {
+        padding: 0;
+        background: none;
+        font-size: 0.85rem;
+    }
+
+    .bubble.md :global(blockquote) {
+        margin: 0.6rem 0;
+        padding: 0.3rem 0.9rem;
+        border-left: 3px solid var(--color-primary);
+        background: color-mix(in oklab, var(--color-primary) 10%, transparent);
     }
 
     .composer {

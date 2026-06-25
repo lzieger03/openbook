@@ -23,6 +23,7 @@ README-websocket-api.md.
     import {onMount} from "svelte";
     import {createAiChatStore} from "../../stores/ai-chat.store.js";
     import type {AiChatState} from "../../stores/ai-chat.store.js";
+    import {renderMarkdown} from "../../data/markdown.js";
 
     type Mode = "floating" | "sidebar";
 
@@ -171,7 +172,12 @@ README-websocket-api.md.
                     {#if message.sender === "assistant"}
                         <img class="avatar" src="logo.png" alt="ElisaAI" />
                     {/if}
-                    <div class="bubble" class:user={message.sender === "user"}>{message.content}</div>
+                    {#if message.format === "markdown"}
+                        <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+                        <div class="bubble md" class:user={message.sender === "user"}>{@html renderMarkdown(message.content)}</div>
+                    {:else}
+                        <div class="bubble" class:user={message.sender === "user"}>{message.content}</div>
+                    {/if}
                 </div>
             {/each}
         </div>
@@ -352,6 +358,75 @@ README-websocket-api.md.
         color: var(--color-base-content);
         background: color-mix(in oklab, var(--color-primary) 12%, transparent);
         border: 1px solid color-mix(in oklab, var(--color-primary) 28%, transparent);
+    }
+
+    /* Rendered Markdown content inside a chat bubble. */
+    .bubble.md :global(:first-child) {
+        margin-top: 0;
+    }
+
+    .bubble.md :global(:last-child) {
+        margin-bottom: 0;
+    }
+
+    .bubble.md :global(h1),
+    .bubble.md :global(h2),
+    .bubble.md :global(h3) {
+        font-weight: 700;
+        line-height: 1.3;
+        margin: 0.8rem 0 0.35rem;
+    }
+
+    .bubble.md :global(h1) { font-size: 1.15rem; }
+    .bubble.md :global(h2) { font-size: 1.05rem; }
+    .bubble.md :global(h3) { font-size: 1rem; }
+
+    .bubble.md :global(p) {
+        margin: 0.45rem 0;
+    }
+
+    .bubble.md :global(ul),
+    .bubble.md :global(ol) {
+        margin: 0.45rem 0 0.45rem 1.3rem;
+    }
+
+    .bubble.md :global(li) {
+        margin: 0.15rem 0;
+    }
+
+    .bubble.md :global(a) {
+        color: var(--color-primary);
+        text-decoration: underline;
+    }
+
+    .bubble.md :global(code) {
+        font-family: ui-monospace, "SF Mono", Menlo, Monaco, monospace;
+        font-size: 0.85em;
+        padding: 0.1rem 0.3rem;
+        border-radius: 0.3rem;
+        background: color-mix(in oklab, var(--color-base-content) 12%, transparent);
+    }
+
+    .bubble.md :global(pre) {
+        margin: 0.5rem 0;
+        padding: 0.7rem 0.85rem;
+        border-radius: 0.5rem;
+        overflow-x: auto;
+        background: color-mix(in oklab, var(--color-base-content) 12%, transparent);
+        border: 1px solid color-mix(in oklab, var(--color-base-content) 14%, transparent);
+    }
+
+    .bubble.md :global(pre code) {
+        padding: 0;
+        background: none;
+        font-size: 0.8rem;
+    }
+
+    .bubble.md :global(blockquote) {
+        margin: 0.5rem 0;
+        padding: 0.25rem 0.8rem;
+        border-left: 3px solid var(--color-primary);
+        background: color-mix(in oklab, var(--color-primary) 10%, transparent);
     }
 
     .composer {
