@@ -23,6 +23,7 @@ a friendly placeholder is shown instead.
     import type {DashboardState} from "../../stores/dashboard.store.js";
     import {loadCourseContent} from "../../data/course-content.js";
     import type {ContentMaterialView} from "../../data/course-content.js";
+    import {completeCourse, fetchLearningState, markPageCompleted, recordPageOpened} from "../../api/learning.js";
 
     let {params}: {params?: {id?: string}} = $props();
 
@@ -38,6 +39,15 @@ a friendly placeholder is shown instead.
     let materials = $state<ContentMaterialView[]>([]);
     let contentLoading = $state(true);
     let contentError = $state("");
+
+    // Learning progress for this course.
+    let completedPageIds = $state<string[]>([]);
+    let courseCompleted = $state(false);
+    let completingCourse = $state(false);
+    let markBusyPageId = $state<string | null>(null);
+    let actionError = $state("");
+    // Non-reactive: avoids re-sending "page opened" for the same page.
+    let lastOpenedPageId: string | null = null;
 
     onMount(() => {
         const unsubscribe = dashboardStore.subscribe((value) => {
@@ -63,10 +73,21 @@ a friendly placeholder is shown instead.
 
         contentLoading = true;
         contentError = "";
+        actionError = "";
+        completedPageIds = [];
+        courseCompleted = false;
+        lastOpenedPageId = null;
+
+        void loadLearningState(courseId);
 
         loadCourseContent(courseId)
             .then((result) => {
                 materials = result;
+                // Treat reaching the content as opening its first page.
+                const firstPage = result.flatMap((material) => material.pages)[0];
+                if (firstPage) {
+                    openPage(firstPage.id);
+                }
             })
             .catch((error: unknown) => {
                 contentError = error instanceof Error ? error.message : String(error);
@@ -84,13 +105,78 @@ a friendly placeholder is shown instead.
         materials.some((material) => material.pages.length > 0 || material.documents.length > 0),
     );
 
+    /** Load the learner's saved progress (completed pages + course completion). */
+    async function loadLearningState(courseId: string): Promise<void> {
+        try {
+            const learningState = await fetchLearningState(courseId);
+            completedPageIds = learningState?.completed_pages ?? [];
+            courseCompleted = learningState?.is_completed ?? false;
+        } catch {
+            // Progress is non-critical; fall back to "nothing completed yet".
+        }
+    }
+
+    function isPageCompleted(pageId: string): boolean {
+        return completedPageIds.includes(pageId);
+    }
+
+    /** Report that the learner opened a page (best-effort, deduplicated). */
+    function openPage(pageId: string): void {
+        const courseId = params?.id;
+        if (!courseId || !pageId || pageId === lastOpenedPageId) {
+            return;
+        }
+        lastOpenedPageId = pageId;
+        void recordPageOpened(courseId, pageId).catch(() => {});
+    }
+
+    /** Mark a single page as completed and reflect the server's updated list. */
+    async function onMarkComplete(pageId: string): Promise<void> {
+        const courseId = params?.id;
+        if (!courseId) {
+            return;
+        }
+        markBusyPageId = pageId;
+        actionError = "";
+        try {
+            const learningState = await markPageCompleted(courseId, pageId);
+            completedPageIds = learningState.completed_pages ?? completedPageIds;
+        } catch (error) {
+            actionError = error instanceof Error ? error.message : String(error);
+        } finally {
+            markBusyPageId = null;
+        }
+    }
+
+    /** Complete the course (awards points server-side) and refresh the dashboard. */
+    async function onCompleteCourse(): Promise<void> {
+        const courseId = params?.id;
+        if (!courseId || courseCompleted) {
+            return;
+        }
+        completingCourse = true;
+        actionError = "";
+        try {
+            const learningState = await completeCourse(courseId);
+            courseCompleted = learningState.is_completed;
+            // Completion grants course points/level, so reload the dashboard data.
+            dashboardStore.refresh();
+        } catch (error) {
+            actionError = error instanceof Error ? error.message : String(error);
+        } finally {
+            completingCourse = false;
+        }
+    }
+
     /** A stable DOM/anchor id for a page section. */
     function anchor(pageId: string): string {
         return `page-${pageId}`;
     }
 
-    function scrollTo(id: string): void {
-        document.getElementById(id)?.scrollIntoView({behavior: "smooth", block: "start"});
+    /** Scroll a page into view and record it as opened. */
+    function goToPage(pageId: string): void {
+        document.getElementById(anchor(pageId))?.scrollIntoView({behavior: "smooth", block: "start"});
+        openPage(pageId);
     }
 </script>
 
@@ -105,8 +191,9 @@ a friendly placeholder is shown instead.
                     {#if material.pages.length > 0}
                         <p class="toc-group">{material.title}</p>
                         {#each material.pages as page (page.id)}
-                            <button type="button" class="toc-link" onclick={() => scrollTo(anchor(page.id))}>
-                                {page.title}
+                            <button type="button" class="toc-link" onclick={() => goToPage(page.id)}>
+                                <span class="toc-link-text">{page.title}</span>
+                                {#if isPageCompleted(page.id)}<span class="toc-check" aria-label="completed">✓</span>{/if}
                             </button>
                         {/each}
                     {/if}
@@ -147,7 +234,22 @@ a friendly placeholder is shown instead.
 
                 {#each material.pages as page (page.id)}
                     <section id={anchor(page.id)} class="block">
-                        <h2>{page.title}</h2>
+                        <div class="page-head">
+                            <h2>{page.title}</h2>
+                            {#if isPageCompleted(page.id)}
+                                <span class="done-badge">✓ Completed</span>
+                            {:else}
+                                <button
+                                    type="button"
+                                    class="btn btn-sm btn-ghost mark-btn"
+                                    onclick={() => onMarkComplete(page.id)}
+                                    disabled={markBusyPageId === page.id}
+                                >
+                                    {#if markBusyPageId === page.id}<span class="loading loading-spinner loading-xs"></span>{/if}
+                                    Mark complete
+                                </button>
+                            {/if}
+                        </div>
                         {#if page.format === "HTML"}
                             <iframe class="html-frame" title={page.title} sandbox="" srcdoc={page.html}></iframe>
                         {:else}
@@ -157,6 +259,20 @@ a friendly placeholder is shown instead.
                     </section>
                 {/each}
             {/each}
+
+            <section class="block course-complete">
+                {#if actionError}
+                    <p class="error">{actionError}</p>
+                {/if}
+                {#if courseCompleted}
+                    <p class="done-note">🎉 You’ve completed this course.</p>
+                {:else}
+                    <button type="button" class="btn btn-primary" onclick={onCompleteCourse} disabled={completingCourse}>
+                        {#if completingCourse}<span class="loading loading-spinner loading-sm"></span>{/if}
+                        Complete course
+                    </button>
+                {/if}
+            </section>
         {:else}
             <section class="block">
                 <p class="placeholder-note">
@@ -235,6 +351,10 @@ a friendly placeholder is shown instead.
     }
 
     .toc-link {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
         text-align: left;
         padding: 0.4rem 0.6rem;
         border-radius: 0.5rem;
@@ -247,6 +367,19 @@ a friendly placeholder is shown instead.
     .toc-link:hover {
         background: color-mix(in oklab, var(--color-primary) 14%, transparent);
         color: var(--color-base-content);
+    }
+
+    .toc-link-text {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .toc-check {
+        flex: 0 0 auto;
+        color: var(--color-success);
+        font-weight: 700;
     }
 
     .article {
@@ -299,6 +432,50 @@ a friendly placeholder is shown instead.
         font-weight: 700;
         margin-bottom: 0.6rem;
         color: var(--color-base-content);
+    }
+
+    /* Page heading row: title on the left, the mark-complete control on the right. */
+    .page-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 0.6rem;
+    }
+
+    .page-head h2 {
+        margin-bottom: 0;
+    }
+
+    .mark-btn {
+        flex: 0 0 auto;
+    }
+
+    .done-badge {
+        flex: 0 0 auto;
+        font-size: 0.8rem;
+        font-weight: 700;
+        padding: 0.2rem 0.6rem;
+        border-radius: 999px;
+        color: var(--color-success);
+        background: color-mix(in oklab, var(--color-success) 15%, transparent);
+        border: 1px solid color-mix(in oklab, var(--color-success) 35%, transparent);
+    }
+
+    /* Footer call-to-action that completes the whole course. */
+    .course-complete {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);
+    }
+
+    .done-note {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--color-success);
     }
 
     .downloads {
