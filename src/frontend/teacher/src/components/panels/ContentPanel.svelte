@@ -26,6 +26,7 @@ Attaching an existing textbook is a secondary, collapsed option.
         createTextbook,
         createTextbookPage,
         deleteMaterial,
+        deleteTextbookPage,
         fetchSkills,
         fetchTextbookPages,
         fetchTextbooks,
@@ -68,6 +69,7 @@ Attaching an existing textbook is a secondary, collapsed option.
     let editorMessage = $state("");
     let newPageName = $state("");
     let creatingPage = $state(false);
+    let deletingPageId = $state<string | null>(null);
 
     // Skill tagging: the global catalog plus the ids selected for the current page.
     let skillCatalog = $state<SkillDto[]>([]);
@@ -389,6 +391,36 @@ Attaching an existing textbook is a secondary, collapsed option.
         }
     }
 
+    /** Permanently delete a page from the textbook (with confirmation). */
+    async function onDeletePage(material: CourseMaterialView, page: TextbookPageDto): Promise<void> {
+        if (!confirm(`Delete the page “${page.name}”? This cannot be undone.`)) {
+            return;
+        }
+
+        deletingPageId = page.id;
+        error = "";
+        editorMessage = "";
+
+        try {
+            await deleteTextbookPage(page.id);
+            pages = await fetchTextbookPages(material.textbookId);
+
+            // Keep a sensible selection: stay on the current page if it still exists,
+            // otherwise fall back to the first remaining page (or clear the editor).
+            if (page.id === selectedPageId) {
+                if (pages.length > 0 && pages[0]) {
+                    selectPage(pages[0].id);
+                } else {
+                    resetEditor();
+                }
+            }
+        } catch (e) {
+            error = e instanceof Error ? e.message : String(e);
+        } finally {
+            deletingPageId = null;
+        }
+    }
+
     async function onSavePage(): Promise<void> {
         if (!selectedPageId) {
             return;
@@ -565,7 +597,7 @@ Attaching an existing textbook is a secondary, collapsed option.
                                             {:else}
                                                 <ul class="pages">
                                                     {#each pages as page (page.id)}
-                                                        <li>
+                                                        <li class="page-row">
                                                             <button
                                                                 type="button"
                                                                 class="page-item"
@@ -573,6 +605,20 @@ Attaching an existing textbook is a secondary, collapsed option.
                                                                 onclick={() => selectPage(page.id)}
                                                             >
                                                                 {page.name}
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                class="page-delete"
+                                                                aria-label={`Delete page ${page.name}`}
+                                                                title="Delete page"
+                                                                disabled={deletingPageId === page.id}
+                                                                onclick={() => onDeletePage(material, page)}
+                                                            >
+                                                                {#if deletingPageId === page.id}
+                                                                    <span class="loading loading-spinner loading-xs"></span>
+                                                                {:else}
+                                                                    ✕
+                                                                {/if}
                                                             </button>
                                                         </li>
                                                     {/each}
@@ -687,8 +733,15 @@ Attaching an existing textbook is a secondary, collapsed option.
                                                         <button type="button" class="btn btn-sm" class:btn-primary={editorMode === "edit"} onclick={() => (editorMode = "edit")}>Write</button>
                                                         <button type="button" class="btn btn-sm" class:btn-primary={editorMode === "preview"} onclick={() => (editorMode = "preview")}>Preview</button>
                                                     </div>
-                                                    <label class="btn btn-sm btn-ghost">
-                                                        Import file
+                                                    <label class="btn btn-sm import-btn">
+                                                        <span class="import-icon" aria-hidden="true">
+                                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                <path d="M12 15V4" />
+                                                                <path d="m7.5 8.5 4.5-4.5 4.5 4.5" />
+                                                                <path d="M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3" />
+                                                            </svg>
+                                                        </span>
+                                                        <span>Import file</span>
                                                         <input class="sr-only" type="file" accept=".md,.markdown,.html,.htm,.txt,text/markdown,text/html,text/plain" onchange={onFileSelected} />
                                                     </label>
                                                 </div>
@@ -898,8 +951,16 @@ Attaching an existing textbook is a secondary, collapsed option.
         gap: 0.2rem;
     }
 
+    /* Each page row: the selectable label plus a delete button that appears on hover. */
+    .page-row {
+        display: flex;
+        align-items: center;
+        gap: 0.2rem;
+    }
+
     .page-item {
-        width: 100%;
+        flex: 1 1 auto;
+        min-width: 0;
         text-align: left;
         padding: 0.4rem 0.6rem;
         border-radius: 0.5rem;
@@ -922,6 +983,40 @@ Attaching an existing textbook is a secondary, collapsed option.
         background: color-mix(in oklab, var(--color-primary) 14%, transparent);
         border-color: color-mix(in oklab, var(--color-primary) 35%, transparent);
         font-weight: 600;
+    }
+
+    .page-delete {
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        width: 1.6rem;
+        height: 1.6rem;
+        border-radius: 0.4rem;
+        border: none;
+        background: none;
+        cursor: pointer;
+        font-size: 0.8rem;
+        line-height: 1;
+        color: color-mix(in oklab, var(--color-base-content) 45%, transparent);
+        opacity: 0;
+        transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+    }
+
+    /* Reveal the delete button when hovering the row, focusing it, or on the active page. */
+    .page-row:hover .page-delete,
+    .page-delete:focus-visible,
+    .page-item.active + .page-delete {
+        opacity: 1;
+    }
+
+    .page-delete:hover {
+        color: var(--color-error);
+        background: color-mix(in oklab, var(--color-error) 14%, transparent);
+    }
+
+    .page-delete:disabled {
+        opacity: 1;
+        cursor: not-allowed;
     }
 
     .add-page {
@@ -968,6 +1063,57 @@ Attaching an existing textbook is a secondary, collapsed option.
     .editor-tabs {
         display: flex;
         gap: 0.4rem;
+    }
+
+    /* Make the file import stand out as the quick way to fill a page: a soft
+       primary chip that fills and lifts on hover. */
+    .import-btn {
+        gap: 0.5rem;
+        font-weight: 600;
+        color: var(--color-primary);
+        border: 1px solid color-mix(in oklab, var(--color-primary) 40%, transparent);
+        background: color-mix(in oklab, var(--color-primary) 10%, transparent);
+        box-shadow: 0 1px 2px color-mix(in oklab, var(--color-base-content) 10%, transparent);
+        transition:
+            background 0.18s ease,
+            border-color 0.18s ease,
+            color 0.18s ease,
+            transform 0.12s ease,
+            box-shadow 0.18s ease;
+    }
+
+    .import-btn:hover {
+        color: var(--color-primary-content);
+        background: var(--color-primary);
+        border-color: var(--color-primary);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px color-mix(in oklab, var(--color-primary) 40%, transparent);
+    }
+
+    .import-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 2px color-mix(in oklab, var(--color-primary) 30%, transparent);
+    }
+
+    .import-btn:focus-within {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+    }
+
+    .import-icon {
+        display: grid;
+        place-items: center;
+    }
+
+    .import-icon svg {
+        width: 1.05rem;
+        height: 1.05rem;
+    }
+
+    /* Nudge the arrow upward on hover for a subtle "uploading" feel. */
+    .import-btn:hover .import-icon svg {
+        transform: translateY(-1px);
+        transition: transform 0.18s ease;
     }
 
     .editor-source,

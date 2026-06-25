@@ -16,9 +16,12 @@ from ..models import AccountProgress, CourseProgress, LevelThreshold, RewardEven
 from ..services.learning_rewards import (
     CHAT_QUESTION_DAILY_LIMIT,
     CHAT_QUESTION_POINTS,
+    EXAM_MAX_COURSE_POINTS,
+    EXAM_SKILL_PROGRESS_PER_POINT,
     QUIZ_MAX_COURSE_POINTS,
     QUIZ_SKILL_PROGRESS_PER_POINT,
     award_chat_question_reward,
+    award_exam_rewards,
     award_quiz_rewards,
 )
 
@@ -111,6 +114,75 @@ class AwardQuizRewards_Tests(TestCase):
             RewardEventLog.objects.filter(
                 account=self.user, event_type=CourseEventType.QUIZ_POINTS_AWARDED,
             ).exists()
+        )
+
+
+class AwardExamRewards_Tests(TestCase):
+    """Tests for rewarding AI-graded exam attempts."""
+
+    def setUp(self):
+        reset_current_user()
+        self.user = User.objects.create_user(
+            username="exam-user", email="exam-user@test.com", password="password",
+        )
+        reset_current_user()
+
+        self.group = LibraryGroup.objects.create(name="Lib", slug="lib")
+        self.course = Course.objects.create(group=self.group, name="Course", slug="course")
+        self.skill = Skill.objects.create(name="HTML")
+
+        for level, min_points in [(1, 0), (2, 100), (3, 300)]:
+            LevelThreshold.objects.create(level=level, min_points=min_points)
+
+        self.page_id = "22222222-2222-2222-2222-222222222222"
+
+    def test_exam_points_scale_and_flow_to_course_and_total(self):
+        """Exam points scale with the score and raise course progress + global total."""
+        state = award_exam_rewards(
+            self.user.id, self.course.id, self.page_id, score=0.5, skill_ids=[self.skill.id],
+        )
+
+        expected = round(0.5 * EXAM_MAX_COURSE_POINTS)
+        self.assertEqual(state["points_awarded"], expected)
+        self.assertEqual(state["course_progress"]["course_points"], expected)
+
+        account = AccountProgress.objects.get(account=self.user)
+        self.assertEqual(account.point_total, expected)
+
+    def test_exam_advances_the_courses_skills(self):
+        """A graded exam advances the textbook's skills on the dashboard."""
+        award_exam_rewards(
+            self.user.id, self.course.id, self.page_id, score=1.0, skill_ids=[self.skill.id],
+        )
+
+        advanced = SkillProgress.objects.get(account=self.user, skill=self.skill)
+        expected = EXAM_MAX_COURSE_POINTS * EXAM_SKILL_PROGRESS_PER_POINT
+        self.assertEqual(float(advanced.progress), expected)
+
+    def test_exam_points_are_independent_of_quiz_points(self):
+        """
+        Exam and quiz use separate high-water marks, so an exam still awards its full
+        points even after a quiz already paid out for the same anchor page.
+        """
+        award_quiz_rewards(self.user.id, self.course.id, self.page_id, score=1.0)
+        quiz_points = QUIZ_MAX_COURSE_POINTS
+
+        exam = award_exam_rewards(self.user.id, self.course.id, self.page_id, score=1.0)
+        self.assertEqual(exam["points_awarded"], EXAM_MAX_COURSE_POINTS)
+
+        # The course total reflects both the quiz and the exam award.
+        progress = CourseProgress.objects.get(account=self.user, course=self.course)
+        self.assertEqual(progress.course_points, quiz_points + EXAM_MAX_COURSE_POINTS)
+
+    def test_only_improvement_over_best_exam_score_is_rewarded(self):
+        """Re-taking an exam only pays out the improvement over the best exam score."""
+        first = award_exam_rewards(self.user.id, self.course.id, self.page_id, score=0.6)
+        self.assertEqual(first["points_awarded"], round(0.6 * EXAM_MAX_COURSE_POINTS))
+
+        second = award_exam_rewards(self.user.id, self.course.id, self.page_id, score=0.9)
+        self.assertEqual(
+            second["points_awarded"],
+            round(0.9 * EXAM_MAX_COURSE_POINTS) - round(0.6 * EXAM_MAX_COURSE_POINTS),
         )
 
 

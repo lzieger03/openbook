@@ -178,6 +178,11 @@ export async function updateTextbookPage(
     return apiSend<TextbookPageDto>("PATCH", `/api/content/textbook_pages/${encodeURIComponent(id)}/`, fields);
 }
 
+/** Permanently delete a textbook page. */
+export async function deleteTextbookPage(id: string): Promise<void> {
+    await apiSend<void>("DELETE", `/api/content/textbook_pages/${encodeURIComponent(id)}/`);
+}
+
 /** The global skill catalog, used to tag textbook pages with the skills they train. */
 export async function fetchSkills(): Promise<SkillDto[]> {
     const data = await apiGet<SkillDto[] | Paginated<SkillDto>>("/api/gamification/skills/", {

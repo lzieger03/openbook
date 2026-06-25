@@ -124,9 +124,40 @@ class ChatMessagePayload(BaseModel):
 
 class ChatHistoryPayload(BaseModel):
     """
-    Payload containing the full chat history.
+    Payload containing the full chat history of one session. ``session_id`` is the
+    session the messages belong to (null when starting a fresh, unsaved chat).
     """
-    messages: list[ChatMessagePayload]
+    messages:   list[ChatMessagePayload]
+    session_id: str | None = None
+
+class OpenChatSessionPayload(BaseModel):
+    """
+    Payload to open a saved chat session (or start a new one when ``session_id`` is null).
+    """
+    session_id: UUID | None = None
+
+class ChatSessionPayload(BaseModel):
+    """
+    Summary of one saved chat session, shown in the chat sidebar.
+    """
+    id:         str
+    title:      str
+    updated_at: datetime
+
+class ChatSessionListPayload(BaseModel):
+    """
+    Payload listing the learner's saved chat sessions for the current course.
+    """
+    sessions: list[ChatSessionPayload]
+
+class RenameChatSessionPayload(BaseModel):
+    """Payload to rename a saved chat session."""
+    session_id: UUID
+    title:      str
+
+class DeleteChatSessionPayload(BaseModel):
+    """Payload to delete a saved chat session."""
+    session_id: UUID
 
 class LearningPagePayload(BaseModel):
     """
@@ -205,6 +236,78 @@ class QuizGeneratedPayload(BaseModel):
     textbook_id:    UUID | None = None
     page_id:        UUID | None = None
 
+class ExamStartPayload(BaseModel):
+    """
+    Payload for requesting a generated exam for the current course channel.
+
+    ``textbook_id`` optionally narrows the exam to a single textbook of the course,
+    mirroring the quiz flow. When omitted, the exam covers the whole course.
+    """
+    question_count: int = Field(default=5, ge=1, le=10)
+    textbook_id:    UUID | None = None
+
+class ExamQuestionPayload(BaseModel):
+    """
+    One generated exam question, as sent to the client. The correct answers and
+    model answers are intentionally omitted so the exam cannot be solved from the
+    payload; grading happens server-side on submission.
+    """
+    id:         str
+    kind:       Literal["free_text", "multiple_choice"]
+    prompt:     str
+    max_points: int
+    # Only populated for multiple-choice questions (option texts, no correct flags).
+    options:    list[str] = Field(default_factory=list)
+
+class ExamGeneratedPayload(BaseModel):
+    """
+    Generated exam questions for the current course.
+
+    ``page_id`` is the textbook page the result is anchored to; the client echoes it
+    back in ``exam_submit`` so the score can be stored and points awarded.
+    """
+    course_id:      UUID
+    context_source: Literal["rag_documents", "course_context"]
+    questions:      list[ExamQuestionPayload]
+    sources:        list[QuizSourcePayload] = Field(default_factory=list)
+    textbook_id:    UUID | None = None
+    page_id:        UUID | None = None
+
+class ExamAnswerPayload(BaseModel):
+    """One submitted answer: free text, or the picked option index for multiple choice."""
+    question_id:    str
+    text:           str = ""
+    selected_index: int | None = None
+
+class ExamSubmitPayload(BaseModel):
+    """Payload submitting a learner's exam answers for grading."""
+    answers: list[ExamAnswerPayload] = Field(default_factory=list)
+
+class ExamQuestionResultPayload(BaseModel):
+    """The grading outcome for a single exam question, shown to the learner."""
+    question_id:    str
+    kind:           Literal["free_text", "multiple_choice"]
+    prompt:         str
+    your_answer:    str
+    awarded_points: int
+    max_points:     int
+    feedback:       str
+    correct:        bool | None = None
+    correct_answer: str = ""
+
+class ExamGradedPayload(BaseModel):
+    """
+    The full grading outcome of an exam attempt, including the points and skills the
+    learner earned (reported like a quiz result so the UI can show immediate feedback).
+    """
+    score:           float
+    total_points:    int
+    max_points:      int
+    results:         list[ExamQuestionResultPayload]
+    overall_feedback: str = ""
+    points_awarded:  int = 0
+    skills_advanced: list[str] = Field(default_factory=list)
+
 class ChatInput(BaseMessage):
     """
     Chat input sent by the user to the assistant.
@@ -234,6 +337,37 @@ class ChatHistory(BaseMessage):
     """
     action:  Literal["chat_history"] = "chat_history"
     payload: ChatHistoryPayload
+
+class ListChatSessions(BaseMessage):
+    """
+    Message sent by the client to list its saved chat sessions for the current course.
+    """
+    action:  Literal["list_chat_sessions"] = "list_chat_sessions"
+    payload: None = None
+
+class OpenChatSession(BaseMessage):
+    """
+    Message sent by the client to open a saved chat session (or start a new one).
+    """
+    action:  Literal["open_chat_session"] = "open_chat_session"
+    payload: OpenChatSessionPayload
+
+class ChatSessionList(BaseMessage):
+    """
+    The learner's saved chat sessions for the current course.
+    """
+    action:  Literal["chat_session_list"] = "chat_session_list"
+    payload: ChatSessionListPayload
+
+class RenameChatSession(BaseMessage):
+    """Message sent by the client to rename a saved chat session."""
+    action:  Literal["rename_chat_session"] = "rename_chat_session"
+    payload: RenameChatSessionPayload
+
+class DeleteChatSession(BaseMessage):
+    """Message sent by the client to delete a saved chat session."""
+    action:  Literal["delete_chat_session"] = "delete_chat_session"
+    payload: DeleteChatSessionPayload
 
 class LearningPageOpened(BaseMessage):
     """
@@ -276,3 +410,31 @@ class QuizGenerated(BaseMessage):
     """
     action:  Literal["quiz_generated"] = "quiz_generated"
     payload: QuizGeneratedPayload
+
+class ExamStart(BaseMessage):
+    """
+    Message sent by the client to generate a course exam.
+    """
+    action:  Literal["exam_start"] = "exam_start"
+    payload: ExamStartPayload
+
+class ExamGenerated(BaseMessage):
+    """
+    Message sent by the server after generating a course exam.
+    """
+    action:  Literal["exam_generated"] = "exam_generated"
+    payload: ExamGeneratedPayload
+
+class ExamSubmit(BaseMessage):
+    """
+    Message sent by the client to submit exam answers for AI grading.
+    """
+    action:  Literal["exam_submit"] = "exam_submit"
+    payload: ExamSubmitPayload
+
+class ExamGraded(BaseMessage):
+    """
+    Message sent by the server with the graded exam result.
+    """
+    action:  Literal["exam_graded"] = "exam_graded"
+    payload: ExamGradedPayload
