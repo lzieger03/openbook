@@ -733,9 +733,15 @@ Attaching an existing textbook is a secondary, collapsed option.
                                                         <button type="button" class="btn btn-sm" class:btn-primary={editorMode === "edit"} onclick={() => (editorMode = "edit")}>Write</button>
                                                         <button type="button" class="btn btn-sm" class:btn-primary={editorMode === "preview"} onclick={() => (editorMode = "preview")}>Preview</button>
                                                     </div>
-                                                    <label class="btn btn-sm btn-outline btn-primary import-btn">
-                                                        <span class="import-icon" aria-hidden="true">⬆</span>
-                                                        Import file
+                                                    <label class="btn btn-sm import-btn">
+                                                        <span class="import-icon" aria-hidden="true">
+                                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                <path d="M12 15V4" />
+                                                                <path d="m7.5 8.5 4.5-4.5 4.5 4.5" />
+                                                                <path d="M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3" />
+                                                            </svg>
+                                                        </span>
+                                                        <span>Import file</span>
                                                         <input class="sr-only" type="file" accept=".md,.markdown,.html,.htm,.txt,text/markdown,text/html,text/plain" onchange={onFileSelected} />
                                                     </label>
                                                 </div>
@@ -1059,15 +1065,55 @@ Attaching an existing textbook is a secondary, collapsed option.
         gap: 0.4rem;
     }
 
-    /* Make the file import stand out as the quick way to fill a page. */
+    /* Make the file import stand out as the quick way to fill a page: a soft
+       primary chip that fills and lifts on hover. */
     .import-btn {
-        gap: 0.35rem;
+        gap: 0.5rem;
         font-weight: 600;
+        color: var(--color-primary);
+        border: 1px solid color-mix(in oklab, var(--color-primary) 40%, transparent);
+        background: color-mix(in oklab, var(--color-primary) 10%, transparent);
+        box-shadow: 0 1px 2px color-mix(in oklab, var(--color-base-content) 10%, transparent);
+        transition:
+            background 0.18s ease,
+            border-color 0.18s ease,
+            color 0.18s ease,
+            transform 0.12s ease,
+            box-shadow 0.18s ease;
+    }
+
+    .import-btn:hover {
+        color: var(--color-primary-content);
+        background: var(--color-primary);
+        border-color: var(--color-primary);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px color-mix(in oklab, var(--color-primary) 40%, transparent);
+    }
+
+    .import-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 2px color-mix(in oklab, var(--color-primary) 30%, transparent);
+    }
+
+    .import-btn:focus-within {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
     }
 
     .import-icon {
-        font-size: 1rem;
-        line-height: 1;
+        display: grid;
+        place-items: center;
+    }
+
+    .import-icon svg {
+        width: 1.05rem;
+        height: 1.05rem;
+    }
+
+    /* Nudge the arrow upward on hover for a subtle "uploading" feel. */
+    .import-btn:hover .import-icon svg {
+        transform: translateY(-1px);
+        transition: transform 0.18s ease;
     }
 
     .editor-source,

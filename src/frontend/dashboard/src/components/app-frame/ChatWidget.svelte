@@ -241,6 +241,9 @@ README-websocket-api.md.
         width: 100%;
         height: 100%;
         object-fit: cover;
+        /* Mirror the robot so it faces the other way — only on the closed launcher
+           (the in-panel .avatar images keep their original orientation). */
+        transform: scaleX(-1);
     }
 
     .panel {
