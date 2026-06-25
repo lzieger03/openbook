@@ -168,6 +168,9 @@ export interface AiChatState {
     messages: ChatMessagePayload[];
     sessions: ChatSessionSummary[];
     activeSessionId: string | null;
+    // True between sending a message and the assistant's reply arriving — drives the
+    // "typing…" indicator.
+    awaitingResponse: boolean;
 }
 
 export interface AiChatStore {
@@ -200,6 +203,7 @@ export function createAiChatStore(courseId?: CourseIdSource): AiChatStore {
         messages: [],
         sessions: [],
         activeSessionId: null,
+        awaitingResponse: false,
     });
 
     let socket: WebSocketClient<SentMessages, ReceivedMessages> | undefined;
@@ -220,7 +224,7 @@ export function createAiChatStore(courseId?: CourseIdSource): AiChatStore {
     /** Start a new, empty chat (persisted once the first message is sent). */
     async function newChat(): Promise<void> {
         // Optimistically clear so the UI feels instant; the server confirms via chat_history.
-        update((state) => ({...state, messages: [], activeSessionId: null}));
+        update((state) => ({...state, messages: [], activeSessionId: null, awaitingResponse: false}));
         await openSession(null);
     }
 
@@ -247,6 +251,8 @@ export function createAiChatStore(courseId?: CourseIdSource): AiChatStore {
                     ...state,
                     connection: status,
                     errorMessage: status === "connected" ? "" : state.errorMessage,
+                    // Don't leave a stuck "typing…" indicator if the socket drops.
+                    awaitingResponse: status === "connected" ? state.awaitingResponse : false,
                 }));
                 if (status === "connected") {
                     void listSessions();
@@ -264,6 +270,7 @@ export function createAiChatStore(courseId?: CourseIdSource): AiChatStore {
                     ...state,
                     messages: message.payload.messages,
                     activeSessionId: message.payload.session_id,
+                    awaitingResponse: false,
                 }));
             });
 
@@ -294,7 +301,10 @@ export function createAiChatStore(courseId?: CourseIdSource): AiChatStore {
                         index === -1
                             ? [...state.messages, message.payload]
                             : state.messages.map((m, i) => (i === index ? message.payload : m));
-                    return {...state, messages};
+                    // Hide the "typing…" indicator as soon as the assistant starts replying.
+                    const awaitingResponse =
+                        message.payload.sender === "assistant" ? false : state.awaitingResponse;
+                    return {...state, messages, awaitingResponse};
                 });
             });
 
@@ -325,6 +335,8 @@ export function createAiChatStore(courseId?: CourseIdSource): AiChatStore {
 
     /** Send a user chat message. The server echoes it back, so we do not add it locally. */
     async function sendChatInput(format: ChatMessageFormat, content: string): Promise<void> {
+        // Show the "typing…" indicator until the assistant's reply arrives.
+        update((state) => ({...state, awaitingResponse: true}));
         await socket?.send({action: "chat_input", payload: {format, content}});
     }
 

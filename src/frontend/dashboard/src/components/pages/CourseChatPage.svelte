@@ -45,10 +45,28 @@ sidebar, minimised icon) can be layered on later.
         messages: [],
         sessions: [],
         activeSessionId: null,
+        awaitingResponse: false,
     });
     let draft = $state("");
     // Whether the "Chats" section in the sidebar is expanded.
     let chatsExpanded = $state(true);
+    // The scrollable messages container; kept pinned to the bottom on new content.
+    let messagesEl = $state<HTMLDivElement>();
+
+    // Auto-scroll to the latest message / typing indicator whenever they change.
+    $effect(() => {
+        // Touch the reactive values so the effect re-runs on new messages or while
+        // the assistant is "typing".
+        void chatState.messages.length;
+        void chatState.awaitingResponse;
+
+        const el = messagesEl;
+        if (el) {
+            requestAnimationFrame(() => {
+                el.scrollTop = el.scrollHeight;
+            });
+        }
+    });
 
     onMount(() => {
         const unsubscribeDashboard = dashboardStore.subscribe((value) => {
@@ -269,7 +287,7 @@ sidebar, minimised icon) can be layered on later.
     </aside>
 
     <main class="conversation">
-        <div class="messages">
+        <div class="messages" bind:this={messagesEl}>
             <div class="message">
                 <img class="avatar" src="logo.png" alt="ElisaAI assistant" />
                 <div class="bubble">
@@ -291,6 +309,17 @@ sidebar, minimised icon) can be layered on later.
                     {/if}
                 </div>
             {/each}
+
+            {#if chatState.awaitingResponse}
+                <div class="message" aria-live="polite">
+                    <img class="avatar" src="logo.png" alt="ElisaAI assistant" />
+                    <div class="bubble typing" aria-label="ElisaAI is typing">
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                    </div>
+                </div>
+            {/if}
         </div>
 
         <div class="composer">
@@ -678,6 +707,41 @@ sidebar, minimised icon) can be layered on later.
         border-color: transparent;
         border-top-left-radius: 1rem;
         border-bottom-right-radius: 0.25rem;
+    }
+
+    /* Animated "assistant is typing" indicator. */
+    .bubble.typing {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.9rem 1.1rem;
+    }
+
+    .typing-dot {
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: 999px;
+        background: color-mix(in oklab, var(--color-base-content) 55%, transparent);
+        animation: typing-bounce 1.2s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(2) {
+        animation-delay: 0.18s;
+    }
+
+    .typing-dot:nth-child(3) {
+        animation-delay: 0.36s;
+    }
+
+    @keyframes typing-bounce {
+        0%, 60%, 100% {
+            transform: translateY(0);
+            opacity: 0.5;
+        }
+        30% {
+            transform: translateY(-0.28rem);
+            opacity: 1;
+        }
     }
 
     /* Rendered Markdown content: the HTML structure provides the spacing, so drop the
