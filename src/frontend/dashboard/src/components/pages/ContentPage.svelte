@@ -15,6 +15,10 @@ course material on the right. The material is the content authored by teachers i
 the /teacher area (course materials → page ranges → textbook pages); it is loaded
 and rendered via the content data layer. When a course has no authored content yet,
 a friendly placeholder is shown instead.
+
+The reader shows one page at a time (single-page view). Learners move between pages
+with the Previous/Next controls or by picking an entry from the table of contents,
+so only the current page scrolls — never the whole textbook at once.
 -->
 <script lang="ts">
     import {onMount} from "svelte";
@@ -39,6 +43,9 @@ a friendly placeholder is shown instead.
     let materials = $state<ContentMaterialView[]>([]);
     let contentLoading = $state(true);
     let contentError = $state("");
+
+    // Index of the entry currently shown in the single-page reader.
+    let currentIndex = $state(0);
 
     // Learning progress for this course.
     let completedPageIds = $state<string[]>([]);
@@ -77,17 +84,13 @@ a friendly placeholder is shown instead.
         completedPageIds = [];
         courseCompleted = false;
         lastOpenedPageId = null;
+        currentIndex = 0;
 
         void loadLearningState(courseId);
 
         loadCourseContent(courseId)
             .then((result) => {
                 materials = result;
-                // Treat reaching the content as opening its first page.
-                const firstPage = result.flatMap((material) => material.pages)[0];
-                if (firstPage) {
-                    openPage(firstPage.id);
-                }
             })
             .catch((error: unknown) => {
                 contentError = error instanceof Error ? error.message : String(error);
@@ -104,6 +107,78 @@ a friendly placeholder is shown instead.
     const hasContent = $derived(
         materials.some((material) => material.pages.length > 0 || material.documents.length > 0),
     );
+
+    // A single reading entry shown one-at-a-time: either a material's downloads or one page.
+    type DownloadsEntry = {
+        kind: "downloads";
+        id: string;
+        materialId: string;
+        materialTitle: string;
+        documents: ContentMaterialView["documents"];
+    };
+    type PageEntry = {
+        kind: "page";
+        id: string;
+        materialId: string;
+        materialTitle: string;
+        page: ContentMaterialView["pages"][number];
+    };
+    type ReadingEntry = DownloadsEntry | PageEntry;
+
+    // Flatten materials into reading order: each material's downloads first, then its pages.
+    const entries = $derived.by<ReadingEntry[]>(() => {
+        const list: ReadingEntry[] = [];
+        for (const material of materials) {
+            if (material.documents.length > 0) {
+                list.push({
+                    kind: "downloads",
+                    id: `downloads-${material.id}`,
+                    materialId: material.id,
+                    materialTitle: material.title,
+                    documents: material.documents,
+                });
+            }
+            for (const page of material.pages) {
+                list.push({
+                    kind: "page",
+                    id: page.id,
+                    materialId: material.id,
+                    materialTitle: material.title,
+                    page,
+                });
+            }
+        }
+        return list;
+    });
+
+    const currentEntry = $derived(entries[currentIndex] ?? null);
+    const isFirstEntry = $derived(currentIndex <= 0);
+    const isLastEntry = $derived(currentIndex >= entries.length - 1);
+    // Only count actual pages for the "Page X of Y" indicator (downloads are not pages).
+    const pageEntries = $derived(entries.filter((entry) => entry.kind === "page"));
+    const currentPageNumber = $derived(
+        currentEntry?.kind === "page"
+            ? pageEntries.findIndex((entry) => entry.id === currentEntry.id) + 1
+            : 0,
+    );
+
+    // Keep the selected index within bounds when the content changes.
+    $effect(() => {
+        if (entries.length === 0) {
+            return;
+        }
+        if (currentIndex > entries.length - 1) {
+            currentIndex = entries.length - 1;
+        }
+    });
+
+    // Record a page as opened whenever it becomes the current entry.
+    $effect(() => {
+        const entry = currentEntry;
+        if (entry?.kind === "page") {
+            openPage(entry.id);
+        }
+    });
 
     /** Load the learner's saved progress (completed pages + course completion). */
     async function loadLearningState(courseId: string): Promise<void> {
@@ -168,30 +243,139 @@ a friendly placeholder is shown instead.
         }
     }
 
-    /** A stable DOM/anchor id for a page section. */
-    function anchor(pageId: string): string {
-        return `page-${pageId}`;
+    /** Show the entry at the given index, scrolling the reader back to the top. */
+    function goToIndex(index: number): void {
+        if (index < 0 || index > entries.length - 1) {
+            return;
+        }
+        currentIndex = index;
+        document.querySelector(".article-scroll")?.scrollTo({top: 0, behavior: "auto"});
     }
 
-    /** Scroll a page into view and record it as opened. */
-    function goToPage(pageId: string): void {
-        document.getElementById(anchor(pageId))?.scrollIntoView({behavior: "smooth", block: "start"});
-        openPage(pageId);
+    /** Show a specific entry (page or downloads) by its id. */
+    function goToEntry(entryId: string): void {
+        const index = entries.findIndex((entry) => entry.id === entryId);
+        if (index !== -1) {
+            goToIndex(index);
+        }
+    }
+
+    function goToPrevious(): void {
+        goToIndex(currentIndex - 1);
+    }
+
+    function goToNext(): void {
+        goToIndex(currentIndex + 1);
+    }
+
+    /** Turn a page title into a safe file name. */
+    function safeFileName(title: string): string {
+        const base = title.trim().replace(/[\\/:*?"<>|]+/g, "_").replace(/\s+/g, " ").slice(0, 100);
+        return (base || "page") + ".html";
+    }
+
+    /** Wrap one page's content as an HTML section (heading + body). */
+    function pageSectionHtml(page: PageEntry["page"]): string {
+        // For HTML pages the html is the authored markup; for MD/TEXT it is rendered HTML.
+        const body = page.format === "HTML" ? page.html : `<div class="prose">${page.html}</div>`;
+        return `<section>\n<h1>${escapeHtml(page.title)}</h1>\n${body}\n</section>`;
+    }
+
+    /** Wrap section HTML in a complete, downloadable HTML document. */
+    function buildHtmlDocument(title: string, bodyHtml: string): Blob {
+        const document_ =
+            "<!DOCTYPE html>\n" +
+            '<html lang="en">\n<head>\n<meta charset="utf-8">\n' +
+            '<meta name="viewport" content="width=device-width, initial-scale=1">\n' +
+            `<title>${escapeHtml(title)}</title>\n` +
+            "<style>body{font-family:system-ui,sans-serif;line-height:1.7;max-width:48rem;margin:2rem auto;padding:0 1rem;}" +
+            "section{margin-bottom:3rem;}" +
+            "pre{background:#f3f3f3;padding:1rem;border-radius:.5rem;overflow:auto;}</style>\n" +
+            `</head>\n<body>\n${bodyHtml}\n</body>\n</html>\n`;
+        return new Blob([document_], {type: "text/html;charset=utf-8"});
+    }
+
+    /** Trigger a browser download for the given blob and file name. */
+    function triggerDownload(blob: Blob, fileName: string): void {
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.href = url;
+        anchor.download = fileName;
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+        URL.revokeObjectURL(url);
+    }
+
+    /** Download the current page as a standalone HTML file the learner can keep. */
+    function downloadPage(page: PageEntry["page"]): void {
+        triggerDownload(buildHtmlDocument(page.title, pageSectionHtml(page)), safeFileName(page.title));
+    }
+
+    /** Download the whole textbook (every page, in reading order) as one HTML file. */
+    function downloadTextbook(): void {
+        const sections = entries
+            .filter((entry): entry is PageEntry => entry.kind === "page")
+            .map((entry) => pageSectionHtml(entry.page))
+            .join("\n");
+        triggerDownload(buildHtmlDocument(courseTitle, sections), safeFileName(courseTitle));
+    }
+
+    /** Minimal HTML-escaping for values injected into the downloaded document. */
+    function escapeHtml(value: string): string {
+        return value
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;");
     }
 </script>
+
+<!-- Download icon: a circle with a downward arrow (reused by all download buttons). -->
+{#snippet downloadIcon()}
+    <svg
+        class="download-icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+    >
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7.5v7" />
+        <path d="m8.5 11 3.5 3.5 3.5-3.5" />
+    </svg>
+{/snippet}
 
 <div class="content-screen">
     <aside class="toc">
         <button type="button" class="back" onclick={() => push(`/chat/${params?.id ?? ""}`)}>← Back to chat</button>
 
-        <p class="toc-label">On this page</p>
+        <p class="toc-label">Contents</p>
         <nav class="toc-nav" aria-label="Table of contents">
             {#if hasContent}
                 {#each materials as material (material.id)}
-                    {#if material.pages.length > 0}
+                    {#if material.pages.length > 0 || material.documents.length > 0}
                         <p class="toc-group">{material.title}</p>
+                        {#if material.documents.length > 0}
+                            <button
+                                type="button"
+                                class="toc-link"
+                                class:active={currentEntry?.id === `downloads-${material.id}`}
+                                onclick={() => goToEntry(`downloads-${material.id}`)}
+                            >
+                                <span class="toc-link-text">⬇ Downloads</span>
+                            </button>
+                        {/if}
                         {#each material.pages as page (page.id)}
-                            <button type="button" class="toc-link" onclick={() => goToPage(page.id)}>
+                            <button
+                                type="button"
+                                class="toc-link"
+                                class:active={currentEntry?.id === page.id}
+                                onclick={() => goToEntry(page.id)}
+                            >
                                 <span class="toc-link-text">{page.title}</span>
                                 {#if isPageCompleted(page.id)}<span class="toc-check" aria-label="completed">✓</span>{/if}
                             </button>
@@ -205,22 +389,32 @@ a friendly placeholder is shown instead.
     </aside>
 
     <main class="article">
-        <header class="article-head">
-            <p class="eyebrow">Course content</p>
-            <h1 class="article-title">{courseTitle}</h1>
-        </header>
+        <!-- Scrollable reading area: only this region scrolls, the pager stays put. -->
+        <div class="article-scroll">
+            <header class="article-head">
+                <div class="article-head-text">
+                    <p class="eyebrow">Course content</p>
+                    <h1 class="article-title">{courseTitle}</h1>
+                </div>
+                {#if hasContent && pageEntries.length > 0}
+                    <button type="button" class="download-btn textbook-download" onclick={downloadTextbook}>
+                        {@render downloadIcon()}
+                        <span>Download textbook</span>
+                    </button>
+                {/if}
+            </header>
 
-        {#if contentLoading}
-            <p class="muted">Loading course content…</p>
-        {:else if contentError}
-            <p class="error">{contentError}</p>
-        {:else if hasContent}
-            {#each materials as material (material.id)}
-                {#if material.documents.length > 0}
+            {#if contentLoading}
+                <p class="muted">Loading course content…</p>
+            {:else if contentError}
+                <p class="error">{contentError}</p>
+            {:else if hasContent && currentEntry}
+                <!-- Single-page reader: only the current entry is shown. -->
+                {#if currentEntry.kind === "downloads"}
                     <section class="block downloads">
-                        <h2>{material.title}</h2>
+                        <h2>{currentEntry.materialTitle} — Downloads</h2>
                         <div class="download-list">
-                            {#each material.documents as document (document.id)}
+                            {#each currentEntry.documents as document (document.id)}
                                 <a class="download-link" href={document.downloadUrl} download>
                                     <span>{document.title}</span>
                                     {#if document.fileName}
@@ -230,61 +424,89 @@ a friendly placeholder is shown instead.
                             {/each}
                         </div>
                     </section>
-                {/if}
-
-                {#each material.pages as page (page.id)}
-                    <section id={anchor(page.id)} class="block">
+                {:else}
+                    <section class="block">
                         <div class="page-head">
-                            <h2>{page.title}</h2>
-                            {#if isPageCompleted(page.id)}
-                                <span class="done-badge">✓ Completed</span>
-                            {:else}
+                            <h2>{currentEntry.page.title}</h2>
+                            <div class="page-actions">
                                 <button
                                     type="button"
-                                    class="btn btn-sm btn-ghost mark-btn"
-                                    onclick={() => onMarkComplete(page.id)}
-                                    disabled={markBusyPageId === page.id}
+                                    class="download-btn"
+                                    onclick={() => downloadPage(currentEntry.page)}
                                 >
-                                    {#if markBusyPageId === page.id}<span class="loading loading-spinner loading-xs"></span>{/if}
-                                    Mark complete
+                                    {@render downloadIcon()}
+                                    <span>Download</span>
                                 </button>
-                            {/if}
+                                {#if isPageCompleted(currentEntry.page.id)}
+                                    <span class="done-badge">✓ Completed</span>
+                                {:else}
+                                    <button
+                                        type="button"
+                                        class="btn btn-sm btn-ghost mark-btn"
+                                        onclick={() => onMarkComplete(currentEntry.page.id)}
+                                        disabled={markBusyPageId === currentEntry.page.id}
+                                    >
+                                        {#if markBusyPageId === currentEntry.page.id}<span class="loading loading-spinner loading-xs"></span>{/if}
+                                        Mark complete
+                                    </button>
+                                {/if}
+                            </div>
                         </div>
-                        {#if page.format === "HTML"}
-                            <iframe class="html-frame" title={page.title} sandbox="" srcdoc={page.html}></iframe>
+                        {#if currentEntry.page.format === "HTML"}
+                            <iframe class="html-frame" title={currentEntry.page.title} sandbox="" srcdoc={currentEntry.page.html}></iframe>
                         {:else}
                             <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-                            <div class="prose">{@html page.html}</div>
+                            <div class="prose">{@html currentEntry.page.html}</div>
                         {/if}
                     </section>
-                {/each}
-            {/each}
+                {/if}
 
-            <section class="block course-complete">
                 {#if actionError}
                     <p class="error">{actionError}</p>
                 {/if}
-                {#if courseCompleted}
-                    <p class="done-note">🎉 You’ve completed this course.</p>
+            {:else if hasContent}
+                <p class="muted">Select a page from the contents to start reading.</p>
+            {:else}
+                <section class="block">
+                    <p class="placeholder-note">
+                        📝 No content has been added to this course yet. Once your teacher publishes course
+                        material in the teacher area, it will appear here.
+                    </p>
+                    <div class="actions">
+                        <button type="button" class="btn btn-ghost" onclick={() => push(`/chat/${params?.id ?? ""}`)}>
+                            Ask the tutor
+                        </button>
+                    </div>
+                </section>
+            {/if}
+        </div>
+
+        {#if !contentLoading && !contentError && hasContent && currentEntry}
+            <!-- Reader navigation: always pinned to the bottom of the reading area. -->
+            <nav class="pager" aria-label="Page navigation">
+                <button type="button" class="btn btn-ghost" onclick={goToPrevious} disabled={isFirstEntry}>
+                    ← Previous
+                </button>
+
+                {#if currentPageNumber > 0}
+                    <span class="pager-status">Page {currentPageNumber} of {pageEntries.length}</span>
+                {/if}
+
+                {#if isLastEntry}
+                    {#if courseCompleted}
+                        <span class="done-note">🎉 Completed</span>
+                    {:else}
+                        <button type="button" class="btn btn-primary" onclick={onCompleteCourse} disabled={completingCourse}>
+                            {#if completingCourse}<span class="loading loading-spinner loading-sm"></span>{/if}
+                            Complete course
+                        </button>
+                    {/if}
                 {:else}
-                    <button type="button" class="btn btn-primary" onclick={onCompleteCourse} disabled={completingCourse}>
-                        {#if completingCourse}<span class="loading loading-spinner loading-sm"></span>{/if}
-                        Complete course
+                    <button type="button" class="btn btn-primary" onclick={goToNext}>
+                        Next →
                     </button>
                 {/if}
-            </section>
-        {:else}
-            <section class="block">
-                <p class="placeholder-note">
-                    📝 No content has been added to this course yet. Once your teacher publishes course
-                    material in the teacher area, it will appear here.
-                </p>
-                <div class="actions">
-                    <button type="button" class="btn btn-ghost" onclick={() => push(`/chat/${params?.id ?? ""}`)}>
-                        Ask the tutor
-                    </button>
-                </div>
-            </section>
+            </nav>
         {/if}
     </main>
 </div>
@@ -369,6 +591,13 @@ a friendly placeholder is shown instead.
         color: var(--color-base-content);
     }
 
+    /* The page currently shown in the reader. */
+    .toc-link.active {
+        background: color-mix(in oklab, var(--color-primary) 22%, transparent);
+        color: var(--color-base-content);
+        font-weight: 600;
+    }
+
     .toc-link-text {
         min-width: 0;
         overflow: hidden;
@@ -382,23 +611,83 @@ a friendly placeholder is shown instead.
         font-weight: 700;
     }
 
+    /* Flex column: a scrollable reading area on top, the pager fixed at the bottom. */
     .article {
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .article-scroll {
+        flex: 1;
         min-height: 0;
         overflow-y: auto;
         padding: 2.5rem 0;
     }
 
     /* Content text spans ~90% of the content view. */
-    .article > * {
+    .article-scroll > * {
         width: 90%;
         margin-left: auto;
         margin-right: auto;
     }
 
     .article-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 1rem;
         margin-bottom: 2rem;
         padding-bottom: 1rem;
         border-bottom: 1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);
+    }
+
+    .article-head-text {
+        min-width: 0;
+    }
+
+    .textbook-download {
+        flex: 0 0 auto;
+    }
+
+    /* Outlined pill that clearly reads as a button, with the download icon. */
+    .download-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.4rem 0.85rem;
+        border-radius: 999px;
+        border: 1px solid color-mix(in oklab, var(--color-primary) 45%, transparent);
+        background: color-mix(in oklab, var(--color-primary) 8%, transparent);
+        color: var(--color-primary);
+        font-size: 0.85rem;
+        font-weight: 600;
+        line-height: 1;
+        cursor: pointer;
+        transition:
+            background 0.15s ease,
+            border-color 0.15s ease,
+            transform 0.05s ease;
+    }
+
+    .download-btn:hover {
+        background: color-mix(in oklab, var(--color-primary) 18%, transparent);
+        border-color: var(--color-primary);
+    }
+
+    .download-btn:active {
+        transform: translateY(1px);
+    }
+
+    .download-btn:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+    }
+
+    .download-icon {
+        width: 1.05rem;
+        height: 1.05rem;
+        flex: 0 0 auto;
     }
 
     .eyebrow {
@@ -447,6 +736,14 @@ a friendly placeholder is shown instead.
         margin-bottom: 0;
     }
 
+    /* Right-aligned controls for the current page (download + mark complete). */
+    .page-actions {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
     .mark-btn {
         flex: 0 0 auto;
     }
@@ -462,14 +759,24 @@ a friendly placeholder is shown instead.
         border: 1px solid color-mix(in oklab, var(--color-success) 35%, transparent);
     }
 
-    /* Footer call-to-action that completes the whole course. */
-    .course-complete {
+    /* Reader navigation bar: fixed as the last row of the reading area, so it
+       always sits flush at the bottom regardless of how short the page is. */
+    .pager {
+        flex: 0 0 auto;
         display: flex;
-        flex-direction: column;
         align-items: center;
-        gap: 0.5rem;
-        padding-top: 1.5rem;
+        justify-content: space-between;
+        gap: 1rem;
+        /* Pad the sides so its contents line up with the 90% page text column. */
+        padding: 1rem 5%;
         border-top: 1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);
+        background: transparent;
+    }
+
+    .pager-status {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: color-mix(in oklab, var(--color-base-content) 65%, transparent);
     }
 
     .done-note {
