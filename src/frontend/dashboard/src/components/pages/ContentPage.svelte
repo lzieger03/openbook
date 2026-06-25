@@ -268,12 +268,6 @@ so only the current page scrolls — never the whole textbook at once.
         goToIndex(currentIndex + 1);
     }
 
-    /** Turn a page title into a safe file name. */
-    function safeFileName(title: string): string {
-        const base = title.trim().replace(/[\\/:*?"<>|]+/g, "_").replace(/\s+/g, " ").slice(0, 100);
-        return (base || "page") + ".html";
-    }
-
     /** Wrap one page's content as an HTML section (heading + body). */
     function pageSectionHtml(page: PageEntry["page"]): string {
         // For HTML pages the html is the authored markup; for MD/TEXT it is rendered HTML.
@@ -281,44 +275,66 @@ so only the current page scrolls — never the whole textbook at once.
         return `<section>\n<h1>${escapeHtml(page.title)}</h1>\n${body}\n</section>`;
     }
 
-    /** Wrap section HTML in a complete, downloadable HTML document. */
-    function buildHtmlDocument(title: string, bodyHtml: string): Blob {
-        const document_ =
+    /** Wrap section HTML in a complete, print-ready HTML document. */
+    function buildHtmlDocument(title: string, bodyHtml: string): string {
+        return (
             "<!DOCTYPE html>\n" +
             '<html lang="en">\n<head>\n<meta charset="utf-8">\n' +
             '<meta name="viewport" content="width=device-width, initial-scale=1">\n' +
             `<title>${escapeHtml(title)}</title>\n` +
-            "<style>body{font-family:system-ui,sans-serif;line-height:1.7;max-width:48rem;margin:2rem auto;padding:0 1rem;}" +
-            "section{margin-bottom:3rem;}" +
-            "pre{background:#f3f3f3;padding:1rem;border-radius:.5rem;overflow:auto;}</style>\n" +
-            `</head>\n<body>\n${bodyHtml}\n</body>\n</html>\n`;
-        return new Blob([document_], {type: "text/html;charset=utf-8"});
+            "<style>" +
+            "@page{margin:18mm;}" +
+            "body{font-family:system-ui,sans-serif;line-height:1.6;color:#111;}" +
+            // Start each page's content on a fresh printed page (but not the very first).
+            "section{break-inside:avoid;}section+section{break-before:page;}" +
+            "h1{font-size:1.6rem;margin:0 0 1rem;}" +
+            "img{max-width:100%;}" +
+            "pre{background:#f3f3f3;padding:1rem;border-radius:.5rem;overflow:auto;white-space:pre-wrap;}" +
+            "</style>\n" +
+            `</head>\n<body>\n${bodyHtml}\n</body>\n</html>\n`
+        );
     }
 
-    /** Trigger a browser download for the given blob and file name. */
-    function triggerDownload(blob: Blob, fileName: string): void {
-        const url = URL.createObjectURL(blob);
-        const anchor = document.createElement("a");
-        anchor.href = url;
-        anchor.download = fileName;
-        document.body.appendChild(anchor);
-        anchor.click();
-        anchor.remove();
-        URL.revokeObjectURL(url);
+    /**
+     * Render the given document in a hidden iframe and open the browser's print
+     * dialog, where the learner can choose "Save as PDF". This yields a real,
+     * selectable-text PDF without bundling a PDF library.
+     */
+    function printAsPdf(title: string, bodyHtml: string): void {
+        const iframe = document.createElement("iframe");
+        iframe.setAttribute("aria-hidden", "true");
+        iframe.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0;";
+        iframe.srcdoc = buildHtmlDocument(title, bodyHtml);
+
+        iframe.onload = () => {
+            const frameWindow = iframe.contentWindow;
+            if (!frameWindow) {
+                iframe.remove();
+                return;
+            }
+            const cleanup = () => iframe.remove();
+            frameWindow.onafterprint = cleanup;
+            frameWindow.focus();
+            frameWindow.print();
+            // Fallback cleanup in case "afterprint" never fires (e.g. dialog dismissed).
+            setTimeout(cleanup, 60000);
+        };
+
+        document.body.appendChild(iframe);
     }
 
-    /** Download the current page as a standalone HTML file the learner can keep. */
+    /** Save the current page as a PDF. */
     function downloadPage(page: PageEntry["page"]): void {
-        triggerDownload(buildHtmlDocument(page.title, pageSectionHtml(page)), safeFileName(page.title));
+        printAsPdf(page.title, pageSectionHtml(page));
     }
 
-    /** Download the whole textbook (every page, in reading order) as one HTML file. */
+    /** Save the whole textbook (every page, in reading order) as one PDF. */
     function downloadTextbook(): void {
         const sections = entries
             .filter((entry): entry is PageEntry => entry.kind === "page")
             .map((entry) => pageSectionHtml(entry.page))
             .join("\n");
-        triggerDownload(buildHtmlDocument(courseTitle, sections), safeFileName(courseTitle));
+        printAsPdf(courseTitle, sections);
     }
 
     /** Minimal HTML-escaping for values injected into the downloaded document. */
