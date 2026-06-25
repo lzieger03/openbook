@@ -36,6 +36,7 @@ export interface TeacherCourse {
     group: string;
     materialCount: number;
     isTemplate: boolean;
+    skills: {id: string; name: string}[];
 }
 
 export interface EnrolledStudent {
@@ -81,6 +82,7 @@ function mapCourse(course: CourseDto): TeacherCourse {
         group: course.group,
         materialCount: course.materials?.length ?? 0,
         isTemplate: Boolean(course.is_template),
+        skills: (course.skills ?? []).map((skill) => ({id: skill.id, name: skill.name})),
     };
 }
 

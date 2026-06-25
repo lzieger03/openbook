@@ -20,6 +20,7 @@ asks the parent to reload on success so the header stays in sync.
 
     import {fetchLibraryGroups, updateCourse} from "../../api/courses.js";
     import type {CourseDto, LibraryGroupDto, TextFormat} from "../../api/courses.js";
+    import {toasts} from "../../stores/toast.store.js";
 
     let {course, onSaved}: {course: CourseDto; onSaved: () => void} = $props();
 
@@ -32,7 +33,6 @@ asks the parent to reload on success so the header stays in sync.
     let isTemplate = $state(false);
     let saving = $state(false);
     let loadingGroups = $state(true);
-    let message = $state("");
     let error = $state("");
 
     $effect(() => {
@@ -87,7 +87,7 @@ asks the parent to reload on success so the header stays in sync.
                 group: groupId,
                 is_template: isTemplate,
             });
-            message = "Saved.";
+            toasts.success("Course saved.");
             onSaved();
         } catch (e) {
             error = e instanceof Error ? e.message : String(e);
@@ -102,74 +102,66 @@ asks the parent to reload on success so the header stays in sync.
         {#if error}
             <div class="alert alert-error"><span>{error}</span></div>
         {/if}
-        {#if message}
-            <div class="alert alert-success"><span>{message}</span></div>
-        {/if}
 
-        <div class="settings-grid">
-            <label class="form-control w-full">
-                <span class="label-text">Course name</span>
-                <input class="input input-bordered w-full" type="text" bind:value={name} />
-            </label>
-
-            <label class="form-control w-full">
-                <span class="label-text">Slug</span>
-                <input class="input input-bordered w-full" type="text" bind:value={slug} />
-            </label>
-        </div>
+        <label class="form-control w-full">
+            <span class="label-text">Course name</span>
+            <input class="input input-bordered w-full" type="text" bind:value={name} />
+        </label>
 
         <label class="form-control w-full mt-3">
             <span class="label-text">Description</span>
             <textarea class="textarea textarea-bordered w-full" rows="5" bind:value={description}></textarea>
         </label>
 
-        <div class="settings-grid mt-3">
-            <label class="form-control w-full">
-                <span class="label-text">Library group</span>
-                <select class="select select-bordered w-full" bind:value={groupId} disabled={loadingGroups}>
-                    {#each groups as group (group.id)}
-                        <option value={group.id}>{group.name}</option>
-                    {/each}
-                </select>
+        <!-- Less-used / technical settings, collapsed by default. -->
+        <details class="advanced">
+            <summary>Advanced settings</summary>
+
+            <div class="settings-grid mt-3">
+                <label class="form-control w-full">
+                    <span class="label-text">Slug</span>
+                    <input class="input input-bordered w-full" type="text" bind:value={slug} />
+                </label>
+
+                <label class="form-control w-full">
+                    <span class="label-text">Library group</span>
+                    <select class="select select-bordered w-full" bind:value={groupId} disabled={loadingGroups}>
+                        {#each groups as group (group.id)}
+                            <option value={group.id}>{group.name}</option>
+                        {/each}
+                    </select>
+                </label>
+
+                <label class="form-control w-full">
+                    <span class="label-text">Text format</span>
+                    <select class="select select-bordered w-full" bind:value={textFormat}>
+                        <option value="MD">Markdown</option>
+                        <option value="HTML">HTML</option>
+                        <option value="TEXT">Plain text</option>
+                    </select>
+                </label>
+            </div>
+
+            <label class="label mt-3 cursor-pointer justify-start gap-3">
+                <input class="checkbox checkbox-primary" type="checkbox" bind:checked={isTemplate} />
+                <span class="label-text">Template course</span>
             </label>
 
-            <label class="form-control w-full">
-                <span class="label-text">Text format</span>
-                <select class="select select-bordered w-full" bind:value={textFormat}>
-                    <option value="MD">Markdown</option>
-                    <option value="HTML">HTML</option>
-                    <option value="TEXT">Plain text</option>
-                </select>
-            </label>
-        </div>
-
-        <label class="label mt-3 cursor-pointer justify-start gap-3">
-            <input class="checkbox checkbox-primary" type="checkbox" bind:checked={isTemplate} />
-            <span class="label-text">Template course</span>
-        </label>
-
-        <dl class="meta-grid mt-4">
-            <div>
-                <dt>ID</dt>
-                <dd>{course.id}</dd>
-            </div>
-            <div>
-                <dt>Owner</dt>
-                <dd>{course.owner ?? "—"}</dd>
-            </div>
-            <div>
-                <dt>Created by</dt>
-                <dd>{course.created_by ?? "—"}</dd>
-            </div>
-            <div>
-                <dt>Created at</dt>
-                <dd>{course.created_at}</dd>
-            </div>
-            <div>
-                <dt>Modified at</dt>
-                <dd>{course.modified_at}</dd>
-            </div>
-        </dl>
+            <dl class="meta-grid mt-4">
+                <div>
+                    <dt>Owner</dt>
+                    <dd>{course.owner ?? "—"}</dd>
+                </div>
+                <div>
+                    <dt>Created at</dt>
+                    <dd>{course.created_at}</dd>
+                </div>
+                <div>
+                    <dt>Modified at</dt>
+                    <dd>{course.modified_at}</dd>
+                </div>
+            </dl>
+        </details>
 
         <div class="card-actions justify-end mt-4">
             <button type="button" class="btn btn-primary" onclick={save} disabled={saving}>
@@ -185,6 +177,21 @@ asks the parent to reload on success so the header stays in sync.
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 1rem;
+    }
+
+    .advanced {
+        margin-top: 1rem;
+        border-top: 1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);
+        padding-top: 0.5rem;
+    }
+
+    .advanced summary {
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: color-mix(in oklab, var(--color-base-content) 75%, transparent);
+        padding: 0.25rem 0;
+        list-style: revert;
     }
 
     .meta-grid {

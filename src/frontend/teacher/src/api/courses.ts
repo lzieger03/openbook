@@ -29,6 +29,8 @@ export interface CourseDto {
     group: string;
     is_template: boolean;
     materials: string[];
+    // Skills a learner can earn in the course (derived from page content); read-only.
+    skills?: {id: string; name: string}[];
     owner: string | null;
     created_by: string | null;
     created_at: string;

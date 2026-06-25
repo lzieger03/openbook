@@ -12,17 +12,18 @@ License, or (at your option) any later version.
 
 <!--
 @component
-Students tab: list the students enrolled in a course and enrol new ones via a
-user search. Enrolling creates a student-role assignment in the course scope;
-unenrolling deletes it.
+Students tab: enrol students via an inline user search and manage the enrolled list.
+Enrolling creates a "student" role assignment in the course scope; unenrolling deletes
+it. `onChanged` lets the parent refresh its student count.
 -->
 <script lang="ts">
     import {loadStudents} from "../../data/teacher.js";
     import type {EnrolledStudent} from "../../data/teacher.js";
     import {enrollStudent, searchUsers, unenrollStudent} from "../../api/enrollment.js";
     import type {UserDto} from "../../api/enrollment.js";
+    import {toasts} from "../../stores/toast.store.js";
 
-    let {courseId}: {courseId: string} = $props();
+    let {courseId, onChanged}: {courseId: string; onChanged?: () => void} = $props();
 
     let students = $state<EnrolledStudent[]>([]);
     let isLoading = $state(true);
@@ -32,12 +33,12 @@ unenrolling deletes it.
     let term = $state("");
     let results = $state<UserDto[]>([]);
     let searching = $state(false);
+    let searched = $state(false);
     let busyUser = $state<string | null>(null);
 
     async function load(): Promise<void> {
         isLoading = true;
         error = "";
-
         try {
             students = await loadStudents(courseId);
         } catch (e) {
@@ -55,9 +56,14 @@ unenrolling deletes it.
     const enrolledUsernames = $derived(new Set(students.map((s) => s.username)));
 
     async function runSearch(): Promise<void> {
+        if (!term.trim()) {
+            return;
+        }
         searching = true;
+        error = "";
         try {
             results = await searchUsers(term);
+            searched = true;
         } catch (e) {
             error = e instanceof Error ? e.message : String(e);
         } finally {
@@ -65,161 +71,217 @@ unenrolling deletes it.
         }
     }
 
-    async function enroll(username: string): Promise<void> {
-        busyUser = username;
-        error = "";
+    async function enroll(user: UserDto): Promise<void> {
+        busyUser = user.username;
         try {
-            await enrollStudent(courseId, username);
+            await enrollStudent(courseId, user.username);
             await load();
+            onChanged?.();
+            toasts.success(`Enrolled ${user.full_name || user.username}.`);
         } catch (e) {
-            error = e instanceof Error ? e.message : String(e);
+            toasts.error(e instanceof Error ? e.message : String(e));
         } finally {
             busyUser = null;
         }
     }
 
     async function unenroll(student: EnrolledStudent): Promise<void> {
+        if (!confirm(`Remove ${student.fullName} from this course?`)) {
+            return;
+        }
         busyUser = student.username;
-        error = "";
         try {
             await unenrollStudent(student.assignmentId);
             await load();
+            onChanged?.();
+            toasts.success(`Removed ${student.fullName}.`);
         } catch (e) {
-            error = e instanceof Error ? e.message : String(e);
+            toasts.error(e instanceof Error ? e.message : String(e));
         } finally {
             busyUser = null;
         }
     }
+
+    function initials(name: string): string {
+        return name.trim().charAt(0).toUpperCase() || "?";
+    }
 </script>
 
-<div class="grid">
-    <!-- Enrolled students -->
-    <div class="card bg-base-100 shadow-sm">
-        <div class="card-body">
-            <h2 class="card-title">Enrolled students</h2>
-
-            {#if error}
-                <div class="alert alert-error"><span>{error}</span></div>
-            {/if}
-
-            {#if isLoading}
-                <span class="loading loading-spinner"></span>
-            {:else if students.length === 0}
-                <p class="muted">No students enrolled yet.</p>
-            {:else}
-                <table class="table table-sm">
-                    <thead>
-                        <tr><th>Name</th><th>Username</th><th></th></tr>
-                    </thead>
-                    <tbody>
-                        {#each students as student (student.assignmentId)}
-                            <tr>
-                                <td>{student.fullName}</td>
-                                <td class="muted">@{student.username}</td>
-                                <td class="text-right">
-                                    <button
-                                        type="button"
-                                        class="btn btn-xs btn-ghost text-error"
-                                        disabled={busyUser === student.username}
-                                        onclick={() => unenroll(student)}
-                                    >
-                                        Remove
-                                    </button>
-                                </td>
-                            </tr>
-                        {/each}
-                    </tbody>
-                </table>
-            {/if}
+<div class="card bg-base-100 shadow-sm">
+    <div class="card-body">
+        <!-- Enrol: inline search with results dropdown -->
+        <h2 class="card-title">Enrol a student</h2>
+        <div class="search-row">
+            <input
+                class="input input-bordered w-full"
+                type="search"
+                placeholder="Search by name or username…"
+                bind:value={term}
+                onkeydown={(e) => e.key === "Enter" && runSearch()}
+            />
+            <button type="button" class="btn btn-primary" onclick={runSearch} disabled={searching || !term.trim()}>
+                {#if searching}<span class="loading loading-spinner loading-sm"></span>{/if}
+                Search
+            </button>
         </div>
-    </div>
 
-    <!-- Enrol a student -->
-    <div class="card bg-base-100 shadow-sm">
-        <div class="card-body">
-            <h2 class="card-title">Enrol a student</h2>
+        {#if error}
+            <div class="alert alert-error mt-2"><span>{error}</span></div>
+        {/if}
 
-            <div class="search-row">
-                <input
-                    class="input input-bordered w-full"
-                    type="text"
-                    placeholder="Search by name or username"
-                    bind:value={term}
-                    onkeydown={(e) => e.key === "Enter" && runSearch()}
-                />
-                <button type="button" class="btn btn-primary" onclick={runSearch} disabled={searching}>
-                    {#if searching}<span class="loading loading-spinner loading-sm"></span>{/if}
-                    Search
-                </button>
-            </div>
-
-            {#if results.length > 0}
-                <ul class="result-list">
-                    {#each results as user (user.username)}
-                        <li>
-                            <span>
+        {#if results.length > 0}
+            <ul class="result-list">
+                {#each results as user (user.username)}
+                    <li>
+                        <span class="ident">
+                            <span class="avatar-dot" aria-hidden="true">{initials(user.full_name || user.username)}</span>
+                            <span class="ident-text">
                                 <strong>{user.full_name || user.username}</strong>
                                 <span class="muted">@{user.username}</span>
                             </span>
-                            {#if enrolledUsernames.has(user.username)}
-                                <span class="badge badge-ghost">Enrolled</span>
-                            {:else}
-                                <button
-                                    type="button"
-                                    class="btn btn-xs btn-primary"
-                                    disabled={busyUser === user.username}
-                                    onclick={() => enroll(user.username)}
-                                >
-                                    Enrol
-                                </button>
-                            {/if}
-                        </li>
-                    {/each}
-                </ul>
-            {/if}
+                        </span>
+                        {#if enrolledUsernames.has(user.username)}
+                            <span class="badge badge-ghost">Enrolled</span>
+                        {:else}
+                            <button
+                                type="button"
+                                class="btn btn-xs btn-primary"
+                                disabled={busyUser === user.username}
+                                onclick={() => enroll(user)}
+                            >
+                                {#if busyUser === user.username}<span class="loading loading-spinner loading-xs"></span>{/if}
+                                + Enrol
+                            </button>
+                        {/if}
+                    </li>
+                {/each}
+            </ul>
+        {:else if searched && !searching}
+            <p class="muted mt-2">No users match “{term}”.</p>
+        {/if}
+
+        <div class="divider"></div>
+
+        <!-- Enrolled list -->
+        <div class="list-head">
+            <h2 class="card-title">Enrolled students</h2>
+            <span class="count-pill">{students.length}</span>
         </div>
+
+        {#if isLoading}
+            <span class="loading loading-spinner"></span>
+        {:else if students.length === 0}
+            <p class="muted">No students enrolled yet — search above to add some.</p>
+        {:else}
+            <ul class="student-list">
+                {#each students as student (student.assignmentId)}
+                    <li class="student-row">
+                        <span class="ident">
+                            <span class="avatar-dot" aria-hidden="true">
+                                {#if student.avatarUrl}<img src={student.avatarUrl} alt="" />{:else}{initials(student.fullName)}{/if}
+                            </span>
+                            <span class="ident-text">
+                                <strong>{student.fullName}</strong>
+                                <span class="muted">@{student.username}</span>
+                            </span>
+                        </span>
+                        <button
+                            type="button"
+                            class="btn btn-xs btn-ghost text-error"
+                            disabled={busyUser === student.username}
+                            onclick={() => unenroll(student)}
+                        >
+                            {#if busyUser === student.username}<span class="loading loading-spinner loading-xs"></span>{/if}
+                            Remove
+                        </button>
+                    </li>
+                {/each}
+            </ul>
+        {/if}
     </div>
 </div>
 
 <style>
-    .grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-    }
-
     .search-row {
         display: flex;
         gap: 0.5rem;
     }
 
-    .result-list {
+    .list-head {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    .count-pill {
+        font-size: 0.8rem;
+        font-weight: 700;
+        padding: 0.05rem 0.55rem;
+        border-radius: 999px;
+        color: var(--color-primary);
+        background: color-mix(in oklab, var(--color-primary) 14%, transparent);
+    }
+
+    .result-list,
+    .student-list {
         list-style: none;
-        margin: 0.75rem 0 0;
+        margin: 0.5rem 0 0;
         padding: 0;
         display: flex;
         flex-direction: column;
-        gap: 0.4rem;
+        gap: 0.35rem;
     }
 
-    .result-list li {
+    .result-list li,
+    .student-row {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 0.5rem;
-        padding: 0.4rem 0.6rem;
-        border-radius: 0.5rem;
-        background: color-mix(in oklab, var(--color-base-200) 60%, transparent);
+        padding: 0.5rem 0.7rem;
+        border-radius: 0.6rem;
+        background: color-mix(in oklab, var(--color-base-200) 55%, transparent);
+        border: 1px solid color-mix(in oklab, var(--color-base-content) 8%, transparent);
+    }
+
+    .ident {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        min-width: 0;
+    }
+
+    .avatar-dot {
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 999px;
+        overflow: hidden;
+        font-weight: 700;
+        color: var(--color-primary-content);
+        background: color-mix(in oklab, var(--color-primary) 70%, transparent);
+    }
+
+    .avatar-dot img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .ident-text {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        line-height: 1.25;
+    }
+
+    .ident-text .muted {
+        font-size: 0.8rem;
     }
 
     .muted {
         color: color-mix(in oklab, var(--color-base-content) 60%, transparent);
-        font-size: 0.85rem;
-    }
-
-    @media (max-width: 55rem) {
-        .grid {
-            grid-template-columns: 1fr;
-        }
     }
 </style>

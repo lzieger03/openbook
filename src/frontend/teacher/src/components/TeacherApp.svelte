@@ -21,6 +21,7 @@ around the routed page content. The header name/avatar follows the shared store.
     import {teacherStore} from "../stores/teacher.store.js";
     import type {TeacherState} from "../stores/teacher.store.js";
     import TeacherHeader from "./app-frame/TeacherHeader.svelte";
+    import Toasts from "./basic/Toasts.svelte";
     import routes from "./routes.js";
 
     let state = $state<TeacherState>({
@@ -52,6 +53,8 @@ around the routed page content. The header name/avatar follows the shared store.
     <footer class="shell-footer">
         <span>Copyright 2026 | OpenBook</span>
     </footer>
+
+    <Toasts />
 </div>
 
 <style>
