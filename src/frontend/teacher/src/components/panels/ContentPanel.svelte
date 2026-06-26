@@ -648,12 +648,12 @@ Attaching an existing textbook is a secondary, collapsed option.
                 <input
                     class="sr-only"
                     type="file"
-                    accept=".md,.markdown,.html,.htm,.txt,text/markdown,text/html,text/plain"
+                    accept=".md,.markdown,.html,.htm,.txt,.pdf,text/markdown,text/html,text/plain,application/pdf"
                     disabled={uploadingScript || !courseGroupId}
                     onchange={onUploadScript}
                 />
             </label>
-            <p class="muted upload-hint">Supported formats: Markdown, HTML and plain text (.md, .html, .txt).</p>
+            <p class="muted upload-hint">Supported formats: PDF, Markdown, HTML and plain text (.pdf, .md, .html, .txt).</p>
         </div>
 
         {#if attachableTextbooks.length > 0}

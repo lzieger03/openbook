@@ -133,10 +133,12 @@ class AccountProgressViewSet(ReadOnlyModelViewSet):
     def leaderboard(self, request):
         # The leaderboard is global: every authenticated user sees the same
         # ranking, so query all accounts directly rather than the (per-user
-        # scoped) default queryset.
+        # scoped) default queryset. Teachers are not learners, so members of the
+        # "Teacher" group are excluded from the ranking entirely.
         top = (
             AccountProgress.objects
             .select_related("account")
+            .exclude(account__groups__name="Teacher")
             .order_by("-point_total", "account__username")[:10]
         )
 

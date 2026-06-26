@@ -197,7 +197,7 @@ sidebar, minimised icon) can be layered on later.
 
         <button type="button" class="content-cta" onclick={() => push(`/content/${params?.id ?? ""}`)}>
             <span aria-hidden="true">📖</span>
-            <span>Content</span>
+            <span>Skript</span>
         </button>
 
         <nav class="nav" aria-label="Sections">

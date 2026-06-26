@@ -229,8 +229,15 @@ deleted from here after a confirmation step.
                         {/if}
 
                         <div class="card-stats">
-                            <span class="stat" title="Textbooks">📚 {course.materialCount}</span>
-                            <span class="stat" title="Skills">🎯 {course.skills.length}</span>
+                            <span class="stat">
+                                <span class="stat-num">{course.materialCount}</span>
+                                <span class="stat-label">{course.materialCount === 1 ? "Textbook" : "Textbooks"}</span>
+                            </span>
+                            <span class="stat-sep" aria-hidden="true"></span>
+                            <span class="stat">
+                                <span class="stat-num">{course.skills.length}</span>
+                                <span class="stat-label">{course.skills.length === 1 ? "Skill" : "Skills"}</span>
+                            </span>
                         </div>
 
                         {#if course.skills.length > 0}
@@ -555,17 +562,41 @@ deleted from here after a confirmation step.
 
     .card-stats {
         display: flex;
+        align-items: center;
         gap: 0.85rem;
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: color-mix(in oklab, var(--color-base-content) 70%, transparent);
+        margin-top: 0.15rem;
+    }
+
+    .stat {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 0.3rem;
+        white-space: nowrap;
+    }
+
+    .stat-num {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--color-base-content);
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+        color: color-mix(in oklab, var(--color-base-content) 55%, transparent);
+    }
+
+    /* Thin, centered separator between the two stats. */
+    .stat-sep {
+        width: 1px;
+        height: 0.9rem;
+        background: color-mix(in oklab, var(--color-base-content) 18%, transparent);
     }
 
     .card-skills {
         display: flex;
         flex-wrap: wrap;
         gap: 0.35rem;
-        margin-top: auto;
+        margin-top: 0.1rem;
     }
 
     .skill-tag {

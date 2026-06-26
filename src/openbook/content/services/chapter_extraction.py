@@ -23,6 +23,7 @@ from __future__ import annotations
 
 from collections import Counter
 from dataclasses import dataclass
+from io import BytesIO
 import html
 import re
 
@@ -32,6 +33,10 @@ MAX_CHAPTERS = 300
 
 # Chapter titles map onto TextbookPage.name (CharField(max_length=255)).
 MAX_TITLE_LENGTH = 200
+
+
+class ChapterExtractionError(ValueError):
+    """Raised when an uploaded document cannot be turned into chapters."""
 
 
 @dataclass(frozen=True)
@@ -65,11 +70,47 @@ def extract_chapters(source: str, text_format: str) -> list[Chapter]:
     if not chapters:
         chapters = [Chapter(title="", source=text)]
 
-    return [
-        Chapter(title=_clean_title(chapter.title), source=chapter.source.strip())
-        for chapter in chapters[:MAX_CHAPTERS]
-        if chapter.source.strip()
+    return _finalize(chapters)
+
+
+def extract_pdf_chapters(data: bytes) -> list[Chapter]:
+    """Split an uploaded PDF into chapters.
+
+    Prefers the PDF's own outline (bookmarks / table of contents) since that maps
+    directly onto chapters; otherwise extracts the text and detects headings in it.
+    The resulting pages are Markdown — extracted PDF text keeps its line breaks, which
+    the textbook renderer preserves. Raises :class:`ChapterExtractionError` for a
+    missing dependency, an unreadable file, or a PDF with no extractable text.
+    """
+    try:
+        from pypdf import PdfReader
+    except ImportError as error:  # pragma: no cover - depends on the deployment env
+        raise ChapterExtractionError(
+            "PDF support is not available on the server (the 'pypdf' package is missing)."
+        ) from error
+
+    try:
+        reader = PdfReader(BytesIO(data))
+        page_texts = [_normalize_pdf_text(page.extract_text() or "") for page in reader.pages]
+    except Exception as error:
+        raise ChapterExtractionError("The PDF could not be read. It may be corrupted or protected.") from error
+
+    # Prefer the outline, but only when it actually yields text — a scanned PDF can
+    # carry bookmarks while every page extracts to nothing.
+    outline_chapters = [
+        chapter for chapter in _chapters_from_pdf_outline(reader, page_texts) if chapter.source.strip()
     ]
+    if outline_chapters:
+        return _finalize(outline_chapters)
+
+    full_text = "\n\n".join(text for text in page_texts if text).strip()
+    if not full_text:
+        raise ChapterExtractionError(
+            "No text could be extracted from the PDF (a scanned/image-only PDF is not supported)."
+        )
+
+    chapters = _extract_text_chapters(full_text) or [Chapter(title="", source=full_text)]
+    return _finalize(chapters)
 
 
 # --- Markdown -----------------------------------------------------------------
@@ -172,7 +213,82 @@ def _extract_text_chapters(text: str) -> list[Chapter]:
     return chapters
 
 
+# --- PDF ----------------------------------------------------------------------
+
+# Strip trailing whitespace before newlines and collapse runs of blank lines so the
+# extracted text renders as tidy Markdown (line breaks are kept on purpose).
+_PDF_TRAILING_WS = re.compile(r"[ \t]+\n")
+_PDF_BLANK_RUN = re.compile(r"\n{3,}")
+
+
+def _normalize_pdf_text(text: str) -> str:
+    cleaned = text.replace("\x0c", "\n")
+    cleaned = _PDF_TRAILING_WS.sub("\n", cleaned)
+    cleaned = _PDF_BLANK_RUN.sub("\n\n", cleaned)
+    return cleaned.strip()
+
+
+def _chapters_from_pdf_outline(reader, page_texts: list[str]) -> list[Chapter]:
+    """Build chapters from a PDF's bookmark outline, slicing text by page ranges."""
+    try:
+        outline = reader.outline
+    except Exception:
+        return []
+
+    # Prefer the coarse top-level bookmarks; if there are too few, descend into the
+    # full (nested) outline so a single "Contents" root with chapter children works.
+    entries = _flatten_pdf_outline(reader, outline, top_level_only=True)
+    if len(entries) < 2:
+        entries = _flatten_pdf_outline(reader, outline, top_level_only=False)
+    if len(entries) < 2:
+        return []
+
+    page_count = len(page_texts)
+    chapters: list[Chapter] = []
+    for position, (title, start_page) in enumerate(entries):
+        start = max(0, min(start_page, page_count))
+        end = entries[position + 1][1] if position + 1 < len(entries) else page_count
+        # Always include at least the bookmark's own page, even when two bookmarks
+        # share one page, so no content is dropped.
+        end = max(end, start + 1)
+        body = "\n\n".join(page_texts[start:end]).strip()
+        chapters.append(Chapter(title=title, source=body))
+
+    return chapters
+
+
+def _flatten_pdf_outline(reader, outline, top_level_only: bool) -> list[tuple[str, int]]:
+    """Flatten a (possibly nested) PDF outline to ``(title, page_index)`` in order."""
+    entries: list[tuple[str, int]] = []
+
+    for item in outline:
+        if isinstance(item, list):
+            if not top_level_only:
+                entries.extend(_flatten_pdf_outline(reader, item, top_level_only=False))
+            continue
+
+        try:
+            page_number = reader.get_destination_page_number(item)
+        except Exception:
+            page_number = None
+
+        title = str(getattr(item, "title", "") or "").strip()
+        if page_number is not None:
+            entries.append((title, int(page_number)))
+
+    return entries
+
+
 # --- Shared helpers -----------------------------------------------------------
+
+def _finalize(chapters: list[Chapter]) -> list[Chapter]:
+    """Normalize titles, drop empties, and cap the number of chapters."""
+    return [
+        Chapter(title=_clean_title(chapter.title), source=chapter.source.strip())
+        for chapter in chapters[:MAX_CHAPTERS]
+        if chapter.source.strip()
+    ]
+
 
 def _choose_split_level(levels: list[int]) -> int:
     """Pick the heading level that best marks chapter boundaries.

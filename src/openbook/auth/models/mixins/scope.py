@@ -49,6 +49,14 @@ class RoleBasedObjectPermissionsMixin(models.Model):
         if hasattr(scope, "owner") and user_obj == scope.owner:
             return True
 
+        # During creation the scope is a not-yet-saved instance (e.g. the object built by
+        # ModelViewSetMixin.create for its permission check). It has no primary key, so its
+        # many-to-many / generic-relation managers (public_permissions, role_assignments)
+        # cannot be queried, and there are no grants to consult yet. Report "not granted"
+        # so the auth backend falls back to the model-level permission instead of crashing.
+        if scope is None or scope.pk is None:
+            return False
+
         app_label, codename = perm.split(".")
 
         if scope.public_permissions.filter(

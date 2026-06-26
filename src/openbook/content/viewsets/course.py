@@ -26,7 +26,9 @@ from rest_framework.viewsets                import ModelViewSet
 from openbook.assistant.services.textbook_sync import (
     TextbookDocumentSyncService,
 )
+from ..services.chapter_extraction import ChapterExtractionError
 from ..services.chapter_extraction import extract_chapters
+from ..services.chapter_extraction import extract_pdf_chapters
 from openbook.drf.flex_serializers          import FlexFieldsModelSerializer
 from openbook.drf.viewsets                  import AllowAnonymousListRetrieveViewSetMixin
 from openbook.drf.viewsets                  import ModelViewSetMixin
@@ -44,7 +46,7 @@ from ..models.textbook_page                 import TextbookPage
 class CourseTextbookUploadSerializer(serializers.Serializer):
     """Validate a teacher upload that should become course material."""
 
-    SUPPORTED_EXTENSIONS = {".md", ".markdown", ".html", ".htm", ".txt"}
+    SUPPORTED_EXTENSIONS = {".md", ".markdown", ".html", ".htm", ".txt", ".pdf"}
 
     file = serializers.FileField()
     name = serializers.CharField(required=False, allow_blank=True, max_length=255)
@@ -57,7 +59,7 @@ class CourseTextbookUploadSerializer(serializers.Serializer):
 
         if extension not in self.SUPPORTED_EXTENSIONS:
             raise serializers.ValidationError(
-                "Supported formats are .md, .markdown, .html, .htm and .txt."
+                "Supported formats are .md, .markdown, .html, .htm, .txt and .pdf."
             )
 
         return file
@@ -169,18 +171,28 @@ class CourseViewSet(AllowAnonymousListRetrieveViewSetMixin, ModelViewSetMixin, M
         uploaded_file = serializer.validated_data["file"]
         filename = Path(uploaded_file.name)
         name = serializer.validated_data.get("name", "").strip() or filename.stem
-        text_format = self._format_from_filename(filename.name)
-        source = uploaded_file.read().decode("utf-8", errors="replace")
-
-        if not source.strip():
-            raise serializers.ValidationError({
-                "file": "Uploaded file must contain text content.",
-            })
+        raw_bytes = uploaded_file.read()
 
         # Split the uploaded script into chapters so each one becomes its own page.
         # A document without recognizable headings yields a single chapter, so the
         # whole file still ends up as one readable page.
-        chapters = extract_chapters(source, text_format)
+        if filename.suffix.lower() == ".pdf":
+            # PDF text is extracted and kept as Markdown (line breaks are preserved
+            # by the renderer); chapters come from the PDF outline or detected headings.
+            text_format = Textbook.TextFormatChoices.MARKDOWN
+            try:
+                chapters = extract_pdf_chapters(raw_bytes)
+            except ChapterExtractionError as error:
+                raise serializers.ValidationError({"file": str(error)})
+        else:
+            text_format = self._format_from_filename(filename.name)
+            source = raw_bytes.decode("utf-8", errors="replace")
+            if not source.strip():
+                raise serializers.ValidationError({
+                    "file": "Uploaded file must contain text content.",
+                })
+            chapters = extract_chapters(source, text_format)
+
         if not chapters:
             raise serializers.ValidationError({
                 "file": "Uploaded file did not produce textbook page content.",
