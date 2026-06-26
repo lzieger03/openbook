@@ -48,13 +48,17 @@ keep the streak).
     // courses that train many skills don't blow up the card.
     const maxVisibleSkills = 3;
 
-    // A single recommended next step on the "Path" tab. `progress` adds a bar;
+    // A single recommended next step on the "Next Steps" tab. `progress` adds a bar;
+    // `metric` is a short at-a-glance badge; `tone` themes the card's colour;
     // `course` makes the card clickable (opens that course's tutor page).
+    type RecTone = "course" | "skill" | "level" | "streak";
     interface Recommendation {
         icon: string;
         title: string;
         detail: string;
+        tone: RecTone;
         progress?: number;
+        metric?: string;
         course?: DashboardCourse;
     }
 
@@ -77,7 +81,10 @@ keep the streak).
             list.push({
                 icon: "▶️",
                 title: "Finish a course",
-                detail: `${courseInProgress.name} — ${Math.round(courseInProgress.progress)}% done, almost there!`,
+                detail: `${courseInProgress.name} — almost there!`,
+                tone: "course",
+                progress: courseInProgress.progress,
+                metric: `${Math.round(courseInProgress.progress)}%`,
                 course: courseInProgress,
             });
         } else if (notStarted) {
@@ -85,6 +92,8 @@ keep the streak).
                 icon: "▶️",
                 title: "Start a new course",
                 detail: `Begin ${notStarted.name} and make your first progress.`,
+                tone: "course",
+                metric: "New",
                 course: notStarted,
             });
         }
@@ -95,7 +104,10 @@ keep the streak).
             list.push({
                 icon: "⬆️",
                 title: "Level up a skill",
-                detail: `${skillToLevel.name} to Level ${skillToLevel.level + 1} — ${100 - Math.round(skillToLevel.progress)}% to go.`,
+                detail: `${skillToLevel.name} — ${100 - Math.round(skillToLevel.progress)}% to Level ${skillToLevel.level + 1}.`,
+                tone: "skill",
+                progress: skillToLevel.progress,
+                metric: `Lvl ${skillToLevel.level + 1}`,
             });
         }
 
@@ -106,14 +118,18 @@ keep the streak).
                     icon: "🏅",
                     title: "Top level reached",
                     detail: `You're at Level ${stats.level} — the highest there is. 🎉`,
+                    tone: "level",
+                    metric: "Max",
                 });
             } else {
                 const remaining = Math.max(0, stats.nextLevelPoints - stats.points);
                 list.push({
                     icon: "⭐",
                     title: "Reach the next level",
-                    detail: `${remaining} points to Level ${stats.level + 1}.`,
+                    detail: `${remaining.toLocaleString()} points to go.`,
+                    tone: "level",
                     progress: stats.levelProgress,
+                    metric: `Lvl ${stats.level + 1}`,
                 });
             }
         }
@@ -125,12 +141,15 @@ keep the streak).
                     icon: "🔥",
                     title: "Keep your streak",
                     detail: `${stats.currentStreak}-day streak — study today to reach ${stats.currentStreak + 1}.`,
+                    tone: "streak",
+                    metric: `${stats.currentStreak}🔥`,
                 });
             } else {
                 list.push({
                     icon: "🔥",
                     title: "Start a streak",
                     detail: "Study today to begin a new daily streak.",
+                    tone: "streak",
                 });
             }
         }
@@ -147,14 +166,21 @@ keep the streak).
 </script>
 
 <!-- Shared inner markup for a recommendation, rendered inside either a button or a div. -->
-{#snippet recInner(rec: Recommendation)}
-    <span class="rec-icon" aria-hidden="true">{rec.icon}</span>
+{#snippet recInner(rec: Recommendation, position: number)}
+    <span class="rec-icon" aria-hidden="true">
+        {rec.icon}
+        <span class="rec-step">{position}</span>
+    </span>
     <span class="rec-body">
-        <span class="rec-title">{rec.title}</span>
+        <span class="rec-top">
+            <span class="rec-title">{rec.title}</span>
+            {#if rec.metric}<span class="rec-metric">{rec.metric}</span>{/if}
+        </span>
         <span class="rec-detail">{rec.detail}</span>
         {#if rec.progress !== undefined}
             <span class="rec-bar">
-                <ProgressBar value={rec.progress} label={rec.title} />
+                <span class="rec-bar-track"><ProgressBar value={rec.progress} label={rec.title} /></span>
+                <span class="rec-bar-val">{Math.round(rec.progress)}%</span>
             </span>
         {/if}
     </span>
@@ -213,18 +239,19 @@ keep the streak).
             {#if recommendations.length === 0}
                 <p class="empty">No next steps yet. Enrol in a course to start your learning path.</p>
             {:else}
-                {#each recommendations as rec (rec.title)}
+                <p class="path-intro">Your personalised path — tackle these in order to keep levelling up.</p>
+                {#each recommendations as rec, i (rec.title)}
                     {#if rec.course}
                         <button
                             type="button"
-                            class="rec-card clickable"
+                            class="rec-card clickable tone-{rec.tone}"
                             onclick={() => onCourseOpen?.(rec.course!)}
                         >
-                            {@render recInner(rec)}
+                            {@render recInner(rec, i + 1)}
                         </button>
                     {:else}
-                        <div class="rec-card">
-                            {@render recInner(rec)}
+                        <div class="rec-card tone-{rec.tone}">
+                            {@render recInner(rec, i + 1)}
                         </div>
                     {/if}
                 {/each}
@@ -467,45 +494,91 @@ keep the streak).
         color: color-mix(in oklab, var(--color-base-content) 70%, transparent);
     }
 
+    /* "Next Steps" is a simple, robust vertical list of themed recommendation cards. */
+    .path-intro {
+        font-size: 0.85rem;
+        color: color-mix(in oklab, var(--color-base-content) 60%, transparent);
+        margin: 0 0 0.25rem;
+    }
+
+    /* Each tone sets a single --tone colour the whole card derives its accents from. */
+    .rec-card.tone-course {
+        --tone: var(--color-primary);
+    }
+
+    .rec-card.tone-skill {
+        --tone: var(--color-info, #38bdf8);
+    }
+
+    .rec-card.tone-level {
+        --tone: var(--color-warning, #f59e0b);
+    }
+
+    .rec-card.tone-streak {
+        --tone: #fb923c;
+    }
+
     /* A recommendation card may render as a <button> (clickable course) or a <div>;
        reset the button chrome so both look identical. */
     .rec-card {
         display: flex;
         align-items: center;
-        gap: 1rem;
+        gap: 0.85rem;
         width: 100%;
         text-align: left;
         font: inherit;
-        padding: 0.9rem 1.1rem;
-        border-radius: 1rem;
+        padding: 0.85rem 1rem;
+        border-radius: 0.9rem;
         background: color-mix(in oklab, var(--color-base-200) 50%, transparent);
         border: 1px solid color-mix(in oklab, var(--color-base-content) 8%, transparent);
+        border-left: 3px solid color-mix(in oklab, var(--tone) 65%, transparent);
     }
 
     .rec-card.clickable {
         cursor: pointer;
-        transition: border-color 0.2s ease, background 0.2s ease;
+        transition: border-color 0.2s ease, background 0.2s ease, transform 0.12s ease;
     }
 
     .rec-card.clickable:hover {
-        background: color-mix(in oklab, var(--color-primary) 12%, transparent);
-        border-color: color-mix(in oklab, var(--color-primary) 45%, transparent);
+        background: color-mix(in oklab, var(--tone) 10%, transparent);
+        border-color: color-mix(in oklab, var(--tone) 45%, transparent);
+        transform: translateY(-1px);
     }
 
     .rec-card.clickable:focus-visible {
-        outline: 2px solid var(--color-primary);
+        outline: 2px solid var(--tone);
         outline-offset: 2px;
     }
 
     .rec-icon {
+        position: relative;
         flex: 0 0 auto;
         display: grid;
         place-items: center;
-        width: 2.5rem;
-        height: 2.5rem;
+        width: 2.6rem;
+        height: 2.6rem;
+        border-radius: 0.8rem;
+        font-size: 1.3rem;
+        background: color-mix(in oklab, var(--tone) 16%, transparent);
+        border: 1px solid color-mix(in oklab, var(--tone) 28%, transparent);
+    }
+
+    /* Small step-number badge on the icon's corner, marking the order of the path. */
+    .rec-step {
+        position: absolute;
+        top: -0.4rem;
+        left: -0.4rem;
+        display: grid;
+        place-items: center;
+        min-width: 1.15rem;
+        height: 1.15rem;
+        padding: 0 0.25rem;
         border-radius: 999px;
-        font-size: 1.2rem;
-        background: color-mix(in oklab, var(--color-primary) 14%, transparent);
+        font-size: 0.65rem;
+        font-weight: 800;
+        color: var(--color-primary-content);
+        background: var(--tone);
+        border: 2px solid var(--color-base-100);
     }
 
     /* Title, detail and optional progress bar stacked, taking the row's free space. */
@@ -514,12 +587,30 @@ keep the streak).
         min-width: 0;
         display: flex;
         flex-direction: column;
-        gap: 0.25rem;
+        gap: 0.2rem;
+    }
+
+    .rec-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
     }
 
     .rec-title {
         font-weight: 700;
         color: var(--color-base-content);
+    }
+
+    .rec-metric {
+        flex: 0 0 auto;
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        padding: 0.12rem 0.55rem;
+        border-radius: 999px;
+        color: var(--tone);
+        background: color-mix(in oklab, var(--tone) 15%, transparent);
     }
 
     .rec-detail {
@@ -528,7 +619,27 @@ keep the streak).
     }
 
     .rec-bar {
-        margin-top: 0.35rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin-top: 0.45rem;
+    }
+
+    .rec-bar-track {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    /* Slimmer bar inside the step cards. */
+    .rec-bar-track :global(.progress-track) {
+        height: 0.6rem;
+    }
+
+    .rec-bar-val {
+        flex: 0 0 auto;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: color-mix(in oklab, var(--color-base-content) 70%, transparent);
     }
 
     .rec-go {
@@ -541,8 +652,8 @@ keep the streak).
         font-size: 1.2rem;
         line-height: 1;
         color: var(--color-primary-content);
-        background: var(--color-primary);
-        box-shadow: 0 0 12px color-mix(in oklab, var(--color-primary) 45%, transparent);
+        background: var(--tone);
+        box-shadow: 0 0 12px color-mix(in oklab, var(--tone) 45%, transparent);
     }
 
     .repeat-item {

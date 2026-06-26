@@ -17,6 +17,7 @@ signed-in teacher's name/avatar on the right. Deliberately plainer than the
 student dashboard header.
 -->
 <script lang="ts">
+    import {push} from "svelte-spa-router";
     import type {TeacherUser} from "../../data/teacher.js";
     import {theme, toggleTheme} from "../../theme.js";
 
@@ -35,8 +36,10 @@ student dashboard header.
 
 <header class="app-header">
     <div class="header-left">
-        <img class="brand-logo" src={logoSrc} alt={`${brand} logo`} />
-        <span class="brand-text">{brand}</span>
+        <button type="button" class="brand" onclick={() => push("/")} aria-label="Go to my courses">
+            <img class="brand-logo" src={logoSrc} alt={`${brand} logo`} />
+            <span class="brand-text">{brand}</span>
+        </button>
         <span class="page-label">{pageLabel}</span>
     </div>
 
@@ -113,6 +116,31 @@ student dashboard header.
         align-items: center;
         gap: 0.75rem;
         font-weight: 700;
+    }
+
+    .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.25rem 0.4rem;
+        margin-left: -0.4rem;
+        border: none;
+        background: none;
+        cursor: pointer;
+        border-radius: 0.6rem;
+        color: inherit;
+        font: inherit;
+        font-weight: 700;
+        transition: background 0.15s ease;
+    }
+
+    .brand:hover {
+        background: color-mix(in oklab, var(--color-base-content) 8%, transparent);
+    }
+
+    .brand:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
     }
 
     .brand-logo {

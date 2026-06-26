@@ -20,6 +20,8 @@ page ranges). The active course id comes from the route parameter.
     import {push} from "svelte-spa-router";
     import {fetchCourse} from "../../api/courses.js";
     import type {CourseDto} from "../../api/courses.js";
+    import {fetchMaterials} from "../../api/content.js";
+    import {loadStudents} from "../../data/teacher.js";
     import OverviewPanel from "../panels/OverviewPanel.svelte";
     import StudentsPanel from "../panels/StudentsPanel.svelte";
     import ContentPanel from "../panels/ContentPanel.svelte";
@@ -28,12 +30,18 @@ page ranges). The active course id comes from the route parameter.
 
     const courseId = $derived(params?.id ?? "");
 
-    type Tab = "overview" | "students" | "content";
-    let tab = $state<Tab>("overview");
+    // Content is the most-used tab, so it opens first; settings live last.
+    type Tab = "content" | "students" | "settings";
+    let tab = $state<Tab>("content");
 
     let course = $state<CourseDto | null>(null);
     let isLoading = $state(true);
     let errorMessage = $state("");
+
+    // At-a-glance counts shown in the summary header and tab badges.
+    let textbookCount = $state(0);
+    let studentCount = $state(0);
+    const skillCount = $derived(course?.skills?.length ?? 0);
 
     async function load(): Promise<void> {
         if (!courseId) {
@@ -52,10 +60,28 @@ page ranges). The active course id comes from the route parameter.
         }
     }
 
+    /** Refresh the summary counts (called on load and after content/student changes). */
+    async function loadStats(): Promise<void> {
+        if (!courseId) {
+            return;
+        }
+        try {
+            const [materials, students] = await Promise.all([
+                fetchMaterials(courseId),
+                loadStudents(courseId),
+            ]);
+            textbookCount = materials.length;
+            studentCount = students.length;
+        } catch {
+            // Counts are non-critical; leave whatever we had.
+        }
+    }
+
     // Reload whenever the route's course id changes.
     $effect(() => {
         void courseId;
         load();
+        void loadStats();
     });
 </script>
 
@@ -76,27 +102,36 @@ page ranges). The active course id comes from the route parameter.
     {:else if course}
         <header class="top">
             <h1 class="title">{course.name}</h1>
+            {#if course.is_template}<span class="template-badge">Template</span>{/if}
         </header>
 
+        <div class="summary">
+            <span class="summary-stat"><strong>{textbookCount}</strong> Textbooks</span>
+            <span class="summary-sep" aria-hidden="true">·</span>
+            <span class="summary-stat"><strong>{studentCount}</strong> Students</span>
+            <span class="summary-sep" aria-hidden="true">·</span>
+            <span class="summary-stat"><strong>{skillCount}</strong> Skills</span>
+        </div>
+
         <div role="tablist" class="tabs tabs-bordered">
-            <button role="tab" class="tab" class:tab-active={tab === "overview"} onclick={() => (tab = "overview")}>
-                Overview
+            <button role="tab" class="tab" class:tab-active={tab === "content"} onclick={() => (tab = "content")}>
+                Content {#if textbookCount > 0}<span class="tab-badge">{textbookCount}</span>{/if}
             </button>
             <button role="tab" class="tab" class:tab-active={tab === "students"} onclick={() => (tab = "students")}>
-                Students
+                Students {#if studentCount > 0}<span class="tab-badge">{studentCount}</span>{/if}
             </button>
-            <button role="tab" class="tab" class:tab-active={tab === "content"} onclick={() => (tab = "content")}>
-                Content
+            <button role="tab" class="tab" class:tab-active={tab === "settings"} onclick={() => (tab = "settings")}>
+                Settings
             </button>
         </div>
 
         <section class="panel-area">
-            {#if tab === "overview"}
-                <OverviewPanel {course} onSaved={load} />
+            {#if tab === "content"}
+                <ContentPanel {courseId} courseGroupId={course.group} onChanged={loadStats} />
             {:else if tab === "students"}
-                <StudentsPanel {courseId} />
+                <StudentsPanel {courseId} onChanged={loadStats} />
             {:else}
-                <ContentPanel {courseId} courseGroupId={course.group} />
+                <OverviewPanel {course} onSaved={() => { load(); loadStats(); }} />
             {/if}
         </section>
     {/if}
@@ -117,9 +152,56 @@ page ranges). The active course id comes from the route parameter.
         display: flex;
     }
 
+    .top {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
     .title {
         font-size: clamp(1.4rem, 3vw, 2rem);
         font-weight: 800;
+    }
+
+    .template-badge {
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 0.15rem 0.55rem;
+        border-radius: 999px;
+        color: var(--color-warning);
+        background: color-mix(in oklab, var(--color-warning) 16%, transparent);
+    }
+
+    /* At-a-glance summary under the title. */
+    .summary {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-size: 0.9rem;
+        color: color-mix(in oklab, var(--color-base-content) 70%, transparent);
+        margin-top: -0.25rem;
+    }
+
+    .summary-stat strong {
+        color: var(--color-base-content);
+        font-weight: 800;
+    }
+
+    .summary-sep {
+        color: color-mix(in oklab, var(--color-base-content) 35%, transparent);
+    }
+
+    /* Count badge inside a tab label. */
+    .tab-badge {
+        margin-left: 0.4rem;
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 0.05rem 0.45rem;
+        border-radius: 999px;
+        color: var(--color-primary);
+        background: color-mix(in oklab, var(--color-primary) 16%, transparent);
     }
 
     .panel-area {

@@ -107,17 +107,10 @@ so only the current page scrolls — never the whole textbook at once.
     );
 
     const hasContent = $derived(
-        materials.some((material) => material.pages.length > 0 || material.documents.length > 0),
+        materials.some((material) => material.pages.length > 0),
     );
 
-    // A single reading entry shown one-at-a-time: either a material's downloads or one page.
-    type DownloadsEntry = {
-        kind: "downloads";
-        id: string;
-        materialId: string;
-        materialTitle: string;
-        documents: ContentMaterialView["documents"];
-    };
+    // A single reading entry shown one-at-a-time: one textbook page.
     type PageEntry = {
         kind: "page";
         id: string;
@@ -125,21 +118,12 @@ so only the current page scrolls — never the whole textbook at once.
         materialTitle: string;
         page: ContentMaterialView["pages"][number];
     };
-    type ReadingEntry = DownloadsEntry | PageEntry;
+    type ReadingEntry = PageEntry;
 
-    // Flatten materials into reading order: each material's downloads first, then its pages.
+    // Flatten materials into reading order: every page of every material, in order.
     const entries = $derived.by<ReadingEntry[]>(() => {
         const list: ReadingEntry[] = [];
         for (const material of materials) {
-            if (material.documents.length > 0) {
-                list.push({
-                    kind: "downloads",
-                    id: `downloads-${material.id}`,
-                    materialId: material.id,
-                    materialTitle: material.title,
-                    documents: material.documents,
-                });
-            }
             for (const page of material.pages) {
                 list.push({
                     kind: "page",
@@ -375,18 +359,8 @@ so only the current page scrolls — never the whole textbook at once.
         <nav class="toc-nav" aria-label="Table of contents">
             {#if hasContent}
                 {#each materials as material (material.id)}
-                    {#if material.pages.length > 0 || material.documents.length > 0}
+                    {#if material.pages.length > 0}
                         <p class="toc-group">{material.title}</p>
-                        {#if material.documents.length > 0}
-                            <button
-                                type="button"
-                                class="toc-link"
-                                class:active={currentEntry?.id === `downloads-${material.id}`}
-                                onclick={() => goToEntry(`downloads-${material.id}`)}
-                            >
-                                <span class="toc-link-text">⬇ Downloads</span>
-                            </button>
-                        {/if}
                         {#each material.pages as page (page.id)}
                             <button
                                 type="button"
@@ -427,22 +401,7 @@ so only the current page scrolls — never the whole textbook at once.
             {:else if contentError}
                 <p class="error">{contentError}</p>
             {:else if hasContent && currentEntry}
-                <!-- Single-page reader: only the current entry is shown. -->
-                {#if currentEntry.kind === "downloads"}
-                    <section class="block downloads">
-                        <h2>{currentEntry.materialTitle} — Downloads</h2>
-                        <div class="download-list">
-                            {#each currentEntry.documents as document (document.id)}
-                                <a class="download-link" href={document.downloadUrl} download>
-                                    <span>{document.title}</span>
-                                    {#if document.fileName}
-                                        <small>{document.fileName}</small>
-                                    {/if}
-                                </a>
-                            {/each}
-                        </div>
-                    </section>
-                {:else}
+                <!-- Single-page reader: only the current page is shown. -->
                     <section class="block">
                         <div class="page-head">
                             <h2>{currentEntry.page.title}</h2>
@@ -477,7 +436,6 @@ so only the current page scrolls — never the whole textbook at once.
                             <div class="prose">{@html currentEntry.page.html}</div>
                         {/if}
                     </section>
-                {/if}
 
                 {#if actionError}
                     <p class="error">{actionError}</p>
@@ -801,41 +759,6 @@ so only the current page scrolls — never the whole textbook at once.
         font-size: 1.1rem;
         font-weight: 700;
         color: var(--color-success);
-    }
-
-    .downloads {
-        padding-bottom: 1rem;
-        border-bottom: 1px solid color-mix(in oklab, var(--color-base-content) 10%, transparent);
-    }
-
-    .download-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.75rem;
-    }
-
-    .download-link {
-        display: inline-flex;
-        flex-direction: column;
-        gap: 0.15rem;
-        max-width: 20rem;
-        padding: 0.65rem 0.85rem;
-        border: 1px solid color-mix(in oklab, var(--color-primary) 35%, transparent);
-        border-radius: 0.5rem;
-        color: var(--color-primary);
-        text-decoration: none;
-        background: color-mix(in oklab, var(--color-primary) 8%, transparent);
-    }
-
-    .download-link:hover {
-        background: color-mix(in oklab, var(--color-primary) 14%, transparent);
-    }
-
-    .download-link small {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        color: color-mix(in oklab, var(--color-base-content) 60%, transparent);
     }
 
     .error {

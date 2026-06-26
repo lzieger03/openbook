@@ -80,6 +80,9 @@ class UserViewSet(ModelViewSetMixin, ModelViewSet):
     __doc__ = "Users"
 
     lookup_field       = "username"
+    # Usernames may contain dots (e.g. "jane.doe"); DRF's default lookup regex stops at
+    # a dot, which 404s the detail route. Allow any character except a slash.
+    lookup_value_regex = "[^/]+"
     queryset           = User.objects.filter(is_active=True)
     http_method_names  = ["get", "put", "patch", "delete"]  # Post (create) not allowed!
     filterset_class    = UserFilter

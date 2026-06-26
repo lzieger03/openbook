@@ -75,6 +75,10 @@ export interface TextbookUploadResult {
     material: string;
     document: string;
     index_status: string;
+    // How many chapters the uploaded script was split into (one page each).
+    pages_created: number;
+    // The chapter/page titles that were created, in reading order.
+    chapters: string[];
 }
 
 interface Paginated<T> {
@@ -140,6 +144,14 @@ export async function uploadTextbookFile(
         form,
         {formData: true},
     );
+}
+
+/** Update a textbook's editable fields (used for renaming from the Content view). */
+export async function updateTextbook(
+    id: string,
+    fields: {name?: string; slug?: string; description?: string; text_format?: TextFormat},
+): Promise<TextbookDto> {
+    return apiSend<TextbookDto>("PATCH", `/api/content/textbooks/${encodeURIComponent(id)}/`, fields);
 }
 
 export async function fetchTextbookPages(textbookId: string): Promise<TextbookPageDto[]> {
