@@ -6,6 +6,9 @@
     - - view_user
       - openbook_auth
       - user
+    - - view_course
+      - openbook_content
+      - course
     - - view_courseprogress
       - openbook_gamification
       - courseprogress
