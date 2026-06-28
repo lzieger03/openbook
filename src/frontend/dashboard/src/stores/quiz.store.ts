@@ -21,7 +21,6 @@ export type QuizContextSource = "rag_documents" | "course_context";
 
 export interface QuizOption {
     text: string;
-    correct: boolean;
 }
 
 export interface QuizQuestion {
@@ -44,9 +43,22 @@ export interface QuizState {
     questions: QuizQuestion[];
     contextSource: QuizContextSource | null;
     sources: QuizSource[];
-    // Textbook the current quiz is scoped to and the page its result anchors to.
+    quizId: string | null;
     textbookId: string | null;
     pageId: string | null;
+}
+
+export interface QuizSubmittedAnswer {
+    question_id: string;
+    selected_index: number | null;
+}
+
+export interface QuizQuestionResult {
+    question_id: string;
+    selected_index: number | null;
+    correct_index: number;
+    correct: boolean;
+    correct_answer: string;
 }
 
 interface QuizStart {
@@ -60,8 +72,8 @@ interface QuizStart {
 interface LearningQuizResult {
     action: "learning_quiz_result";
     payload: {
-        page_id: string;
-        score: number;
+        quiz_id: string;
+        answers: QuizSubmittedAnswer[];
         attempts: number | null;
     };
 }
@@ -69,6 +81,7 @@ interface LearningQuizResult {
 interface QuizGenerated {
     action: "quiz_generated";
     payload: {
+        quiz_id: string;
         course_id: string;
         context_source: QuizContextSource;
         questions: QuizQuestion[];
@@ -86,6 +99,10 @@ interface LearningEventStatus {
         message: string;
         points_awarded?: number;
         skills_advanced?: string[];
+        score?: number | null;
+        correct_count?: number | null;
+        question_count?: number | null;
+        quiz_results?: QuizQuestionResult[];
     };
 }
 
@@ -93,6 +110,10 @@ interface LearningEventStatus {
 export interface QuizRewardSummary {
     pointsAwarded: number;
     skillsAdvanced: string[];
+    score: number;
+    correctCount: number;
+    questionCount: number;
+    results: QuizQuestionResult[];
 }
 
 type SentMessages = QuizStart | LearningQuizResult;
@@ -104,9 +125,7 @@ type CourseIdSource = string | (() => string | undefined);
 /** Options for {@link createQuizStore}. */
 export interface QuizStoreOptions {
     /**
-     * Called once the backend has acknowledged a submitted quiz result (points and
-     * skill progress have been awarded). Receives what the learner earned so the UI can
-     * show it; the dashboard also uses this to refresh so the new totals show up.
+     * Called once the backend has graded a submitted quiz and awarded points/skills.
      */
     onResultRecorded?: (reward: QuizRewardSummary) => void;
 }
@@ -116,7 +135,7 @@ export interface QuizStore {
     connect: () => Promise<void>;
     disconnect: () => Promise<void>;
     requestQuiz: (questionCount?: number, textbookId?: string) => Promise<void>;
-    submitResult: (score: number, attempts?: number) => Promise<void>;
+    submitResult: (answers: QuizSubmittedAnswer[], attempts?: number) => Promise<void>;
 }
 
 function initialState(): QuizState {
@@ -127,6 +146,7 @@ function initialState(): QuizState {
         questions: [],
         contextSource: null,
         sources: [],
+        quizId: null,
         textbookId: null,
         pageId: null,
     };
@@ -136,8 +156,7 @@ export function createQuizStore(courseId: CourseIdSource, options: QuizStoreOpti
     const {subscribe, update} = writable<QuizState>(initialState());
 
     let socket: WebSocketClient<SentMessages, ReceivedMessages> | undefined;
-    // Anchor page for the active quiz, used when submitting the result.
-    let currentPageId: string | null = null;
+    let currentQuizId: string | null = null;
 
     function resolveCourseId(): string {
         const resolvedCourseId = typeof courseId === "function" ? courseId() : courseId;
@@ -168,7 +187,7 @@ export function createQuizStore(courseId: CourseIdSource, options: QuizStoreOpti
             });
 
             socket.setMessageHandler("quiz_generated", (message: QuizGenerated) => {
-                currentPageId = message.payload.page_id;
+                currentQuizId = message.payload.quiz_id;
                 update((state) => ({
                     ...state,
                     isLoading: false,
@@ -176,6 +195,7 @@ export function createQuizStore(courseId: CourseIdSource, options: QuizStoreOpti
                     questions: message.payload.questions,
                     contextSource: message.payload.context_source,
                     sources: message.payload.sources,
+                    quizId: message.payload.quiz_id,
                     textbookId: message.payload.textbook_id,
                     pageId: message.payload.page_id,
                 }));
@@ -195,14 +215,16 @@ export function createQuizStore(courseId: CourseIdSource, options: QuizStoreOpti
 
                 if (event === "learning_quiz_result") {
                     if (success) {
-                        // Points and skill progress were awarded server-side; hand the
-                        // earned amounts to the UI and let the dashboard refresh.
                         options.onResultRecorded?.({
                             pointsAwarded: message.payload.points_awarded ?? 0,
                             skillsAdvanced: message.payload.skills_advanced ?? [],
+                            score: message.payload.score ?? 0,
+                            correctCount: message.payload.correct_count ?? 0,
+                            questionCount: message.payload.question_count ?? 0,
+                            results: message.payload.quiz_results ?? [],
                         });
                     } else {
-                        console.error("[quiz] Awarding quiz points failed:", detail);
+                        console.error("[quiz] Grading quiz failed:", detail);
                     }
                 }
             });
@@ -216,7 +238,7 @@ export function createQuizStore(courseId: CourseIdSource, options: QuizStoreOpti
     }
 
     async function requestQuiz(questionCount = 5, textbookId?: string): Promise<void> {
-        currentPageId = null;
+        currentQuizId = null;
         update((state) => ({
             ...state,
             isLoading: true,
@@ -224,6 +246,7 @@ export function createQuizStore(courseId: CourseIdSource, options: QuizStoreOpti
             questions: [],
             contextSource: null,
             sources: [],
+            quizId: null,
             textbookId: textbookId ?? null,
             pageId: null,
         }));
@@ -246,35 +269,23 @@ export function createQuizStore(courseId: CourseIdSource, options: QuizStoreOpti
         }
     }
 
-    /**
-     * Submit the finished quiz score so the backend stores it and awards points. The
-     * score is normalized to 0–1. Does nothing if the quiz has no anchor page.
-     */
-    async function submitResult(score: number, attempts?: number): Promise<void> {
-        if (!currentPageId) {
-            // No anchor page means the quiz wasn't tied to a textbook page, so the
-            // backend has nothing to attach the score (and points) to.
-            console.warn("[quiz] Result not submitted: this quiz has no anchor page.");
+    async function submitResult(answers: QuizSubmittedAnswer[], attempts?: number): Promise<void> {
+        if (!currentQuizId) {
+            console.warn("[quiz] Result not submitted: this quiz has no server id.");
             return;
         }
 
-        const normalized = Math.max(0, Math.min(1, score));
-
         try {
-            // The socket may have gone idle while the learner worked through the quiz.
-            // Re-establish it first (a no-op when already connected) so the result is
-            // actually delivered instead of being queued on a dead socket and lost.
             await connect();
             await socket?.send({
                 action: "learning_quiz_result",
                 payload: {
-                    page_id: currentPageId,
-                    score: normalized,
+                    quiz_id: currentQuizId,
+                    answers,
                     attempts: attempts ?? null,
                 },
             });
         } catch (error) {
-            // Awarding points is best-effort; never break the quiz UI over it.
             console.error("[quiz] Failed to submit quiz result:", error);
         }
     }

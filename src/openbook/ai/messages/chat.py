@@ -165,12 +165,25 @@ class LearningPagePayload(BaseModel):
     """
     page_id: UUID
 
+class QuizAnswerPayload(BaseModel):
+    """One submitted quiz answer: the picked option index for a question."""
+    question_id:    str
+    selected_index: int | None = None
+
+class QuizQuestionResultPayload(BaseModel):
+    """The grading outcome for one quiz question."""
+    question_id:     str
+    selected_index:  int | None = None
+    correct_index:   int
+    correct:         bool
+    correct_answer:  str
+
 class LearningQuizResultPayload(BaseModel):
     """
-    Payload for storing a quiz result in the learning model.
+    Payload for submitting quiz answers for server-side grading.
     """
-    page_id:  UUID
-    score:    float
+    quiz_id:  UUID
+    answers:  list[QuizAnswerPayload] = Field(default_factory=list)
     attempts: int | None = None
 
 class LearningEventStatusPayload(BaseModel):
@@ -185,6 +198,10 @@ class LearningEventStatusPayload(BaseModel):
     message:         str = ""
     points_awarded:  int = 0
     skills_advanced: list[str] = Field(default_factory=list)
+    score:           float | None = None
+    correct_count:   int | None = None
+    question_count:  int | None = None
+    quiz_results:    list[QuizQuestionResultPayload] = Field(default_factory=list)
 
 class QuizStartPayload(BaseModel):
     """
@@ -201,8 +218,7 @@ class QuizAnswerOptionPayload(BaseModel):
     """
     A selectable answer option in a generated quiz question.
     """
-    text:    str
-    correct: bool
+    text: str
 
 class QuizQuestionPayload(BaseModel):
     """
@@ -225,10 +241,11 @@ class QuizGeneratedPayload(BaseModel):
     """
     Generated quiz questions for the current course.
 
-    ``textbook_id`` echoes the textbook the quiz was scoped to (if any). ``page_id`` is
-    the textbook page the result should be anchored to: the client sends it back in a
-    ``learning_quiz_result`` message so the score can be stored and points awarded.
+    ``quiz_id`` identifies the server-side quiz copy with the correct answers.
+    ``textbook_id`` echoes the textbook the quiz was scoped to (if any), and ``page_id``
+    is the textbook page the backend anchors the graded result to.
     """
+    quiz_id:        UUID
     course_id:      UUID
     context_source: Literal["rag_documents", "course_context"]
     questions:      list[QuizQuestionPayload]
@@ -389,7 +406,7 @@ class LearningPageCompleted(BaseMessage):
 
 class LearningQuizResult(BaseMessage):
     """
-    Message sent by the client when a course quiz result should be stored.
+    Message sent by the client when course quiz answers should be graded and stored.
     """
     action:  Literal["learning_quiz_result"] = "learning_quiz_result"
     payload: LearningQuizResultPayload

@@ -62,8 +62,11 @@ from ..messages.chat          import (
 from openbook.assistant.models import ChatMessage as ChatMessageModel
 from openbook.assistant.models import ChatSession as ChatSessionModel
 from openbook.assistant.models import ExamAttempt as ExamAttemptModel
+from openbook.assistant.models import QuizAttempt as QuizAttemptModel
 from openbook.assistant.services.exam_generation import deserialize_generated_exam
 from openbook.assistant.services.exam_generation import serialize_generated_exam
+from openbook.assistant.services.quiz_generation import deserialize_generated_quiz
+from openbook.assistant.services.quiz_generation import serialize_generated_quiz
 
 logger = logging.getLogger(__name__)
 
@@ -447,16 +450,30 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         """
         try:
             reward = await sync_to_async(self._record_quiz_result)(
-                page_id=message.payload.page_id,
-                score=message.payload.score,
+                quiz_id=message.payload.quiz_id,
+                answers=message.payload.answers,
                 attempts=message.payload.attempts,
             )
+            graded_quiz = reward.get("graded_quiz")
             return LearningEventStatus(
                 payload=LearningEventStatusPayload(
                     event="learning_quiz_result",
                     success=True,
                     points_awarded=reward.get("points_awarded", 0),
                     skills_advanced=reward.get("skills_advanced", []),
+                    score=graded_quiz.score if graded_quiz else None,
+                    correct_count=graded_quiz.correct_count if graded_quiz else None,
+                    question_count=graded_quiz.question_count if graded_quiz else None,
+                    quiz_results=[
+                        {
+                            "question_id": result.question_id,
+                            "selected_index": result.selected_index,
+                            "correct_index": result.correct_index,
+                            "correct": result.correct,
+                            "correct_answer": result.correct_answer,
+                        }
+                        for result in graded_quiz.results
+                    ] if graded_quiz else [],
                 ),
             )
         except Exception as error:
@@ -480,23 +497,24 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         Generate quiz questions for the current course.
         """
         try:
-            quiz = await sync_to_async(self._generate_quiz)(
+            quiz_attempt, quiz = await sync_to_async(self._generate_quiz)(
                 question_count=message.payload.question_count,
                 textbook_id=message.payload.textbook_id,
             )
             return QuizGenerated(
                 payload=QuizGeneratedPayload(
+                    quiz_id=quiz_attempt.id,
                     course_id=self._get_required_course_id(),
                     context_source=quiz.context_source,
                     textbook_id=quiz.textbook_id,
                     page_id=quiz.page_id,
                     questions=[
                         QuizQuestionPayload(
+                            id=question.id,
                             prompt=question.prompt,
                             options=[
                                 QuizAnswerOptionPayload(
                                     text=option.text,
-                                    correct=option.correct,
                                 )
                                 for option in question.options
                             ],
@@ -689,12 +707,22 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     def _generate_quiz(self, question_count: int, textbook_id=None):
         """Run the blocking quiz generation stack outside the async event loop."""
         course_id = self._get_required_course_id()
-        return AssistantOrchestrator().generate_quiz(
+        user = self.scope.get("user")
+        quiz = AssistantOrchestrator().generate_quiz(
             user=self.scope.get("user"),
             course=course_id,
             question_count=question_count,
             textbook=textbook_id,
         )
+        quiz_attempt = QuizAttemptModel.objects.create(
+            user=user,
+            course_id=course_id,
+            textbook_id=quiz.textbook_id or None,
+            page_id=quiz.page_id or None,
+            quiz=serialize_generated_quiz(quiz),
+            question_count=len(quiz.questions),
+        )
+        return quiz_attempt, quiz
 
     def _generate_exam(self, question_count: int, textbook_id=None):
         """Run the blocking exam generation stack outside the async event loop."""
@@ -804,19 +832,58 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     def _record_quiz_result(
         self,
-        page_id: UUID,
-        score: float,
+        quiz_id: UUID,
+        answers,
         attempts: int | None,
     ) -> dict:
         """Store the current user's quiz result and return the awarded points/skills."""
         course_id = self._get_required_course_id()
-        return AssistantOrchestrator().record_quiz_result(
+        attempt = QuizAttemptModel.objects.filter(
+            pk=quiz_id,
+            user=self.scope.get("user"),
+            course_id=course_id,
+        ).first()
+        if attempt is None:
+            raise ValueError("Quiz not found.")
+
+        quiz = deserialize_generated_quiz(attempt.quiz)
+        graded = AssistantOrchestrator().grade_quiz(
             user=self.scope.get("user"),
             course=course_id,
-            page=page_id,
-            score=score,
+            quiz=quiz,
+            answers=[answer.model_dump() for answer in answers],
             attempts=attempts,
         )
+        graded_quiz = graded.get("graded_quiz")
+        if graded_quiz:
+            attempt.result = {
+                "score": graded_quiz.score,
+                "correct_count": graded_quiz.correct_count,
+                "question_count": graded_quiz.question_count,
+                "results": [
+                    {
+                        "question_id": result.question_id,
+                        "selected_index": result.selected_index,
+                        "correct_index": result.correct_index,
+                        "correct": result.correct,
+                        "correct_answer": result.correct_answer,
+                    }
+                    for result in graded_quiz.results
+                ],
+            }
+            attempt.correct_count = graded_quiz.correct_count
+            attempt.question_count = graded_quiz.question_count
+            attempt.score = graded_quiz.score
+            attempt.save(
+                update_fields=[
+                    "result",
+                    "correct_count",
+                    "question_count",
+                    "score",
+                    "updated_at",
+                ]
+            )
+        return graded
 
     def _get_required_course_id(self):
         """Return the course id from the course-scoped WebSocket route."""

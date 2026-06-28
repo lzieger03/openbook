@@ -86,19 +86,39 @@ class ChatConsumerLearningEvent_Tests(SimpleTestCase):
     def test_handle_learning_quiz_result(self):
         """Quiz-result events should be delegated to the orchestrator."""
         course_id = uuid4()
-        page_id = uuid4()
+        quiz_id = uuid4()
         consumer = self._consumer(course_id=course_id)
+        graded_quiz = SimpleNamespace(
+            score=0.5,
+            correct_count=1,
+            question_count=2,
+            results=(
+                SimpleNamespace(
+                    question_id="q1",
+                    selected_index=0,
+                    correct_index=0,
+                    correct=True,
+                    correct_answer="Markup language",
+                ),
+            ),
+        )
 
-        with patch("openbook.ai.consumers.chat.AssistantOrchestrator") as orchestrator:
-            orchestrator.return_value.record_quiz_result.return_value = {
+        with patch.object(consumer, "_record_quiz_result") as record_quiz_result:
+            record_quiz_result.return_value = {
+                "graded_quiz": graded_quiz,
                 "points_awarded": 40,
                 "skills_advanced": ["HTML", "CSS"],
             }
             response = async_to_sync(consumer.handle_learning_quiz_result)(
                 LearningQuizResult(
                     payload={
-                        "page_id": page_id,
-                        "score": 0.8,
+                        "quiz_id": quiz_id,
+                        "answers": [
+                            {
+                                "question_id": "q1",
+                                "selected_index": 0,
+                            },
+                        ],
                         "attempts": 2,
                     },
                 ),
@@ -107,12 +127,14 @@ class ChatConsumerLearningEvent_Tests(SimpleTestCase):
         self.assertTrue(response.payload.success)
         self.assertEqual(response.payload.points_awarded, 40)
         self.assertEqual(response.payload.skills_advanced, ["HTML", "CSS"])
-        orchestrator.return_value.record_quiz_result.assert_called_once_with(
-            user=consumer.scope["user"],
-            course=course_id,
-            page=page_id,
-            score=0.8,
-            attempts=2,
+        self.assertEqual(response.payload.score, 0.5)
+        self.assertEqual(response.payload.correct_count, 1)
+        self.assertEqual(response.payload.question_count, 2)
+        self.assertTrue(response.payload.quiz_results[0].correct)
+        record_quiz_result.assert_called_once()
+        self.assertEqual(
+            record_quiz_result.call_args.kwargs["quiz_id"],
+            quiz_id,
         )
 
     def test_learning_events_require_course_route(self):
@@ -134,6 +156,7 @@ class ChatConsumerLearningEvent_Tests(SimpleTestCase):
             context_source="course_context",
             questions=(
                 GeneratedQuizQuestion(
+                    id="question-1",
                     prompt="What is HTML?",
                     options=(
                         GeneratedQuizOption(text="Markup language", correct=True),
@@ -144,22 +167,20 @@ class ChatConsumerLearningEvent_Tests(SimpleTestCase):
                 ),
             ),
         )
+        quiz_attempt = SimpleNamespace(id=uuid4())
 
-        with patch("openbook.ai.consumers.chat.AssistantOrchestrator") as orchestrator:
-            orchestrator.return_value.generate_quiz.return_value = generated_quiz
+        with patch.object(consumer, "_generate_quiz") as generate_quiz:
+            generate_quiz.return_value = (quiz_attempt, generated_quiz)
             response = async_to_sync(consumer.handle_quiz_start)(
                 QuizStart(payload={"question_count": 1}),
             )
 
-        orchestrator.return_value.generate_quiz.assert_called_once_with(
-            user=consumer.scope["user"],
-            course=course_id,
-            question_count=1,
-            textbook=None,
-        )
+        generate_quiz.assert_called_once_with(question_count=1, textbook_id=None)
+        self.assertEqual(response.payload.quiz_id, quiz_attempt.id)
         self.assertEqual(response.payload.context_source, "course_context")
+        self.assertEqual(response.payload.questions[0].id, "question-1")
         self.assertEqual(response.payload.questions[0].prompt, "What is HTML?")
-        self.assertTrue(response.payload.questions[0].options[0].correct)
+        self.assertFalse(hasattr(response.payload.questions[0].options[0], "correct"))
 
     def test_quiz_start_requires_course_route(self):
         """Quiz generation should fail on the global chat route."""

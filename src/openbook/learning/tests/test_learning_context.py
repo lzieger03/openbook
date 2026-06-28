@@ -9,7 +9,6 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from openbook.assistant.services.learning_context import LearningContextService
 from openbook.auth.middleware.current_user import reset_current_user
 from openbook.auth.models.user import User
 from openbook.content.models.course import Course
@@ -20,6 +19,7 @@ from openbook.content.models.textbook_page import TextbookPage
 from openbook.gamification.models.course_progress import CourseProgress
 from openbook.learning.models.quiz_result import QuizResult
 from openbook.learning.models.state import LearningState
+from openbook.learning.services import LearningContextService
 
 
 class LearningContextService_Tests(TestCase):

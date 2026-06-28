@@ -9,9 +9,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from dataclasses import field
 import json
 import re
 from typing import Literal
+from uuid import uuid4
 
 from openbook.assistant.services.rag_client import RagSource
 
@@ -33,6 +35,7 @@ class GeneratedQuizQuestion:
 
     prompt: str
     options: tuple[GeneratedQuizOption, ...]
+    id: str = field(default_factory=lambda: str(uuid4()))
 
 
 @dataclass(frozen=True)
@@ -45,6 +48,28 @@ class GeneratedQuiz:
     # Optional textbook the quiz was scoped to and the page the result anchors to.
     textbook_id: str | None = None
     page_id: str | None = None
+
+
+@dataclass(frozen=True)
+class GradedQuizQuestion:
+    """The grading outcome for one generated quiz question."""
+
+    question_id: str
+    prompt: str
+    selected_index: int | None
+    correct_index: int
+    correct: bool
+    correct_answer: str
+
+
+@dataclass(frozen=True)
+class GradedQuiz:
+    """The full grading outcome of a generated quiz attempt."""
+
+    results: tuple[GradedQuizQuestion, ...]
+    correct_count: int
+    question_count: int
+    score: float
 
 
 class QuizResponseParser:
@@ -127,3 +152,56 @@ class QuizResponseParser:
             raise ValueError(f"The quiz response field {key} must be a non-empty string.")
 
         return value.strip()
+
+
+def serialize_generated_quiz(quiz: GeneratedQuiz) -> dict:
+    """Serialize a generated quiz including server-side correct answers."""
+    return {
+        "context_source": quiz.context_source,
+        "textbook_id": quiz.textbook_id,
+        "page_id": quiz.page_id,
+        "questions": [
+            {
+                "id": question.id,
+                "prompt": question.prompt,
+                "options": [
+                    {
+                        "text": option.text,
+                        "correct": option.correct,
+                    }
+                    for option in question.options
+                ],
+            }
+            for question in quiz.questions
+        ],
+    }
+
+
+def deserialize_generated_quiz(data: dict) -> GeneratedQuiz:
+    """Reconstruct a generated quiz from :func:`serialize_generated_quiz`."""
+    questions = tuple(
+        GeneratedQuizQuestion(
+            id=str(raw.get("id") or uuid4()),
+            prompt=raw.get("prompt", "") or "",
+            options=tuple(
+                GeneratedQuizOption(
+                    text=option.get("text", "") or "",
+                    correct=bool(option.get("correct")),
+                )
+                for option in raw.get("options", [])
+            ),
+        )
+        for raw in data.get("questions", [])
+    )
+
+    context_source = (
+        "rag_documents"
+        if data.get("context_source") == "rag_documents"
+        else "course_context"
+    )
+    return GeneratedQuiz(
+        questions=questions,
+        context_source=context_source,
+        textbook_id=data.get("textbook_id"),
+        page_id=data.get("page_id"),
+    )
