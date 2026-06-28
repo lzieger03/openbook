@@ -23,6 +23,7 @@ assistant backend through the existing course chat WebSocket channel.
     import {dashboardStore} from "../../stores/dashboard.store.js";
     import type {DashboardState} from "../../stores/dashboard.store.js";
     import {createQuizStore} from "../../stores/quiz.store.js";
+    import type {QuizQuestionResult, QuizSubmittedAnswer} from "../../stores/quiz.store.js";
     import type {QuizState} from "../../stores/quiz.store.js";
 
     let {params}: {params?: {id?: string}} = $props();
@@ -42,13 +43,20 @@ assistant backend through the existing course chat WebSocket channel.
         courses: [],
     });
 
-    let reward = $state<{pointsAwarded: number; skillsAdvanced: string[]} | null>(null);
+    let reward = $state<{
+        pointsAwarded: number;
+        skillsAdvanced: string[];
+        correctCount: number;
+        questionCount: number;
+        results: QuizQuestionResult[];
+    } | null>(null);
 
     const quiz = createQuizStore(() => params?.id, {
         // Once the backend confirms the quiz result, show what was earned and reload the
         // dashboard data so the new course and skill points are reflected immediately.
         onResultRecorded: (summary) => {
             reward = summary;
+            score = summary.correctCount;
             dashboardStore.refresh();
         },
     });
@@ -59,13 +67,17 @@ assistant backend through the existing course chat WebSocket channel.
         questions: [],
         contextSource: null,
         sources: [],
+        quizId: null,
+        textbookId: null,
+        pageId: null,
     });
 
     const letters = ["A", "B", "C", "D"];
 
     let index = $state(0);
     let selected = $state<number | null>(null);
-    let score = $state(0);
+    let selectedAnswers = $state<Record<string, number>>({});
+    let score = $state<number | null>(null);
     let finished = $state(false);
     let timer: ReturnType<typeof setTimeout> | null = null;
 
@@ -128,8 +140,11 @@ assistant backend through the existing course chat WebSocket channel.
             finished = true;
             if (!resultSubmitted) {
                 resultSubmitted = true;
-                const normalized = questions.length ? score / questions.length : 0;
-                void quiz.submitResult(normalized, 1);
+                const answers: QuizSubmittedAnswer[] = questions.map((question) => ({
+                    question_id: question.id,
+                    selected_index: selectedAnswers[question.id] ?? null,
+                }));
+                void quiz.submitResult(answers, 1);
             }
         } else {
             index += 1;
@@ -143,9 +158,7 @@ assistant backend through the existing course chat WebSocket channel.
         }
 
         selected = optionIndex;
-        if (current.options[optionIndex]?.correct) {
-            score += 1;
-        }
+        selectedAnswers = {...selectedAnswers, [current.id]: optionIndex};
 
         timer = setTimeout(advance, 950);
     }
@@ -153,7 +166,8 @@ assistant backend through the existing course chat WebSocket channel.
     function restart(): void {
         index = 0;
         selected = null;
-        score = 0;
+        selectedAnswers = {};
+        score = null;
         finished = false;
         resultSubmitted = false;
         reward = null;
@@ -295,10 +309,16 @@ assistant backend through the existing course chat WebSocket channel.
             {#if selectedTextbookName}
                 <span class="progress-pill">{selectedTextbookName}</span>
             {/if}
-            <div class="score-ring">{score}/{questions.length}</div>
-            <p class="result-text">
-                {score === questions.length ? "Perfect score." : "Keep practising."}
-            </p>
+            <div class="score-ring">
+                {score === null ? "..." : `${score}/${questions.length}`}
+            </div>
+            {#if score === null}
+                <p class="result-text">Grading quiz...</p>
+            {:else}
+                <p class="result-text">
+                    {score === questions.length ? "Perfect score." : "Keep practising."}
+                </p>
+            {/if}
 
             {#if reward}
                 {#if reward.pointsAwarded > 0}
@@ -335,9 +355,8 @@ assistant backend through the existing course chat WebSocket channel.
                     <button
                         type="button"
                         class="answer c{optionIndex}"
-                        class:correct={answered && option.correct}
-                        class:wrong={answered && optionIndex === selected && !option.correct}
-                        class:dim={answered && !option.correct && optionIndex !== selected}
+                        class:selected={answered && optionIndex === selected}
+                        class:dim={answered && optionIndex !== selected}
                         disabled={answered}
                         onclick={() => choose(optionIndex)}
                     >
@@ -651,6 +670,12 @@ assistant backend through the existing course chat WebSocket channel.
 
     .answer.dim {
         opacity: 0.35;
+    }
+
+    .answer.selected {
+        outline: 4px solid var(--color-base-content);
+        outline-offset: 3px;
+        transform: translateY(-3px);
     }
 
     .answer.correct {
