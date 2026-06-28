@@ -13,6 +13,9 @@ from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 
 from openbook.assistant.services.orchestrator import AssistantOrchestrator
+from openbook.assistant.services.quiz_generation import GeneratedQuiz
+from openbook.assistant.services.quiz_generation import GeneratedQuizOption
+from openbook.assistant.services.quiz_generation import GeneratedQuizQuestion
 from openbook.assistant.services.rag_client import RagContext
 from openbook.assistant.services.rag_client import RagSource
 from openbook.auth.middleware.current_user import reset_current_user
@@ -205,6 +208,58 @@ class AssistantOrchestrator_Tests(TestCase):
             page=self.page,
             score=0.75,
             attempts=3,
+        )
+
+    def test_grade_quiz_calculates_score_before_recording_result(self):
+        """Submitted quiz answers should be graded server-side before learning is updated."""
+        self.learning_context_service.record_quiz_result.return_value = "quiz result"
+        quiz = GeneratedQuiz(
+            context_source="course_context",
+            page_id=str(self.page.id),
+            questions=(
+                GeneratedQuizQuestion(
+                    id="question-1",
+                    prompt="What is HTML?",
+                    options=(
+                        GeneratedQuizOption(text="Markup language", correct=True),
+                        GeneratedQuizOption(text="Database", correct=False),
+                        GeneratedQuizOption(text="Server", correct=False),
+                        GeneratedQuizOption(text="Image format", correct=False),
+                    ),
+                ),
+                GeneratedQuizQuestion(
+                    id="question-2",
+                    prompt="What is CSS?",
+                    options=(
+                        GeneratedQuizOption(text="Markup language", correct=False),
+                        GeneratedQuizOption(text="Stylesheet language", correct=True),
+                        GeneratedQuizOption(text="Server", correct=False),
+                        GeneratedQuizOption(text="Image format", correct=False),
+                    ),
+                ),
+            ),
+        )
+
+        result = self.orchestrator.grade_quiz(
+            user=self.owner,
+            course=self.course,
+            quiz=quiz,
+            answers=[
+                {"question_id": "question-1", "selected_index": 0},
+                {"question_id": "question-2", "selected_index": 0},
+            ],
+            attempts=1,
+        )
+
+        self.assertEqual(result["graded_quiz"].correct_count, 1)
+        self.assertEqual(result["graded_quiz"].question_count, 2)
+        self.assertEqual(result["graded_quiz"].score, 0.5)
+        self.learning_context_service.record_quiz_result.assert_called_once_with(
+            user=self.owner,
+            course=self.course,
+            page=self.page,
+            score=0.5,
+            attempts=1,
         )
 
     def test_generate_quiz_uses_rag_documents_first(self):

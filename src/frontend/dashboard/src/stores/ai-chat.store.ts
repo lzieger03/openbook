@@ -117,9 +117,14 @@ export interface LearningPagePayload {
     page_id: string;
 }
 
+export interface QuizAnswerPayload {
+    question_id: string;
+    selected_index: number | null;
+}
+
 export interface LearningQuizResultPayload {
-    page_id: string;
-    score: number;
+    quiz_id: string;
+    answers: QuizAnswerPayload[];
     attempts?: number | null;
 }
 
@@ -191,7 +196,11 @@ export interface AiChatStore {
     sendChatInput: (format: ChatMessageFormat, content: string, pageContext?: string) => Promise<void>;
     recordPageOpened: (pageId: string) => Promise<void>;
     markPageCompleted: (pageId: string) => Promise<void>;
-    recordQuizResult: (pageId: string, score: number, attempts?: number) => Promise<void>;
+    recordQuizResult: (
+        quizId: string,
+        answers: QuizAnswerPayload[],
+        attempts?: number,
+    ) => Promise<void>;
 }
 
 type CourseIdSource = string | (() => string | undefined);
@@ -362,13 +371,13 @@ export function createAiChatStore(courseId?: CourseIdSource): AiChatStore {
     }
 
     async function recordQuizResult(
-        pageId: string,
-        score: number,
+        quizId: string,
+        answers: QuizAnswerPayload[],
         attempts?: number,
     ): Promise<void> {
         await socket?.send({
             action: "learning_quiz_result",
-            payload: {page_id: pageId, score, attempts: attempts ?? null},
+            payload: {quiz_id: quizId, answers, attempts: attempts ?? null},
         });
     }
 

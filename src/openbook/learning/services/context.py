@@ -83,7 +83,9 @@ class LearningContext:
             if self.gamification.course_points is not None:
                 gamification_parts.append(f"{self.gamification.course_points} Kurspunkte")
             if self.gamification.course_progress is not None:
-                gamification_parts.append(f"{self.gamification.course_progress}% Kursfortschritt")
+                gamification_parts.append(
+                    f"{self.gamification.course_progress}% Kursfortschritt"
+                )
             if gamification_parts:
                 parts.append("Gamification: " + ", ".join(gamification_parts) + ".")
 
@@ -192,7 +194,7 @@ class LearningContextService:
         quiz_result.save(update_fields=["score", "attempts", "answered_at"])
         return quiz_result
 
-    def _page_summary(self, page) -> LearningPageSummary:
+    def _page_summary(self, page: TextbookPage) -> LearningPageSummary:
         """Return the compact representation used in prompt context."""
         return LearningPageSummary(
             id=str(page.id),
