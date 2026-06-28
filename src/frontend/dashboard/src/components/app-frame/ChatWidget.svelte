@@ -24,8 +24,10 @@ README-websocket-api.md.
 <script lang="ts">
     import {onMount} from "svelte";
     import {createAiChatStore} from "../../stores/ai-chat.store.js";
-    import type {AiChatState} from "../../stores/ai-chat.store.js";
+    import type {AiChatState, ChatSessionSummary} from "../../stores/ai-chat.store.js";
     import {renderMarkdown} from "../../data/markdown.js";
+    import {pageContext, formatPageContext} from "../../stores/page-context.store.js";
+    import type {PageContext} from "../../stores/page-context.store.js";
 
     type Mode = "floating" | "sidebar";
 
@@ -53,6 +55,12 @@ README-websocket-api.md.
     let connectStarted = false;
     // The scrollable message area; kept pinned to the bottom on new content.
     let bodyEl = $state<HTMLDivElement>();
+
+    // Whether the chat-history (sessions) panel is shown instead of the conversation.
+    let showHistory = $state(false);
+
+    // What the user is currently looking at, sent to the assistant as context.
+    let currentContext = $state<PageContext | null>(null);
 
     const connected = $derived(chatState.connection === "connected");
 
@@ -83,7 +91,42 @@ README-websocket-api.md.
         }
 
         draft = "";
-        await chat.sendChatInput("markdown", text);
+        await chat.sendChatInput("markdown", text, formatPageContext(currentContext));
+    }
+
+    function onNewChat(): void {
+        void chat.newChat();
+        showHistory = false;
+    }
+
+    function onOpenSession(sessionId: string): void {
+        if (sessionId !== chatState.activeSessionId) {
+            void chat.openSession(sessionId);
+        }
+        showHistory = false;
+    }
+
+    function onDeleteSession(session: ChatSessionSummary): void {
+        if (confirm(`Delete the chat “${session.title}”? This cannot be undone.`)) {
+            void chat.deleteSession(session.id);
+        }
+    }
+
+    /** Compact "x min ago" style timestamp for the history list. */
+    function formatRelative(iso: string): string {
+        const then = new Date(iso).getTime();
+        if (Number.isNaN(then)) {
+            return "";
+        }
+        const seconds = Math.round((Date.now() - then) / 1000);
+        if (seconds < 60) return "just now";
+        const minutes = Math.round(seconds / 60);
+        if (minutes < 60) return `${minutes}m ago`;
+        const hours = Math.round(minutes / 60);
+        if (hours < 24) return `${hours}h ago`;
+        const days = Math.round(hours / 24);
+        if (days < 7) return `${days}d ago`;
+        return new Date(iso).toLocaleDateString();
     }
 
     function notify(): void {
@@ -96,8 +139,12 @@ README-websocket-api.md.
         const unsubscribe = chat.subscribe((value) => {
             chatState = value;
         });
+        const unsubscribeContext = pageContext.subscribe((value) => {
+            currentContext = value;
+        });
         return () => {
             unsubscribe();
+            unsubscribeContext();
             void chat.disconnect();
         };
     });
@@ -173,6 +220,20 @@ README-websocket-api.md.
                 <button
                     type="button"
                     class="icon-btn"
+                    class:active={showHistory}
+                    aria-label="Chat history"
+                    aria-pressed={showHistory}
+                    title="Chat history"
+                    onclick={() => (showHistory = !showHistory)}
+                >
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M12 7.5V12l3 2" />
+                    </svg>
+                </button>
+                <button
+                    type="button"
+                    class="icon-btn"
                     aria-label={mode === "sidebar" ? "Float chat" : "Dock chat to sidebar"}
                     onclick={toggleMode}
                 >
@@ -182,6 +243,30 @@ README-websocket-api.md.
             </div>
         </header>
 
+        {#if showHistory}
+            <div class="panel-body history">
+                <div class="history-head">
+                    <span class="history-title-label">Chat history</span>
+                    <button type="button" class="new-chat" onclick={onNewChat}>+ New chat</button>
+                </div>
+
+                {#if chatState.sessions.length === 0}
+                    <p class="history-empty">No saved chats yet. Send a message to start one.</p>
+                {:else}
+                    <ul class="history-list">
+                        {#each chatState.sessions as session (session.id)}
+                            <li class="history-row" class:active={session.id === chatState.activeSessionId}>
+                                <button type="button" class="history-open" onclick={() => onOpenSession(session.id)} title={session.title}>
+                                    <span class="history-name">{session.title}</span>
+                                    <span class="history-time">{formatRelative(session.updated_at)}</span>
+                                </button>
+                                <button type="button" class="history-action" aria-label="Delete chat" title="Delete" onclick={() => onDeleteSession(session)}>✕</button>
+                            </li>
+                        {/each}
+                    </ul>
+                {/if}
+            </div>
+        {:else}
         <div class="panel-body" bind:this={bodyEl}>
             <div class="message">
                 <img class="avatar" src="logo.png" alt="ElisaAI" />
@@ -216,10 +301,21 @@ README-websocket-api.md.
                 </div>
             {/if}
         </div>
+        {/if}
 
+        {#if !showHistory}
         <div class="composer">
             {#if !connected}
                 <span class="coming-soon">{chatState.connection === "connecting" ? "Connecting…" : "Offline — reconnecting…"}</span>
+            {/if}
+            {#if currentContext && connected}
+                <span class="context-chip" title={currentContext.label}>
+                    <svg class="context-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                        <path d="M5 3h9l5 5v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
+                    </svg>
+                    Using the current page as context
+                </span>
             {/if}
             <form class="composer-row" onsubmit={(event) => {event.preventDefault(); send();}}>
                 <button type="button" class="composer-add" aria-label="Add" disabled>+</button>
@@ -239,6 +335,7 @@ README-websocket-api.md.
             </form>
             <p class="disclaimer">ElisaAI may generate misinformation. Please verify all information.</p>
         </div>
+        {/if}
     </section>
 {/if}
 
@@ -360,6 +457,16 @@ README-websocket-api.md.
         color: var(--color-base-content);
     }
 
+    .icon-btn.active {
+        background: color-mix(in oklab, var(--color-primary) 16%, transparent);
+        color: var(--color-primary);
+    }
+
+    .icon-btn .icon {
+        width: 1.05rem;
+        height: 1.05rem;
+    }
+
     .panel-body {
         flex: 1;
         min-height: 0;
@@ -368,6 +475,123 @@ README-websocket-api.md.
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
+    }
+
+    /* --- Chat history (clock icon) ------------------------------------- */
+
+    .panel-body.history {
+        gap: 0.4rem;
+    }
+
+    .history-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        padding-bottom: 0.4rem;
+    }
+
+    .history-title-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: color-mix(in oklab, var(--color-base-content) 55%, transparent);
+    }
+
+    .new-chat {
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 0.25rem 0.6rem;
+        border-radius: 999px;
+        cursor: pointer;
+        color: var(--color-primary);
+        background: color-mix(in oklab, var(--color-primary) 12%, transparent);
+        border: 1px solid color-mix(in oklab, var(--color-primary) 30%, transparent);
+    }
+
+    .new-chat:hover {
+        background: color-mix(in oklab, var(--color-primary) 20%, transparent);
+    }
+
+    .history-empty {
+        font-size: 0.85rem;
+        color: color-mix(in oklab, var(--color-base-content) 55%, transparent);
+        padding: 0.5rem 0.25rem;
+    }
+
+    .history-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .history-row {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        border-radius: 0.6rem;
+        border: 1px solid transparent;
+    }
+
+    .history-row.active {
+        background: color-mix(in oklab, var(--color-primary) 12%, transparent);
+        border-color: color-mix(in oklab, var(--color-primary) 30%, transparent);
+    }
+
+    .history-open {
+        flex: 1 1 auto;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.1rem;
+        text-align: left;
+        padding: 0.45rem 0.6rem;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--color-base-content);
+    }
+
+    .history-open:hover {
+        background: color-mix(in oklab, var(--color-base-content) 6%, transparent);
+        border-radius: 0.6rem;
+    }
+
+    .history-name {
+        font-size: 0.88rem;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .history-time {
+        font-size: 0.72rem;
+        color: color-mix(in oklab, var(--color-base-content) 50%, transparent);
+    }
+
+    .history-action {
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        width: 1.7rem;
+        height: 1.7rem;
+        margin-right: 0.25rem;
+        border-radius: 0.45rem;
+        border: none;
+        background: none;
+        cursor: pointer;
+        font-size: 0.8rem;
+        color: color-mix(in oklab, var(--color-base-content) 45%, transparent);
+    }
+
+    .history-action:hover {
+        color: var(--color-error);
+        background: color-mix(in oklab, var(--color-error) 14%, transparent);
     }
 
     .message {
@@ -515,6 +739,31 @@ README-websocket-api.md.
         align-self: center;
         font-size: 0.7rem;
         color: var(--color-warning);
+    }
+
+    /* Shows that the assistant is aware of the page the user is currently viewing. */
+    .context-chip {
+        align-self: flex-start;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        max-width: 100%;
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 0.15rem 0.55rem;
+        border-radius: 999px;
+        color: var(--color-primary);
+        background: color-mix(in oklab, var(--color-primary) 12%, transparent);
+        border: 1px solid color-mix(in oklab, var(--color-primary) 28%, transparent);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .context-icon {
+        flex: 0 0 auto;
+        width: 0.85rem;
+        height: 0.85rem;
     }
 
     .composer-row {

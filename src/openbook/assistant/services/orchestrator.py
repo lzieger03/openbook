@@ -67,8 +67,14 @@ class AssistantOrchestrator:
         query: str,
         user: AbstractUser | AnonymousUser | None = None,
         course: Course | UUID | str | None = None,
+        context: str = "",
     ) -> str:
-        """Generate an assistant answer for a global or course-scoped query."""
+        """Generate an assistant answer for a global or course-scoped query.
+
+        ``context`` is optional free-text describing what the user is currently looking
+        at (e.g. the textbook page they are reading); it is added to the prompt so the
+        Quick Chat can answer about the current page.
+        """
         course_obj = self._resolve_course(course)
         self._check_chat_permission(user=user, course=course_obj)
 
@@ -76,15 +82,19 @@ class AssistantOrchestrator:
         if course_obj is not None:
             self._award_chat_question_reward(user=user, course=course_obj)
 
-        if course_obj is None:
-            return self.llm_client.get_user_message(query)
+        context_block = self._page_context_block(context)
 
-        learning_context = ""
-        if course_obj is not None:
-            learning_context = self.learning_context_service.get_prompt_context(
-                user=user,
-                course=course_obj,
-            )
+        if course_obj is None:
+            return self.llm_client.get_user_message(f"{context_block}{query}")
+
+        learning_context = self.learning_context_service.get_prompt_context(
+            user=user,
+            course=course_obj,
+        )
+        # The page context belongs in the generation context, not the retrieval query,
+        # so RAG still retrieves on the user's actual question.
+        if context_block:
+            learning_context = f"{learning_context}\n\n{context_block}".strip()
 
         try:
             return self.llm_client.perform_rag_query(
@@ -97,9 +107,27 @@ class AssistantOrchestrator:
                 "No global assistant documents have been indexed yet.",
                 "No assistant documents have been indexed for this course yet.",
             }:
-                return self.llm_client.get_user_message(query)
+                return self.llm_client.get_user_message(f"{context_block}{query}")
 
             raise
+
+    @staticmethod
+    def _page_context_block(context: str) -> str:
+        """Wrap the current-page context for inclusion in a prompt (capped in size)."""
+        context = (context or "").strip()
+        if not context:
+            return ""
+
+        # Cap so a very long page cannot blow up the prompt / token budget.
+        max_length = 6000
+        if len(context) > max_length:
+            context = context[:max_length].rstrip() + "…"
+
+        return (
+            "The learner is currently looking at the following in the OpenBook app. "
+            "Use it as context for their question when it is relevant:\n"
+            f'"""\n{context}\n"""\n\n'
+        )
 
     def record_page_opened(
         self,

@@ -238,6 +238,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         try:
             response_string = await sync_to_async(self._answer_chat_query)(
                 message.payload.content,
+                message.payload.page_context,
             )
             response_type     = "normal"
             response_severity = "info"
@@ -675,7 +676,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 ),
             )
 
-    def _answer_chat_query(self, query: str) -> str:
+    def _answer_chat_query(self, query: str, page_context: str = "") -> str:
         """Run the blocking assistant stack outside the async event loop."""
         course_id = self.scope.get("url_route", {}).get("kwargs", {}).get("course_id")
         user = self.scope.get("user")
@@ -683,6 +684,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             query=query,
             user=user,
             course=course_id,
+            context=page_context,
         )
         return str(answer or "")
 
