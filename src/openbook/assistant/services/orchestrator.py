@@ -93,14 +93,35 @@ class AssistantOrchestrator:
         query: str,
         user: AbstractUser | AnonymousUser | None = None,
         course: Course | UUID | str | None = None,
+        context: str = "",
     ) -> str:
         """Generate an assistant answer for a global or course-scoped query."""
         course_obj = self.request_context_service.resolve_course(course)
         self.request_context_service.check_chat_permission(user=user, course=course_obj)
+        context_block = self._page_context_block(context)
         return self.chat_service.answer(
             query=query,
             user=user,
             course=course_obj,
+            context_block=context_block,
+        )
+
+    @staticmethod
+    def _page_context_block(context: str) -> str:
+        """Wrap the current-page context for inclusion in a prompt (capped in size)."""
+        context = (context or "").strip()
+        if not context:
+            return ""
+
+        # Cap so a very long page cannot blow up the prompt / token budget.
+        max_length = 6000
+        if len(context) > max_length:
+            context = context[:max_length].rstrip() + "…"
+
+        return (
+            "The learner is currently looking at the following in the OpenBook app. "
+            "Use it as context for their question when it is relevant:\n"
+            f'"""\n{context}\n"""\n\n'
         )
 
     def record_page_opened(

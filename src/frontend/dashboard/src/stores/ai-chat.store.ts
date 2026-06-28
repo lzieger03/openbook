@@ -41,6 +41,8 @@ export interface GuardRailCheckResult {
 export interface ChatInputPayload {
     format: ChatMessageFormat;
     content: string;
+    // Optional description of what the user is currently viewing, used as assistant context.
+    page_context?: string;
 }
 
 export interface ChatMessagePayload {
@@ -191,7 +193,7 @@ export interface AiChatStore {
     newChat: () => Promise<void>;
     renameSession: (sessionId: string, title: string) => Promise<void>;
     deleteSession: (sessionId: string) => Promise<void>;
-    sendChatInput: (format: ChatMessageFormat, content: string) => Promise<void>;
+    sendChatInput: (format: ChatMessageFormat, content: string, pageContext?: string) => Promise<void>;
     recordPageOpened: (pageId: string) => Promise<void>;
     markPageCompleted: (pageId: string) => Promise<void>;
     recordQuizResult: (
@@ -344,11 +346,20 @@ export function createAiChatStore(courseId?: CourseIdSource): AiChatStore {
         }
     }
 
-    /** Send a user chat message. The server echoes it back, so we do not add it locally. */
-    async function sendChatInput(format: ChatMessageFormat, content: string): Promise<void> {
+    /** Send a user chat message. The server echoes it back, so we do not add it locally.
+     *  `pageContext` optionally tells the assistant what the user is currently viewing. */
+    async function sendChatInput(
+        format: ChatMessageFormat,
+        content: string,
+        pageContext?: string,
+    ): Promise<void> {
         // Show the "typing…" indicator until the assistant's reply arrives.
         update((state) => ({...state, awaitingResponse: true}));
-        await socket?.send({action: "chat_input", payload: {format, content}});
+        const payload: ChatInputPayload = {format, content};
+        if (pageContext?.trim()) {
+            payload.page_context = pageContext.trim();
+        }
+        await socket?.send({action: "chat_input", payload});
     }
 
     async function recordPageOpened(pageId: string): Promise<void> {

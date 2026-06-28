@@ -107,6 +107,10 @@ class ChatInputPayload(BaseModel):
     """
     format:  ChatMessageFormat
     content: str
+    # Optional free-text description of what the user is currently looking at in the
+    # app (e.g. the textbook page they are reading). Passed to the assistant as extra
+    # context so the Quick Chat can answer about the current page.
+    page_context: str = ""
 
 class ChatMessagePayload(BaseModel):
     """

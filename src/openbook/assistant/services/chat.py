@@ -38,16 +38,19 @@ class AssistantChatService:
         query: str,
         user: AbstractUser | AnonymousUser | None,
         course: Course | None = None,
+        context_block: str = "",
     ) -> str:
         """Generate an assistant answer for a global or course-scoped query."""
         if course is None:
-            return self.llm_client.get_user_message(query)
+            return self.llm_client.get_user_message(f"{context_block}{query}")
 
         self.learning_activity_service.record_chat_question(user=user, course=course)
         learning_context = self.learning_context_service.get_prompt_context(
             user=user,
             course=course,
         )
+        if context_block:
+            learning_context = f"{learning_context}\n\n{context_block}".strip()
 
         try:
             return self.llm_client.perform_rag_query(
@@ -60,6 +63,6 @@ class AssistantChatService:
                 "No global assistant documents have been indexed yet.",
                 "No assistant documents have been indexed for this course yet.",
             }:
-                return self.llm_client.get_user_message(query)
+                return self.llm_client.get_user_message(f"{context_block}{query}")
 
             raise

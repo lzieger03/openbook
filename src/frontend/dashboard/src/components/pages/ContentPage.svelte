@@ -23,13 +23,14 @@ with the Previous/Next controls or by picking an entry from the table of content
 so only the current page scrolls — never the whole textbook at once.
 -->
 <script lang="ts">
-    import {onMount} from "svelte";
+    import {onDestroy, onMount} from "svelte";
     import {push} from "svelte-spa-router";
     import {dashboardStore} from "../../stores/dashboard.store.js";
     import type {DashboardState} from "../../stores/dashboard.store.js";
     import {loadCourseContent} from "../../data/course-content.js";
     import type {ContentMaterialView} from "../../data/course-content.js";
     import {completeCourse, fetchLearningState, markPageCompleted, recordPageOpened} from "../../api/learning.js";
+    import {clearPageContext, setPageContext} from "../../stores/page-context.store.js";
 
     let {params}: {params?: {id?: string}} = $props();
 
@@ -158,13 +159,35 @@ so only the current page scrolls — never the whole textbook at once.
         }
     });
 
-    // Record a page as opened whenever it becomes the current entry.
+    // Record a page as opened whenever it becomes the current entry, and publish it as
+    // the Quick Chat's page context so the assistant knows what the learner is reading.
     $effect(() => {
         const entry = currentEntry;
         if (entry?.kind === "page") {
             openPage(entry.id);
+            setPageContext({
+                label: `The learner is reading the page "${entry.page.title}" in the course "${courseTitle}".`,
+                details: htmlToText(entry.page.html),
+            });
+        } else {
+            clearPageContext();
         }
     });
+
+    onDestroy(() => clearPageContext());
+
+    /** Reduce rendered page HTML to plain text for use as assistant context. */
+    function htmlToText(html: string): string {
+        return html
+            .replace(/<(script|style)[^>]*>[\s\S]*?<\/\1>/gi, " ")
+            .replace(/<[^>]+>/g, " ")
+            .replace(/&nbsp;/gi, " ")
+            .replace(/&amp;/gi, "&")
+            .replace(/&lt;/gi, "<")
+            .replace(/&gt;/gi, ">")
+            .replace(/\s+/g, " ")
+            .trim();
+    }
 
     /** Load the learner's saved progress (completed pages + course completion). */
     async function loadLearningState(courseId: string): Promise<void> {
