@@ -77,5 +77,8 @@
         "tsx": "^4.22.4",
         "typescript": "^6.0.3",
         "yaml": "^2.9.0"
+    },
+    "dependencies": {
+        "graphviz": "^0.0.9"
     }
 }

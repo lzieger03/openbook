@@ -152,6 +152,29 @@ Alle drei liefern den aktualisierten `LearningState` (`is_completed`, `completed
 
 ---
 
+## 7b. Mini-Spiele (Memory / Flashcards / Hangman) – **noch nicht angebunden**
+
+Im Dashboard gibt es einen **Spiele-Hub** pro Kurs (`/games/:id`) mit drei Mini-Spielen.
+Sie sind aktuell eine **Demo / Machbarkeitsstudie** und **nicht in die Gamification
+integriert**:
+
+- **Keine Punkte fürs Spielen.** Die Spielseiten rufen **keinen** `award_*`-Service auf
+  und erzeugen **keinen** `RewardEventLog`. Spielen verändert weder Punkte noch Level,
+  Streak oder Skills.
+- Die Aktivitätsart **`GAME_PLAYED`** existiert in `constants.py`
+  (`LearningActivityType`), wird aber **nirgends im Produktivpfad ausgelöst** (nur in
+  einem Streak-Test referenziert). Sie ist der vorgesehene Aufhänger für eine spätere
+  Anbindung.
+- **Inhaltsquelle = nur das Textbook.** Memory und Hangman verwenden ausschließlich
+  Begriffe, die **bereits im Seiteninhalt** stehen (Frontend `data/course-terms.ts`,
+  extrahiert aus dem gerenderten HTML). Es gibt **noch keine KI-generierten** Begriffe
+  oder Antwortmöglichkeiten.
+
+Geplante nächste Schritte (z. B. Punkte/Streak via `record_learning_activity` +
+`award_course_points`, KI-gestützte Begriffe) stehen in `TODOS.md`.
+
+---
+
 ## 8. REST-API (`/api/gamification/...`)
 
 Routen in `gamification/routes.py` (registriert mit Prefix `gamification`):
@@ -177,7 +200,7 @@ Flex-Fields werden unterstützt (`_expand`, `_fields`, `_omit`, `_sort`, `_page_
 
 ## 9. Konstanten (`gamification/constants.py`)
 
-- `LearningActivityType`: `CHAT_MESSAGE_SENT, QUIZ_ANSWERED, QUIZ_COMPLETED, CONTENT_VIEWED, MODULE_COMPLETED, GAME_PLAYED` (Login zählt **nicht**).
+- `LearningActivityType`: `CHAT_MESSAGE_SENT, QUIZ_ANSWERED, QUIZ_COMPLETED, CONTENT_VIEWED, MODULE_COMPLETED, GAME_PLAYED` (Login zählt **nicht**). ⚠️ `GAME_PLAYED` ist **definiert, aber noch ungenutzt** – die Mini-Spiele lösen es nicht aus (siehe §7b).
 - `CourseEventType`: `COURSE_POINTS_AWARDED, QUIZ_POINTS_AWARDED, CHAT_POINTS_AWARDED`.
 - `StreakEventType`: `STREAK_STARTED, STREAK_INCREMENTED, STREAK_RESET, STREAK_ALREADY_COUNTED_TODAY, LEARNING_ACTIVITY_RECORDED`.
 

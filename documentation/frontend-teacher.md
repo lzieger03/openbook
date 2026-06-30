@@ -118,9 +118,17 @@ Geführter, geradliniger Ablauf:
      **Import file** (`.md/.html/.txt`) und **Save page**.
 4. Textbooks lassen sich neu anordnen (↑/↓) und entfernen.
 
-> Ein **Save** einer Seite stößt serverseitig die **RAG-Synchronisation** an
-> (`TextbookDocumentSyncService`): Der Textbook-Inhalt wird zu einem `.md`-Dokument
-> gerendert, im Assistant indexiert und ist im Student-Dashboard herunterladbar.
+> ⚠️ **Speichern dauert merklich lange – das ist erwartetes Verhalten.**
+> Ein **Save** einer Seite (ebenso das Hinzufügen/Importieren von Inhalt) stößt
+> serverseitig **synchron** die **RAG-Synchronisation** an (`TextbookDocumentSyncService`):
+> Der Textbook-Inhalt wird zu einem `.md`-Dokument gerendert, in **Chunks** zerlegt,
+> **Embeddings** werden berechnet und im Assistant-/Vektorindex abgelegt (und das Dokument
+> ist im Student-Dashboard herunterladbar). Weil das **direkt im Request** passiert und nicht
+> in einen Hintergrund-Job ausgelagert ist, **wartet die UI**, bis die Verarbeitung fertig ist
+> – je nach Inhaltsmenge und Embedding-Backend mehrere Sekunden bis deutlich länger.
+> Der „Save page"-Button zeigt währenddessen einen Lade-Spinner; **nicht doppelt klicken**
+> und die Seite **nicht neu laden**, bis der Vorgang abgeschlossen ist.
+> _(Auslagern in einen asynchronen Task ist ein offener Punkt – siehe `TODOS.md`.)_
 
 ---
 
@@ -158,3 +166,5 @@ Nach Änderungen: **Browser hart neu laden** (Cmd/Ctrl+Shift+R).
   Dashboard werden serverseitig aus den Seiten-Skills abgeleitet.
 - **Nach Merges** im Backend `migrate` nicht vergessen (sonst 500er im Teacher-Content,
   z. B. fehlende `assistantdocument.textbook`-Spalte).
+- **Langes Laden beim Speichern von Inhalten ist kein Bug, sondern die synchrone
+  RAG-Verarbeitung** (siehe §6). Geduld haben, Spinner abwarten, nicht doppelt klicken.

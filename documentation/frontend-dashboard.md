@@ -33,6 +33,10 @@ components/
     QuizPage.svelte         KI-Quiz (Textbook wählen → spielen → Punkte)
     CourseChatPage.svelte   Vollbild-Kurs-Chat
     ContentPage.svelte      Lese-Ansicht der Kursinhalte + Lernfortschritt
+    GamesPage.svelte        Spiele-Hub eines Kurses (Auswahlkarten)
+    MemoryGamePage.svelte   Memory mit Kursbegriffen (Demo, keine Punkte)
+    FlashcardsGamePage.svelte Lernkarten Überschrift→Abschnitt (Demo)
+    HangmanGamePage.svelte  Galgenmännchen mit Kursbegriffen (Demo, keine Punkte)
     ProfileEditPage.svelte  Profil bearbeiten
   panels/
     StatsPanel.svelte       Punkte/Level/Streak-Kacheln
@@ -53,6 +57,7 @@ api/
 data/
   dashboard.ts            DTO → View-Modelle für das Dashboard
   course-content.ts       Kursinhalte (Materialien → Seiten → HTML)
+  course-terms.ts         Begriffe/Lernkarten für die Spiele aus echtem Seiteninhalt
   markdown.ts             Gemeinsamer Markdown-Renderer (sicher, html:false)
 ```
 
@@ -69,6 +74,8 @@ data/
   - `/quiz/:id` → `QuizPage`
   - `/chat/:id` → `CourseChatPage`
   - `/content/:id` → `ContentPage`
+  - `/games/:id` → `GamesPage` (Hub) · `/games/:id/memory` · `/games/:id/flashcards` ·
+    `/games/:id/hangman`
 - **`theme.ts`**: `data-theme="light|dark"` am Root, gespeichert in `localStorage`,
   Default = System-Farbschema; `toggleTheme()` (Pill-Toggle im Header).
 
@@ -166,6 +173,25 @@ Inhaltsverzeichnis links, Inhalt rechts. Anbindung ans Lernstandsmodell:
 - am Ende **„Complete course"** → `completeCourse` (Backend vergibt +200 Punkte) →
   danach `dashboardStore.refresh()`. Gespeicherter Fortschritt wird beim Öffnen geladen.
 Zusätzlich: **Download-Links** pro Textbook (`.md`, aus den Assistant-Dokumenten).
+
+### `GamesPage` + Mini-Spiele (Memory / Flashcards / Hangman)
+Der **Spiele-Hub** (`/games/:id`) zeigt drei Karten; jede führt zu einem Mini-Spiel.
+Das Lernmaterial der Spiele wird **aus dem echten Seiteninhalt des Kurses** abgeleitet
+(`data/course-terms.ts`, das auf `loadCourseContent` aufsetzt):
+- **`loadCourseTerms`** extrahiert kurze Fachbegriffe aus dem **gerenderten HTML** der
+  Seiten (Überschriften, fett/kursiv, `code`, kurze Listenpunkte) → genutzt von
+  **Memory** (Paare finden) und **Hangman** (Begriff Buchstabe für Buchstabe raten).
+- **`loadCourseFlashcards`** bildet **Überschrift → Abschnitt**-Paare für **Flashcards**.
+
+> ⚠️ **Status: Demo / noch nicht vollständig implementiert.** Die Spiele sind als
+> Machbarkeitsdemo eingebaut und bewusst noch begrenzt:
+> - Memory & Hangman arbeiten **nur mit Wörtern/Begriffen, die bereits im Textbook
+>   stehen** – es gibt **noch keine KI-generierten** Begriffe/Antwortmöglichkeiten.
+> - **Für das Spielen werden (noch) keine Punkte vergeben.** Es gibt keine Anbindung an
+>   die Gamification: kein `award_*`-Aufruf, kein RewardEvent. (Die Aktivitätsart
+>   `GAME_PLAYED` existiert im Backend, ist aber **nirgends verdrahtet**.)
+>
+> Details & geplante Schritte stehen in `TODOS.md`.
 
 ### `ProfileEditPage`
 Profil bearbeiten (`api/profile.ts`).
