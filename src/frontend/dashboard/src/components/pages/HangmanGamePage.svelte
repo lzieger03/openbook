@@ -21,6 +21,7 @@ physical keyboard before the figure is complete.
     import {push} from "svelte-spa-router";
     import {dashboardStore} from "../../stores/dashboard.store.js";
     import type {DashboardState} from "../../stores/dashboard.store.js";
+    import {recordLearningActivityResult} from "../../api/learning.js";
     import {loadCourseTerms} from "../../data/course-terms.js";
     import {clearPageContext, setCourseContext} from "../../stores/page-context.store.js";
     import type {PageContext} from "../../stores/page-context.store.js";
@@ -55,6 +56,8 @@ physical keyboard before the figure is complete.
     let word = $state(""); // uppercase secret word
     let guessed = $state<string[]>([]);
     let wrong = $state(0);
+    let roundId = $state(0);
+    let reportedRoundId = $state<number | null>(null);
 
     const lettersInWord = $derived(new Set(word.split("").filter((c) => /[A-ZÄÖÜ]/.test(c))));
     const solved = $derived(
@@ -62,6 +65,13 @@ physical keyboard before the figure is complete.
     );
     const lost = $derived(wrong >= MAX_WRONG);
     const over = $derived(solved || lost);
+
+    $effect(() => {
+        if (over && word && reportedRoundId !== roundId) {
+            reportedRoundId = roundId;
+            void reportResult();
+        }
+    });
 
     onMount(() => {
         const unsubscribe = dashboardStore.subscribe((value) => (state = value));
@@ -105,6 +115,8 @@ physical keyboard before the figure is complete.
         word = pick;
         guessed = [];
         wrong = 0;
+        roundId += 1;
+        reportedRoundId = null;
     }
 
     function guess(letter: string): void {
@@ -129,6 +141,31 @@ physical keyboard before the figure is complete.
             guess(key);
         } else if (event.key === "Enter" && over) {
             newWord();
+        }
+    }
+
+    async function reportResult(): Promise<void> {
+        const courseId = params?.id;
+        if (!courseId) {
+            return;
+        }
+
+        const solvedAtEnd = solved;
+        const wrongAtEnd = wrong;
+        const wordLength = word.replace(/\s/g, "").length;
+        const score = solvedAtEnd ? Math.max(0, (MAX_WRONG - wrongAtEnd) / MAX_WRONG) : 0;
+
+        try {
+            await recordLearningActivityResult(courseId, "hangman", score, {
+                metadata: {
+                    solved: solvedAtEnd,
+                    wrong_guesses: wrongAtEnd,
+                    max_wrong: MAX_WRONG,
+                    word_length: wordLength,
+                },
+            });
+        } catch {
+            // Best-effort learning telemetry; the game should remain playable offline.
         }
     }
 </script>

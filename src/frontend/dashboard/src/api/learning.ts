@@ -27,6 +27,20 @@ export interface LearningStateDto {
     is_completed: boolean;
 }
 
+export type LearningActivityType = "quiz" | "exam" | "hangman" | "memory" | "flashcards";
+
+export interface LearningActivityResultDto {
+    id: string;
+    course: string;
+    textbook: string | null;
+    page: string | null;
+    activity_type: LearningActivityType;
+    score: number;
+    attempts: number;
+    metadata: Record<string, unknown>;
+    answered_at: string;
+}
+
 interface Paginated<T> {
     results: T[];
 }
@@ -61,5 +75,28 @@ export function markPageCompleted(courseId: string, pageId: string): Promise<Lea
 export function completeCourse(courseId: string): Promise<LearningStateDto> {
     return apiSend<LearningStateDto>("POST", "/api/learning/states/complete-course/", {
         course: courseId,
+    });
+}
+
+/** Record a scored quiz/exam/game result for the learner. Best-effort at call sites. */
+export function recordLearningActivityResult(
+    courseId: string,
+    activityType: LearningActivityType,
+    score: number,
+    options: {
+        pageId?: string | null;
+        textbookId?: string | null;
+        attempts?: number;
+        metadata?: Record<string, unknown>;
+    } = {},
+): Promise<LearningActivityResultDto> {
+    return apiSend<LearningActivityResultDto>("POST", "/api/learning/quiz-results/record-activity/", {
+        course: courseId,
+        activity_type: activityType,
+        score,
+        page: options.pageId ?? null,
+        textbook: options.textbookId ?? null,
+        attempts: options.attempts,
+        metadata: options.metadata ?? {},
     });
 }

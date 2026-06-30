@@ -281,6 +281,32 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         """Course id from the course-scoped route, or None on the global chat route."""
         return self.scope.get("url_route", {}).get("kwargs", {}).get("course_id")
 
+    def _authenticated_user(self):
+        """Return the authenticated scope user, or None."""
+        user = self.scope.get("user")
+        if user is None or not getattr(user, "is_authenticated", False):
+            return None
+        return user
+
+    def _chat_sessions_for_scope(self):
+        """Return chat sessions owned by the current user in the current route scope."""
+        user = self._authenticated_user()
+        if user is None:
+            return ChatSessionModel.objects.none()
+
+        return ChatSessionModel.objects.filter(user=user, course_id=self._course_id())
+
+    def _exam_attempts_for_scope(self):
+        """Return exam attempts owned by the current user in the current course scope."""
+        user = self._authenticated_user()
+        if user is None:
+            return ExamAttemptModel.objects.none()
+
+        return ExamAttemptModel.objects.filter(
+            user=user,
+            course_id=self._get_required_course_id(),
+        )
+
     @staticmethod
     def _make_title(content: str) -> str:
         """Build a short sidebar title from the first user message."""
@@ -308,11 +334,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     def _session_summaries(self) -> list[ChatSessionPayload]:
         """Saved sessions of the current user+course, newest first."""
-        user = self.scope.get("user")
-        if user is None or not getattr(user, "is_authenticated", False):
-            return []
-
-        sessions = ChatSessionModel.objects.filter(user=user, course_id=self._course_id())
+        sessions = self._chat_sessions_for_scope()
         return [
             ChatSessionPayload(id=str(s.id), title=s.title or "Neuer Chat", updated_at=s.updated_at)
             for s in sessions
@@ -321,19 +343,14 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     def _load_active_history(self):
         """(session_id, messages) for the active session, else the latest, else empty."""
         if self.session_id:
-            session = ChatSessionModel.objects.filter(pk=self.session_id).first()
+            session = self._chat_sessions_for_scope().filter(pk=self.session_id).first()
             if session is not None:
                 return str(session.id), self._payloads_for(session)
 
-        user = self.scope.get("user")
-        if user is None or not getattr(user, "is_authenticated", False):
+        if self._authenticated_user() is None:
             return None, []
 
-        latest = (
-            ChatSessionModel.objects
-            .filter(user=user, course_id=self._course_id())
-            .first()
-        )
+        latest = self._chat_sessions_for_scope().first()
         if latest is None:
             return None, []
 
@@ -344,10 +361,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         if session_id is None:
             return None, []
 
-        user = self.scope.get("user")
-        session = ChatSessionModel.objects.filter(
-            pk=session_id, user=user, course_id=self._course_id(),
-        ).first()
+        session = self._chat_sessions_for_scope().filter(pk=session_id).first()
 
         if session is None:
             # Unknown / not owned -> behave like a fresh chat instead of leaking state.
@@ -357,30 +371,26 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     def _rename_session(self, session_id, title) -> None:
         """Set a new title on an owned session (trimmed, capped to the model length)."""
-        user = self.scope.get("user")
         clean = (title or "").strip()[:120] or "Neuer Chat"
-        ChatSessionModel.objects.filter(pk=session_id, user=user).update(title=clean)
+        self._chat_sessions_for_scope().filter(pk=session_id).update(title=clean)
 
     def _delete_session(self, session_id) -> bool:
         """Delete an owned session. Returns whether it was the active session."""
-        user = self.scope.get("user")
         was_active = str(session_id) == str(self.session_id)
-        ChatSessionModel.objects.filter(pk=session_id, user=user).delete()
-        return was_active
+        deleted_count, _ = self._chat_sessions_for_scope().filter(pk=session_id).delete()
+        return was_active and deleted_count > 0
 
     def _persist_turn(self, user_payload, assistant_payload, source_text):
         """Persist a user+assistant turn; create the session on the first message."""
-        user = self.scope.get("user")
-        if user is None or not getattr(user, "is_authenticated", False):
+        user = self._authenticated_user()
+        if user is None:
             return None, False  # Anonymous chats are not saved.
 
         created_new = False
         session = None
 
         if self.session_id:
-            session = ChatSessionModel.objects.filter(
-                pk=self.session_id, user=user,
-            ).first()
+            session = self._chat_sessions_for_scope().filter(pk=self.session_id).first()
 
         if session is None:
             session = ChatSessionModel.objects.create(
@@ -580,7 +590,17 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         message: ExamResume,
     ) -> ExamGenerated | LearningEventStatus:
         """Load a saved exam into this connection so it can be taken again."""
-        exam = await sync_to_async(self._load_saved_exam)(str(message.payload.exam_id))
+        try:
+            exam = await sync_to_async(self._load_saved_exam)(str(message.payload.exam_id))
+        except Exception as error:
+            return LearningEventStatus(
+                payload=LearningEventStatusPayload(
+                    event="exam_resume",
+                    success=False,
+                    message=str(error),
+                ),
+            )
+
         if exam is None:
             return LearningEventStatus(
                 payload=LearningEventStatusPayload(
@@ -762,8 +782,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     def _persist_exam(self, graded_exam) -> None:
         """Create or update the saved ExamAttempt for the current (graded) exam."""
-        user = self.scope.get("user")
-        if user is None or not getattr(user, "is_authenticated", False) or self._active_exam is None or graded_exam is None:
+        user = self._authenticated_user()
+        if user is None or self._active_exam is None or graded_exam is None:
             return
 
         result = {
@@ -789,7 +809,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
         attempt = None
         if self._active_exam_id:
-            attempt = ExamAttemptModel.objects.filter(pk=self._active_exam_id, user=user).first()
+            attempt = self._exam_attempts_for_scope().filter(pk=self._active_exam_id).first()
 
         if attempt is None:
             attempt = ExamAttemptModel(
@@ -809,7 +829,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     def _load_saved_exam(self, exam_id: str):
         """Reconstruct a saved exam (with answers) for the current user, or None."""
-        attempt = ExamAttemptModel.objects.filter(pk=exam_id, user=self.scope.get("user")).first()
+        attempt = self._exam_attempts_for_scope().filter(pk=exam_id).first()
         if attempt is None or not attempt.exam:
             return None
         return deserialize_generated_exam(attempt.exam)

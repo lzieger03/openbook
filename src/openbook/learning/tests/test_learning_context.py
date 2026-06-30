@@ -89,7 +89,7 @@ class LearningContextService_Tests(TestCase):
 
         self.assertIn("Zuletzt gelesene Seite: Basics.", context)
         self.assertIn("Abgeschlossene Seiten: Setup.", context)
-        self.assertIn("Schwache Quizbereiche: Basics.", context)
+        self.assertIn("Schwache Übungsbereiche: Basics.", context)
         self.assertIn("Kurslevel 3", context)
 
     def test_record_page_opened_creates_learning_state(self):
@@ -131,8 +131,62 @@ class LearningContextService_Tests(TestCase):
         )
 
         self.assertEqual(updated_quiz_result.id, quiz_result.id)
+        self.assertEqual(updated_quiz_result.activity_type, QuizResult.ActivityTypeChoices.QUIZ)
+        self.assertEqual(updated_quiz_result.course, self.course)
+        self.assertEqual(updated_quiz_result.textbook, self.textbook)
         self.assertEqual(updated_quiz_result.score, 0.4)
         self.assertEqual(updated_quiz_result.attempts, 2)
+
+    def test_record_exam_result_creates_separate_result(self):
+        """Exam results should be stored separately from quiz results."""
+        self.service.record_quiz_result(
+            user=self.user,
+            course=self.course,
+            page=self.last_page,
+            score=0.8,
+        )
+
+        exam_result = self.service.record_exam_result(
+            user=self.user,
+            course=self.course,
+            page=self.last_page,
+            score=0.6,
+            metadata={"total_points": 6, "max_points": 10},
+        )
+
+        self.assertEqual(exam_result.activity_type, QuizResult.ActivityTypeChoices.EXAM)
+        self.assertEqual(exam_result.course, self.course)
+        self.assertEqual(exam_result.page, self.last_page)
+        self.assertEqual(exam_result.metadata["total_points"], 6)
+        self.assertEqual(
+            QuizResult.objects.filter(user=self.user, page=self.last_page).count(),
+            2,
+        )
+
+    def test_record_activity_result_updates_course_level_game(self):
+        """Game results should be stored once per user, course, and activity."""
+        result = self.service.record_activity_result(
+            user=self.user,
+            course=self.course,
+            activity_type=QuizResult.ActivityTypeChoices.HANGMAN,
+            score=0.5,
+            metadata={"wrong_guesses": 3},
+        )
+
+        updated = self.service.record_activity_result(
+            user=self.user,
+            course=self.course,
+            activity_type=QuizResult.ActivityTypeChoices.HANGMAN,
+            score=1.0,
+            metadata={"wrong_guesses": 0},
+        )
+
+        self.assertEqual(updated.id, result.id)
+        self.assertIsNone(updated.page)
+        self.assertEqual(updated.course, self.course)
+        self.assertEqual(updated.score, 1.0)
+        self.assertEqual(updated.attempts, 2)
+        self.assertEqual(updated.metadata["wrong_guesses"], 0)
 
     def test_record_page_opened_rejects_page_outside_course(self):
         """Learning updates should reject pages outside the course material."""

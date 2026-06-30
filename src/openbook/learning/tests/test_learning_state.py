@@ -5,7 +5,7 @@ from django.test            import TestCase
 from django.urls            import reverse
 from rest_framework.test    import APIClient
 
-from openbook.content.models        import Course, LibraryGroup, Textbook, TextbookPage
+from openbook.content.models        import Course, CourseMaterial, LibraryGroup, Textbook, TextbookPage
 from openbook.learning.models.state import LearningState
 
 User = get_user_model()
@@ -42,8 +42,20 @@ def _make_page():
     return TextbookPage.objects.create(name=f"Page-{puid}", textbook=textbook, position=0)
 
 
+def _make_course_with_page():
+    uid      = _u()
+    group    = LibraryGroup.objects.create(name=f"LSPG-{uid}", slug=f"lspg-{uid}")
+    course   = Course.objects.create(name=f"LSCourse-{uid}", slug=f"lscourse-{uid}", group=group)
+    textbook = Textbook.objects.create(name=f"LSTB-{uid}", slug=f"lstb-{uid}", group=group)
+    CourseMaterial.objects.create(course=course, textbook=textbook, position=0)
+    page = TextbookPage.objects.create(name=f"LSPage-{uid}", textbook=textbook, position=0)
+    return course, page
+
+
 LIST_URL   = reverse("learning-state-list")
 DETAIL_URL = lambda pk: reverse("learning-state-detail", args=[pk])
+RECORD_OPENED_URL = reverse("learning-state-record-page-opened")
+MARK_COMPLETED_URL = reverse("learning-state-mark-page-completed")
 
 
 class LearningState_List_Tests(TestCase):
@@ -141,3 +153,46 @@ class LearningState_Update_Tests(TestCase):
             format="json",
         )
         self.assertEqual(response.status_code, 404)
+
+
+class LearningState_Action_Tests(TestCase):
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user   = _make_user("act", superuser=True)
+        self.course, self.page = _make_course_with_page()
+
+    def test_record_page_opened_uses_service_validation(self):
+        self.client.force_authenticate(self.user)
+        response = self.client.post(
+            RECORD_OPENED_URL,
+            {"course": str(self.course.pk), "page": str(self.page.pk)},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        state = LearningState.objects.get(user=self.user, course=self.course)
+        self.assertEqual(state.last_page, self.page)
+
+    def test_mark_page_completed_uses_service_validation(self):
+        self.client.force_authenticate(self.user)
+        response = self.client.post(
+            MARK_COMPLETED_URL,
+            {"course": str(self.course.pk), "page": str(self.page.pk)},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        state = LearningState.objects.get(user=self.user, course=self.course)
+        self.assertIn(self.page, state.completed_pages.all())
+
+    def test_record_page_opened_rejects_page_outside_course(self):
+        outside_page = _make_page()
+        self.client.force_authenticate(self.user)
+        response = self.client.post(
+            RECORD_OPENED_URL,
+            {"course": str(self.course.pk), "page": str(outside_page.pk)},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)

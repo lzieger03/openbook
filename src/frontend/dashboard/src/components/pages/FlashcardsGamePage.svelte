@@ -21,6 +21,7 @@ navigate with the controls (or arrow keys / space).
     import {push} from "svelte-spa-router";
     import {dashboardStore} from "../../stores/dashboard.store.js";
     import type {DashboardState} from "../../stores/dashboard.store.js";
+    import {recordLearningActivityResult} from "../../api/learning.js";
     import {loadCourseFlashcards} from "../../data/course-terms.js";
     import type {Flashcard} from "../../data/course-terms.js";
     import {clearPageContext, setCourseContext} from "../../stores/page-context.store.js";
@@ -41,11 +42,23 @@ navigate with the controls (or arrow keys / space).
     let loading = $state(true);
     let index = $state(0);
     let flippedCard = $state(false);
+    let reviewed = $state<Record<number, boolean>>({});
+    let reportedReview = $state(false);
 
     const courseTitle = $derived(
         state.courses.find((course) => course.id === params?.id)?.name ?? "Course",
     );
     const current = $derived(cards[index] ?? null);
+    const reviewedCount = $derived(Object.keys(reviewed).length);
+    const knownCount = $derived(Object.values(reviewed).filter(Boolean).length);
+    const allReviewed = $derived(cards.length > 0 && reviewedCount >= cards.length);
+
+    $effect(() => {
+        if (allReviewed && !reportedReview) {
+            reportedReview = true;
+            void reportReview();
+        }
+    });
 
     // Give the global Quick Chat the current-page context (flashcards in this course).
     let contextToken: PageContext | null = null;
@@ -77,6 +90,7 @@ navigate with the controls (or arrow keys / space).
         }
         index = 0;
         flippedCard = false;
+        resetReview();
         loading = false;
     }
 
@@ -106,6 +120,47 @@ navigate with the controls (or arrow keys / space).
         cards = [...cards];
         index = 0;
         flippedCard = false;
+        resetReview();
+    }
+
+    function resetReview(): void {
+        reviewed = {};
+        reportedReview = false;
+    }
+
+    function rateCurrent(known: boolean): void {
+        if (!current) {
+            return;
+        }
+
+        reviewed = {...reviewed, [index]: known};
+
+        if (index < cards.length - 1) {
+            next();
+        } else {
+            flippedCard = true;
+        }
+    }
+
+    async function reportReview(): Promise<void> {
+        const courseId = params?.id;
+        if (!courseId || cards.length === 0) {
+            return;
+        }
+
+        const score = knownCount / cards.length;
+
+        try {
+            await recordLearningActivityResult(courseId, "flashcards", score, {
+                metadata: {
+                    known_count: knownCount,
+                    reviewed_count: reviewedCount,
+                    card_count: cards.length,
+                },
+            });
+        } catch {
+            // Best-effort learning telemetry; the cards should remain usable offline.
+        }
     }
 
     function onKey(event: KeyboardEvent): void {
@@ -154,6 +209,15 @@ navigate with the controls (or arrow keys / space).
             <button type="button" class="btn btn-sm btn-ghost" onclick={shuffle}>↺ Shuffle</button>
             <button type="button" class="btn btn-ghost" onclick={next} disabled={index === cards.length - 1}>Next →</button>
         </div>
+
+        <div class="review-controls">
+            <button type="button" class="btn btn-ghost" onclick={() => rateCurrent(false)}>Review again</button>
+            <button type="button" class="btn btn-primary" onclick={() => rateCurrent(true)}>Got it</button>
+        </div>
+
+        {#if allReviewed}
+            <p class="review-summary" role="status">Known {knownCount}/{cards.length}</p>
+        {/if}
     {/if}
 </div>
 
@@ -321,5 +385,19 @@ navigate with the controls (or arrow keys / space).
         align-items: center;
         justify-content: center;
         gap: 0.75rem;
+    }
+
+    .review-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .review-summary {
+        text-align: center;
+        font-weight: 700;
+        color: var(--color-base-content);
     }
 </style>

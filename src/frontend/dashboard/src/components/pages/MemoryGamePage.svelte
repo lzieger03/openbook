@@ -22,6 +22,7 @@ course has no content yet. Frontend-only.
     import {push} from "svelte-spa-router";
     import {dashboardStore} from "../../stores/dashboard.store.js";
     import type {DashboardState} from "../../stores/dashboard.store.js";
+    import {recordLearningActivityResult} from "../../api/learning.js";
     import {loadCourseTerms} from "../../data/course-terms.js";
     import {clearPageContext, setCourseContext} from "../../stores/page-context.store.js";
     import type {PageContext} from "../../stores/page-context.store.js";
@@ -114,10 +115,18 @@ course has no content yet. Frontend-only.
     let locked = $state(false);
     let started = $state(false);
     let seconds = $state(0);
+    let reportedWin = $state(false);
     let flipBackTimer: ReturnType<typeof setTimeout> | null = null;
     let tickTimer: ReturnType<typeof setInterval> | null = null;
 
     const won = $derived(cards.length > 0 && matches === pairs);
+
+    $effect(() => {
+        if (won && !reportedWin) {
+            reportedWin = true;
+            void reportWin();
+        }
+    });
 
     function clearTimers(): void {
         if (flipBackTimer) {
@@ -154,6 +163,7 @@ course has no content yet. Frontend-only.
         locked = false;
         started = false;
         seconds = 0;
+        reportedWin = false;
     }
 
     function setLevel(value: number): void {
@@ -212,6 +222,28 @@ course has no content yet. Frontend-only.
         const m = Math.floor(total / 60);
         const s = total % 60;
         return `${m}:${s.toString().padStart(2, "0")}`;
+    }
+
+    async function reportWin(): Promise<void> {
+        const courseId = params?.id;
+        if (!courseId) {
+            return;
+        }
+
+        const score = moves > 0 ? Math.max(0, Math.min(1, pairs / moves)) : 1;
+
+        try {
+            await recordLearningActivityResult(courseId, "memory", score, {
+                metadata: {
+                    moves,
+                    pairs,
+                    seconds,
+                    used_course_terms: usingCourseTerms,
+                },
+            });
+        } catch {
+            // Best-effort learning telemetry; the game should remain playable offline.
+        }
     }
 
     onDestroy(clearTimers);

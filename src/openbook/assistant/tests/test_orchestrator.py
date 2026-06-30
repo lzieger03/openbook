@@ -13,6 +13,9 @@ from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 
 from openbook.assistant.services.orchestrator import AssistantOrchestrator
+from openbook.assistant.services.exam_generation import GeneratedExam
+from openbook.assistant.services.exam_generation import GeneratedExamOption
+from openbook.assistant.services.exam_generation import GeneratedExamQuestion
 from openbook.assistant.services.quiz_generation import GeneratedQuiz
 from openbook.assistant.services.quiz_generation import GeneratedQuizOption
 from openbook.assistant.services.quiz_generation import GeneratedQuizQuestion
@@ -260,6 +263,78 @@ class AssistantOrchestrator_Tests(TestCase):
             page=self.page,
             score=0.5,
             attempts=1,
+            metadata={
+                "correct_count": 1,
+                "question_count": 2,
+                "results": [
+                    {
+                        "question_id": "question-1",
+                        "prompt": "What is HTML?",
+                        "selected_index": 0,
+                        "correct_index": 0,
+                        "correct": True,
+                    },
+                    {
+                        "question_id": "question-2",
+                        "prompt": "What is CSS?",
+                        "selected_index": 0,
+                        "correct_index": 1,
+                        "correct": False,
+                    },
+                ],
+            },
+        )
+
+    def test_grade_exam_records_learning_result(self):
+        """Submitted exam answers should be stored in the learning result model."""
+        self.learning_context_service.record_exam_result.return_value = "exam result"
+        exam = GeneratedExam(
+            context_source="course_context",
+            page_id=str(self.page.id),
+            questions=(
+                GeneratedExamQuestion(
+                    id="question-1",
+                    kind="multiple_choice",
+                    prompt="What is HTML?",
+                    max_points=10,
+                    options=(
+                        GeneratedExamOption(text="Markup language", correct=True),
+                        GeneratedExamOption(text="Database", correct=False),
+                    ),
+                ),
+            ),
+        )
+
+        result = self.orchestrator.grade_exam(
+            user=self.owner,
+            course=self.course,
+            exam=exam,
+            answers=[
+                {"question_id": "question-1", "selected_index": 0},
+            ],
+        )
+
+        self.assertEqual(result["graded_exam"].score, 1.0)
+        self.learning_context_service.record_exam_result.assert_called_once_with(
+            user=self.owner,
+            course=self.course,
+            page=self.page,
+            score=1.0,
+            attempts=None,
+            metadata={
+                "total_points": 10,
+                "max_points": 10,
+                "results": [
+                    {
+                        "question_id": "question-1",
+                        "kind": "multiple_choice",
+                        "prompt": "What is HTML?",
+                        "awarded_points": 10,
+                        "max_points": 10,
+                        "correct": True,
+                    },
+                ],
+            },
         )
 
     def test_generate_quiz_uses_rag_documents_first(self):
