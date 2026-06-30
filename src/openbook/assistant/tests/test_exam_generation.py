@@ -1,5 +1,5 @@
 # OpenBook: Interactive Online Textbooks - Server
-# Copyright 2026 Sebastian Wolf, Daniel Sachada
+# Copyright 2026 Sebastian Wolf, Daniel Sachadä
 # Ledejna Salihi (@LedejnaSalihi)
 # Lars Zieger (@lzieger03)
 #
