@@ -6,21 +6,33 @@
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
 
+from datetime import UTC
+from datetime import datetime
 from types import SimpleNamespace
 from unittest.mock import patch
 from uuid import uuid4
 
 from asgiref.sync import async_to_sync
 from django.test import SimpleTestCase
+from django.test import TestCase
 
 from openbook.ai.consumers.chat import ChatConsumer
+from openbook.ai.messages.chat import ChatMessagePayload
 from openbook.ai.messages.chat import LearningPageCompleted
 from openbook.ai.messages.chat import LearningPageOpened
 from openbook.ai.messages.chat import LearningQuizResult
 from openbook.ai.messages.chat import QuizStart
+from openbook.assistant.models import ChatMessage
+from openbook.assistant.models import ChatSession
+from openbook.assistant.models import ExamAttempt
 from openbook.assistant.services.quiz_generation import GeneratedQuiz
 from openbook.assistant.services.quiz_generation import GeneratedQuizOption
 from openbook.assistant.services.quiz_generation import GeneratedQuizQuestion
+from openbook.auth.models.user import User
+from openbook.content.models.course import Course
+from openbook.content.models.library_group import LibraryGroup
+from openbook.content.models.textbook import Textbook
+from openbook.content.models.textbook_page import TextbookPage
 
 
 class ChatConsumerLearningEvent_Tests(SimpleTestCase):
@@ -193,3 +205,141 @@ class ChatConsumerLearningEvent_Tests(SimpleTestCase):
         self.assertFalse(response.payload.success)
         self.assertEqual(response.payload.event, "quiz_start")
         self.assertIn("course-scoped", response.payload.message)
+
+
+class ChatConsumerPersistenceScope_Tests(TestCase):
+    """Tests for course scoping of persisted assistant state."""
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="student",
+            email="student@example.com",
+            password="password",
+        )
+        self.library_group = LibraryGroup.objects.create(name="Library", slug="library")
+        self.course = Course.objects.create(
+            name="Course A",
+            slug="course-a",
+            group=self.library_group,
+            owner=self.user,
+        )
+        self.other_course = Course.objects.create(
+            name="Course B",
+            slug="course-b",
+            group=self.library_group,
+            owner=self.user,
+        )
+
+    def _consumer(self, course: Course) -> ChatConsumer:
+        """Return a consumer scoped to the given course."""
+        consumer = ChatConsumer()
+        consumer.scope = {
+            "url_route": {"kwargs": {"course_id": course.id}},
+            "user": self.user,
+        }
+        return consumer
+
+    def _message_payload(self, sender: str, content: str) -> ChatMessagePayload:
+        """Return a minimal persisted chat payload."""
+        return ChatMessagePayload(
+            datetime=datetime.now(UTC),
+            sender=sender,
+            type="normal",
+            severity="info",
+            guardRails={"findings": "none", "explanation": ""},
+            format="markdown",
+            content=content,
+            finished=True,
+        )
+
+    def test_load_active_history_ignores_session_from_another_course(self):
+        """A stale session id from another course must not leak chat history."""
+        other_session = ChatSession.objects.create(
+            user=self.user,
+            course=self.other_course,
+            title="Other course",
+        )
+        ChatMessage.objects.create(
+            session=other_session,
+            sender="assistant",
+            content="Hidden message",
+        )
+        consumer = self._consumer(self.course)
+        consumer.session_id = str(other_session.id)
+
+        session_id, messages = consumer._load_active_history()
+
+        self.assertIsNone(session_id)
+        self.assertEqual(messages, [])
+
+    def test_rename_session_does_not_touch_another_course(self):
+        """Course-scoped rename messages must not rename another course's chat."""
+        other_session = ChatSession.objects.create(
+            user=self.user,
+            course=self.other_course,
+            title="Original",
+        )
+        consumer = self._consumer(self.course)
+
+        consumer._rename_session(other_session.id, "Renamed")
+
+        other_session.refresh_from_db()
+        self.assertEqual(other_session.title, "Original")
+
+    def test_delete_session_does_not_remove_another_course(self):
+        """Course-scoped delete messages must not delete another course's chat."""
+        other_session = ChatSession.objects.create(
+            user=self.user,
+            course=self.other_course,
+            title="Original",
+        )
+        consumer = self._consumer(self.course)
+
+        deleted_active = consumer._delete_session(other_session.id)
+
+        self.assertFalse(deleted_active)
+        self.assertTrue(ChatSession.objects.filter(pk=other_session.id).exists())
+
+    def test_persist_turn_creates_current_course_session_for_stale_session_id(self):
+        """A stale session id must not append messages to a different course."""
+        other_session = ChatSession.objects.create(
+            user=self.user,
+            course=self.other_course,
+            title="Other course",
+        )
+        consumer = self._consumer(self.course)
+        consumer.session_id = str(other_session.id)
+
+        session_id, created_new = consumer._persist_turn(
+            self._message_payload("user", "Question"),
+            self._message_payload("assistant", "Answer"),
+            "Question",
+        )
+
+        self.assertTrue(created_new)
+        self.assertNotEqual(session_id, str(other_session.id))
+        self.assertEqual(ChatSession.objects.get(pk=session_id).course, self.course)
+        self.assertEqual(other_session.messages.count(), 0)
+
+    def test_load_saved_exam_requires_current_course(self):
+        """A saved exam from another course must not be resumed in this course."""
+        textbook = Textbook.objects.create(
+            name="Textbook",
+            slug="textbook",
+            group=self.library_group,
+        )
+        page = TextbookPage.objects.create(textbook=textbook, name="Page", position=0)
+        attempt = ExamAttempt.objects.create(
+            user=self.user,
+            course=self.other_course,
+            textbook=textbook,
+            exam={
+                "context_source": "course_context",
+                "textbook_id": str(textbook.id),
+                "page_id": str(page.id),
+                "questions": [],
+            },
+        )
+        consumer = self._consumer(self.course)
+
+        self.assertIsNone(consumer._load_saved_exam(str(attempt.id)))

@@ -10,6 +10,8 @@
 
 from __future__ import annotations
 
+from unittest.mock import patch
+
 from django.contrib.auth                   import get_user_model
 from django.contrib.auth.models            import Permission
 from django.contrib.contenttypes.models    import ContentType
@@ -123,3 +125,21 @@ class CourseContentAccessTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["count"], 2)
+
+    @patch("openbook.content.viewsets.textbook_page.TextbookDocumentSyncService")
+    def test_teacher_can_delete_textbook_page(self, sync_service_cls):
+        """Deleting a textbook page should remove it and resync the textbook document."""
+        teacher = User.objects.create_superuser(
+            username="teacher",
+            email="teacher@test.com",
+            password="password",
+        )
+        self.client.force_authenticate(teacher)
+
+        response = self.client.delete(
+            reverse("textbook-page-detail", args=[self.page_one.id]),
+        )
+
+        self.assertEqual(response.status_code, 204)
+        self.assertFalse(TextbookPage.objects.filter(pk=self.page_one.pk).exists())
+        sync_service_cls.return_value.sync_textbook.assert_called_once_with(self.textbook)

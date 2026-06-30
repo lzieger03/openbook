@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from django.core.exceptions                 import ValidationError as DjangoValidationError
 from django_filters.filterset              import FilterSet
 from drf_spectacular.utils                 import extend_schema
 from django_filters.rest_framework         import DjangoFilterBackend
@@ -15,6 +16,7 @@ from openbook.content.models.textbook_page import TextbookPage
 from openbook.drf.viewsets                 import ModelViewSetMixin, with_flex_fields_parameters
 from ..models.state                        import LearningState
 from ..serializers.state                   import LearningStateSerializer
+from ..services                            import LearningActivityService
 
 
 class LearningStateFilter(FilterSet):
@@ -68,9 +70,14 @@ class LearningStateViewSet(ModelViewSetMixin, ModelViewSet):
         course = s.validated_data["course"]
         page   = s.validated_data["page"]
 
-        state, _ = LearningState.objects.get_or_create(user=request.user, course=course)
-        state.last_page = page
-        state.save()
+        try:
+            state = LearningActivityService().record_page_opened(
+                user=request.user,
+                course=course,
+                page=page,
+            )
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError(exc.messages) from exc
 
         return Response(LearningStateSerializer(state, context={"request": request}).data)
 
@@ -82,9 +89,14 @@ class LearningStateViewSet(ModelViewSetMixin, ModelViewSet):
         course = s.validated_data["course"]
         page   = s.validated_data["page"]
 
-        state, _ = LearningState.objects.get_or_create(user=request.user, course=course)
-        state.completed_pages.add(page)
-        state.save()
+        try:
+            state = LearningActivityService().mark_page_completed(
+                user=request.user,
+                course=course,
+                page=page,
+            )
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError(exc.messages) from exc
 
         return Response(LearningStateSerializer(state, context={"request": request}).data)
 

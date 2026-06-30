@@ -153,6 +153,21 @@ class ExamService:
                 course=course,
                 page=self.request_context_service.resolve_page(exam.page_id),
                 score=score,
+                metadata={
+                    "total_points": total_points,
+                    "max_points": max_points,
+                    "results": [
+                        {
+                            "question_id": result.question_id,
+                            "kind": result.kind,
+                            "prompt": result.prompt,
+                            "awarded_points": result.awarded_points,
+                            "max_points": result.max_points,
+                            "correct": result.correct,
+                        }
+                        for result in results
+                    ],
+                },
             )
 
         return {

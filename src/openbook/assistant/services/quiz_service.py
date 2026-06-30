@@ -147,6 +147,20 @@ class QuizService:
                 page=self.request_context_service.resolve_page(quiz.page_id),
                 score=score,
                 attempts=attempts,
+                metadata={
+                    "correct_count": correct_count,
+                    "question_count": question_count,
+                    "results": [
+                        {
+                            "question_id": result.question_id,
+                            "prompt": result.prompt,
+                            "selected_index": result.selected_index,
+                            "correct_index": result.correct_index,
+                            "correct": result.correct,
+                        }
+                        for result in results
+                    ],
+                },
             )
 
         return {
