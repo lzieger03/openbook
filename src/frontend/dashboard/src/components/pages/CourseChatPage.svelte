@@ -20,13 +20,15 @@ Default presentation is full-screen; other modes (floating window, docked
 sidebar, minimised icon) can be layered on later.
 -->
 <script lang="ts">
-    import {onMount} from "svelte";
+    import {onDestroy, onMount} from "svelte";
     import {push} from "svelte-spa-router";
     import {dashboardStore} from "../../stores/dashboard.store.js";
     import type {DashboardState} from "../../stores/dashboard.store.js";
     import {createAiChatStore} from "../../stores/ai-chat.store.js";
     import type {AiChatState} from "../../stores/ai-chat.store.js";
     import {renderMarkdown} from "../../data/markdown.js";
+    import {clearPageContext, setCourseContext} from "../../stores/page-context.store.js";
+    import type {PageContext} from "../../stores/page-context.store.js";
 
     let {params}: {params?: {id?: string}} = $props();
 
@@ -94,6 +96,13 @@ sidebar, minimised icon) can be layered on later.
     const courseName = $derived(
         state.courses.find((course) => course.id === params?.id)?.name ?? "this course",
     );
+
+    // Give the global Quick Chat whole-course context while inside a course.
+    let contextToken: PageContext | null = null;
+    $effect(() => {
+        contextToken = setCourseContext("studying", state.courses.find((course) => course.id === params?.id));
+    });
+    onDestroy(() => clearPageContext(contextToken));
 
     // Side navigation. "Quizzes" is wired; the rest are placeholders for now.
     // "Chats" is its own expandable section below the nav.

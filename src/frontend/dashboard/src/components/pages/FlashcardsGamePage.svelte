@@ -17,12 +17,14 @@ page — the heading on the front, the section text on the back. Flip to check y
 navigate with the controls (or arrow keys / space).
 -->
 <script lang="ts">
-    import {onMount} from "svelte";
+    import {onDestroy, onMount} from "svelte";
     import {push} from "svelte-spa-router";
     import {dashboardStore} from "../../stores/dashboard.store.js";
     import type {DashboardState} from "../../stores/dashboard.store.js";
     import {loadCourseFlashcards} from "../../data/course-terms.js";
     import type {Flashcard} from "../../data/course-terms.js";
+    import {clearPageContext, setCourseContext} from "../../stores/page-context.store.js";
+    import type {PageContext} from "../../stores/page-context.store.js";
 
     let {params}: {params?: {id?: string}} = $props();
 
@@ -44,6 +46,13 @@ navigate with the controls (or arrow keys / space).
         state.courses.find((course) => course.id === params?.id)?.name ?? "Course",
     );
     const current = $derived(cards[index] ?? null);
+
+    // Give the global Quick Chat the current-page context (flashcards in this course).
+    let contextToken: PageContext | null = null;
+    $effect(() => {
+        contextToken = setCourseContext("reviewing flashcards", state.courses.find((course) => course.id === params?.id));
+    });
+    onDestroy(() => clearPageContext(contextToken));
 
     onMount(() => {
         const unsubscribe = dashboardStore.subscribe((value) => (state = value));

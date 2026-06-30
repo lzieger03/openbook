@@ -16,10 +16,12 @@ Gamification dashboard page: loads progress data and renders the three panels
 with loading / error / content states.
 -->
 <script lang="ts">
-    import {onMount} from "svelte";
+    import {onDestroy, onMount} from "svelte";
     import {push} from "svelte-spa-router";
     import {dashboardStore} from "../../stores/dashboard.store.js";
     import type {DashboardState} from "../../stores/dashboard.store.js";
+    import {clearPageContext, setPageContext} from "../../stores/page-context.store.js";
+    import type {PageContext} from "../../stores/page-context.store.js";
     import MyLearningPanel from "../panels/MyLearningPanel.svelte";
     import StatsPanel from "../panels/StatsPanel.svelte";
     import LeaderboardPanel from "../panels/LeaderboardPanel.svelte";
@@ -46,6 +48,28 @@ with loading / error / content states.
     });
 
     const handle = $derived(state.user?.username ? `@${state.user.username}` : "@user");
+
+    // Give the global Quick Chat context about the dashboard the learner is viewing.
+    let contextToken: PageContext | null = null;
+    $effect(() => {
+        const details: string[] = [];
+        if (state.stats) {
+            details.push(
+                `Level ${state.stats.level}, ${state.stats.points.toLocaleString()} points, ${state.stats.currentStreak}-day streak.`,
+            );
+        }
+        if (state.courses.length) {
+            details.push(`Enrolled courses: ${state.courses.map((course) => course.name).join(", ")}.`);
+        }
+        if (state.skills.length) {
+            details.push(`Skills: ${state.skills.map((skill) => skill.name).join(", ")}.`);
+        }
+        contextToken = setPageContext({
+            label: "The learner is on their dashboard (overview of their courses, level, points, skills and the leaderboard).",
+            details: details.join(" ") || undefined,
+        });
+    });
+    onDestroy(() => clearPageContext(contextToken));
 </script>
 
 <div class="dashboard">

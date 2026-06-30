@@ -17,11 +17,13 @@ extracted from the textbook pages. Guess letters via the on-screen keyboard or y
 physical keyboard before the figure is complete.
 -->
 <script lang="ts">
-    import {onMount} from "svelte";
+    import {onDestroy, onMount} from "svelte";
     import {push} from "svelte-spa-router";
     import {dashboardStore} from "../../stores/dashboard.store.js";
     import type {DashboardState} from "../../stores/dashboard.store.js";
     import {loadCourseTerms} from "../../data/course-terms.js";
+    import {clearPageContext, setCourseContext} from "../../stores/page-context.store.js";
+    import type {PageContext} from "../../stores/page-context.store.js";
 
     let {params}: {params?: {id?: string}} = $props();
 
@@ -37,6 +39,13 @@ physical keyboard before the figure is complete.
     const courseTitle = $derived(
         state.courses.find((course) => course.id === params?.id)?.name ?? "Course",
     );
+
+    // Give the global Quick Chat the current-page context (the Hangman game in this course).
+    let contextToken: PageContext | null = null;
+    $effect(() => {
+        contextToken = setCourseContext("playing the Hangman word game", state.courses.find((course) => course.id === params?.id));
+    });
+    onDestroy(() => clearPageContext(contextToken));
 
     const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
     const MAX_WRONG = 6;

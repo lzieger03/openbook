@@ -30,7 +30,8 @@ so only the current page scrolls — never the whole textbook at once.
     import {loadCourseContent} from "../../data/course-content.js";
     import type {ContentMaterialView} from "../../data/course-content.js";
     import {completeCourse, fetchLearningState, markPageCompleted, recordPageOpened} from "../../api/learning.js";
-    import {clearPageContext, setPageContext} from "../../stores/page-context.store.js";
+    import {clearPageContext, setCourseContext, setPageContext} from "../../stores/page-context.store.js";
+    import type {PageContext} from "../../stores/page-context.store.js";
 
     let {params}: {params?: {id?: string}} = $props();
 
@@ -161,20 +162,22 @@ so only the current page scrolls — never the whole textbook at once.
 
     // Record a page as opened whenever it becomes the current entry, and publish it as
     // the Quick Chat's page context so the assistant knows what the learner is reading.
+    let contextToken: PageContext | null = null;
     $effect(() => {
         const entry = currentEntry;
+        const course = state.courses.find((candidate) => candidate.id === params?.id);
         if (entry?.kind === "page") {
             openPage(entry.id);
-            setPageContext({
+            contextToken = setPageContext({
                 label: `The learner is reading the page "${entry.page.title}" in the course "${courseTitle}".`,
                 details: htmlToText(entry.page.html),
             });
         } else {
-            clearPageContext();
+            contextToken = setCourseContext("reading the course content", course);
         }
     });
 
-    onDestroy(() => clearPageContext());
+    onDestroy(() => clearPageContext(contextToken));
 
     /** Reduce rendered page HTML to plain text for use as assistant context. */
     function htmlToText(html: string): string {

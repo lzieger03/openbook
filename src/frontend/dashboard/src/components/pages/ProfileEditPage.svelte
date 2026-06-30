@@ -23,6 +23,8 @@ Username is read-only; e-mail becomes active only after the verification link.
     import {fetchEmailAddresses, requestEmailChange, saveProfile} from "../../api/profile.js";
     import type {EmailAddress} from "../../api/profile.js";
     import {dashboardStore} from "../../stores/dashboard.store.js";
+    import {clearPageContext, setPageContext} from "../../stores/page-context.store.js";
+    import type {PageContext} from "../../stores/page-context.store.js";
 
     let isLoading = $state(true);
     let isSaving = $state(false);
@@ -62,6 +64,11 @@ Username is read-only; e-mail becomes active only after the verification link.
         emails = await fetchEmailAddresses().catch(() => []);
     }
 
+    // Let the global Quick Chat know the learner is on the profile/settings page.
+    const contextToken: PageContext = setPageContext({
+        label: "The learner is editing their profile settings (name, bio, profile picture and e-mail).",
+    });
+
     onMount(() => {
         load()
             .catch((error: unknown) => {
@@ -73,6 +80,7 @@ Username is read-only; e-mail becomes active only after the verification link.
     });
 
     onDestroy(() => {
+        clearPageContext(contextToken);
         if (previewUrl) {
             URL.revokeObjectURL(previewUrl);
         }

@@ -18,7 +18,7 @@ learner answers them in a single form; on submission the backend grades free tex
 the LLM and multiple choice by comparison, then awards points and skills like a quiz.
 -->
 <script lang="ts">
-    import {onMount} from "svelte";
+    import {onDestroy, onMount} from "svelte";
     import {push} from "svelte-spa-router";
 
     import {fetchMaterials} from "../../api/content.js";
@@ -26,6 +26,8 @@ the LLM and multiple choice by comparison, then awards points and skills like a 
     import type {ExamAttemptDto} from "../../api/exams.js";
     import {dashboardStore} from "../../stores/dashboard.store.js";
     import type {DashboardState} from "../../stores/dashboard.store.js";
+    import {clearPageContext, setCourseContext} from "../../stores/page-context.store.js";
+    import type {PageContext} from "../../stores/page-context.store.js";
     import {createExamStore} from "../../stores/exam.store.js";
     import type {ExamAnswer, ExamState} from "../../stores/exam.store.js";
 
@@ -66,6 +68,13 @@ the LLM and multiple choice by comparison, then awards points and skills like a 
         pageId: null,
         result: null,
     });
+
+    // Give the global Quick Chat the current-page context (an exam in this course).
+    let contextToken: PageContext | null = null;
+    $effect(() => {
+        contextToken = setCourseContext("taking an exam", state.courses.find((course) => course.id === params?.id));
+    });
+    onDestroy(() => clearPageContext(contextToken));
 
     const letters = ["A", "B", "C", "D", "E", "F"];
 

@@ -23,6 +23,8 @@ course has no content yet. Frontend-only.
     import {dashboardStore} from "../../stores/dashboard.store.js";
     import type {DashboardState} from "../../stores/dashboard.store.js";
     import {loadCourseTerms} from "../../data/course-terms.js";
+    import {clearPageContext, setCourseContext} from "../../stores/page-context.store.js";
+    import type {PageContext} from "../../stores/page-context.store.js";
 
     let {params}: {params?: {id?: string}} = $props();
 
@@ -49,6 +51,13 @@ course has no content yet. Frontend-only.
 
     const course = $derived(state.courses.find((c) => c.id === params?.id) ?? null);
     const courseTitle = $derived(course?.name ?? "Course");
+
+    // Give the global Quick Chat the current-page context (the Memory game in this course).
+    let contextToken: PageContext | null = null;
+    $effect(() => {
+        contextToken = setCourseContext("playing the Memory matching game", course ?? undefined);
+    });
+    onDestroy(() => clearPageContext(contextToken));
 
     // ── Deck source (course terms) ────────────────────────────────────────────
     const SYMBOLS = ["🧠", "📚", "✏️", "💡", "🔬", "🧮", "🌍", "⚛️", "🧪", "📐", "🔤", "🧬"];

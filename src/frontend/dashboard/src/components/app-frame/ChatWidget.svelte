@@ -318,7 +318,6 @@ README-websocket-api.md.
                 </span>
             {/if}
             <form class="composer-row" onsubmit={(event) => {event.preventDefault(); send();}}>
-                <button type="button" class="composer-add" aria-label="Add" disabled>+</button>
                 <input
                     class="composer-input"
                     type="text"
@@ -776,7 +775,6 @@ README-websocket-api.md.
         border: 1px solid color-mix(in oklab, var(--color-primary) 30%, transparent);
     }
 
-    .composer-add,
     .composer-send {
         display: grid;
         place-items: center;
@@ -785,9 +783,14 @@ README-websocket-api.md.
         flex: 0 0 auto;
         border-radius: 999px;
         border: none;
-        cursor: not-allowed;
+        cursor: pointer;
         color: var(--color-primary-content);
         background: color-mix(in oklab, var(--color-primary) 70%, transparent);
+    }
+
+    .composer-send:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
     }
 
     .composer-input {

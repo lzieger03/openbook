@@ -16,10 +16,12 @@ Games hub for a course: a chooser shown when the learner opens "Games". Each gam
 is a card; Memory is playable today, more can be added here later.
 -->
 <script lang="ts">
-    import {onMount} from "svelte";
+    import {onDestroy, onMount} from "svelte";
     import {push} from "svelte-spa-router";
     import {dashboardStore} from "../../stores/dashboard.store.js";
     import type {DashboardState} from "../../stores/dashboard.store.js";
+    import {clearPageContext, setCourseContext} from "../../stores/page-context.store.js";
+    import type {PageContext} from "../../stores/page-context.store.js";
 
     let {params}: {params?: {id?: string}} = $props();
 
@@ -44,6 +46,13 @@ is a card; Memory is playable today, more can be added here later.
         state.courses.find((course) => course.id === params?.id)?.name ?? "Course",
     );
     const courseId = $derived(params?.id ?? "");
+
+    // Give the global Quick Chat the current-page context (the games hub for this course).
+    let contextToken: PageContext | null = null;
+    $effect(() => {
+        contextToken = setCourseContext("choosing a learning game", state.courses.find((course) => course.id === params?.id));
+    });
+    onDestroy(() => clearPageContext(contextToken));
 
     interface Game {
         icon: string;

@@ -888,17 +888,20 @@ Attaching an existing textbook is a secondary, collapsed option.
                                                         <button type="button" class="btn btn-sm" class:btn-primary={editorMode === "edit"} onclick={() => (editorMode = "edit")}>Write</button>
                                                         <button type="button" class="btn btn-sm" class:btn-primary={editorMode === "preview"} onclick={() => (editorMode = "preview")}>Preview</button>
                                                     </div>
-                                                    <label class="btn btn-sm import-btn">
-                                                        <span class="import-icon" aria-hidden="true">
-                                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                                <path d="M12 15V4" />
-                                                                <path d="m7.5 8.5 4.5-4.5 4.5 4.5" />
-                                                                <path d="M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3" />
-                                                            </svg>
-                                                        </span>
-                                                        <span>Import file</span>
-                                                        <input class="sr-only" type="file" accept=".md,.markdown,.html,.htm,.txt,text/markdown,text/html,text/plain" onchange={onFileSelected} />
-                                                    </label>
+                                                    <div class="import-group">
+                                                        <span class="import-formats">Supported: Markdown, HTML, Text</span>
+                                                        <label class="btn btn-sm import-btn">
+                                                            <span class="import-icon" aria-hidden="true">
+                                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                    <path d="M12 15V4" />
+                                                                    <path d="m7.5 8.5 4.5-4.5 4.5 4.5" />
+                                                                    <path d="M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3" />
+                                                                </svg>
+                                                            </span>
+                                                            <span>Import file</span>
+                                                            <input class="sr-only" type="file" accept=".md,.markdown,.html,.htm,.txt,text/markdown,text/html,text/plain" onchange={onFileSelected} />
+                                                        </label>
+                                                    </div>
                                                 </div>
 
                                                 {#if editorMode === "edit"}
@@ -1305,6 +1308,19 @@ Attaching an existing textbook is a secondary, collapsed option.
     .editor-tabs {
         display: flex;
         gap: 0.4rem;
+    }
+
+    /* Keep the format hint next to its import button on the toolbar's right. */
+    .import-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .import-formats {
+        font-size: 0.75rem;
+        color: color-mix(in oklab, var(--color-base-content) 60%, transparent);
+        white-space: nowrap;
     }
 
     /* Make the file import stand out as the quick way to fill a page: a soft
