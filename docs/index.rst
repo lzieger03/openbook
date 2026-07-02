@@ -114,3 +114,13 @@ download, install, and use **without restrictions**.
    developers/howto-guides
    developers/api-reference
    developers/repository-setup
+
+
+.. toctree::
+   :maxdepth: 1
+   :caption: ELISA Handover
+
+   handbook/index
+   info_materials/students
+   info_materials/teachers
+
