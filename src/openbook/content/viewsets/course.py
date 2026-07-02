@@ -182,8 +182,10 @@ class CourseViewSet(AllowAnonymousListRetrieveViewSetMixin, ModelViewSetMixin, M
             text_format = Textbook.TextFormatChoices.MARKDOWN
             try:
                 chapters = extract_pdf_chapters(raw_bytes)
-            except ChapterExtractionError as error:
-                raise serializers.ValidationError({"file": str(error)})
+            except ChapterExtractionError:
+                raise serializers.ValidationError({
+                    "file": "Could not extract chapters from the uploaded PDF.",
+                })
         else:
             text_format = self._format_from_filename(filename.name)
             source = raw_bytes.decode("utf-8", errors="replace")

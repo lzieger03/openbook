@@ -149,8 +149,8 @@ class CourseProgressViewSet(ReadOnlyModelViewSet):
 
         try:
             state = award_course_points(account.id, course.id, points, context=context)
-        except ValueError as error:
-            raise ValidationError({"points": str(error)})
+        except ValueError:
+            raise ValidationError({"points": "Unable to award points with the provided input."})
 
         # Advance the skills trained in this course. A specific skill (e.g. the one a
         # quiz question targets) takes precedence; otherwise every skill the course
