@@ -1,0 +1,488 @@
+ELISA / OpenBook Übergabe-Dokumentation für die nächste Projektgruppe
+=====================================================================
+
+Stand: 02.07.2026
+
+
+Zweck dieses Dokuments
+----------------------
+
+Dieses Dokument gibt der nächsten Projektgruppe einen kompakten, aber vollständigen
+Einstieg in den aktuellen ELISA-Stand im OpenBook-Projekt. Es fasst die studentischen
+Branches, die wichtigsten Funktionsbereiche, vorhandene technische Zusatzdokumentation
+und bekannte offene Punkte zusammen.
+
+ELISA ist der Projektname für den studentischen Proof of Concept eines KI-gestützten
+Lernassistenten innerhalb von OpenBook. Die Arbeit erweitert OpenBook um kursbezogene
+KI-Unterstützung, Lernfortschritt, Quiz-Funktionen, Gamification sowie neue Oberflächen
+für Studierende und Lehrende.
+
+Nicht als studentische Leistung berücksichtigt wurden Branches und Commits von Dennis
+Schulmeister-Zimolong / Schulmeister sowie Renovate-, GitHub-Actions- und sonstige
+Maintenance-Branches des Upstream-Projekts.
+
+
+Studentisches Team und grobe Zuordnung
+--------------------------------------
+
+Die genaue Zuordnung ist nicht an jeder Stelle eindeutig, weil mehrere Arbeiten über
+Integrationsbranches zusammengeführt wurden. Die folgende Zuordnung basiert auf den
+sichtbaren Git-Autoren, Branch-Namen und Dokumentationsdateien.
+
+* Anas & Patrick:
+  Learning-App, LearningState, QuizResult, Learning-API, Tests und Anbindung an
+  Gamification-Signals.
+* Daniel & Sebastian:
+  Assistant-/RAG-Integration, Course-Aware Orchestrator, Quiz-Generierung,
+  serverseitiges Quiz-Grading, CodeQL-/Security-Fixes, lokale Assistant-/RAG-Arbeiten,
+  Client-Refactoring, sqlite/sqlean-bezogene Arbeiten und Management-Commands für
+  lokale Assistant-Interaktion.
+* Lars & Ledejna:
+  Gamification, Dashboard- und Teacher-Frontend, Games-Proof-of-Concept, Chat-History,
+  Seed-Daten, technische Dokumentationen, Skill-Matrix, Leaderboard, Exam-/Quiz-Seiten,
+  Content-Fixes und Download-Funktionen.
+
+
+
+Wichtige Branches
+-----------------
+
+``origin/main``
+    Aktueller integrierter Stand im studentischen Fork. Enthält die meisten
+    zusammengeführten ELISA-Arbeiten.
+
+``origin/integration/all-pairs-final-branch``
+    Zentrale Integrationsbasis für fast alle studentischen Arbeiten. Enthält Assistant,
+    Learning, Gamification, Dashboard, Teacher-Frontend, Quiz-/Exam-Flows und
+    technische Dokumentation.
+
+``origin/Backend_Datenmodell_API``
+    Vor allem Backend-Arbeiten von Anas und Lars. Enthält LearningState, QuizResult,
+    Learning-API, Gamification-Modelle, Gamification-Tests und frühe
+    Gamification-/Learning-Dokumentation.
+
+``origin/integration/orchestrator-learning-frontend``
+    Integration von Assistant-Orchestrator, Learning-Kontext und Frontend. Beteiligte
+    Autoren sind Daniel, Sebastian, Ledejna und Lars.
+
+``origin/assistant/frontend-integration``
+    Assistant-/Frontend-Integration mit RAG, course-aware Kontext, Quiz-Generierung und
+    Textbook-Synchronisation in Assistant-Dokumente.
+
+``origin/codex/fix-codeql-alerts``
+    Daniel. CodeQL-/Security-Fixes auf dem integrierten Stand.
+
+``origin/handbook``
+    Aktueller Dokumentationsbranch. Enthält die neue Übergabe-Dokumentation, das
+    Handbook und Info-Material-Seiten.
+
+Historisch sichtbare Feature-Branches, die in den Integrationsstand eingeflossen sind:
+
+* ``feature/course-assistant-orchestrator``
+* ``feature/skill-view-reworked``
+* ``feature/frontend/dashborad/Leaderboard``
+* ``feature/front-content/fixes``
+* ``feature/chat-history``
+* ``feature/games``
+* ``feature/exam``
+* ``feature/front-gami/fixes``
+* ``feature/exam-history``
+* ``feature/teacher-rework``
+* ``feature/assistant-learning-quiz-flow``
+
+
+Projektstruktur der ELISA-Arbeiten
+----------------------------------
+
+``docs/``
+    Primäre Sphinx-Dokumentation des Projekts. Neue offizielle Dokumentation sollte
+    langfristig hier gepflegt werden.
+
+``docs/handbook/index.rst``
+    Startpunkt für das spätere zentrale ELISA-Handbook. Diese Seite soll eher
+    userorientiert bleiben und erklären, was ELISA für Studierende und Lehrende leistet.
+
+``docs/info_materials/students.rst`` und ``docs/info_materials/teachers.rst``
+    Platzhalter für spätere Infomaterialien. Aktueller Plan: Hier werden später jeweils
+    Flyer als PNG eingebunden, einer für Studierende und einer für Lehrende.
+
+``docs/Handover/handover_next_group.txt``
+    Diese Übergabe-Datei. Im Git-Status war eine Umbenennung von
+    ``docs/handover_next_group.txt`` nach ``docs/Handover/handover_next_group.txt``
+    sichtbar.
+
+``documentation/``
+    Studentische technische Markdown-Notizen außerhalb der Sphinx-Dokumentation. Diese
+    Dateien sind wichtig für die Übergabe, sollten aber langfristig entweder nach
+    ``docs/`` migriert oder als technische Zusatzdoku referenziert werden.
+
+``src/openbook/assistant/``
+    Neue Assistant-App mit Dokumentenmodell, RAG, Vector Index, Prompt Builder,
+    Orchestrator, Quiz-/Exam-Services, Management-Commands, Viewsets und Tests.
+
+``src/openbook/learning/``
+    Learning-App mit LearningState, QuizResult, Serializers, Viewsets, Signals, Tests
+    und README.
+
+``src/openbook/gamification/``
+    Gamification-App mit Punkten, Leveln, Streaks, Rewards, Skill-Katalog,
+    SkillProgress, CourseProgress, Services, Signals, APIs, Admin-Klassen,
+    Migrations und Tests.
+
+``src/frontend/dashboard/``
+    Eigenständiges Svelte-5-Microfrontend für Studierende. Enthält Dashboard,
+    Kursinhalte, Chat, Quiz, Exam, Games, Lernfortschritt, Skill-Matrix,
+    Leaderboard und Profilseite.
+
+``src/frontend/teacher/``
+    Eigenständiges Svelte-5-Microfrontend für Lehrende. Enthält Kursliste,
+    Kursdetailansicht, Content-Editor, Overview-Panel und Studierendenverwaltung.
+
+``src/frontend/app/``
+    Bestehendes OpenBook-Frontend. Wurde für Routen, Auth, Gamification-Karten,
+    API-Client-Artefakte und Integrationspunkte angepasst.
+
+
+Funktionsbereiche
+-----------------
+
+Assistant, RAG und Orchestrator
+...............................
+
+Der Assistant-Bereich soll ELISA kursbewusst machen. Fragen und Quiz-Interaktionen
+sollen nicht allgemein beantwortet werden, sondern im Kontext eines konkreten Kurses.
+
+Wichtige Bestandteile:
+
+* Assistant-Dokumente für RAG-Kontext.
+* sqlite-vec-basierter Vector Index.
+* Textbook-Synchronisation in Assistant-Dokumente.
+* Prompt Builder und Course Context.
+* Orchestrator für Chat, Quiz und Lernkontext.
+* Management-Commands für lokale Tests, z. B. Assistant-Fragen oder Textbook-Sync.
+
+Wichtig für die nächste Gruppe: ``sqlite-vec`` wird zur Laufzeit gebraucht. Es war im
+lokalen Setup nicht im Lockfile vorhanden und musste separat installiert werden. Das
+sollte sauber in ``pyproject.toml`` und ``poetry.lock`` aufgenommen werden.
+
+
+Learning-App
+............
+
+Die Learning-App verfolgt den Lernfortschritt pro Nutzer und Kurs. Sie ist die Brücke
+zwischen Kursinhalt, Assistant-Kontext, Quiz-Ergebnissen und Gamification.
+
+Wichtige Konzepte:
+
+* ``LearningState`` speichert pro Nutzer und Kurs die letzte Seite,
+  abgeschlossene Seiten und den letzten Zugriff.
+* ``QuizResult`` speichert Quiz-Ergebnisse pro Nutzer und Seite.
+* Custom Actions wie ``record-page-opened``, ``mark-page-completed`` und
+  ``complete-course`` sind für das Dashboard relevant.
+* Signals melden Lernaktivität an die Gamification-App, z. B. für Daily Streaks.
+
+Die ältere README unter ``src/openbook/learning/README.md`` dokumentiert noch offene
+Fragen wie Kursabschluss, Quiz-Punktevergabe und Memory Entries. Teile davon wurden
+später bereits umgesetzt, trotzdem ist die Datei als Verlauf und technische
+Zusatzinformation wichtig.
+
+
+Quiz, Exam und Games
+....................
+
+Der aktuelle dokumentierte Quiz-Weg läuft über den Course-Chat-WebSocket:
+
+1. Das Frontend sendet ``quiz_start``.
+2. Der Assistant generiert Fragen aus RAG-/Kurskontext.
+3. Das Frontend zeigt die Fragen an.
+4. Ergebnisse werden serverseitig bewertet oder als Lern-/Gamification-Ereignis
+   gespeichert.
+
+Später kamen serverseitiges Quiz-Grading, Exam-Seiten, Exam-History und mehrere
+Games-Proof-of-Concepts hinzu. Die nächste Gruppe sollte entscheiden, ob das Quiz
+endgültig im Assistant-WebSocket bleibt oder ob eine separate Quiz-App bzw. ein
+separater API-Bereich notwendig ist.
+
+
+Gamification
+............
+
+Die Gamification-App ist umfangreich und sollte als eigener technischer Bereich
+verstanden werden. Ziel ist, Lernaktivität sichtbar zu machen, nicht formale Leistung
+zu bewerten.
+
+Wichtige Konzepte:
+
+* ``AccountProgress`` für globale Punkte und Level.
+* ``CourseProgress`` für Kursfortschritt, Kurspunkte und Kurslevel.
+* ``LevelThreshold`` als gemeinsame Level-Schwellenlogik.
+* ``AccountStreak`` und ``AccountActivityDay`` für Daily Streaks.
+* ``Skill`` als globaler Skill-Katalog.
+* ``SkillProgress`` für nutzerspezifischen Skill-Fortschritt.
+* ``Reward`` und ``RewardEventLog`` als Belohnungs- und Ereignislogik.
+
+Der zentrale Schreibpfad läuft über Services, die ``RewardEventLog``-Einträge
+schreiben. Signals aktualisieren daraus globale Punkte, Level und Streaks. Diese
+Architektur sollte beibehalten oder bewusst neu entschieden werden, weil sie verhindert,
+dass Punktestand und Event-Log auseinanderlaufen.
+
+Wichtig: Die konkreten pädagogischen Regeln sind noch nicht final. Die nächste Gruppe
+sollte entscheiden, wann Punkte vergeben werden, wie hoch Quiz- und Kursabschlusswerte
+sind und wie Anti-Farming-Regeln aussehen sollen.
+
+
+Student Dashboard
+.................
+
+Das Dashboard ist die zentrale Studierendenoberfläche. Es liegt unter
+``src/frontend/dashboard/`` und ist ein eigenes Svelte-5-Microfrontend.
+
+Dokumentierte Hauptbereiche:
+
+* Dashboard-Startseite mit Stats, Leaderboard, Skill-Matrix und Kursübersicht.
+* Kursinhaltsseite mit Seitenliste, Lesefortschritt und Download-Links.
+* Kurs-Chat und Chat-Widget.
+* Quiz-Seite.
+* Exam-Seite.
+* Games-Seiten als Proof of Concept.
+* Profilbearbeitung.
+
+Die technische Detaildokumentation steht in ``documentation/frontend-dashboard.md``.
+Diese Datei sollte nicht wortwörtlich ins Handbook kopiert werden, sondern als
+technische Zusatzdoku referenziert oder später strukturiert in die Entwicklerdoku
+überführt werden.
+
+
+Teacher Frontend
+................
+
+Das Teacher-Frontend liegt unter ``src/frontend/teacher/`` und ist ebenfalls ein
+eigenständiges Svelte-5-Microfrontend.
+
+Dokumentierte Hauptbereiche:
+
+* Kursliste.
+* Kursdetailseite.
+* Overview-Panel für Kursdaten.
+* Students-Panel für Einschreibungen.
+* Content-Panel für Textbooks, Seiten, Skill-Tagging, Vorschau und Import.
+
+Das Teacher-Frontend soll Lehrenden eine einfachere Oberfläche für Kursarbeit bieten,
+ohne dass jede Tätigkeit über den Django Admin laufen muss. Die technische Detaildoku
+steht in ``documentation/frontend-teacher.md``.
+
+
+Admin Bundle Loader Fix
+.......................
+
+``documentation/admin-bundle-loader-fix.md`` beschreibt einen konkreten Fix für das
+Admin-Bundle. Problem war, dass ein ES-Module-Bundle als klassisches Script geladen
+wurde und dadurch Browserfehler entstanden. Die Lösung ist ein klassischer Loader, der
+das Bundle per dynamischem ``import()`` lädt.
+
+Diese Information gehört nicht ins Handbook, aber in die technische Übergabe, weil sie
+bei späteren Admin-/Frontend-Builds wieder relevant werden kann.
+
+
+Vorhandene technische Dokumentationsdateien
+-------------------------------------------
+
+``documentation/admin-bundle-loader-fix.md``
+    Beschreibt den Admin-Bundle-Loader-Fix. Sollte als technische Zusatzdoku erhalten
+    bleiben.
+
+``documentation/frontend-dashboard.md``
+    Vollständige technische Dokumentation des Student-Dashboards: Stack,
+    Verzeichnisstruktur, Routen, Stores, API-Schicht, Pages, Panels,
+    WebSocket-Protokoll und Build-Hinweise.
+
+``documentation/frontend-teacher.md``
+    Vollständige technische Dokumentation des Teacher-Frontends: Stack,
+    Verzeichnisstruktur, Routen, Store, API-Schicht, Datenmodell-Begriffe,
+    Workflows und Stolperfallen.
+
+``documentation/gamification.md``
+    Zentrale technische Gamification-Dokumentation. Sollte als wichtigste Grundlage für
+    die weitere Gamification-Arbeit verwendet werden.
+
+``documentation/gamification-api-route-fix.md``
+    Beschreibt die Registrierung der Gamification-DRF-Routen und das Wiederherstellen
+    der Signal-Registrierung.
+
+``documentation/gamification-course-progress.md``
+    Beschreibt ``CourseProgress``, Kurslevel, Kursfortschritt, Punktevergabe und die
+    Entscheidung gegen eine separate Enrollment-Tabelle in diesem Kontext.
+
+``documentation/skills-catalog-progress-implementation.md``
+    Beschreibt die Trennung von globalem ``Skill``-Katalog und nutzerspezifischem
+    ``SkillProgress``.
+
+
+Was in welches Dokument gehört
+------------------------------
+
+In diese Handover-Datei gehören:
+
+* Branch- und Teamübersicht.
+* Architektur- und Funktionsüberblick.
+* Setup-Hinweise und bekannte lokale Stolperfallen.
+* offene Integrationsentscheidungen.
+* Verweise auf technische Zusatzdokumentation.
+
+Ins Handbook gehören:
+
+* Was ELISA für Studierende und Lehrende ist.
+* typische Nutzer-Workflows.
+* verständliche Erklärung von Dashboard, Chat, Quiz und Lernfortschritt.
+* Responsible-AI-Hinweise.
+* keine tiefen Model-, API- oder Branch-Details.
+
+In ``docs/info_materials/`` gehören:
+
+* kurze Flyer-/Infomaterial-Seiten.
+* später je ein PNG-Flyer für Studierende und Lehrende.
+* keine technische Dokumentation.
+
+Als technische Zusatzdokumentation sollten erhalten oder später migriert werden:
+
+* ``documentation/frontend-dashboard.md``
+* ``documentation/frontend-teacher.md``
+* ``documentation/gamification.md``
+* ``documentation/gamification-course-progress.md``
+* ``documentation/gamification-api-route-fix.md``
+* ``documentation/skills-catalog-progress-implementation.md``
+* ``documentation/admin-bundle-loader-fix.md``
+
+
+Setup- und Betriebsnotizen
+--------------------------
+
+Lokale Python-Umgebung:
+
+* Das Projekt nutzt Poetry.
+* In diesem lokalen Windows-Setup wurde Python 3.13 verwendet.
+* Die OpenBook-Venv lag unter
+  ``C:\Users\patri\AppData\Local\pypoetry\Cache\virtualenvs\openbook-Jr5oGFJm-py3.13``.
+
+Wichtige Befehle:
+
+.. code-block:: powershell
+
+   py -3.13 -m poetry install
+   py -3.13 -m poetry run python src/manage.py migrate
+   py -3.13 -m poetry run npm run docs
+
+Für Graphviz:
+
+.. code-block:: powershell
+
+   dot -V
+
+Graphviz war lokal installiert unter:
+
+.. code-block:: text
+
+   C:\Program Files\Graphviz\bin\dot.exe
+
+Der Docs-Server läuft nach erfolgreichem Start auf:
+
+.. code-block:: text
+
+   http://localhost:8885/
+
+Wichtig: Der vollständige Docs-Befehl führt zuerst den OpenAPI-Sync aus. Dafür startet
+kurz ein Django-Server. Wenn die lokale Datenbank nicht migriert ist, schlägt der
+OpenAPI-Sync fehl, z. B. mit ``no such table: django_site``.
+
+
+Bekannte Warnungen und Probleme
+-------------------------------
+
+Fehlendes ``sqlite-vec``
+    Die Assistant-/RAG-Integration importiert ``sqlite_vec``. Im lokalen Setup fehlte
+    das Paket und musste manuell installiert werden. Das sollte dauerhaft in die
+    Projektabhängigkeiten aufgenommen werden.
+
+OpenAPI-/Docs-Warnung
+    Beim Docs-Build gab es eine Warnung zu ``docs/_openapi/asyncapi.yaml``. Der Build
+    lief trotzdem durch, aber die nächste Gruppe sollte prüfen, ob diese Datei erzeugt,
+    referenziert oder entfernt werden soll.
+
+Nicht migrierte Datenbank
+    Ohne ``manage.py migrate`` schlägt der OpenAPI-Sync fehl. Häufige Fehlermeldung:
+    ``no such table: django_site``.
+
+Frontend-``dist``-Warnungen
+    Django meldet Warnungen, wenn ``src/frontend/app/dist``,
+    ``src/frontend/dashboard/dist`` oder ``src/frontend/teacher/dist`` fehlen. Das
+    blockiert den Docs-Build nicht, sollte aber vor Frontend-Tests oder Deployment
+    sauber gebaut werden.
+
+Generierte und doppelte Dateien
+    In Integrationsständen tauchen generierte Frontend-Dateien und Dateien mit Namen wie
+    ``AppHeader 2.svelte`` oder ``gamification-dashboard.store 2.ts`` auf. Diese sollten
+    vor einer finalen Übergabe oder einem Merge geprüft und bereinigt werden.
+
+NPM-Warnung
+    ``npm`` meldete lokal ``Unknown env config "min-release-age"``. Das blockiert den
+    Build nicht, sollte aber bei Gelegenheit in der npm-Konfiguration geprüft werden.
+
+
+Empfohlene nächste Schritte
+---------------------------
+
+1. Finale Basis festlegen
+   Entscheidet, ob ``origin/main``, ``origin/integration/all-pairs-final-branch`` oder
+   ``origin/handbook`` die Quelle der Wahrheit für die nächste Arbeit ist.
+
+2. Abhängigkeiten bereinigen
+   ``sqlite-vec`` sauber in ``pyproject.toml`` und ``poetry.lock`` aufnehmen. Danach
+   frische Installation und Tests ausführen.
+
+3. Datenbank und OpenAPI stabilisieren
+   Lokale Migrationen dokumentieren und prüfen, warum ``asyncapi.yaml`` fehlt oder
+   falsch referenziert wird.
+
+4. Quiz-Architektur entscheiden
+   Klären, ob Quiz dauerhaft über den Assistant-WebSocket läuft oder ob eine eigene
+   Quiz-/Exam-API entstehen soll.
+
+5. Gamification-Regeln finalisieren
+   Pädagogisch entscheiden, welche Aktionen Punkte geben, wie Anti-Farming funktioniert
+   und wie Kursabschluss, Quiz, Chat und Seitenfortschritt gewichtet werden.
+
+6. Teacher-Workflow stabilisieren
+   Prüfen, welche Teile des Teacher-Frontends produktiv weitergeführt werden sollen:
+   Kursanlage, Content-Editor, Skill-Tagging, Einschreibungen und Reporting.
+
+7. Student-Dashboard testen
+   Dashboard, Content, Chat, Quiz, Exam, Games und Download-Funktionen mit echten
+   Kursdaten testen.
+
+8. Technische Markdown-Doku migrieren
+   Die Dateien unter ``documentation/`` entweder nach ``docs/developers/`` überführen
+   oder bewusst als Archiv/Zusatzdoku behalten.
+
+9. Handbook ausbauen
+   ``docs/handbook/index.rst`` soll eine nutzerorientierte Übersicht bleiben. Es sollte
+   nicht mit Branch- oder API-Details überladen werden.
+
+10. Flyer einbinden
+    Für ``docs/info_materials/students.rst`` und
+    ``docs/info_materials/teachers.rst`` jeweils den geplanten PNG-Flyer erstellen und
+    einbinden.
+
+
+Kurzfazit
+---------
+
+ELISA ist aktuell ein breiter Proof of Concept. Die wichtigsten Bausteine sind
+vorhanden: Assistant/RAG, LearningState, QuizResult, Gamification, Student Dashboard und
+Teacher Frontend. Die nächste Gruppe sollte nicht bei null anfangen, sondern zuerst den
+integrierten Stand stabilisieren, Abhängigkeiten und generierte Artefakte bereinigen und
+dann fachlich entscheiden, welche Lern- und Gamification-Regeln wirklich gelten sollen.
+
+Die vorhandenen Markdown-Dateien unter ``documentation/`` enthalten viel wertvolle
+Detailinformation. Für neue Teammitglieder ist diese Handover-Datei der Einstieg; für
+tiefe technische Arbeit sollten anschließend gezielt die passenden Zusatzdokumente und
+Quellcodebereiche gelesen werden.
