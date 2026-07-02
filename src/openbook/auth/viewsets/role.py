@@ -42,7 +42,14 @@ class RoleSerializer(FlexFieldsModelSerializer):
             "created_by", "created_at", "modified_by", "modified_at",
         ]
 
-        read_only_fields = ["id", "created_at", "modified_at"]
+        read_only_fields = [
+            "id",
+            "role_assignments",
+            "enrollment_methods",
+            "access_requests",
+            "created_at",
+            "modified_at",
+        ]
 
         expandable_fields = {
             "permissions":        ("openbook.auth.viewsets.permission.PermissionSerializer",              {"many": True}),

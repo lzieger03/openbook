@@ -6,6 +6,15 @@
     - - view_user
       - openbook_auth
       - user
+    - - view_course
+      - openbook_content
+      - course
+    - - view_courseprogress
+      - openbook_gamification
+      - courseprogress
+    - - view_skillprogress
+      - openbook_gamification
+      - skillprogress
 
 - model: openbook_auth.group
   fields:
@@ -30,6 +39,93 @@
     - - add_course
       - openbook_content
       - course
+    - - change_course
+      - openbook_content
+      - course
+    - - delete_course
+      - openbook_content
+      - course
+    - - view_course
+      - openbook_content
+      - course
+    - - add_librarygroup
+      - openbook_content
+      - librarygroup
+    - - change_librarygroup
+      - openbook_content
+      - librarygroup
+    - - view_librarygroup
+      - openbook_content
+      - librarygroup
+    - - add_textbook
+      - openbook_content
+      - textbook
+    - - change_textbook
+      - openbook_content
+      - textbook
+    - - delete_textbook
+      - openbook_content
+      - textbook
+    - - view_textbook
+      - openbook_content
+      - textbook
+    - - add_textbookpage
+      - openbook_content
+      - textbookpage
+    - - change_textbookpage
+      - openbook_content
+      - textbookpage
+    - - delete_textbookpage
+      - openbook_content
+      - textbookpage
+    - - view_textbookpage
+      - openbook_content
+      - textbookpage
+    - - add_coursematerial
+      - openbook_content
+      - coursematerial
+    - - change_coursematerial
+      - openbook_content
+      - coursematerial
+    - - delete_coursematerial
+      - openbook_content
+      - coursematerial
+    - - view_coursematerial
+      - openbook_content
+      - coursematerial
+    - - add_coursematerialpagerange
+      - openbook_content
+      - coursematerialpagerange
+    - - change_coursematerialpagerange
+      - openbook_content
+      - coursematerialpagerange
+    - - delete_coursematerialpagerange
+      - openbook_content
+      - coursematerialpagerange
+    - - view_coursematerialpagerange
+      - openbook_content
+      - coursematerialpagerange
+    - - add_role
+      - openbook_auth
+      - role
+    - - view_role
+      - openbook_auth
+      - role
+    - - add_roleassignment
+      - openbook_auth
+      - roleassignment
+    - - delete_roleassignment
+      - openbook_auth
+      - roleassignment
+    - - view_roleassignment
+      - openbook_auth
+      - roleassignment
+    - - add_skill
+      - openbook_gamification
+      - skill
+    - - view_skill
+      - openbook_gamification
+      - skill
 
 - model: openbook_auth.group
   fields:

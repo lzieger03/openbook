@@ -34,6 +34,11 @@ export default {
         conditions: [_breadcrumbs()],
     }),
 
+    "/gamification-test": wrap({
+        asyncComponent: () => import("./pages/gamification/GamificationManualTestPage.svelte"),
+        conditions: [_breadcrumbs(() => [{ href: "#/gamification-test", label: "Gamification Test" }])],
+    }),
+
     "*": wrap({
         asyncComponent: () => import("./pages/errors/NotFoundPage.svelte"),
         conditions: [_breadcrumbs(i18n => [{ href: "", label: i18n.Error.Page.NotFound.Title }])],

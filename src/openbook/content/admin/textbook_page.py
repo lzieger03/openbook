@@ -12,6 +12,9 @@ from django.utils.translation          import gettext_lazy as _
 
 from openbook.admin                    import CustomModelAdmin
 from openbook.admin                    import ImportExportModelResource
+from openbook.assistant.services.textbook_sync import (
+    TextbookDocumentSyncService,
+)
 from openbook.auth.admin.mixins.audit  import created_modified_by_fields
 from openbook.auth.admin.mixins.audit  import created_modified_by_fieldset
 from openbook.auth.admin.mixins.audit  import created_modified_by_filter
@@ -39,6 +42,7 @@ class TextbookPageAdmin(CustomModelAdmin):
     search_fields       = ["name", "textbook__name", "parent__name"]
     ordering            = ["textbook_id", "parent_id", "position", "name"]
     readonly_fields     = ["content", *created_modified_by_fields]
+    filter_horizontal   = ["skills"]
 
     fieldsets = [
         (None, {
@@ -47,6 +51,10 @@ class TextbookPageAdmin(CustomModelAdmin):
         (_("Description"), {
             "classes": ["tab"],
             "fields": ["description", "text_format"],
+        }),
+        (_("Skills"), {
+            "classes": ["tab"],
+            "fields": ["skills"],
         }),
         (_("Content"), {
             "classes": ["tab"],
@@ -63,4 +71,29 @@ class TextbookPageAdmin(CustomModelAdmin):
             "classes": ["tab"],
             "fields": ["description", "text_format"],
         }),
+        (_("Skills"), {
+            "classes": ["tab"],
+            "fields": ["skills"],
+        }),
     ]
+
+    def save_model(self, request, obj, form, change) -> None:
+        """Sync derived assistant documents after a textbook page changes."""
+        previous_textbook = None
+
+        if change and obj.pk:
+            previous_textbook = TextbookPage.objects.get(pk=obj.pk).textbook
+
+        super().save_model(request, obj, form, change)
+        sync_service = TextbookDocumentSyncService()
+
+        if previous_textbook and previous_textbook.id != obj.textbook_id:
+            sync_service.sync_textbook(previous_textbook)
+
+        sync_service.sync_textbook(obj.textbook)
+
+    def delete_model(self, request, obj) -> None:
+        """Sync derived assistant documents after a textbook page is deleted."""
+        textbook = obj.textbook
+        super().delete_model(request, obj)
+        TextbookDocumentSyncService().sync_textbook(textbook)

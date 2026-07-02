@@ -39,11 +39,15 @@ drf-spectacular = {extras = ["sidecar"], version = "^0.29.0"}
 markdown = "^3.10.2"
 pillow = "^12.2.0"
 pygments = "^2.19.2"
+pypdf = "^5.1"
 python = "^3.12"
 pyyaml = "^6.0.3"
 semver = "^3.0.4"
 twisted = {extras = ["http2", "tls"], version = "^25.5.0"}
 django-colorfield = "^0.14.0"
+mistralai = "^2.4.8"
+sqlite-vec = "^0.1.9"
+sqlean-py = { version = "^3.50.4.5", markers = "sys_platform == 'darwin'" }
 
 # Documentation dependencies
 [tool.poetry.group.docs.dependencies]

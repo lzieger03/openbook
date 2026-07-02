@@ -15,6 +15,7 @@ from rest_framework.viewsets            import ModelViewSet
 from openbook.auth.filters.mixins.audit import CreatedModifiedByFilterMixin
 from openbook.auth.serializers.user     import UserField
 from openbook.drf.flex_serializers      import FlexFieldsModelSerializer
+from openbook.drf.viewsets              import AllowAnonymousListRetrieveViewSetMixin
 from openbook.drf.viewsets              import ModelViewSetMixin
 from openbook.drf.viewsets              import with_flex_fields_parameters
 from ..models.course_material           import CourseMaterialPageRange
@@ -67,7 +68,7 @@ class CourseMaterialPageRangeFilter(CreatedModifiedByFilterMixin, FilterSet):
     }
 )
 @with_flex_fields_parameters()
-class CourseMaterialPageRangeViewSet(ModelViewSetMixin, ModelViewSet):
+class CourseMaterialPageRangeViewSet(AllowAnonymousListRetrieveViewSetMixin, ModelViewSetMixin, ModelViewSet):
     __doc__ = "Course Material Page Ranges"
 
     queryset         = CourseMaterialPageRange.objects.all()

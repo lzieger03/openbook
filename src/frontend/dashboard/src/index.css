@@ -1,0 +1,27 @@
+/*
+ * OpenBook: Interactive Online Textbooks - Server
+ * © 2026 Dennis Schulmeister-Zimolong <dennis@wpvs.de>
+ * Ledejna Salihi (@LedejnaSalihi)
+ * Lars Zieger (@lzieger03)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ */
+
+/* Page reset. Background follows the active DaisyUI theme. */
+/* Cap the document to the viewport so only inner areas scroll (header/sidebars stay fixed). */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-base-300);
+    color: var(--color-base-content);
+}

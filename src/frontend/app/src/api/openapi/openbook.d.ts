@@ -4,6 +4,62 @@
  */
 
 export interface paths {
+    "/api/assistant/documents/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List
+         * @description Assistant documents available to the current user.
+         */
+        get: operations["assistant_documents_list"];
+        put?: never;
+        /**
+         * Create
+         * @description Assistant documents available to the current user.
+         */
+        post: operations["assistant_documents_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assistant/documents/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Retrieve
+         * @description Assistant documents available to the current user.
+         */
+        get: operations["assistant_documents_retrieve"];
+        /**
+         * Update
+         * @description Assistant documents available to the current user.
+         */
+        put: operations["assistant_documents_update"];
+        post?: never;
+        /**
+         * Delete
+         * @description Assistant documents available to the current user.
+         */
+        delete: operations["assistant_documents_destroy"];
+        options?: never;
+        head?: never;
+        /**
+         * Partial Update
+         * @description Assistant documents available to the current user.
+         */
+        patch: operations["assistant_documents_partial_update"];
+        trace?: never;
+    };
     "/api/auth/access_requests/": {
         parameters: {
             query?: never;
@@ -1406,6 +1462,326 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/gamification/account_progress/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List
+         * @description Current progress (points and level) per account
+         */
+        get: operations["gamification_account_progress_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gamification/account_progress/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Retrieve
+         * @description Current progress (points and level) per account
+         */
+        get: operations["gamification_account_progress_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gamification/account_progress/me/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Current User Progress
+         * @description Current progress (points and level) per account
+         */
+        get: operations["gamification_account_progress_me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gamification/activity/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Record Learning Activity
+         * @description Record real learning activities that may advance the daily streak
+         */
+        post: operations["gamification_activity_record"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gamification/course_progress/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List
+         * @description Current progress per course and account
+         */
+        get: operations["gamification_course_progress_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gamification/course_progress/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Retrieve
+         * @description Current progress per course and account
+         */
+        get: operations["gamification_course_progress_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gamification/reward_event_log/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List
+         * @description Reward event log (audit log)
+         */
+        get: operations["gamification_reward_event_log_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gamification/reward_event_log/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Retrieve
+         * @description Reward event log (audit log)
+         */
+        get: operations["gamification_reward_event_log_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gamification/reward_event_log/trigger/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Trigger Reward Event
+         * @description Reward event log (audit log)
+         */
+        post: operations["gamification_reward_event_log_trigger"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gamification/rewards/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List
+         * @description Rewards
+         */
+        get: operations["gamification_rewards_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gamification/rewards/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Retrieve
+         * @description Rewards
+         */
+        get: operations["gamification_rewards_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gamification/skill_progress/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List
+         * @description Current progress per skill and account
+         */
+        get: operations["gamification_skill_progress_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gamification/skill_progress/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Retrieve
+         * @description Current progress per skill and account
+         */
+        get: operations["gamification_skill_progress_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gamification/skills/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List
+         * @description Global skill catalog
+         */
+        get: operations["gamification_skills_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gamification/skills/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Retrieve
+         * @description Global skill catalog
+         */
+        get: operations["gamification_skills_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/gamification/streak/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Current User Streak
+         * @description Daily learning streak of the current user
+         */
+        get: operations["gamification_streak_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1437,6 +1813,34 @@ export interface components {
             /** Format: date-time */
             readonly modified_at: string | null;
         };
+        /** @description Account Progress */
+        AccountProgress: {
+            /** Format: uuid */
+            readonly id: string;
+            account: string;
+            /** Format: int64 */
+            point_total?: number;
+            /** Format: int64 */
+            level?: number;
+            /** Format: date-time */
+            readonly updated_at: string;
+        };
+        AccountProgressMe: {
+            point_total: number;
+            level: number;
+            current_level_min_points: number;
+            next_level_min_points: number | null;
+        };
+        /**
+         * @description * `CHAT_MESSAGE_SENT` - Chat Message Sent
+         *     * `QUIZ_ANSWERED` - Quiz Answered
+         *     * `QUIZ_COMPLETED` - Quiz Completed
+         *     * `CONTENT_VIEWED` - Content Viewed
+         *     * `MODULE_COMPLETED` - Module Completed
+         *     * `GAME_PLAYED` - Game Played
+         * @enum {string}
+         */
+        ActivityTypeEnum: "CHAT_MESSAGE_SENT" | "QUIZ_ANSWERED" | "QUIZ_COMPLETED" | "CONTENT_VIEWED" | "MODULE_COMPLETED" | "GAME_PLAYED";
         AllowedPermission: {
             id: number;
             perm: string;
@@ -1463,6 +1867,34 @@ export interface components {
          * @enum {string}
          */
         AssignmentMethodEnum: "manual" | "self-enrollment" | "access-request";
+        /** @description Serializer for course-scoped assistant documents. */
+        AssistantDocument: {
+            /** Format: uuid */
+            readonly id: string;
+            /**
+             * Format: uuid
+             * @description Course that owns this assistant document. Empty documents are global.
+             */
+            course?: string | null;
+            title?: string;
+            /** Format: uri */
+            file_data?: string;
+            readonly file_name: string;
+            readonly file_size: number | null;
+            readonly mime_type: string;
+            readonly index_status: components["schemas"]["IndexStatusEnum"];
+            readonly index_error: string;
+            /** Format: date-time */
+            readonly indexed_at: string | null;
+            readonly embedding_model: string;
+            readonly chunk_count: number;
+            readonly created_by: string;
+            /** Format: date-time */
+            readonly created_at: string | null;
+            readonly modified_by: string;
+            /** Format: date-time */
+            readonly modified_at: string | null;
+        };
         /** @description Authentication Token */
         AuthToken: {
             /** Format: uuid */
@@ -1603,6 +2035,20 @@ export interface components {
             readonly modified_by: string;
             /** Format: date-time */
             readonly modified_at: string | null;
+        };
+        /** @description Course Progress */
+        CourseProgress: {
+            /** Format: uuid */
+            readonly id: string;
+            account: string;
+            /** Format: uuid */
+            course: string;
+            /** Format: int64 */
+            course_points?: number;
+            /** Format: int64 */
+            course_level?: number;
+            /** Format: decimal */
+            course_progress?: string;
         };
         /** @description Current User */
         CurrentUser: {
@@ -1772,6 +2218,14 @@ export interface components {
             /** Format: date-time */
             readonly modified_at: string | null;
         };
+        /**
+         * @description * `pending` - Pending
+         *     * `indexing` - Indexing
+         *     * `indexed` - Indexed
+         *     * `failed` - Failed
+         * @enum {string}
+         */
+        IndexStatusEnum: "pending" | "indexing" | "indexed" | "failed";
         /** @description Language */
         Language: {
             /** Language Code */
@@ -1864,6 +2318,21 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["AccessRequest"][];
         };
+        PaginatedAccountProgressList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?_page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?_page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["AccountProgress"][];
+        };
         PaginatedAllowedRolePermissionList: {
             /** @example 123 */
             count: number;
@@ -1878,6 +2347,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["AllowedRolePermission"][];
+        };
+        PaginatedAssistantDocumentList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?_page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?_page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["AssistantDocument"][];
         };
         PaginatedAuthTokenList: {
             /** @example 123 */
@@ -1938,6 +2422,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["CourseMaterialPageRange"][];
+        };
+        PaginatedCourseProgressList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?_page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?_page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["CourseProgress"][];
         };
         PaginatedCurrentUserList: {
             /** @example 123 */
@@ -2134,6 +2633,36 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["PermissionText"][];
         };
+        PaginatedRewardEventLogList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?_page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?_page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["RewardEventLog"][];
+        };
+        PaginatedRewardList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?_page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?_page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Reward"][];
+        };
         PaginatedRoleAssignmentList: {
             /** @example 123 */
             count: number;
@@ -2178,6 +2707,36 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["Site"][];
+        };
+        PaginatedSkillList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?_page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?_page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Skill"][];
+        };
+        PaginatedSkillProgressList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?_page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?_page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["SkillProgress"][];
         };
         PaginatedTextbookList: {
             /** @example 123 */
@@ -2244,6 +2803,34 @@ export interface components {
             decision?: components["schemas"]["DecisionEnum"];
             /** Format: date-time */
             readonly decision_date?: string | null;
+            readonly created_by?: string;
+            /** Format: date-time */
+            readonly created_at?: string | null;
+            readonly modified_by?: string;
+            /** Format: date-time */
+            readonly modified_at?: string | null;
+        };
+        /** @description Serializer for course-scoped assistant documents. */
+        PatchedAssistantDocument: {
+            /** Format: uuid */
+            readonly id?: string;
+            /**
+             * Format: uuid
+             * @description Course that owns this assistant document. Empty documents are global.
+             */
+            course?: string | null;
+            title?: string;
+            /** Format: uri */
+            file_data?: string;
+            readonly file_name?: string;
+            readonly file_size?: number | null;
+            readonly mime_type?: string;
+            readonly index_status?: components["schemas"]["IndexStatusEnum"];
+            readonly index_error?: string;
+            /** Format: date-time */
+            readonly indexed_at?: string | null;
+            readonly embedding_model?: string;
+            readonly chunk_count?: number;
             readonly created_by?: string;
             /** Format: date-time */
             readonly created_at?: string | null;
@@ -2510,9 +3097,9 @@ export interface components {
             /** Active */
             is_active?: boolean;
             permissions?: string[];
-            role_assignments?: string[];
-            enrollment_methods?: string[];
-            access_requests?: string[];
+            readonly role_assignments?: string[];
+            readonly enrollment_methods?: string[];
+            readonly access_requests?: string[];
             readonly created_by?: string;
             /** Format: date-time */
             readonly created_at?: string | null;
@@ -2665,6 +3252,36 @@ export interface components {
             /** Translated Name */
             name: string;
         };
+        /** @description Record a learning activity */
+        RecordActivityRequest: {
+            activity_type: components["schemas"]["ActivityTypeEnum"];
+            /** Format: date-time */
+            occurred_at?: string;
+            metadata?: unknown;
+        };
+        /** @description Reward */
+        Reward: {
+            /** Format: uuid */
+            readonly id: string;
+            reward_type: string;
+            /** Format: int64 */
+            value: number;
+            description?: string;
+        };
+        /** @description Reward Event Log */
+        RewardEventLog: {
+            /** Format: uuid */
+            readonly id: string;
+            account: string;
+            /** Format: uuid */
+            reward?: string | null;
+            event_type: string;
+            /** Format: int64 */
+            points_delta?: number;
+            /** Format: date-time */
+            readonly created_at: string;
+            context?: unknown;
+        };
         /** @description Role */
         Role: {
             /** Format: uuid */
@@ -2684,9 +3301,9 @@ export interface components {
             /** Active */
             is_active?: boolean;
             permissions: string[];
-            role_assignments: string[];
-            enrollment_methods: string[];
-            access_requests: string[];
+            readonly role_assignments: string[];
+            readonly enrollment_methods: string[];
+            readonly access_requests: string[];
             readonly created_by: string;
             /** Format: date-time */
             readonly created_at: string | null;
@@ -2761,6 +3378,34 @@ export interface components {
             brand_color?: string;
             auth_config: number;
         };
+        /** @description Skill */
+        Skill: {
+            /** Format: uuid */
+            readonly id: string;
+            name: string;
+            description?: string;
+            icon_path?: string;
+        };
+        /** @description Skill Progress */
+        SkillProgress: {
+            /** Format: uuid */
+            readonly id: string;
+            account: string;
+            /** Format: uuid */
+            skill: string;
+            /** Format: int64 */
+            level?: number;
+            /** Format: decimal */
+            progress?: string;
+        };
+        /** @description Current daily streak state of an account */
+        StreakState: {
+            current_streak: number;
+            longest_streak: number;
+            /** Format: date */
+            last_active_date: string | null;
+            streak_freezes: number;
+        };
         /**
          * @description * `TEXT` - Plain Text
          *     * `HTML` - HTML
@@ -2834,6 +3479,17 @@ export interface components {
             /** Format: date-time */
             readonly modified_at: string | null;
         };
+        TriggerRewardEventLogRequest: {
+            account?: string;
+            /** Format: uuid */
+            reward: string;
+            event_type?: string;
+            context?: unknown;
+        };
+        TriggerRewardEventLogResponse: {
+            reward_event_log: components["schemas"]["RewardEventLog"];
+            point_total: number;
+        };
         /** @description User */
         User: {
             readonly id: number;
@@ -2871,6 +3527,219 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    assistant_documents_list: {
+        parameters: {
+            query?: {
+                /** @description Relationships to be expanded in the response */
+                _expand?: string;
+                /** @description Fields to be included in the response */
+                _fields?: string;
+                /** @description Fields to be removed from the response */
+                _omit?: string;
+                /** @description A page number within the paginated result set. */
+                _page?: number;
+                /** @description Number of results to return per page. */
+                _page_size?: number;
+                /** @description A search term. */
+                _search?: string;
+                /** @description Which field to use when ordering the results. */
+                _sort?: string;
+                course?: string;
+                course__isnull?: boolean;
+                created_at?: string;
+                created_at__gte?: string;
+                created_at__lte?: string;
+                created_by?: string;
+                file_name?: string;
+                /**
+                 * @description * `pending` - Pending
+                 *     * `indexing` - Indexing
+                 *     * `indexed` - Indexed
+                 *     * `failed` - Failed
+                 */
+                index_status?: "failed" | "indexed" | "indexing" | "pending";
+                mime_type?: string;
+                modified_at?: string;
+                modified_at__gte?: string;
+                modified_at__lte?: string;
+                modified_by?: string;
+                title?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedAssistantDocumentList"];
+                };
+            };
+        };
+    };
+    assistant_documents_create: {
+        parameters: {
+            query?: {
+                /** @description Relationships to be expanded in the response */
+                _expand?: string;
+                /** @description Fields to be included in the response */
+                _fields?: string;
+                /** @description Fields to be removed from the response */
+                _omit?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["AssistantDocument"];
+                "application/x-www-form-urlencoded": components["schemas"]["AssistantDocument"];
+                "multipart/form-data": components["schemas"]["AssistantDocument"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantDocument"];
+                };
+            };
+        };
+    };
+    assistant_documents_retrieve: {
+        parameters: {
+            query?: {
+                /** @description Relationships to be expanded in the response */
+                _expand?: string;
+                /** @description Fields to be included in the response */
+                _fields?: string;
+                /** @description Fields to be removed from the response */
+                _omit?: string;
+            };
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this Assistant Document. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantDocument"];
+                };
+            };
+        };
+    };
+    assistant_documents_update: {
+        parameters: {
+            query?: {
+                /** @description Relationships to be expanded in the response */
+                _expand?: string;
+                /** @description Fields to be included in the response */
+                _fields?: string;
+                /** @description Fields to be removed from the response */
+                _omit?: string;
+            };
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this Assistant Document. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["AssistantDocument"];
+                "application/x-www-form-urlencoded": components["schemas"]["AssistantDocument"];
+                "multipart/form-data": components["schemas"]["AssistantDocument"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantDocument"];
+                };
+            };
+        };
+    };
+    assistant_documents_destroy: {
+        parameters: {
+            query?: {
+                /** @description Relationships to be expanded in the response */
+                _expand?: string;
+                /** @description Fields to be included in the response */
+                _fields?: string;
+                /** @description Fields to be removed from the response */
+                _omit?: string;
+            };
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this Assistant Document. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    assistant_documents_partial_update: {
+        parameters: {
+            query?: {
+                /** @description Relationships to be expanded in the response */
+                _expand?: string;
+                /** @description Fields to be included in the response */
+                _fields?: string;
+                /** @description Fields to be removed from the response */
+                _omit?: string;
+            };
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this Assistant Document. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedAssistantDocument"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedAssistantDocument"];
+                "multipart/form-data": components["schemas"]["PatchedAssistantDocument"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantDocument"];
+                };
+            };
+        };
+    };
     auth_access_requests_list: {
         parameters: {
             query?: {
@@ -2906,7 +3775,7 @@ export interface operations {
                 modified_at__lte?: string;
                 modified_by?: string;
                 role?: string;
-                scope_type?: number;
+                scope_type?: string;
                 scope_uuid?: string;
                 user?: string;
             };
@@ -3161,7 +4030,7 @@ export interface operations {
                 /** @description Which field to use when ordering the results. */
                 _sort?: string;
                 permission?: number;
-                scope_type?: number;
+                scope_type?: string;
             };
             header?: never;
             path?: never;
@@ -3609,7 +4478,7 @@ export interface operations {
                 modified_by?: string;
                 name?: string;
                 role?: string;
-                scope_type?: number;
+                scope_type?: string;
                 scope_uuid?: string;
             };
             header?: never;
@@ -3996,7 +4865,7 @@ export interface operations {
                 modified_at__lte?: string;
                 modified_by?: string;
                 role?: string;
-                scope_type?: number;
+                scope_type?: string;
                 scope_uuid?: string;
                 start_date?: string;
                 start_date__gte?: string;
@@ -4208,7 +5077,7 @@ export interface operations {
                 priority?: number;
                 priority__gte?: number;
                 priority__lte?: number;
-                scope_type?: number;
+                scope_type?: string;
                 scope_uuid?: string;
                 slug?: string;
             };
@@ -5032,7 +5901,7 @@ export interface operations {
                 modified_at__lte?: string;
                 modified_by?: string;
                 name?: string;
-                owner?: number;
+                owner?: string;
                 slug?: string;
             };
             header?: never;
@@ -5236,7 +6105,7 @@ export interface operations {
                 modified_at__lte?: string;
                 modified_by?: string;
                 name?: string;
-                owner?: number;
+                owner?: string;
                 parent?: string;
                 slug?: string;
             };
@@ -6736,6 +7605,534 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["health-response"];
+                };
+            };
+        };
+    };
+    gamification_account_progress_list: {
+        parameters: {
+            query?: {
+                /** @description Relationships to be expanded in the response */
+                _expand?: string;
+                /** @description Fields to be included in the response */
+                _fields?: string;
+                /** @description Fields to be removed from the response */
+                _omit?: string;
+                /** @description A page number within the paginated result set. */
+                _page?: number;
+                /** @description Number of results to return per page. */
+                _page_size?: number;
+                /** @description A search term. */
+                _search?: string;
+                /** @description Which field to use when ordering the results. */
+                _sort?: string;
+                account?: string;
+                level?: number;
+                level__gte?: number;
+                level__lte?: number;
+                point_total?: number;
+                point_total__gte?: number;
+                point_total__lte?: number;
+                updated_at?: string;
+                updated_at__gte?: string;
+                updated_at__lte?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedAccountProgressList"];
+                };
+            };
+        };
+    };
+    gamification_account_progress_retrieve: {
+        parameters: {
+            query?: {
+                /** @description Relationships to be expanded in the response */
+                _expand?: string;
+                /** @description Fields to be included in the response */
+                _fields?: string;
+                /** @description Fields to be removed from the response */
+                _omit?: string;
+            };
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this Account Progress. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountProgress"];
+                };
+            };
+        };
+    };
+    gamification_account_progress_me: {
+        parameters: {
+            query?: {
+                /** @description Relationships to be expanded in the response */
+                _expand?: string;
+                /** @description Fields to be included in the response */
+                _fields?: string;
+                /** @description Fields to be removed from the response */
+                _omit?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountProgressMe"];
+                };
+            };
+        };
+    };
+    gamification_activity_record: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RecordActivityRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["RecordActivityRequest"];
+                "multipart/form-data": components["schemas"]["RecordActivityRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StreakState"];
+                };
+            };
+        };
+    };
+    gamification_course_progress_list: {
+        parameters: {
+            query?: {
+                /** @description Relationships to be expanded in the response */
+                _expand?: string;
+                /** @description Fields to be included in the response */
+                _fields?: string;
+                /** @description Fields to be removed from the response */
+                _omit?: string;
+                /** @description A page number within the paginated result set. */
+                _page?: number;
+                /** @description Number of results to return per page. */
+                _page_size?: number;
+                /** @description A search term. */
+                _search?: string;
+                /** @description Which field to use when ordering the results. */
+                _sort?: string;
+                account?: string;
+                course?: string;
+                course_level?: number;
+                course_level__gte?: number;
+                course_level__lte?: number;
+                course_points?: number;
+                course_points__gte?: number;
+                course_points__lte?: number;
+                course_progress?: number;
+                course_progress__gte?: number;
+                course_progress__lte?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedCourseProgressList"];
+                };
+            };
+        };
+    };
+    gamification_course_progress_retrieve: {
+        parameters: {
+            query?: {
+                /** @description Relationships to be expanded in the response */
+                _expand?: string;
+                /** @description Fields to be included in the response */
+                _fields?: string;
+                /** @description Fields to be removed from the response */
+                _omit?: string;
+            };
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this Course Progress. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseProgress"];
+                };
+            };
+        };
+    };
+    gamification_reward_event_log_list: {
+        parameters: {
+            query?: {
+                /** @description Relationships to be expanded in the response */
+                _expand?: string;
+                /** @description Fields to be included in the response */
+                _fields?: string;
+                /** @description Fields to be removed from the response */
+                _omit?: string;
+                /** @description A page number within the paginated result set. */
+                _page?: number;
+                /** @description Number of results to return per page. */
+                _page_size?: number;
+                /** @description A search term. */
+                _search?: string;
+                /** @description Which field to use when ordering the results. */
+                _sort?: string;
+                account?: string;
+                created_at?: string;
+                created_at__gte?: string;
+                created_at__lte?: string;
+                event_type?: string;
+                event_type__icontains?: string;
+                points_delta?: number;
+                points_delta__gte?: number;
+                points_delta__lte?: number;
+                reward?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedRewardEventLogList"];
+                };
+            };
+        };
+    };
+    gamification_reward_event_log_retrieve: {
+        parameters: {
+            query?: {
+                /** @description Relationships to be expanded in the response */
+                _expand?: string;
+                /** @description Fields to be included in the response */
+                _fields?: string;
+                /** @description Fields to be removed from the response */
+                _omit?: string;
+            };
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this Reward Event Log. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RewardEventLog"];
+                };
+            };
+        };
+    };
+    gamification_reward_event_log_trigger: {
+        parameters: {
+            query?: {
+                /** @description Relationships to be expanded in the response */
+                _expand?: string;
+                /** @description Fields to be included in the response */
+                _fields?: string;
+                /** @description Fields to be removed from the response */
+                _omit?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TriggerRewardEventLogRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["TriggerRewardEventLogRequest"];
+                "multipart/form-data": components["schemas"]["TriggerRewardEventLogRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TriggerRewardEventLogResponse"];
+                };
+            };
+        };
+    };
+    gamification_rewards_list: {
+        parameters: {
+            query?: {
+                /** @description Relationships to be expanded in the response */
+                _expand?: string;
+                /** @description Fields to be included in the response */
+                _fields?: string;
+                /** @description Fields to be removed from the response */
+                _omit?: string;
+                /** @description A page number within the paginated result set. */
+                _page?: number;
+                /** @description Number of results to return per page. */
+                _page_size?: number;
+                /** @description A search term. */
+                _search?: string;
+                /** @description Which field to use when ordering the results. */
+                _sort?: string;
+                reward_type?: string;
+                reward_type__icontains?: string;
+                value?: number;
+                value__gte?: number;
+                value__lte?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedRewardList"];
+                };
+            };
+        };
+    };
+    gamification_rewards_retrieve: {
+        parameters: {
+            query?: {
+                /** @description Relationships to be expanded in the response */
+                _expand?: string;
+                /** @description Fields to be included in the response */
+                _fields?: string;
+                /** @description Fields to be removed from the response */
+                _omit?: string;
+            };
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this Reward. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Reward"];
+                };
+            };
+        };
+    };
+    gamification_skill_progress_list: {
+        parameters: {
+            query?: {
+                /** @description Relationships to be expanded in the response */
+                _expand?: string;
+                /** @description Fields to be included in the response */
+                _fields?: string;
+                /** @description Fields to be removed from the response */
+                _omit?: string;
+                /** @description A page number within the paginated result set. */
+                _page?: number;
+                /** @description Number of results to return per page. */
+                _page_size?: number;
+                /** @description A search term. */
+                _search?: string;
+                /** @description Which field to use when ordering the results. */
+                _sort?: string;
+                account?: string;
+                level?: number;
+                level__gte?: number;
+                level__lte?: number;
+                progress?: number;
+                progress__gte?: number;
+                progress__lte?: number;
+                skill?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedSkillProgressList"];
+                };
+            };
+        };
+    };
+    gamification_skill_progress_retrieve: {
+        parameters: {
+            query?: {
+                /** @description Relationships to be expanded in the response */
+                _expand?: string;
+                /** @description Fields to be included in the response */
+                _fields?: string;
+                /** @description Fields to be removed from the response */
+                _omit?: string;
+            };
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this Skill Progress. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SkillProgress"];
+                };
+            };
+        };
+    };
+    gamification_skills_list: {
+        parameters: {
+            query?: {
+                /** @description Relationships to be expanded in the response */
+                _expand?: string;
+                /** @description Fields to be included in the response */
+                _fields?: string;
+                /** @description Fields to be removed from the response */
+                _omit?: string;
+                /** @description A page number within the paginated result set. */
+                _page?: number;
+                /** @description Number of results to return per page. */
+                _page_size?: number;
+                /** @description A search term. */
+                _search?: string;
+                /** @description Which field to use when ordering the results. */
+                _sort?: string;
+                icon_path?: string;
+                icon_path__icontains?: string;
+                name?: string;
+                name__icontains?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedSkillList"];
+                };
+            };
+        };
+    };
+    gamification_skills_retrieve: {
+        parameters: {
+            query?: {
+                /** @description Relationships to be expanded in the response */
+                _expand?: string;
+                /** @description Fields to be included in the response */
+                _fields?: string;
+                /** @description Fields to be removed from the response */
+                _omit?: string;
+            };
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this Skill. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Skill"];
+                };
+            };
+        };
+    };
+    gamification_streak_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StreakState"][];
                 };
             };
         };

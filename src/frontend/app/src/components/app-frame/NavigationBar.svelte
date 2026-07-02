@@ -27,7 +27,7 @@ Top navigation bar of the application frame.
     import SubMenu                  from "../basic/dropdown-menu/SubMenu.svelte";
     import Navbar                   from "../basic/navbar/Navbar.svelte";
 
-    import { AuthStore }            from "../../stores/auth.js";
+    import { auth }                 from "../../stores/auth.js";
     import { breadcrumbs }          from "../../stores/breadcrumbs.js";
     import { i18n }                 from "../../stores/i18n.js";
     import { language }             from "../../stores/i18n.js";
@@ -47,7 +47,6 @@ Top navigation bar of the application frame.
         desktopPaneMode = $bindable("both"),
     }: Props = $props();
 
-    let auth = new AuthStore();
     let avatar = $state(AvatarDefault);
     let availableLanguages: openbookSchemas["Language"][] = $state([]);
 

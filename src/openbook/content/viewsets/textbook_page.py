@@ -12,9 +12,13 @@ from django_filters.filterset           import FilterSet
 from drf_spectacular.utils              import extend_schema
 from rest_framework.viewsets            import ModelViewSet
 
+from openbook.assistant.services.textbook_sync import (
+    TextbookDocumentSyncService,
+)
 from openbook.auth.filters.mixins.audit import CreatedModifiedByFilterMixin
 from openbook.auth.serializers.user     import UserField
 from openbook.drf.flex_serializers      import FlexFieldsModelSerializer
+from openbook.drf.viewsets              import AllowAnonymousListRetrieveViewSetMixin
 from openbook.drf.viewsets              import ModelViewSetMixin
 from openbook.drf.viewsets              import with_flex_fields_parameters
 from ..models.textbook_page             import TextbookPage
@@ -33,6 +37,7 @@ class TextbookPageSerializer(FlexFieldsModelSerializer):
             "position",
             "name", "description", "text_format",
             "content",
+            "skills",
             "created_by", "created_at", "modified_by", "modified_at",
         ]
 
@@ -46,6 +51,7 @@ class TextbookPageSerializer(FlexFieldsModelSerializer):
             "textbook":    "openbook.content.viewsets.textbook.TextbookSerializer",
             "parent":      "openbook.content.viewsets.textbook_page.TextbookPageSerializer",
             "children":    ("openbook.content.viewsets.textbook_page.TextbookPageSerializer", {"many": True}),
+            "skills":      ("openbook.gamification.viewsets.skill.SkillSerializer", {"many": True}),
             "created_by":  "openbook.auth.viewsets.user.UserSerializer",
             "modified_by": "openbook.auth.viewsets.user.UserSerializer",
         }
@@ -70,7 +76,7 @@ class TextbookPageFilter(CreatedModifiedByFilterMixin, FilterSet):
     }
 )
 @with_flex_fields_parameters()
-class TextbookPageViewSet(ModelViewSetMixin, ModelViewSet):
+class TextbookPageViewSet(AllowAnonymousListRetrieveViewSetMixin, ModelViewSetMixin, ModelViewSet):
     __doc__ = "Textbook Pages"
 
     queryset         = TextbookPage.objects.all()
@@ -78,3 +84,25 @@ class TextbookPageViewSet(ModelViewSetMixin, ModelViewSet):
     serializer_class = TextbookPageSerializer
     ordering         = ["textbook", "parent", "position", "name"]
     search_fields    = ["name", "description"]
+
+    def perform_create(self, serializer) -> None:
+        """Sync derived assistant documents after a page is created."""
+        page = serializer.save()
+        TextbookDocumentSyncService().sync_textbook(page.textbook)
+
+    def perform_update(self, serializer) -> None:
+        """Sync derived assistant documents after page content or order changes."""
+        previous_textbook = serializer.instance.textbook
+        page = serializer.save()
+        sync_service = TextbookDocumentSyncService()
+
+        if previous_textbook.id != page.textbook_id:
+            sync_service.sync_textbook(previous_textbook)
+
+        sync_service.sync_textbook(page.textbook)
+
+    def perform_destroy(self, instance) -> None:
+        """Sync derived assistant documents after a page is deleted."""
+        textbook = instance.textbook
+        instance.delete()
+        TextbookDocumentSyncService().sync_textbook(textbook)

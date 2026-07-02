@@ -14,8 +14,12 @@
         "maildev": "maildev -s 1025 -w 8887",
         "mocksaml": "node bin/mock-saml-idp/server.js -h localhost -p 8886",
         "frontend": "cd src/frontend && npm run watch",
+        "frontend:dashboard": "cd src/frontend && npm run watch:dashboard",
+        "frontend:dashboard-teacher": "cd src/frontend && conc -n dashboard,teacher -c auto \"npm run watch:dashboard\" \"npm run watch:teacher\"",
         "libraries": "cd src/libraries && npm run watch",
         "start": "conc -n redis,django,maildev,mocksaml,frontend,libraries -c auto \"npm run redis\" \"npm run runserver\" \"npm run maildev\" \"npm run mocksaml\" \"npm run frontend\" \"npm run libraries\"",
+        "start:dashboard": "conc -n redis,django,maildev,mocksaml,dashboard -c auto \"npm run redis\" \"npm run runserver\" \"npm run maildev\" \"npm run mocksaml\" \"npm run frontend:dashboard\"",
+        "start:dashboard-teacher": "conc -n redis,django,maildev,mocksaml,frontend -c auto \"npm run redis\" \"npm run runserver\" \"npm run maildev\" \"npm run mocksaml\" \"npm run frontend:dashboard-teacher\"",
         "start:debug": "conc -n redis,maildev,mocksaml,frontend,libraries -c auto \"npm run redis\" \"npm run maildev\" \"npm run mocksaml\" \"npm run frontend\" \"npm run libraries\"",
         "watch": "npm start",
         "build:libraries": "cd src/libraries && npm run build",
@@ -73,5 +77,8 @@
         "tsx": "^4.22.4",
         "typescript": "^6.0.3",
         "yaml": "^2.9.0"
+    },
+    "dependencies": {
+        "graphviz": "^0.0.9"
     }
 }

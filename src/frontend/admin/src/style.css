@@ -8,6 +8,11 @@
  * License, or (at your option) any later version.
  */
 
+/* Hide Alpine-controlled UI until Alpine has initialized it. */
+[x-cloak] {
+    display: none !important;
+}
+
 /* Adopt styling of DjangoQL Searchbar for Django Unfold Admin */
 #searchbar {
     height: auto !important;
