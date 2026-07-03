@@ -724,8 +724,6 @@ Entwicklung, Übergabe oder Projektplanung gedacht.
 
 .. seealso::
 
-   * :doc:`../info_materials/students`
-   * :doc:`../info_materials/teachers`
    * :doc:`../getting-started/teaching-and-learning-with-ai`
    * :doc:`../getting-started/design-decisions`
    * :doc:`../students/signup-and-account-management`

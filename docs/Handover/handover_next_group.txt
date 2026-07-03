@@ -1,7 +1,7 @@
 ELISA / OpenBook Übergabe-Dokumentation für die nächste Projektgruppe
 =====================================================================
 
-Stand: 02.07.2026
+Stand: 03.07.2026
 
 
 Zweck dieses Dokuments
@@ -98,13 +98,14 @@ Projektstruktur der ELISA-Arbeiten
     Primäre Sphinx-Dokumentation des Projekts. Neue offizielle Dokumentation sollte
     langfristig hier gepflegt werden.
 
-``docs/handbook/index.rst``
-    Startpunkt für das spätere zentrale ELISA-Handbook. Diese Seite soll eher
-    userorientiert bleiben und erklären, was ELISA für Studierende und Lehrende leistet.
+``docs/handbook/benutzerhandbuch.rst``
+    Zentrales ELISA-Benutzerhandbuch. Diese Seite bleibt nutzerorientiert und erklärt,
+    was ELISA für Studierende und Lehrende leistet.
 
-``docs/info_materials/students.rst`` und ``docs/info_materials/teachers.rst``
-    Platzhalter für spätere Infomaterialien. Aktueller Plan: Hier werden später jeweils
-    Flyer als PNG eingebunden, einer für Studierende und einer für Lehrende.
+``docs/info_materials/img/elisa-flyer-students.png`` und
+``docs/info_materials/img/elisa-flyer-teachers.png``
+    PNG-Flyer für Studierende und Lehrende. Sie sind als kompaktes Infomaterial für
+    die Abgabe und Weitergabe gedacht.
 
 ``docs/Handover/handover_next_group.txt``
     Diese Übergabe-Datei. Im Git-Status war eine Umbenennung von
@@ -339,8 +340,8 @@ Ins Handbook gehören:
 
 In ``docs/info_materials/`` gehören:
 
-* kurze Flyer-/Infomaterial-Seiten.
-* später je ein PNG-Flyer für Studierende und Lehrende.
+* PNG-Flyer und zugehörige Bildassets.
+* keine RST-Infomaterial-Seiten, solange die Flyer direkt als PNG abgegeben werden.
 * keine technische Dokumentation.
 
 Als technische Zusatzdokumentation sollten erhalten oder später migriert werden:
@@ -464,13 +465,12 @@ Empfohlene nächste Schritte
    oder bewusst als Archiv/Zusatzdoku behalten.
 
 9. Handbook ausbauen
-   ``docs/handbook/index.rst`` soll eine nutzerorientierte Übersicht bleiben. Es sollte
-   nicht mit Branch- oder API-Details überladen werden.
+   ``docs/handbook/benutzerhandbuch.rst`` soll eine nutzerorientierte Übersicht
+   bleiben. Es sollte nicht mit Branch- oder API-Details überladen werden.
 
-10. Flyer einbinden
-    Für ``docs/info_materials/students.rst`` und
-    ``docs/info_materials/teachers.rst`` jeweils den geplanten PNG-Flyer erstellen und
-    einbinden.
+10. Flyer prüfen und weitergeben
+    Die PNG-Flyer unter ``docs/info_materials/img/`` sollten vor der Abgabe visuell
+    geprüft und bei Bedarf direkt als Infomaterial weitergegeben werden.
 
 
 Kurzfazit

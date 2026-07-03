@@ -120,7 +120,4 @@ download, install, and use **without restrictions**.
    :maxdepth: 1
    :caption: ELISA Handover
 
-   handbook/index
-   info_materials/students
-   info_materials/teachers
-
+   handbook/benutzerhandbuch
