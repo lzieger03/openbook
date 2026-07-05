@@ -1,10 +1,10 @@
-ELISA Technische Übergabe- Und Abschlussdokumentation
+ELISA technische Übergabe- und Abschlussdokumentation
 =====================================================
 
 Stand: 04.07.2026
 
 
-Zweck Dieses Dokuments
+Zweck dieses Dokuments
 ----------------------
 
 Dieses Dokument beschreibt den technischen Ist-Zustand der studentischen ELISA-Arbeiten
@@ -87,8 +87,8 @@ sein. Kurse, Textbooks, Textbook-Seiten, Rollen und Berechtigungen kommen aus Op
 ELISA ergänzt darauf eigene Apps und Frontends.
 
 Die Backend-Apps liegen unter ``src/openbook/assistant/``,
-``src/openbook/learning/`` und ``src/openbook/gamification/``. Die neuen
-Microfrontends liegen unter ``src/frontend/dashboard/`` und
+``src/openbook/learning/`` und ``src/openbook/gamification/``.
+Die neuen Microfrontends liegen unter ``src/frontend/dashboard/`` und
 ``src/frontend/teacher/``. Zusätzlich wurden bestehende Content-ViewSets erweitert,
 damit Textbook-Seiten automatisch in Assistant-Dokumente synchronisiert werden.
 
@@ -101,7 +101,7 @@ Der wichtigste Datenfluss ist die Synchronisation von Kursmaterial:
 5. Chat, Quiz und Exam können den Kurskontext abrufen.
 
 
-Assistant, RAG Und Orchestrator
+Assistant, RAG und Orchestrator
 -------------------------------
 
 Der Assistant-Bereich bündelt die KI-Funktionen. Im Zentrum steht der
@@ -445,7 +445,7 @@ Das Benutzerhandbuch liegt unter ``docs/handbook/benutzerhandbuch.rst``. Es ist 
 nutzerorientiert und sollte keine Branch-, Modell- oder API-Details enthalten.
 
 
-Bekannte Punkte Für Die Übergabe
+Bekannte Punkte für die Übergabe
 --------------------------------
 
 Die folgenden Punkte beschreiben nicht, dass einzelne Dateien "schlecht" sind. Sie
@@ -468,7 +468,7 @@ Der LLM-Client nutzt aktuell Mistral mit ``mistral-small-latest`` und
 Antwortqualität, Quiz-Erzeugung, Freitextbewertung, Kosten und Latenz passt oder ob
 andere Modelle geeigneter sind.
 
-Memory Und Spiele schärfen
+Memory und Spiele schärfen
 ..........................
 
 Memory, Flashcards und Hangman extrahieren Begriffe automatisch aus Kursinhalten. Das
@@ -484,7 +484,7 @@ eigener Bedienmodus umgesetzt. Die nächste Gruppe kann einen Modus ergänzen, i
 ELISA nicht sofort Lösungen gibt, sondern über Rückfragen, Hinweise und kleine
 Zwischenschritte zum Verständnis führt.
 
-Quiz- Und Exam-Regeln entscheiden
+Quiz- und Exam-Regeln entscheiden
 .................................
 
 Quiz und Exam laufen technisch über den kursbezogenen Assistant-WebSocket. Das ist für
@@ -492,13 +492,27 @@ den PoC ausreichend. Für eine langfristige Architektur sollte entschieden werde
 Quiz/Exam in diesem WebSocket bleiben oder ob ein separater API-Bereich mit klareren
 Tests, Historie und Konfiguration entstehen soll.
 
-Gamification Didaktisch finalisieren
+Gamification didaktisch finalisieren
 ....................................
 
 Punkte, Level, Streaks, Skills und Anti-Farming-Regeln sind technisch vorhanden. Die
 pädagogischen Regeln sind aber noch nicht final. Die nächste Gruppe sollte festlegen,
 welche Aktivitäten belohnt werden, wie stark sie gewichtet sind und welche Grenzen für
 formale Leistungsbewertung gelten.
+
+Lernstandsmodell erweitern
+..........................
+
+Das aktuelle Lernstandsmodell speichert bereits Kurs, letzte Seite, abgeschlossene
+Seiten, Kursabschluss und Quiz-Ergebnisse. Für einen ausgebauten Lernassistenten kann
+es fachlich erweitert werden. Als Orientierung dient das Konzept "Lernermodell für
+(KI-)Lernassistent" vom 01.06.2026: Dort sind Lernplan, geplante Lerneinheiten,
+geplante Lernaktivitäten, geplante Lernziele, Lernprotokoll mit Chatverlauf,
+kursbezogenes und kursübergreifendes Chat-Gedächtnis, Reflexionsergebnisse sowie
+Bewertungsraster beschrieben. Die nächste Gruppe sollte prüfen, welche Teile davon in
+OpenBook übernommen werden sollen und wie sie zu bestehenden Modellen wie
+``LearningState``, ``QuizResult``, ``CourseProgress`` und den Assistant-Chat-Sessions
+passen.
 
 Teacher-Workflow stabilisieren
 ..............................
@@ -533,7 +547,7 @@ Einige Kommentare und Zusatzdokumente stammen aus Zwischenständen. Beispiel:
 sollten bereinigt werden, damit die Doku nicht gegen den aktuellen Code arbeitet.
 
 
-Empfohlene Erste Schritte Für Die Nächste Gruppe
+Empfohlene erste Schritte für die nächste Gruppe
 ------------------------------------------------
 
 1. Aktuellen integrierten Stand lokal starten und Testdaten laden oder erstellen.
@@ -554,7 +568,3 @@ ELISA erweitert OpenBook im aktuellen Stand um mehrere zusammenhängende Lern- u
 KI-Bausteine. Die wichtigste Leistung ist nicht ein einzelnes Feature, sondern die
 integrierte Grundlage aus Assistant/RAG, Learning, Gamification, Dashboard und
 Teacher-Frontend.
-
-Die nächste Gruppe sollte nicht bei null anfangen. Sie sollte den vorhandenen
-PoC stabilisieren, mit echten Kursdaten prüfen, fachliche Regeln festlegen und dann
-gezielt entscheiden, welche Bausteine produktnah weiterentwickelt werden.
