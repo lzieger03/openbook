@@ -11,7 +11,7 @@ Dashboard, Kurs-Chat, Kursinhalte, Quiz, Exam, Spiele und Teacher-Frontend.
 
 
 --------------------
-Einstieg Und Rollen
+Einstieg und Rollen
 --------------------
 
 ELISA wird über OpenBook geöffnet. Nach der Anmeldung leitet das System Lehrende in
@@ -21,7 +21,7 @@ Weiterleitung nicht greift, können die Oberflächen direkt geöffnet werden.
 Zur Navigationshilfe enthält dieses Handbuch Direktlinks zu den einzelnen ELISA-Seiten.
 Die Links funktionieren, wenn OpenBook lokal läuft und der Benutzer angemeldet ist.
 
-.. list-table:: Einstiege In Die ELISA-Oberflächen
+.. list-table:: Einstiege in die ELISA-Oberflächen
    :header-rows: 1
    :widths: 25 35 40
 
@@ -39,13 +39,17 @@ Lehrende müssen Mitglied der Django-Gruppe ``Teacher`` sein. Ohne diese Rolle w
 Teacher-Frontend nicht geöffnet. Studierende benötigen eine Kurseinschreibung, damit
 Kurse im Dashboard erscheinen.
 
+In den lokalen Testdaten ist ``teacher.demo`` der Account für die Teacher-Links.
+``student.demo`` wird beim Öffnen von ``/teacher/`` automatisch in das Dashboard
+umgeleitet.
+
 Die OpenBook-Administration ist nicht Teil dieses Benutzerhandbuchs. Sie bleibt für
 Benutzer, Rollen und technische Verwaltung zuständig. Für die normale ELISA-Nutzung
 reichen Dashboard und Teacher-Frontend aus.
 
 
 -------------------------
-Anleitung Für Studierende
+Anleitung für Studierende
 -------------------------
 
 Studierende arbeiten im Dashboard. Dort stehen Kursübersicht, Lernfortschritt,
@@ -53,7 +57,7 @@ Punkte, Skills, Bestenliste und die Navigation in die Kursfunktionen bereit. Der
 normale Ablauf ist: Kurs öffnen, Inhalte lesen, Fragen stellen, Quiz oder Exam
 bearbeiten und den Fortschritt prüfen.
 
-Dashboard Öffnen
+Dashboard öffnen
 ................
 
 1. Melden Sie sich in OpenBook an.
@@ -67,7 +71,7 @@ Wenn kein Kurs sichtbar ist, ist der Account wahrscheinlich noch nicht eingeschr
 oder es fehlen Kursdaten. In diesem Fall muss eine Lehrperson den Kurs vorbereiten und
 den Account im Teacher-Frontend einschreiben.
 
-Dashboard Verstehen
+Dashboard verstehen
 ...................
 
 Das Dashboard zeigt mehrere Bereiche. ``MyLearningPanel`` listet Kurse und nächste
@@ -78,7 +82,7 @@ Diese Werte sind Lernhinweise. Sie zeigen Aktivität und Fortschritt, ersetzen a
 keine fachliche Rückmeldung durch eine Lehrperson. Punkte, Level und Streaks sollen
 zum regelmäßigen Üben motivieren.
 
-.. figure:: img/student-dashboard.png
+.. figure:: img/student-dashboard-current.png
    :align: center
    :width: 95%
    :alt: ELISA-Dashboard aus Studierendensicht
@@ -86,20 +90,46 @@ zum regelmäßigen Üben motivieren.
    Beispielansicht: Das Dashboard zeigt Kurse, Lernfortschritt, Punkte,
    Bestenliste und Skills.
 
-Kursinhalte Lesen
+.. figure:: img/student-dashboard-next-steps.png
+   :align: center
+   :width: 95%
+   :alt: Dashboard mit Next-Steps-Ansicht
+
+   Beispielansicht: Die Ansicht ``Next Steps`` priorisiert die nächsten Lernschritte.
+
+.. figure:: img/student-dashboard-repeat.png
+   :align: center
+   :width: 95%
+   :alt: Dashboard mit Repeat-Ansicht im Aufbau
+
+   Beispielansicht: Die Ansicht ``Repeat`` zeigt, dass Wiederholungen noch in
+   Bearbeitung sind.
+
+Über ``Go to Profile`` öffnen Studierende ihr Profil. Dort können sie Profilbild,
+Name, Beschreibung und E-Mail-Adresse prüfen oder bearbeiten.
+
+.. figure:: img/student-profile-edit.png
+   :align: center
+   :width: 95%
+   :alt: Profilbearbeitung aus Studierendensicht
+
+   Beispielansicht: Im Profil bearbeiten Studierende persönliche Angaben und sehen
+   den Status ihrer E-Mail-Adresse.
+
+Kursinhalte lesen
 .................
 
 Öffnen Sie einen Kurs und wählen Sie in der Kursnavigation ``Skript``. Links erscheint
 die Seitenliste, rechts der Inhalt der ausgewählten Seite. Mit ``Previous`` und
 ``Next`` wechseln Sie durch die Seiten.
 
-Direktlink: `Kursinhalt öffnen`_.
+Einstieg über das Dashboard: `Dashboard öffnen`_.
 
 Beim Öffnen einer Seite speichert ELISA die letzte Position. Mit ``Mark complete``
 markieren Sie eine Seite als bearbeitet. Am Ende kann ``Complete course`` den ganzen
 Kurs abschließen, wenn die Funktion in der Umgebung verfügbar ist.
 
-.. figure:: img/student-content.png
+.. figure:: img/student-course-content.png
    :align: center
    :width: 95%
    :alt: Kursinhalt mit Seitenliste und Lesebereich
@@ -107,20 +137,20 @@ Kurs abschließen, wenn die Funktion in der Umgebung verfügbar ist.
    Beispielansicht: Im Skriptbereich wählen Studierende links eine Seite und lesen
    rechts den Inhalt.
 
-Fragen An ELISA Stellen
+Fragen an ELISA stellen
 .......................
 
 Der Kurs-Chat beantwortet Fragen zum geöffneten Kurs. Geben Sie Ihre Frage in das
 Eingabefeld ein und senden Sie sie ab. Der Chat benötigt eine aktive
 WebSocket-Verbindung; die Oberfläche zeigt den Verbindungsstatus an.
 
-Direktlink: `Kurs-Chat öffnen`_.
+Einstieg über das Dashboard: `Dashboard öffnen`_.
 
 Gespeicherte Chats erscheinen in der Seitenleiste. Sie können einen neuen Chat starten,
 ältere Chats öffnen, umbenennen oder löschen. So lassen sich unterschiedliche
 Lernsituationen pro Kurs getrennt halten.
 
-.. figure:: img/student-chat.png
+.. figure:: img/student-course-chat.png
    :align: center
    :width: 95%
    :alt: Kurs-Chat mit Seitenleiste, Chatverlauf und Eingabefeld
@@ -128,7 +158,18 @@ Lernsituationen pro Kurs getrennt halten.
    Beispielansicht: Im Kurs-Chat sehen Studierende gespeicherte Chats, Navigation
    zu Skript, Quiz, Exam und Games sowie den aktuellen Chatverlauf.
 
-Quiz Bearbeiten
+Der Quick Chat kann direkt aus dem Dashboard geöffnet werden. Er eignet sich für kurze
+Fragen, ohne zuerst in einen Kurs-Chat zu wechseln.
+
+.. figure:: img/student-dashboard-quick-chat.png
+   :align: center
+   :width: 95%
+   :alt: Dashboard mit geöffnetem Quick Chat
+
+   Beispielansicht: Der Quick Chat liegt über dem Dashboard und beantwortet kurze
+   Fragen.
+
+Quiz bearbeiten
 ...............
 
 1. Öffnen Sie im Kurs den Bereich ``Quizzes``.
@@ -137,7 +178,7 @@ Quiz Bearbeiten
 4. Beantworten Sie die Multiple-Choice-Fragen.
 5. Prüfen Sie Ergebnis, Punkte und Skill-Fortschritt.
 
-Direktlink: `Quiz öffnen`_.
+Einstieg über das Dashboard: `Dashboard öffnen`_.
 
 Ein erneuter Versuch bringt nur dann neue Punkte, wenn das Ergebnis besser ist als das
 bisher belohnte Ergebnis. Diese Regel verhindert, dass Punkte durch bloßes Wiederholen
@@ -151,14 +192,14 @@ gesammelt werden.
    Beispielansicht: Vor einem Quiz wählen Studierende das Textbook aus, aus dem
    ELISA Fragen erzeugt.
 
-Exam Nutzen
+Exam nutzen
 ...........
 
 Der Bereich ``Exams`` erzeugt prüfungsähnliche Übungen aus einem ausgewählten Textbook.
 Die Aufgaben können Multiple-Choice- und Freitextfragen enthalten. Nach der Abgabe
 zeigt ELISA Punkte, Feedback und gespeicherte Exam-Versuche.
 
-Direktlink: `Exam öffnen`_.
+Einstieg über das Dashboard: `Dashboard öffnen`_.
 
 Nutzen Sie Exams als Übung und Orientierung. KI-generiertes Feedback kann hilfreich
 sein, sollte aber bei wichtigen fachlichen Fragen mit dem Skript oder der Lehrperson
@@ -172,20 +213,20 @@ abgeglichen werden.
    Beispielansicht: Exams starten ebenfalls mit einer Textbook-Auswahl und zeigen
    gespeicherte Versuche.
 
-Spiele Nutzen
+Spiele nutzen
 .............
 
 Der Bereich ``Games`` bietet Memory, Flashcards und Hangman. Die Spiele verwenden nach
 Möglichkeit Begriffe und Abschnitte aus den Kursinhalten. Wenn ein Kurs noch keine
 auswertbaren Inhalte enthält, können neutrale Inhalte oder leere Zustände erscheinen.
 
-Direktlink: `Games öffnen`_.
+Einstieg über das Dashboard: `Dashboard öffnen`_.
 
 Memory nutzt kurze Begriffe aus dem Kurs und lässt passende Kartenpaare finden.
 Flashcards erzeugt Lernkarten aus Überschriften und Abschnitten. Hangman nutzt
 Fachbegriffe aus Kursseiten.
 
-.. figure:: img/student-games.png
+.. figure:: img/student-games-overview-current.png
    :align: center
    :width: 95%
    :alt: Games-Übersicht mit Memory, Flashcards und Hangman
@@ -197,9 +238,9 @@ Fachbegriffe aus Kursseiten.
 zwei Karten nacheinander auf. Wenn beide Karten zusammenpassen, bleiben sie sichtbar.
 Die Anzeige zeigt Züge, gefundene Paare und die benötigte Zeit.
 
-Direktlink: `Memory öffnen`_.
+Einstieg über das Dashboard: `Dashboard öffnen`_.
 
-.. figure:: img/student-memory.png
+.. figure:: img/student-game-memory-current.png
    :align: center
    :width: 95%
    :alt: Memory-Spiel mit Kartenfeld, Schwierigkeitsauswahl und Spielstatistik
@@ -211,9 +252,9 @@ Direktlink: `Memory öffnen`_.
 steht ein Begriff oder eine Überschrift. Nach dem Umdrehen erscheint die Erklärung aus
 dem Skript. Mit ``Prev``, ``Next`` und ``Shuffle`` wechseln oder mischen Sie die Karten.
 
-Direktlink: `Flashcards öffnen`_.
+Einstieg über das Dashboard: `Dashboard öffnen`_.
 
-.. figure:: img/student-flashcards.png
+.. figure:: img/student-game-flashcards-current.png
    :align: center
    :width: 95%
    :alt: Flashcards-Spiel mit umgedrehter Lernkarte und Navigationsbuttons
@@ -225,9 +266,9 @@ Direktlink: `Flashcards öffnen`_.
 Buchstaben über die Tastatur oder über die Buttons auf dem Bildschirm. Falsche
 Buchstaben füllen die Fehleranzeige; richtige Buchstaben werden im Begriff sichtbar.
 
-Direktlink: `Hangman öffnen`_.
+Einstieg über das Dashboard: `Dashboard öffnen`_.
 
-.. figure:: img/student-hangman.png
+.. figure:: img/student-game-hangman-current.png
    :align: center
    :width: 95%
    :alt: Hangman-Spiel mit Begriff, Fehleranzeige und Buchstabentastatur
@@ -237,7 +278,7 @@ Direktlink: `Hangman öffnen`_.
 
 
 ----------------------
-Anleitung Für Lehrende
+Anleitung für Lehrende
 ----------------------
 
 Lehrende arbeiten im Teacher-Frontend. Dort werden Kurse erstellt, Materialien
@@ -245,7 +286,7 @@ hochgeladen, Textbooks und Seiten gepflegt, Skills vergeben und Studierende
 eingeschrieben. Die Oberfläche ist dafür gedacht, typische Kursarbeit ohne direkten
 Django-Admin-Zugriff zu erledigen.
 
-Teacher-Frontend Öffnen
+Teacher-Frontend öffnen
 .......................
 
 1. Melden Sie sich mit einem Account an, der zur Gruppe ``Teacher`` gehört.
@@ -254,6 +295,9 @@ Teacher-Frontend Öffnen
 
 Direktlink: `Teacher-Kursübersicht öffnen`_.
 
+Mit den lokalen Testdaten funktioniert dieser Link mit ``teacher.demo``. Wenn Sie noch
+als ``student.demo`` angemeldet sind, leitet OpenBook absichtlich zum Dashboard weiter.
+
 Jede Kurskarte zeigt grundlegende Informationen und führt über ``Manage`` in die
 Kursdetailseite. Dort stehen die Tabs ``Overview``, ``Students`` und ``Content`` zur
 Verfügung.
@@ -261,7 +305,7 @@ Verfügung.
 Über ``Delete`` löschen Lehrende einen Kurs nach einer Sicherheitsabfrage. Nutzen Sie
 diese Aktion nur, wenn der Kurs nicht mehr für Studierende benötigt wird.
 
-.. figure:: img/teacher-courses.png
+.. figure:: img/teacher-courses-overview-current.png
    :align: center
    :width: 95%
    :alt: Teacher-Frontend mit My Courses und Kurskarten
@@ -269,7 +313,14 @@ diese Aktion nur, wenn der Kurs nicht mehr für Studierende benötigt wird.
    Beispielansicht: Lehrende sehen ihre Kurse als Karten und öffnen die
    Kursverwaltung über ``Open course``.
 
-Kurs Anlegen
+.. figure:: img/teacher-course-delete-confirmation.png
+   :align: center
+   :width: 95%
+   :alt: Sicherheitsabfrage beim Löschen eines Kurses
+
+   Beispielansicht: Vor dem Löschen eines Kurses erscheint eine Sicherheitsabfrage.
+
+Kurs anlegen
 ............
 
 1. Klicken Sie auf ``New course``.
@@ -283,7 +334,31 @@ Für die normale Arbeit reichen Kursname und Library Group aus. Die erweiterten 
 sind vor allem relevant, wenn ein Kurs gezielt mit bestehenden OpenBook-Strukturen
 verbunden werden soll.
 
-Kursdetails Bearbeiten
+.. figure:: img/teacher-course-create-existing-group.png
+   :align: center
+   :width: 95%
+   :alt: Dialog zum Anlegen eines Kurses mit vorhandener Library Group
+
+   Beispielansicht: Beim Anlegen eines Kurses kann eine bestehende Library Group
+   ausgewählt werden.
+
+.. figure:: img/teacher-course-create-new-group.png
+   :align: center
+   :width: 95%
+   :alt: Dialog zum Anlegen eines Kurses mit neuer Library Group
+
+   Beispielansicht: Alternativ kann direkt im Dialog eine neue Library Group angelegt
+   werden.
+
+.. figure:: img/teacher-course-create-advanced.png
+   :align: center
+   :width: 95%
+   :alt: Erweiterte Einstellungen beim Anlegen eines Kurses
+
+   Beispielansicht: Die erweiterten Einstellungen zeigen Slug, Beschreibung,
+   Textformat und Gruppenoptionen.
+
+Kursdetails bearbeiten
 ......................
 
 Im Tab ``Overview`` bearbeiten Sie Kursname, Beschreibung und weitere Kursdaten. Diese
@@ -293,7 +368,14 @@ bevor Sie in einen anderen Bereich wechseln.
 Wenn ein Kurs keine Library Group hat, können Inhalte und Uploads fehlschlagen. Prüfen
 Sie deshalb zuerst ``Overview``, wenn im Content-Bereich Fehlermeldungen erscheinen.
 
-Studierende Einschreiben
+.. figure:: img/teacher-course-settings.png
+   :align: center
+   :width: 95%
+   :alt: Kurseinstellungen im Teacher-Frontend
+
+   Beispielansicht: Im Tab ``Settings`` bearbeiten Lehrende Kursname und Beschreibung.
+
+Studierende einschreiben
 ........................
 
 Öffnen Sie den Tab ``Students``. Dort suchen Sie nach Benutzern und schreiben sie in den
@@ -306,7 +388,15 @@ Benutzer angemeldet ist.
 Über ``Remove`` entfernen Lehrende eingeschriebene Studierende wieder aus dem Kurs. Die
 Studierenden sehen den Kurs danach nicht mehr in ihrer Kursübersicht.
 
-Materialien Hochladen
+.. figure:: img/teacher-course-students.png
+   :align: center
+   :width: 95%
+   :alt: Studierende im Teacher-Frontend einschreiben
+
+   Beispielansicht: Im Tab ``Students`` suchen Lehrende nach Benutzern und sehen
+   eingeschriebene Studierende.
+
+Materialien hochladen
 .....................
 
 Öffnen Sie den Tab ``Content``. Über ``Upload a script`` laden Sie ein Skript hoch. Das
@@ -317,34 +407,43 @@ Beim Upload versucht ELISA, Kapitel zu erkennen und daraus Textbook-Seiten anzul
 Markdown-Importe können Nacharbeit brauchen, vor allem bei Überschriften,
 Seitenreihenfolge und Formatierung.
 
-Textbooks Und Seiten Pflegen
+.. figure:: img/teacher-course-content-upload.png
+   :align: center
+   :width: 95%
+   :alt: Content-Tab mit Upload-Bereich und Textbook-Liste
+
+   Beispielansicht: Im Tab ``Content`` laden Lehrende Skripte hoch oder verwalten
+   bestehende Textbooks.
+
+Textbooks und Seiten pflegen
 ............................
 
-Im Content-Bereich können Sie ein neues Textbook anlegen oder ein vorhandenes Textbook
-anhängen. Ein Klick auf ein Textbook öffnet den Editor. Links steht die Seitenliste,
-rechts werden Titel, Format, Inhalt, Vorschau und Skills der ausgewählten Seite
-bearbeitet.
+Öffnen Sie zuerst die Teacher-Kursübersicht und wählen Sie dort den gewünschten Kurs
+über ``Manage`` oder ``Open course`` aus. Im Tab ``Content`` können Sie ein neues
+Textbook anlegen oder ein vorhandenes Textbook anhängen. Ein Klick auf ein Textbook
+öffnet den Editor. Links steht die Seitenliste, rechts werden Titel, Format, Inhalt,
+Vorschau und Skills der ausgewählten Seite bearbeitet.
 
 Mit ``New page`` legen Sie neue Seiten an. Mit ``Import file`` füllen Sie eine Seite aus
 einer ``.md``, ``.html`` oder ``.txt``-Datei. Mit ``Write`` bearbeiten Sie den Inhalt,
 mit ``Preview`` prüfen Sie die Darstellung, und mit ``Save page`` speichern Sie die
 Seite.
 
-Direktlink: `Teacher-Content-Editor öffnen`_.
+Direktlink zur Kursübersicht: `Teacher-Kursübersicht öffnen`_.
 
 Mit ``Rename`` benennen Sie ein Textbook um. Mit ``Remove`` entfernen Sie ein Textbook
 aus dem Kurs. Das kleine Löschsymbol neben einer Seite löscht die jeweilige Seite nach
 einer Sicherheitsabfrage.
 
-.. figure:: img/teacher-content.png
+.. figure:: img/teacher-course-content-upload.png
    :align: center
    :width: 95%
-   :alt: Teacher-Content-Editor mit Textbook, Seitenliste und Skill-Tags
+   :alt: Teacher-Content-Bereich mit Textbook-Liste und Upload
 
-   Beispielansicht: Im Content-Editor pflegen Lehrende Textbook-Seiten, Inhalte
-   und Skills.
+   Beispielansicht: Im Content-Bereich pflegen Lehrende Textbooks und öffnen von dort
+   aus einzelne Seiten zur Bearbeitung.
 
-Skills Vergeben
+Skills vergeben
 ...............
 
 Skills werden pro Textbook-Seite vergeben. Suchen Sie im Skill-Feld nach vorhandenen
@@ -354,7 +453,7 @@ welcher Skill-Fortschritt bei Quiz- und Exam-Ergebnissen sichtbar werden kann.
 Vergeben Sie Skills sparsam und fachlich passend. Ein Skill sollte eine Kompetenz oder
 ein Thema beschreiben, das auf der Seite tatsächlich trainiert wird.
 
-Kurs Für Studierende Prüfen
+Kurs für Studierende prüfen
 ...........................
 
 Prüfen Sie nach dem Bearbeiten eines Kurses die Studierendensicht. Ein sinnvoller
@@ -367,7 +466,7 @@ Materialien wirklich verwendet.
 
 
 ---------------------------
-Gute Fragen An ELISA
+Gute Fragen an ELISA
 ---------------------------
 
 Gute Fragen nennen Kontext und Ziel. Formulieren Sie nicht nur "Erkläre alles",
@@ -394,7 +493,8 @@ Kurs eingeschrieben sind. Lehrende können die Einschreibung im Tab ``Students``
 
 **Ich komme nicht in das Teacher-Frontend.** --- Der Account muss zur Gruppe
 ``Teacher`` gehören. Ohne diese Rolle werden Nutzer zur Studierendenansicht
-weitergeleitet.
+weitergeleitet. Mit den Testdaten müssen Sie sich dafür als ``teacher.demo`` anmelden;
+``student.demo`` darf das Teacher-Frontend nicht öffnen.
 
 **Ein hochgeladenes Skript wird nicht verarbeitet.** --- Prüfen Sie Dateiformat,
 Textinhalt und Library Group des Kurses. Unterstützt werden ``.md``, ``.markdown``,
@@ -469,13 +569,4 @@ für Weiterentwicklung und Projektübergabe gedacht, nicht für die tägliche Be
 
 
 .. _Dashboard öffnen: http://127.0.0.1:8000/dashboard/index.html#/
-.. _Kursinhalt öffnen: http://127.0.0.1:8000/dashboard/index.html#/content/48f16b3c-1856-4187-8343-09e4263f16cd
-.. _Kurs-Chat öffnen: http://127.0.0.1:8000/dashboard/index.html#/chat/48f16b3c-1856-4187-8343-09e4263f16cd
-.. _Quiz öffnen: http://127.0.0.1:8000/dashboard/index.html#/quiz/48f16b3c-1856-4187-8343-09e4263f16cd
-.. _Exam öffnen: http://127.0.0.1:8000/dashboard/index.html#/exam/48f16b3c-1856-4187-8343-09e4263f16cd
-.. _Games öffnen: http://127.0.0.1:8000/dashboard/index.html#/games/48f16b3c-1856-4187-8343-09e4263f16cd
-.. _Memory öffnen: http://127.0.0.1:8000/dashboard/index.html#/games/48f16b3c-1856-4187-8343-09e4263f16cd/memory
-.. _Flashcards öffnen: http://127.0.0.1:8000/dashboard/index.html#/games/48f16b3c-1856-4187-8343-09e4263f16cd/flashcards
-.. _Hangman öffnen: http://127.0.0.1:8000/dashboard/index.html#/games/48f16b3c-1856-4187-8343-09e4263f16cd/hangman
 .. _Teacher-Kursübersicht öffnen: http://127.0.0.1:8000/teacher/#/
-.. _Teacher-Content-Editor öffnen: http://127.0.0.1:8000/teacher/#/courses/48f16b3c-1856-4187-8343-09e4263f16cd
