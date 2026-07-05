@@ -1,737 +1,481 @@
-===========================
+=========================
 Benutzerhandbuch ELISA-AI
-===========================
+=========================
 
-Dieses Handbuch beschreibt die Nutzung von ELISA-AI im aktuellen OpenBook-Projektstand.
-Es richtet sich an normale Nutzerinnen und Nutzer und unterscheidet bewusst zwischen
-umgesetzten Funktionen, Proof-of-Concept-Funktionen und geplanten Erweiterungen.
+Dieses Handbuch erklärt, wie Studierende und Lehrende die ELISA-Oberflächen im
+OpenBook-Prototyp bedienen. Es beschreibt bewusst nur sichtbare Nutzerabläufe:
+Dashboard, Kurs-Chat, Kursinhalte, Quiz, Exam, Spiele und Teacher-Frontend.
 
 .. contents:: Page Content
    :local:
 
 
-------------
-Einleitung
-------------
+--------------------
+Einstieg Und Rollen
+--------------------
 
-ELISA-AI ist ein interaktiver KI-Lerntutor im OpenBook-Projekt. Der Prototyp verbindet
-Kurse, Lernmaterialien, einen kursbezogenen KI-Chat, Quiz- und Exam-Funktionen,
-Lernfortschritt sowie erste spielerische Elemente. Ziel ist eine Lernumgebung, in der
-Studierende Inhalte verstehen, wiederholen, üben und über ihren eigenen Lernstand
-reflektieren können.
+ELISA wird über OpenBook geöffnet. Nach der Anmeldung leitet das System Lehrende in
+das Teacher-Frontend und Studierende in das Dashboard. Wenn die automatische
+Weiterleitung nicht greift, können die Oberflächen direkt geöffnet werden.
 
-ELISA-AI arbeitet nicht als allgemeiner Chatbot neben dem Kurs. Die vorhandene
-Implementierung ist auf Kurse, Textbooks, Textbook-Seiten und Assistant-Dokumente
-ausgerichtet. Wenn Kursmaterial vorhanden und indexiert ist, kann der Assistant dieses
-Material als Kontext für Antworten, Quizfragen und Prüfungsübungen nutzen.
+Zur Navigationshilfe enthält dieses Handbuch Direktlinks zu den einzelnen ELISA-Seiten.
+Die Links funktionieren, wenn OpenBook lokal läuft und der Benutzer angemeldet ist.
 
-.. warning::
+.. list-table:: Einstiege In Die ELISA-Oberflächen
+   :header-rows: 1
+   :widths: 25 35 40
 
-   ELISA-AI ersetzt keine Lehrperson, keine offizielle Musterlösung und keine
-   eigenständige Prüfungsvorbereitung. Antworten und automatisch erzeugte Fragen müssen
-   kritisch geprüft werden.
+   * - Rolle
+     - Adresse
+     - Zweck
+   * - Studierende
+     - ``/dashboard/index.html``
+     - Kurse öffnen, Inhalte lesen, Chat, Quiz, Exam und Spiele nutzen.
+   * - Lehrende
+     - ``/teacher/``
+     - Kurse vorbereiten, Inhalte pflegen und Studierende einschreiben.
 
-Der aktuelle Stand ist ein Proof of Concept. Mehrere zentrale Funktionen sind im Code
-vorhanden, unter anderem Dashboard, Kurs-Chat, Inhaltsansicht, Quiz, Exam, Lernstand,
-Gamification, Chatverlauf, Teacher-Frontend und einfache Spiele. Andere Teile, etwa
-abschließende didaktische Regeln oder vollständige Auswertungen für Lehrende, sind noch
-nicht als fertiges Produkt zu verstehen.
+Lehrende müssen Mitglied der Django-Gruppe ``Teacher`` sein. Ohne diese Rolle wird das
+Teacher-Frontend nicht geöffnet. Studierende benötigen eine Kurseinschreibung, damit
+Kurse im Dashboard erscheinen.
 
-
-------------------------------
-Zielgruppen Dieses Handbuchs
-------------------------------
-
-Dieses Handbuch ist für drei Gruppen geschrieben. Studierende finden vor allem in der
-Anleitung für Studierende, im Kapitel zu guten Fragen an ELISA und in der FAQ praktische
-Hinweise. Lehrende finden in der Anleitung für Lehrende, im typischen Ablauf und im
-Kapitel zu verantwortungsvoller Nutzung die wichtigsten Informationen.
-
-Administrierende werden nur am Rand behandelt. OpenBook enthält ein Rollen-,
-Berechtigungs- und Administrationskonzept, aber dieses Handbuch beschreibt keine
-Installation, Serverwartung oder technische Administration. Dafür sind die
-Administrations- und Entwicklerdokumente des Projekts zuständig.
-
-.. note::
-
-   Wenn eine Funktion im aktuellen Repository nur als Konzept oder PoC erkennbar ist,
-   wird sie in diesem Handbuch entsprechend markiert. Es werden keine Bedienwege
-   beschrieben, die nicht in vorhandener Dokumentation oder im Code erkennbar sind.
-
-**Für Studierende relevant** sind besonders Dashboard, Kursauswahl, Skriptansicht,
-KI-Chat, Quiz, Exam, Spiele, Lernfortschritt und Gamification.
-
-**Für Lehrende relevant** sind besonders Kursliste, Kursdetailseite, Content-Bereich,
-Studierendenverwaltung, Skill-Tagging, Materialimport und der didaktische Umgang mit
-KI-generierten Inhalten.
-
-**Für Administrierende relevant** sind vor allem Anmeldung, Rollen, Berechtigungen und
-Systemzustand. Diese Themen werden hier nur aus Nutzersicht erwähnt.
+Die OpenBook-Administration ist nicht Teil dieses Benutzerhandbuchs. Sie bleibt für
+Benutzer, Rollen und technische Verwaltung zuständig. Für die normale ELISA-Nutzung
+reichen Dashboard und Teacher-Frontend aus.
 
 
---------------------------------
-Grundidee Und Funktionsumfang
---------------------------------
-
-ELISA-AI erweitert OpenBook um eine lernbegleitende Oberfläche. Studierende sollen
-nicht nur statische Materialien lesen, sondern mit einem KI-Tutor, Lernpfaden,
-Quizfragen und spielerischen Formaten aktiv arbeiten. OpenBook bleibt dabei die
-Grundlage für Kurse, Rollen, Textbooks und Seiten.
-
-Der umgesetzte Prototyp besteht aus mehreren sichtbaren Bereichen. Das Student Dashboard
-zeigt Lernübersicht, Statistiken, Kurse, Skills, Bestenliste und Navigation zu
-Kursfunktionen. Der Kurs-Chat ist ein vollflächiger KI-Chat für einen konkreten Kurs.
-Die Inhaltsansicht zeigt Textbook-Seiten, Fortschritt pro Seite und Download-Funktionen.
-Quiz und Exam nutzen den kursbezogenen Assistant-Kontext.
-
-**Chat mit ELISA** ist im Dashboard als Kurs-Chat und als Chat-Widget vorgesehen. Der
-Chat läuft über einen WebSocket-Kanal für den gewählten Kurs. Der Code enthält außerdem
-gespeicherte Chat-Sitzungen mit Chatverlauf, Umbenennen und Löschen von Chats.
-
-**Kursbezogene Inhalte und Materialien** werden über OpenBook-Kurse, Textbooks und
-Textbook-Seiten abgebildet. Lehrende können im Teacher-Frontend Inhalte erstellen,
-hochladen, importieren, strukturieren und mit Skills versehen. Beim Speichern oder
-Importieren können Inhalte für den Assistant synchronisiert werden.
-
-**Lernpfade und Lerneinheiten** sind im aktuellen Code vor allem über Kurse, Textbooks,
-Seiten und Lernfortschritt sichtbar. Ein vollständiger, didaktisch ausformulierter
-Lernplan ist als Zielbild erkennbar, aber nicht als vollständig fertige
-Nutzeroberfläche dokumentiert.
-
-**Quiz und Lernkontrollen** sind umgesetzt. Im Dashboard wählen Studierende ein Textbook
-aus, ELISA generiert Fragen für den Kurskontext und die Antworten werden serverseitig
-bewertet. Die Oberfläche zeigt Ergebnis, Punkte und Skill-Fortschritt, wenn der Server
-diese Werte zurückmeldet.
-
-**Lernfortschritt und Lernstand** sind umgesetzt. Das Modell ``LearningState`` speichert
-für angemeldete Nutzer den Kurs, die zuletzt geöffnete Seite, abgeschlossene Seiten,
-Kursabschluss und den letzten Zugriff. ``QuizResult`` speichert Quiz-Ergebnisse pro
-Nutzer und Seite.
-
-**Gamification** ist im Code und in der Dokumentation breit umgesetzt. Dazu gehören
-globale Punkte, Kursfortschritt, Level, Daily Streaks, Skills, Skill-Fortschritt,
-Rewards, Reward-Events und Leaderboard. Die konkreten pädagogischen Regeln sind im
-Proof of Concept noch nicht abschließend als Produktregelwerk zu verstehen.
-
-**Interaktive Spiele** sind im Dashboard vorhanden. Es gibt eine Games-Seite sowie
-Routen für Memory, Flashcards und Hangman. Diese Spiele nutzen, soweit möglich,
-Begriffe und Inhalte aus dem Kurs. Sie sind als PoC-Lernformate einzuordnen.
-
-
----------------
-Rollenmodell
----------------
-
-ELISA-AI arbeitet mit unterschiedlichen Rollen. Für normale Nutzerinnen und Nutzer ist
-wichtig, welche Aufgaben mit welcher Rolle verbunden sind. Die technische
-Berechtigungslogik bleibt im Hintergrund.
-
-Studierende nutzen ELISA-AI zum Lernen. Sie öffnen Kurse, lesen Inhalte, stellen Fragen,
-starten Quiz- oder Exam-Übungen, spielen einfache Lernspiele und sehen Fortschritt,
-Punkte, Skills, Level und Streaks.
-
-Lehrende bereiten Kurse und Inhalte vor. Sie legen Kurse an, verwalten Textbooks und
-Seiten, importieren Materialien, vergeben Skills pro Seite und schreiben Studierende in
-Kurse ein oder aus. Außerdem entscheiden sie, wie KI-Chat, Quiz und Spiele didaktisch
-eingesetzt werden.
-
-Administrierende verwalten Benutzer, Rollen und Systemkonfiguration im OpenBook-Kontext.
-Im aktuellen ELISA-Benutzerhandbuch wird diese Rolle nur allgemein erwähnt, weil die
-Administration nicht Teil der eigentlichen Lernoberfläche ist.
-
-.. graphviz::
-   :caption: Rollen und typische Aufgaben in ELISA-AI
-   :align: center
-
-   digraph rollen {
-      graph [bgcolor=transparent];
-      rankdir=LR;
-      node [shape=box, style="rounded,filled", fillcolor="#f8fafc", color="#64748b"];
-      edge [color="#475569"];
-
-      student [label="Studierende"];
-      teacher [label="Lehrende"];
-      admin [label="Administration"];
-      elisa [label="ELISA-AI"];
-
-      student -> elisa [label="Fragen stellen\nQuiz/Spiele nutzen\nLernfortschritt ansehen"];
-      teacher -> elisa [label="Kurse verwalten\nMaterialien bereitstellen\nLernformate vorbereiten"];
-      admin -> elisa [label="Benutzer und Rollen verwalten"];
-   }
-
-
-----------------
-Erste Schritte
-----------------
-
-ELISA-AI ist Teil von OpenBook. Der Einstieg hängt davon ab, welche Oberfläche in der
-jeweiligen Umgebung gestartet wurde. Im aktuellen Code gibt es eine allgemeine
-OpenBook-App, ein Student Dashboard und ein Teacher-Frontend. Die ELISA-Funktionen
-liegen vor allem im Dashboard und im Teacher-Frontend.
-
-**Anwendung öffnen** --- Öffnen Sie die bereitgestellte OpenBook-Adresse im Browser.
-Für den Prototyp können je nach Umgebung unterschiedliche Startadressen verwendet
-werden. Entscheidend ist, dass Sie in der passenden Oberfläche landen: Student
-Dashboard für Lernende oder Teacher-Frontend für Lehrende.
-
-**Anmelden** --- Der WebSocket-Chat und die Lernstands-Endpunkte setzen einen
-angemeldeten Nutzer voraus. Ohne Login können Chat, Lernfortschritt, Quiz-Ergebnisse
-und kursbezogene Daten nicht zuverlässig geladen oder gespeichert werden.
-
-**Kurs auswählen** --- Studierende sehen ihre Kurse im Dashboard. Lehrende sehen ihre
-Kurse in der Teacher-Kursliste. Wenn kein Kurs erscheint, ist wahrscheinlich noch keine
-Einschreibung, kein Kurs oder keine passende Berechtigung vorhanden.
-
-**Startseite verstehen** --- Im Student Dashboard erscheinen Lernübersicht, Statistik,
-Leaderboard und Skill-Matrix. Im Teacher-Frontend erscheinen Kurskarten mit
-Kursstatus, Anzahl der Textbooks und Skills.
-
-.. note::
-
-   Login, Kursauswahl und Rollen hängen im PoC von der lokalen OpenBook-Einrichtung ab.
-   Wenn Testdaten, Migrationen oder Rollen fehlen, können sichtbare Funktionen leer
-   bleiben oder Fehlermeldungen anzeigen.
-
-Screenshots sind im aktuellen Repository für dieses Handbuch nicht als eigene
-Benutzerhandbuch-Grafiken hinterlegt. Sie können später ergänzt werden, sobald ein
-stabiler Demo-Stand festgelegt ist.
-
-
-----------------------------
+-------------------------
 Anleitung Für Studierende
-----------------------------
+-------------------------
 
-Studierende arbeiten im Normalfall im Student Dashboard. Von dort führen die
-Kurskarten in den Kurs-Chat. In der Chat-Seitenleiste sind weitere Bereiche erreichbar:
-Skript, Games, Quizzes, Exams und gespeicherte Chats.
+Studierende arbeiten im Dashboard. Dort stehen Kursübersicht, Lernfortschritt,
+Punkte, Skills, Bestenliste und die Navigation in die Kursfunktionen bereit. Der
+normale Ablauf ist: Kurs öffnen, Inhalte lesen, Fragen stellen, Quiz oder Exam
+bearbeiten und den Fortschritt prüfen.
 
-Kurs Auswählen
-..............
+Dashboard Öffnen
+................
 
-Öffnen Sie das Student Dashboard. In der Lernübersicht werden die Kurse angezeigt, die
-für Ihren Account geladen werden können. Ein Klick auf einen Kurs öffnet im aktuellen
-Dashboard den Kurs-Chat.
+1. Melden Sie sich in OpenBook an.
+2. Öffnen Sie das Dashboard über die Weiterleitung oder über
+   ``/dashboard/index.html``.
+3. Wählen Sie in der Kursübersicht den gewünschten Kurs aus.
 
-Wenn ein Kurs fehlt, prüfen Sie zuerst, ob Sie angemeldet sind. Danach muss geprüft
-werden, ob Sie im Kurs eingeschrieben sind. Im PoC kann die Einschreibung über das
-Teacher-Frontend oder über Rollen im OpenBook-System vorbereitet werden.
+Direktlink: `Dashboard öffnen`_.
 
-Dashboard Und Lernübersicht Verstehen
-......................................
+Wenn kein Kurs sichtbar ist, ist der Account wahrscheinlich noch nicht eingeschrieben
+oder es fehlen Kursdaten. In diesem Fall muss eine Lehrperson den Kurs vorbereiten und
+den Account im Teacher-Frontend einschreiben.
+
+Dashboard Verstehen
+...................
 
 Das Dashboard zeigt mehrere Bereiche. ``MyLearningPanel`` listet Kurse und nächste
-Schritte. ``StatsPanel`` zeigt Punkte, Level und Streak. ``LeaderboardPanel`` zeigt eine
-Bestenliste. ``SkillMatrixPanel`` zeigt Skill-Fortschritt als Übersicht.
+Lernschritte. ``StatsPanel`` zeigt Punkte, Level und Streak. ``LeaderboardPanel`` zeigt
+die Bestenliste. ``SkillMatrixPanel`` zeigt den Skill-Fortschritt.
 
-Diese Werte sind Orientierungshilfen. Sie zeigen Aktivität und Fortschritt, ersetzen
-aber keine fachliche Rückmeldung durch Lehrende. Besonders Punkte und Streaks sollen
-regelmäßiges Lernen unterstützen, nicht allein Leistung bewerten.
+Diese Werte sind Lernhinweise. Sie zeigen Aktivität und Fortschritt, ersetzen aber
+keine fachliche Rückmeldung durch eine Lehrperson. Punkte, Level und Streaks sollen
+zum regelmäßigen Üben motivieren.
 
-.. admonition:: Tipp
+.. figure:: img/student-dashboard.png
+   :align: center
+   :width: 95%
+   :alt: ELISA-Dashboard aus Studierendensicht
 
-   Nutzen Sie das Dashboard als Startpunkt: Kurs öffnen, Material lesen, Frage stellen,
-   Quiz bearbeiten und danach prüfen, ob sich Fortschritt, Punkte oder Skills geändert
-   haben.
+   Beispielansicht: Das Dashboard zeigt Kurse, Lernfortschritt, Punkte,
+   Bestenliste und Skills.
 
-Lernpfad Und Lerneinheiten Nutzen
-.................................
+Kursinhalte Lesen
+.................
 
-Im Kurs-Chat führt der Button ``Skript`` zur Inhaltsansicht. Dort sehen Sie links ein
-Inhaltsverzeichnis und rechts die aktuelle Textbook-Seite. Sie können Seiten direkt
-auswählen oder mit ``Previous`` und ``Next`` durch den Kurs gehen.
+Öffnen Sie einen Kurs und wählen Sie in der Kursnavigation ``Skript``. Links erscheint
+die Seitenliste, rechts der Inhalt der ausgewählten Seite. Mit ``Previous`` und
+``Next`` wechseln Sie durch die Seiten.
 
-Wenn Sie eine Seite öffnen, meldet die Oberfläche diesen Zugriff an den Lernstand.
-Wenn Sie eine Seite abgeschlossen haben, können Sie sie mit ``Mark complete`` markieren.
-Am Ende des Kurses kann ``Complete course`` den Kursabschluss speichern.
+Direktlink: `Kursinhalt öffnen`_.
 
-.. note::
+Beim Öffnen einer Seite speichert ELISA die letzte Position. Mit ``Mark complete``
+markieren Sie eine Seite als bearbeitet. Am Ende kann ``Complete course`` den ganzen
+Kurs abschließen, wenn die Funktion in der Umgebung verfügbar ist.
 
-   Der Lernpfad ist im aktuellen Prototyp vor allem eine strukturierte Abfolge von
-   Textbook-Seiten. Ein vollständig adaptiver Lernplan ist als Zielbild beschrieben,
-   aber nicht als fertige Nutzeroberfläche belegt.
+.. figure:: img/student-content.png
+   :align: center
+   :width: 95%
+   :alt: Kursinhalt mit Seitenliste und Lesebereich
+
+   Beispielansicht: Im Skriptbereich wählen Studierende links eine Seite und lesen
+   rechts den Inhalt.
 
 Fragen An ELISA Stellen
 .......................
 
-Der Kurs-Chat ist für Fragen zum ausgewählten Kurs gedacht. Geben Sie Ihre Frage in das
-Eingabefeld ein und senden Sie sie ab. Der Chat zeigt den Verbindungsstatus an. Nur bei
-aktiver Verbindung kann eine Nachricht gesendet werden.
+Der Kurs-Chat beantwortet Fragen zum geöffneten Kurs. Geben Sie Ihre Frage in das
+Eingabefeld ein und senden Sie sie ab. Der Chat benötigt eine aktive
+WebSocket-Verbindung; die Oberfläche zeigt den Verbindungsstatus an.
 
-Gespeicherte Chat-Sitzungen erscheinen in der Chat-Seitenleiste. Sie können einen neuen
-Chat starten, vorhandene Chats öffnen, umbenennen oder löschen. So lassen sich mehrere
-Lernkontexte pro Kurs getrennt halten.
+Direktlink: `Kurs-Chat öffnen`_.
 
-Antworten Richtig Einordnen
-............................
+Gespeicherte Chats erscheinen in der Seitenleiste. Sie können einen neuen Chat starten,
+ältere Chats öffnen, umbenennen oder löschen. So lassen sich unterschiedliche
+Lernsituationen pro Kurs getrennt halten.
 
-ELISA kann Markdown-Antworten anzeigen und Kurskontext verwenden. Trotzdem können
-Antworten falsch, unvollständig oder missverständlich sein. Prüfen Sie wichtige
-Informationen mit den Kursmaterialien und den Vorgaben Ihrer Lehrperson.
+.. figure:: img/student-chat.png
+   :align: center
+   :width: 95%
+   :alt: Kurs-Chat mit Seitenleiste, Chatverlauf und Eingabefeld
 
-.. warning::
+   Beispielansicht: Im Kurs-Chat sehen Studierende gespeicherte Chats, Navigation
+   zu Skript, Quiz, Exam und Games sowie den aktuellen Chatverlauf.
 
-   Übernehmen Sie keine KI-Antwort ungeprüft in Abgaben, Prüfungen oder
-   prüfungsrelevante Notizen. ELISA-AI ist eine Lernhilfe, keine verbindliche
-   Autorität.
+Quiz Bearbeiten
+...............
 
-Quiz Starten Und Bearbeiten
-............................
+1. Öffnen Sie im Kurs den Bereich ``Quizzes``.
+2. Wählen Sie ein Textbook aus.
+3. Warten Sie, bis ELISA die Fragen erzeugt hat.
+4. Beantworten Sie die Multiple-Choice-Fragen.
+5. Prüfen Sie Ergebnis, Punkte und Skill-Fortschritt.
 
-Öffnen Sie im Kurs-Chat den Bereich ``Quizzes``. Wählen Sie zuerst ein Textbook aus.
-Das Quiz wird danach für dieses Textbook und den aktuellen Kurs generiert. Wenn keine
-Textbooks vorhanden sind, zeigt die Oberfläche einen entsprechenden Hinweis.
+Direktlink: `Quiz öffnen`_.
 
-Das Quiz besteht aus Multiple-Choice-Fragen. Wählen Sie pro Frage eine Antwort aus. Nach
-dem Durchlauf werden Ihre Antworten serverseitig bewertet und das Ergebnis wird
-angezeigt. Über ``Try again``, ``New quiz`` oder ``Change textbook`` können Sie weiter
-üben.
+Ein erneuter Versuch bringt nur dann neue Punkte, wenn das Ergebnis besser ist als das
+bisher belohnte Ergebnis. Diese Regel verhindert, dass Punkte durch bloßes Wiederholen
+gesammelt werden.
 
-Feedback Nach Quizfragen Verstehen
-..................................
+.. figure:: img/student-quiz.png
+   :align: center
+   :width: 95%
+   :alt: Quiz-Startansicht mit Textbook-Auswahl
 
-Nach dem Quiz zeigt die Oberfläche Ihr Ergebnis als Anzahl korrekter Antworten. Wenn
-der Server Punkte oder Skill-Fortschritt vergibt, werden diese Werte direkt im Ergebnis
-angezeigt und das Dashboard wird aktualisiert.
+   Beispielansicht: Vor einem Quiz wählen Studierende das Textbook aus, aus dem
+   ELISA Fragen erzeugt.
 
-Das Gamification-System vergibt Quizpunkte verbesserungsbasiert. Ein erneuter Versuch
-mit gleichem oder niedrigerem Ergebnis kann daher keine neuen Punkte bringen. Das ist
-als Anti-Farming-Regel im PoC umgesetzt.
+Exam Nutzen
+...........
 
-Lernfortschritt, Punkte, Skillpoints, Level Und Streaks Verstehen
-.................................................................
+Der Bereich ``Exams`` erzeugt prüfungsähnliche Übungen aus einem ausgewählten Textbook.
+Die Aufgaben können Multiple-Choice- und Freitextfragen enthalten. Nach der Abgabe
+zeigt ELISA Punkte, Feedback und gespeicherte Exam-Versuche.
 
-Der Lernfortschritt wird auf mehreren Ebenen sichtbar. Abgeschlossene Seiten erscheinen
-in der Inhaltsansicht. Der zuletzt besuchte Stand wird im Modell gespeichert. Der
-Kursabschluss kann zusätzliche Kurspunkte vergeben.
+Direktlink: `Exam öffnen`_.
 
-Punkte und Level existieren global und pro Kurs. Skills haben einen eigenen Fortschritt
-pro Nutzer. Streaks zeigen regelmäßige Lernaktivität. Das System erfasst etwa
-Seitenaufrufe, Quiz-Ergebnisse, Chat-Fragen und Kursabschluss unterschiedlich.
+Nutzen Sie Exams als Übung und Orientierung. KI-generiertes Feedback kann hilfreich
+sein, sollte aber bei wichtigen fachlichen Fragen mit dem Skript oder der Lehrperson
+abgeglichen werden.
 
-.. admonition:: Tipp
+.. figure:: img/student-exam.png
+   :align: center
+   :width: 95%
+   :alt: Exam-Startansicht mit Textbook-Auswahl und Exam-Historie
 
-   Verstehen Sie Punkte als Lernmotivation. Ein hoher Punktestand bedeutet nicht
-   automatisch, dass Sie ein Thema sicher beherrschen. Nutzen Sie zusätzlich Quiz,
-   eigene Erklärungen und Rückfragen.
+   Beispielansicht: Exams starten ebenfalls mit einer Textbook-Auswahl und zeigen
+   gespeicherte Versuche.
 
-Interaktive Spiele Nutzen
-..........................
+Spiele Nutzen
+.............
 
-Öffnen Sie im Kurs-Chat den Bereich ``Games``. Dort sind Memory, Flashcards und Hangman
-verfügbar. Die Spiele nutzen nach Möglichkeit Begriffe, Überschriften und Inhalte aus
-dem Kurs. Wenn keine passenden Kursdaten vorhanden sind, können sie mit neutralen
-Fallback-Inhalten arbeiten oder leer bleiben.
+Der Bereich ``Games`` bietet Memory, Flashcards und Hangman. Die Spiele verwenden nach
+Möglichkeit Begriffe und Abschnitte aus den Kursinhalten. Wenn ein Kurs noch keine
+auswertbaren Inhalte enthält, können neutrale Inhalte oder leere Zustände erscheinen.
 
-Memory lässt Sie Begriffspaare finden. Flashcards zeigen Karten mit Vorder- und
-Rückseite aus Kursinhalten. Hangman nutzt Fachbegriffe aus den Textbook-Seiten. Diese
-Spiele sind PoC-Lernformate und sollten als Übungsergänzung verstanden werden.
+Direktlink: `Games öffnen`_.
 
-Typische Nutzungsszenarien
-..........................
+Memory nutzt kurze Begriffe aus dem Kurs und lässt passende Kartenpaare finden.
+Flashcards erzeugt Lernkarten aus Überschriften und Abschnitten. Hangman nutzt
+Fachbegriffe aus Kursseiten.
 
-**Unklaren Abschnitt verstehen** --- Öffnen Sie die Kursseite, lesen Sie den Abschnitt
-und fragen Sie ELISA gezielt nach dem Teil, der unklar ist. Lassen Sie sich danach ein
-Beispiel oder Gegenbeispiel geben.
+.. figure:: img/student-games.png
+   :align: center
+   :width: 95%
+   :alt: Games-Übersicht mit Memory, Flashcards und Hangman
 
-**Vor einer Präsenzveranstaltung wiederholen** --- Öffnen Sie den Kurs, markieren Sie
-bearbeitete Seiten, starten Sie ein Quiz und notieren Sie Fragen, die Sie mit der
-Lehrperson klären möchten.
+   Beispielansicht: Die Games-Übersicht bietet Memory, Flashcards und Hangman für
+   den geöffneten Kurs.
 
-**Begriffe üben** --- Nutzen Sie Flashcards oder Hangman, wenn ein Kurs genügend
-Begriffe und Seiten enthält. Prüfen Sie anschließend im Skript, ob Sie die Begriffe
-nicht nur wiedererkennen, sondern erklären können.
+**Memory** --- Memory öffnet ein Kartenfeld mit Begriffen aus dem Kurs. Decken Sie
+zwei Karten nacheinander auf. Wenn beide Karten zusammenpassen, bleiben sie sichtbar.
+Die Anzeige zeigt Züge, gefundene Paare und die benötigte Zeit.
+
+Direktlink: `Memory öffnen`_.
+
+.. figure:: img/student-memory.png
+   :align: center
+   :width: 95%
+   :alt: Memory-Spiel mit Kartenfeld, Schwierigkeitsauswahl und Spielstatistik
+
+   Beispielansicht: Memory zeigt verdeckte Karten, Schwierigkeitsstufen und einen
+   aufgedeckten Kursbegriff.
+
+**Flashcards** --- Flashcards erzeugt Lernkarten aus Kursabschnitten. Auf der Vorderseite
+steht ein Begriff oder eine Überschrift. Nach dem Umdrehen erscheint die Erklärung aus
+dem Skript. Mit ``Prev``, ``Next`` und ``Shuffle`` wechseln oder mischen Sie die Karten.
+
+Direktlink: `Flashcards öffnen`_.
+
+.. figure:: img/student-flashcards.png
+   :align: center
+   :width: 95%
+   :alt: Flashcards-Spiel mit umgedrehter Lernkarte und Navigationsbuttons
+
+   Beispielansicht: Eine umgedrehte Flashcard zeigt die Erklärung zur aktuellen
+   Lernkarte.
+
+**Hangman** --- Hangman wählt einen Fachbegriff aus den Kursinhalten. Raten Sie die
+Buchstaben über die Tastatur oder über die Buttons auf dem Bildschirm. Falsche
+Buchstaben füllen die Fehleranzeige; richtige Buchstaben werden im Begriff sichtbar.
+
+Direktlink: `Hangman öffnen`_.
+
+.. figure:: img/student-hangman.png
+   :align: center
+   :width: 95%
+   :alt: Hangman-Spiel mit Begriff, Fehleranzeige und Buchstabentastatur
+
+   Beispielansicht: Hangman zeigt geratene Buchstaben, Fehlerstand und die
+   Bildschirmtastatur.
 
 
--------------------------
+----------------------
 Anleitung Für Lehrende
--------------------------
+----------------------
 
-Lehrende arbeiten im Teacher-Frontend. Dort können sie Kurse vorbereiten,
-Kursmaterialien erstellen oder importieren, Seiten bearbeiten, Skills vergeben und
-Studierende einschreiben. Die Oberfläche ist als einfachere Alternative zu reinem
-Django-Admin-Arbeiten gedacht.
+Lehrende arbeiten im Teacher-Frontend. Dort werden Kurse erstellt, Materialien
+hochgeladen, Textbooks und Seiten gepflegt, Skills vergeben und Studierende
+eingeschrieben. Die Oberfläche ist dafür gedacht, typische Kursarbeit ohne direkten
+Django-Admin-Zugriff zu erledigen.
 
-Kurs Vorbereiten
-................
+Teacher-Frontend Öffnen
+.......................
 
-Öffnen Sie das Teacher-Frontend. Die Startseite zeigt ``My Courses`` mit vorhandenen
-Kursen. Über ``New course`` legen Sie einen neuen Kurs an. Dazu benötigen Sie mindestens
-einen Kursnamen und eine Library Group.
+1. Melden Sie sich mit einem Account an, der zur Gruppe ``Teacher`` gehört.
+2. Öffnen Sie ``/teacher/``.
+3. Prüfen Sie auf der Startseite ``My Courses``, ob Ihre Kurse sichtbar sind.
 
-Sie können eine vorhandene Library Group auswählen oder eine neue erstellen. Weitere
-Einstellungen wie Slug, Beschreibung, Textformat oder Template-Status liegen im Bereich
-``Advanced settings``. Für normale Kursarbeit reichen die Pflichtangaben meist aus.
+Direktlink: `Teacher-Kursübersicht öffnen`_.
 
-Materialien Bereitstellen Oder Hochladen
-........................................
+Jede Kurskarte zeigt grundlegende Informationen und führt über ``Manage`` in die
+Kursdetailseite. Dort stehen die Tabs ``Overview``, ``Students`` und ``Content`` zur
+Verfügung.
 
-Öffnen Sie einen Kurs und wechseln Sie zum Tab ``Content``. Dort können Sie ein neues
-Textbook über einen Namen anlegen oder ein vorhandenes Textbook anhängen. Zusätzlich
-ist ein Upload für Skripte vorgesehen.
+Über ``Delete`` löschen Lehrende einen Kurs nach einer Sicherheitsabfrage. Nutzen Sie
+diese Aktion nur, wenn der Kurs nicht mehr für Studierende benötigt wird.
 
-Der Materialimport akzeptiert laut Backend ``.md``, ``.markdown``, ``.html``, ``.htm``,
-``.txt`` und ``.pdf``. Bei Uploads versucht das Backend, Kapitel zu erkennen und daraus
-Textbook-Seiten anzulegen. Nach dem Import kann das Material im Editor geprüft und
-überarbeitet werden.
+.. figure:: img/teacher-courses.png
+   :align: center
+   :width: 95%
+   :alt: Teacher-Frontend mit My Courses und Kurskarten
 
-.. warning::
+   Beispielansicht: Lehrende sehen ihre Kurse als Karten und öffnen die
+   Kursverwaltung über ``Open course``.
 
-   Prüfen Sie importierte Materialien immer. Automatische Kapiteltrennung und
-   Markdown-/PDF-Extraktion können unvollständig sein oder Nacharbeit erfordern.
+Kurs Anlegen
+............
 
-Inhalte Strukturieren
+1. Klicken Sie auf ``New course``.
+2. Tragen Sie den Kursnamen ein.
+3. Wählen Sie eine vorhandene ``Library Group`` oder legen Sie eine neue an.
+4. Öffnen Sie bei Bedarf ``Advanced settings`` für Slug, Beschreibung und weitere
+   OpenBook-Felder.
+5. Speichern Sie den Kurs.
+
+Für die normale Arbeit reichen Kursname und Library Group aus. Die erweiterten Felder
+sind vor allem relevant, wenn ein Kurs gezielt mit bestehenden OpenBook-Strukturen
+verbunden werden soll.
+
+Kursdetails Bearbeiten
+......................
+
+Im Tab ``Overview`` bearbeiten Sie Kursname, Beschreibung und weitere Kursdaten. Diese
+Daten helfen Studierenden, den Kurs im Dashboard zu erkennen. Speichern Sie Änderungen,
+bevor Sie in einen anderen Bereich wechseln.
+
+Wenn ein Kurs keine Library Group hat, können Inhalte und Uploads fehlschlagen. Prüfen
+Sie deshalb zuerst ``Overview``, wenn im Content-Bereich Fehlermeldungen erscheinen.
+
+Studierende Einschreiben
+........................
+
+Öffnen Sie den Tab ``Students``. Dort suchen Sie nach Benutzern und schreiben sie in den
+Kurs ein. Beim Einschreiben wird die Student-Rolle im Kurskontext verwendet.
+
+Eingeschriebene Studierende erscheinen danach im Dashboard. Wenn ein Kurs dort nicht
+angezeigt wird, prüfen Sie die Einschreibung und ob der Account mit dem richtigen
+Benutzer angemeldet ist.
+
+Über ``Remove`` entfernen Lehrende eingeschriebene Studierende wieder aus dem Kurs. Die
+Studierenden sehen den Kurs danach nicht mehr in ihrer Kursübersicht.
+
+Materialien Hochladen
 .....................
 
-Ein Kurs enthält Textbooks, und Textbooks enthalten Seiten. Im Content-Bereich können
-Sie Textbooks öffnen, Seiten anlegen, Seiten löschen, Seiteninhalte schreiben und eine
-Vorschau anzeigen. Seiten können in Markdown, HTML oder Plain Text gepflegt werden.
+Öffnen Sie den Tab ``Content``. Über ``Upload a script`` laden Sie ein Skript hoch. Das
+Backend akzeptiert ``.md``, ``.markdown``, ``.html``, ``.htm``, ``.txt`` und ``.pdf``.
 
-Skills werden im aktuellen Modell pro Textbook-Seite vergeben. Diese Skills bilden die
-Grundlage dafür, welche Fähigkeiten im Dashboard und bei Quiz-Belohnungen sichtbar
-werden. Neue Skills können direkt im Skill-Suchfeld angelegt und einer Seite zugeordnet
-werden.
+Beim Upload versucht ELISA, Kapitel zu erkennen und daraus Textbook-Seiten anzulegen.
+Öffnen Sie das erzeugte Textbook danach und prüfen Sie die Seiten. PDF- und
+Markdown-Importe können Nacharbeit brauchen, vor allem bei Überschriften,
+Seitenreihenfolge und Formatierung.
 
-Lernformate Aktivieren Oder Vorbereiten
-.......................................
+Textbooks Und Seiten Pflegen
+............................
 
-Quiz, Exam, Spiele und KI-Chat hängen stark davon ab, ob Kursinhalte vorhanden und
-sinnvoll strukturiert sind. Legen Sie daher aussagekräftige Seiten an, benennen Sie
-Kapitel klar und vergeben Sie Skills nur dort, wo sie fachlich passen.
+Im Content-Bereich können Sie ein neues Textbook anlegen oder ein vorhandenes Textbook
+anhängen. Ein Klick auf ein Textbook öffnet den Editor. Links steht die Seitenliste,
+rechts werden Titel, Format, Inhalt, Vorschau und Skills der ausgewählten Seite
+bearbeitet.
 
-Beim Speichern von Seiten oder beim Import von Textbooks kann das System den Inhalt als
-Assistant-Dokument synchronisieren. Dadurch kann der Assistant Kursmaterial als Kontext
-verwenden. Der Indexstatus kann technisch relevant sein, ist aber im normalen
-Lehrendenablauf vor allem dann wichtig, wenn der Assistant Material nicht berücksichtigt.
+Mit ``New page`` legen Sie neue Seiten an. Mit ``Import file`` füllen Sie eine Seite aus
+einer ``.md``, ``.html`` oder ``.txt``-Datei. Mit ``Write`` bearbeiten Sie den Inhalt,
+mit ``Preview`` prüfen Sie die Darstellung, und mit ``Save page`` speichern Sie die
+Seite.
 
-Quiz Und Lernkontrollen Einsetzen
-.................................
+Direktlink: `Teacher-Content-Editor öffnen`_.
 
-Studierende starten Quizze selbst im Dashboard. Lehrende bereiten dafür indirekt die
-Grundlage: Textbooks, Seiten, Skills und Kursmaterialien. Das Quiz wird aus
-RAG-Dokumenten oder aus dem Kurskontext erzeugt und serverseitig bewertet.
+Mit ``Rename`` benennen Sie ein Textbook um. Mit ``Remove`` entfernen Sie ein Textbook
+aus dem Kurs. Das kleine Löschsymbol neben einer Seite löscht die jeweilige Seite nach
+einer Sicherheitsabfrage.
 
-Exams sind ebenfalls im Dashboard vorhanden. Sie erzeugen und bewerten
-prüfungstypische Aufgaben im Kurskontext. Da KI-generierte Aufgaben und Bewertungen
-fehlerhaft sein können, sollten Exams im PoC nur als Übung und Reflexionshilfe genutzt
-werden.
-
-Lernstand Und Auswertungen
-..........................
-
-Der Code enthält Lernstandsdaten, Quiz-Ergebnisse, Kursfortschritt, Skill-Fortschritt,
-Streaks und Reward-Events. Daraus lassen sich grundsätzlich Fortschritt und Aktivität
-ableiten. Das Dashboard zeigt diese Daten vor allem für Studierende.
-
-Ein fertiges, datenschutzfreundliches Reporting für Lehrende ist im aktuellen Stand
-nicht als abgeschlossenes Produkt dokumentiert. Lehrende sollten daher keine
-personenbezogene Leistungsbewertung aus ELISA-Daten ableiten, solange kein klares
-pädagogisches und rechtliches Auswertungskonzept festgelegt ist.
-
-Didaktische Hinweise Zur Nutzung Im Selbststudium
-.................................................
-
-ELISA-AI eignet sich besonders für betreutes Selbststudium. Studierende können Inhalte
-vorbereiten, Verständnisfragen stellen, Quizze bearbeiten und offene Punkte in die
-Präsenzveranstaltung mitbringen. Dadurch kann Präsenzzeit stärker für Diskussion,
-Übung und Feedback genutzt werden.
-
-Geben Sie Studierenden klare Regeln. Legen Sie fest, wann KI-Unterstützung erlaubt ist,
-wie Antworten geprüft werden sollen und welche Nutzung in Abgaben nicht zulässig ist.
-Eine gute Regel ist: ELISA darf beim Verstehen helfen, aber nicht das eigene Denken
-ersetzen.
-
-Grenzen Aus Lehrendensicht
-..........................
-
-Der Prototyp ist nicht mit einem vollständigen Lernmanagementsystem gleichzusetzen.
-Einige Oberflächen und Dienste sind vorhanden, aber nicht alle Workflows sind final
-stabilisiert. Insbesondere Bewertung, Reporting, finale Gamification-Regeln und
-produktive Qualitätssicherung brauchen weitere fachliche Entscheidungen.
-
-Nutzen Sie KI-generierte Quizfragen, Exam-Feedback und Assistant-Antworten nicht als
-ungeprüfte Musterlösung. Prüfen Sie fachliche Richtigkeit, didaktische Passung und
-Datenschutz, bevor Sie Ergebnisse in formalen Lehrkontexten einsetzen.
-
-
------------------------------
-Typischer Nutzungsablauf
------------------------------
-
-Ein typischer Ablauf aus Studierendensicht beginnt mit der Anmeldung und Kursauswahl.
-Danach lesen Studierende Kursinhalte, stellen Fragen an ELISA, bearbeiten ein Quiz oder
-eine Lernaktivität und sehen anschließend Feedback sowie Fortschritt.
-
-Aus Lehrendensicht beginnt der Ablauf mit einem Kurs. Lehrende erstellen oder wählen
-eine Library Group, legen Textbooks und Seiten an, importieren Material, vergeben Skills
-und schreiben Studierende ein. Danach können Studierende mit dem Kurs arbeiten.
-
-.. graphviz::
-   :caption: Vereinfachter Nutzungsablauf von ELISA-AI
+.. figure:: img/teacher-content.png
    :align: center
+   :width: 95%
+   :alt: Teacher-Content-Editor mit Textbook, Seitenliste und Skill-Tags
 
-   digraph ablauf {
-      graph [bgcolor=transparent];
-      rankdir=TB;
-      node [shape=box, style="rounded,filled", fillcolor="#f8fafc", color="#64748b"];
-      edge [arrowsize=0.8, color="#475569"];
+   Beispielansicht: Im Content-Editor pflegen Lehrende Textbook-Seiten, Inhalte
+   und Skills.
 
-      start [label="Anmeldung"];
-      course [label="Kurs auswählen"];
-      content [label="Lerninhalt öffnen"];
-      chat [label="Frage an ELISA stellen"];
-      quiz [label="Quiz oder Lernaktivität starten"];
-      feedback [label="Feedback erhalten"];
-      progress [label="Lernfortschritt aktualisieren"];
+Skills Vergeben
+...............
 
-      start -> course;
-      course -> content;
-      content -> chat;
-      chat -> quiz;
-      quiz -> feedback;
-      feedback -> progress;
-   }
+Skills werden pro Textbook-Seite vergeben. Suchen Sie im Skill-Feld nach vorhandenen
+Skills oder legen Sie direkt einen neuen Skill an. Die vergebenen Skills bestimmen,
+welcher Skill-Fortschritt bei Quiz- und Exam-Ergebnissen sichtbar werden kann.
 
-**Studierendenablauf**:
+Vergeben Sie Skills sparsam und fachlich passend. Ein Skill sollte eine Kompetenz oder
+ein Thema beschreiben, das auf der Seite tatsächlich trainiert wird.
 
-1. Im Browser anmelden.
-2. Student Dashboard öffnen.
-3. Kurs auswählen.
-4. Im Kurs-Chat eine Frage stellen oder über ``Skript`` die Inhalte öffnen.
-5. Seiten lesen und mit ``Mark complete`` abschließen.
-6. Quiz, Exam oder Spiel starten.
-7. Feedback, Punkte, Skills und Fortschritt prüfen.
+Kurs Für Studierende Prüfen
+...........................
 
-**Lehrendenablauf**:
+Prüfen Sie nach dem Bearbeiten eines Kurses die Studierendensicht. Ein sinnvoller
+Kontrollablauf ist: Kurs im Dashboard öffnen, Skript anzeigen, eine Frage im Chat
+stellen, ein Quiz erzeugen und prüfen, ob Punkte oder Skills aktualisiert werden.
 
-1. Im Teacher-Frontend anmelden.
-2. Kurs anlegen oder bestehenden Kurs öffnen.
-3. Textbook anlegen, vorhandenes Textbook anhängen oder Material hochladen.
-4. Seiten strukturieren und Inhalte prüfen.
-5. Skills pro Seite vergeben.
-6. Studierende einschreiben.
-7. KI- und Quiz-Nutzung didaktisch erklären.
+Wenn Chat, Quiz oder Spiele keine passenden Inhalte verwenden, prüfen Sie zuerst, ob
+Textbooks Seiten enthalten, ob die Seiten gespeichert wurden und ob der Kurs die
+Materialien wirklich verwendet.
 
 
---------------------------------
-Gute Fragen An ELISA Stellen
---------------------------------
+---------------------------
+Gute Fragen An ELISA
+---------------------------
 
-Gute Fragen sind konkret. Nennen Sie das Thema, den Abschnitt oder den Begriff, mit dem
-Sie arbeiten. Beschreiben Sie außerdem, was Sie nicht verstehen oder was Sie überprüfen
-möchten.
+Gute Fragen nennen Kontext und Ziel. Formulieren Sie nicht nur "Erkläre alles",
+sondern sagen Sie, welchen Abschnitt, Begriff oder Zusammenhang Sie verstehen möchten.
 
-Beispiele für sinnvolle Fragen:
+Beispiele:
 
-* "Erkläre mir das Thema in einfachen Worten."
-* "Stelle mir drei Verständnisfragen zu diesem Abschnitt."
-* "Prüfe, ob ich den Unterschied zwischen X und Y verstanden habe."
-* "Gib mir ein Beispiel aus der Praxis."
-* "Welche Begriffe aus dieser Seite sollte ich wiederholen?"
-* "Fasse diesen Abschnitt als Lernkarte zusammen."
+* "Erkläre mir den Unterschied zwischen synchroner und asynchroner Kommunikation."
+* "Stelle mir drei Verständnisfragen zu dieser Seite."
+* "Gib mir ein Beispiel zu diesem Abschnitt."
+* "Welche Begriffe aus dem Skript sollte ich wiederholen?"
+* "Prüfe, ob meine Erklärung fachlich passt: ..."
 
-.. admonition:: Tipp
-
-   Eine gute Frage an ELISA enthält Kontext und ein Ziel. Besser als "Erkläre alles" ist
-   zum Beispiel: "Erkläre mir den Unterschied zwischen synchroner und asynchroner
-   Kommunikation anhand eines Beispiels."
-
-Schlechte Nutzungsweisen schwächen den Lerneffekt. Dazu gehört, eine Lösung ohne
-eigenes Nachdenken zu übernehmen, prüfungsrelevante Inhalte ungeprüft zu kopieren oder
-ELISA nach endgültigen Antworten für Aufgaben zu fragen, die selbst bearbeitet werden
-sollen.
-
-Geben Sie keine privaten oder personenbezogenen Daten in den Chat ein. Dazu gehören
-Adressen, Telefonnummern, private Konflikte, Gesundheitsdaten, personenbezogene
-Leistungsdaten anderer Personen oder vertrauliche Hochschulunterlagen.
+Verwenden Sie ELISA als Lernhilfe. Übernehmen Sie Antworten nicht ungeprüft in Abgaben
+oder prüfungsrelevante Unterlagen.
 
 
-----------------------------------------------
-Datenschutz Und Verantwortungsvolle Nutzung
-----------------------------------------------
-
-ELISA-AI ist ein KI-System und kann Fehler machen. Antworten können überzeugend
-klingen, obwohl sie fachlich nicht stimmen. KI-generierte Quizfragen können
-unvollständig, zu leicht, zu schwer oder missverständlich sein.
-
-Prüfen Sie wichtige Antworten mit Kursmaterialien, Lehrendenhinweisen und anerkannten
-Quellen. Nutzen Sie ELISA, um Verständnis aufzubauen, nicht um Verantwortung abzugeben.
-Bei Widersprüchen gilt nicht automatisch die KI-Antwort.
-
-.. warning::
-
-   Geben Sie keine sensiblen personenbezogenen Daten in den Chat ein. Behandeln Sie
-   Chatverläufe und Lernstandsdaten so, als könnten sie technisch gespeichert und im
-   vorgesehenen Systemrahmen verarbeitet werden.
-
-Lernstandsdaten sollen nur für den vorgesehenen Zweck verwendet werden. Im aktuellen
-Prototyp sind Lernstände, Quiz-Ergebnisse und Gamification-Daten als Lernhilfe und
-technische Grundlage sichtbar. Eine automatische Notenvergabe ist nicht dokumentiert
-und sollte nicht behauptet oder aus den Daten abgeleitet werden.
-
-Lehrende sollten ELISA-Ergebnisse nicht als alleinige Leistungsbewertung nutzen.
-KI-generierte Inhalte sind Lernhilfe, Übungsanstoß und Gesprächsgrundlage, aber keine
-verbindliche Musterlösung.
-
-
---------------------------------
-Grenzen Des Prototyps / PoC
---------------------------------
-
-ELISA-AI ist im aktuellen Repository ein Proof of Concept. Der Code enthält viele
-funktionierende Bausteine, aber das System ist noch nicht als vollständig produktionsreife
-Lernplattform dokumentiert. Besonders lokale Einrichtung, Migrationen, Frontend-Builds
-und Assistant-Abhängigkeiten beeinflussen, ob alle Funktionen in einer Umgebung sichtbar
-sind.
-
-Bekannte Grenzen aus Dokumentation und Code:
-
-* Die finale Quiz-Architektur ist fachlich noch zu entscheiden. Der aktuelle Weg läuft
-  über den kursbezogenen Assistant-WebSocket.
-* Gamification-Regeln sind teilweise umgesetzt, aber pädagogisch noch nicht vollständig
-  finalisiert.
-* Ein vollständiges Teacher-Reporting ist nicht als fertiger Workflow dokumentiert.
-* Lernpfade sind im PoC vor allem über Kursinhalte, Seiten und Fortschrittsdaten
-  sichtbar. Ein vollständig adaptiver Lernplan bleibt Zielbild.
-* Memory, Flashcards und Hangman sind als einfache PoC-Lernspiele vorhanden.
-* Eine vollständige LMS-, Moodle- oder LTI-Integration ist in den betrachteten
-  Unterlagen nicht als umgesetzt erkennbar.
-* Das Rechte- und Rollensystem basiert auf OpenBook, aber der ELISA-Demo-Workflow kann
-  je nach lokaler Testumgebung unvollständig konfiguriert sein.
-* Eine vollständige Hochverfügbarkeits- oder Produktionsbetriebsbeschreibung gehört
-  nicht zum Benutzerhandbuch und ist für den PoC nicht belegt.
-* Assistant-Antworten und KI-generierte Prüfungsübungen brauchen menschliche Prüfung.
-
-Diese Grenzen sind kein Bedienfehler. Sie markieren den aktuellen Projektstand und
-helfen, Erwartungen an die Demo und an spätere Projektphasen realistisch zu halten.
-
-
-----------------------
+--------------------
 Fehlerbehebung / FAQ
-----------------------
+--------------------
 
-Die folgenden Hinweise beschreiben typische Probleme aus Nutzersicht. In einer lokalen
-PoC-Umgebung können technische Ursachen zusätzlich durch fehlende Migrationen,
-fehlende Testdaten, nicht gebaute Frontends oder nicht verfügbare Assistant-Abhängigkeiten
-entstehen.
+**Ich sehe keinen Kurs im Dashboard.** --- Prüfen Sie, ob Sie angemeldet und in den
+Kurs eingeschrieben sind. Lehrende können die Einschreibung im Tab ``Students`` prüfen.
 
-**Ich kann mich nicht anmelden. Was kann ich tun?** --- Prüfen Sie Benutzername,
-Passwort und die richtige OpenBook-Adresse. Wenn die Anmeldung weiter fehlschlägt,
-wenden Sie sich an die betreuende Person oder Administration. Ohne Login funktionieren
-Chat, Lernfortschritt und kursbezogene Daten nicht vollständig.
+**Ich komme nicht in das Teacher-Frontend.** --- Der Account muss zur Gruppe
+``Teacher`` gehören. Ohne diese Rolle werden Nutzer zur Studierendenansicht
+weitergeleitet.
 
-**Ich sehe keinen Kurs.** --- Sie sind möglicherweise nicht in einen Kurs eingeschrieben
-oder der Kurs wurde noch nicht angelegt. Lehrende können im Teacher-Frontend Kurse
-anlegen und Studierende im Tab ``Students`` einschreiben.
+**Ein hochgeladenes Skript wird nicht verarbeitet.** --- Prüfen Sie Dateiformat,
+Textinhalt und Library Group des Kurses. Unterstützt werden ``.md``, ``.markdown``,
+``.html``, ``.htm``, ``.txt`` und ``.pdf``.
 
-**ELISA beantwortet meine Frage nicht passend.** --- Formulieren Sie die Frage
-konkreter und nennen Sie Kurs, Thema oder Abschnitt. Prüfen Sie außerdem, ob im Kurs
-Material vorhanden ist. Wenn keine passenden Assistant-Dokumente indexiert sind, kann
-ELISA weniger kursbezogen antworten.
+**ELISA antwortet nicht kursbezogen.** --- Prüfen Sie, ob im Kurs Textbooks mit Seiten
+vorhanden sind und ob die Inhalte gespeichert wurden. Ohne auswertbare Materialien kann
+ELISA nur eingeschränkt kursbezogen antworten.
 
-**Das Quiz startet nicht.** --- Prüfen Sie, ob Sie im richtigen Kurs sind und ob ein
-Textbook auswählbar ist. Wenn keine Textbooks vorhanden sind oder der WebSocket keine
-Verbindung aufbauen kann, kann kein Quiz generiert werden.
+**Quiz oder Exam startet nicht.** --- Prüfen Sie, ob ein Textbook auswählbar ist und ob
+die WebSocket-Verbindung aktiv ist. Ohne Kursmaterial kann keine sinnvolle Aufgabe
+erzeugt werden.
 
-**Mein Fortschritt wird nicht aktualisiert.** --- Prüfen Sie, ob Sie angemeldet sind.
-Öffnen Sie eine Seite erneut oder nutzen Sie ``Mark complete``. Wenn der Server nicht
-erreichbar ist, kann der Fortschritt nicht gespeichert werden.
-
-**Ein hochgeladenes Material wird nicht verarbeitet.** --- Prüfen Sie das Dateiformat.
-Unterstützt sind im Backend ``.md``, ``.markdown``, ``.html``, ``.htm``, ``.txt`` und
-``.pdf``. Prüfen Sie außerdem, ob die Datei Text enthält und ob der Kurs eine Library
-Group besitzt.
-
-**Was mache ich, wenn ELISA falsche Informationen liefert?** --- Verwenden Sie die
-Antwort nicht ungeprüft. Vergleichen Sie sie mit dem Skript oder fragen Sie die
-Lehrperson. Sie können ELISA auch bitten, die Antwort anhand des Kursmaterials neu zu
-begründen.
-
-**An wen wende ich mich bei Problemen?** --- In einer Lehrveranstaltung wenden Sie sich
-zuerst an die verantwortliche Lehrperson oder das Projektteam. Bei Login-, Rollen- oder
-Systemproblemen ist die zuständige Administration die richtige Anlaufstelle.
+**Memory nutzt unpassende Begriffe.** --- Die Spiele extrahieren Begriffe automatisch
+aus Kursinhalten. Bei sehr kurzen, allgemein formulierten oder unstrukturierten Seiten
+können unpassende Wörter entstehen.
 
 
 ---------------
 Kurzübersicht
 ---------------
 
-Die folgenden Tabellen fassen die wichtigsten Rollen und Funktionen zusammen. Sie sind
-bewusst knapp gehalten und ersetzen nicht die ausführlichen Kapitel.
-
-.. list-table:: Rollen Und Aufgaben
+.. list-table:: Wichtige Aktionen
    :header-rows: 1
-   :widths: 20 45 35
+   :widths: 25 35 40
 
-   * - Rolle
-     - Aufgabe
-     - Wo in ELISA?
-   * - Studierende
-     - Kurs öffnen, Inhalte lesen, Fragen stellen, Quiz und Spiele nutzen
-     - Student Dashboard, Kurs-Chat, Skript, Quizzes, Exams, Games
-   * - Lehrende
-     - Kurse vorbereiten, Materialien pflegen, Skills vergeben, Studierende einschreiben
-     - Teacher-Frontend, Kursliste, Kursdetailseite, Content, Students
-   * - Administration
-     - Benutzer, Rollen und Systemzugang verwalten
-     - OpenBook-Administration und Rollenverwaltung
-
-.. list-table:: Funktionen Und Hinweise
-   :header-rows: 1
-   :widths: 25 45 30
-
-   * - Funktion
-     - Zweck
-     - Hinweis
-   * - Kurs-Chat
-     - Fragen zum ausgewählten Kurs stellen
-     - Benötigt Login und WebSocket-Verbindung
-   * - Skript / Content View
-     - Textbook-Seiten lesen und Fortschritt speichern
-     - Seiten können markiert und heruntergeladen werden
-   * - Quiz
-     - Verständnis mit Multiple-Choice-Fragen prüfen
-     - Fragen werden kursbezogen generiert und serverseitig bewertet
-   * - Exam
-     - Prüfungsähnliche Übung im Kurskontext
-     - PoC-Funktion, nicht als offizielle Prüfung verwenden
-   * - Lernfortschritt
-     - Letzte Seite, abgeschlossene Seiten und Kursabschluss speichern
-     - Sichtbarkeit hängt von Login und Kursdaten ab
-   * - Gamification
-     - Punkte, Level, Streaks, Skills und Leaderboard anzeigen
-     - Motivation, keine automatische Leistungsbewertung
-   * - Memory
-     - Begriffspaare aus Kursinhalten üben
-     - Frontend-Spiel, nutzt Fallbacks bei fehlenden Kursdaten
-   * - Flashcards
-     - Kursbegriffe und Erklärungen wiederholen
-     - Benötigt lesbare Kursinhalte
-   * - Hangman
-     - Fachbegriffe spielerisch wiederholen
-     - PoC-Spiel aus Kursbegriffen
-   * - Teacher Content
-     - Textbooks, Seiten, Vorschau, Import und Skill-Tagging
-     - Grundlage für Chat, Quiz, Spiele und Assistant-Kontext
+   * - Aktion
+     - Rolle
+     - Wo?
+   * - Kurs öffnen
+     - Studierende
+     - ``/dashboard/index.html`` und Kurskarte.
+   * - Kursinhalte lesen
+     - Studierende
+     - Kurs öffnen und ``Skript`` wählen.
+   * - Frage stellen
+     - Studierende
+     - Kurs-Chat oder Chat-Widget.
+   * - Quiz oder Exam starten
+     - Studierende
+     - ``Quizzes`` oder ``Exams`` im Kurs.
+   * - Spiel starten
+     - Studierende
+     - ``Games`` im Kurs.
+   * - Kurs anlegen
+     - Lehrende
+     - ``/teacher/`` und ``New course``.
+   * - Materialien pflegen
+     - Lehrende
+     - Kursdetailseite, Tab ``Content``.
+   * - Studierende einschreiben
+     - Lehrende
+     - Kursdetailseite, Tab ``Students``.
 
 
 ------------------------------
 Weiterführende Dokumentation
 ------------------------------
 
-Die folgenden Dokumente existieren im Repository und ergänzen dieses Benutzerhandbuch.
-Sie haben unterschiedliche Zielgruppen. Einige sind nutzerorientiert, andere eher für
-Entwicklung, Übergabe oder Projektplanung gedacht.
+Die folgenden OpenBook-Seiten erklären allgemeine Funktionen außerhalb der
+ELISA-Oberflächen:
 
 .. seealso::
 
-   * :doc:`../getting-started/teaching-and-learning-with-ai`
-   * :doc:`../getting-started/design-decisions`
    * :doc:`../students/signup-and-account-management`
    * :doc:`../students/textbooks-and-courses`
    * :doc:`../educators/course-management`
    * :doc:`../educators/content-creation`
 
-Die Übergabedokumentation unter ``docs/Handover/handover_next_group.txt`` beschreibt
-zusätzlich den technischen Projektstand und offene Punkte für die nächste
-Projektgruppe. Sie ist vor allem für Projektübergabe und Weiterentwicklung gedacht,
-nicht für die alltägliche Nutzung von ELISA-AI.
+Die technische Übergabe liegt unter ``docs/Handover/handover_next_group.txt``. Sie ist
+für Weiterentwicklung und Projektübergabe gedacht, nicht für die tägliche Bedienung.
+
+
+.. _Dashboard öffnen: http://127.0.0.1:8000/dashboard/index.html#/
+.. _Kursinhalt öffnen: http://127.0.0.1:8000/dashboard/index.html#/content/48f16b3c-1856-4187-8343-09e4263f16cd
+.. _Kurs-Chat öffnen: http://127.0.0.1:8000/dashboard/index.html#/chat/48f16b3c-1856-4187-8343-09e4263f16cd
+.. _Quiz öffnen: http://127.0.0.1:8000/dashboard/index.html#/quiz/48f16b3c-1856-4187-8343-09e4263f16cd
+.. _Exam öffnen: http://127.0.0.1:8000/dashboard/index.html#/exam/48f16b3c-1856-4187-8343-09e4263f16cd
+.. _Games öffnen: http://127.0.0.1:8000/dashboard/index.html#/games/48f16b3c-1856-4187-8343-09e4263f16cd
+.. _Memory öffnen: http://127.0.0.1:8000/dashboard/index.html#/games/48f16b3c-1856-4187-8343-09e4263f16cd/memory
+.. _Flashcards öffnen: http://127.0.0.1:8000/dashboard/index.html#/games/48f16b3c-1856-4187-8343-09e4263f16cd/flashcards
+.. _Hangman öffnen: http://127.0.0.1:8000/dashboard/index.html#/games/48f16b3c-1856-4187-8343-09e4263f16cd/hangman
+.. _Teacher-Kursübersicht öffnen: http://127.0.0.1:8000/teacher/#/
+.. _Teacher-Content-Editor öffnen: http://127.0.0.1:8000/teacher/#/courses/48f16b3c-1856-4187-8343-09e4263f16cd

@@ -118,6 +118,6 @@ download, install, and use **without restrictions**.
 
 .. toctree::
    :maxdepth: 1
-   :caption: ELISA Handover
+   :caption: ELISA Documentation
 
    handbook/benutzerhandbuch
