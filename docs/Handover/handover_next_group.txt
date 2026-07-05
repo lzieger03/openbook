@@ -1,4 +1,4 @@
-ELISA technische Übergabe- und Abschlussdokumentation
+ELISA Technische Übergabe- und Abschlussdokumentation
 =====================================================
 
 Stand: 04.07.2026
@@ -7,10 +7,9 @@ Stand: 04.07.2026
 Zweck dieses Dokuments
 ----------------------
 
-Dieses Dokument beschreibt den technischen Ist-Zustand der studentischen ELISA-Arbeiten
-im OpenBook-Projekt. Es richtet sich an die nächste Projektgruppe und an Personen, die
-nachvollziehen müssen, welche Bausteine umgesetzt wurden und wo sie im Quellcode
-liegen.
+Dieses Dokument zeigt, wo ELISA im OpenBook-Projekt aktuell steht. Es richtet sich an
+die nächste Projektgruppe und an Personen, die nachvollziehen müssen, welche Bausteine
+umgesetzt wurden und wo sie im Quellcode liegen.
 
 Die Dokumentation ersetzt kein OpenBook-Setup-Handbuch. Allgemeine Installation,
 Poetry, Django, Admin und OpenBook-Grundfunktionen bleiben in der bestehenden
@@ -30,11 +29,11 @@ So wird dieses Dokument genutzt:
 Gesamtzustand
 -------------
 
-ELISA liegt als breiter Proof of Concept in OpenBook vor. Der Prototyp verbindet
+ELISA existiert aktuell als breiter Proof of Concept in OpenBook. Der Prototyp verbindet
 kursbezogene KI-Unterstützung, Lernstandsverfolgung, Quiz- und Exam-Übungen,
 Gamification sowie getrennte Oberflächen für Studierende und Lehrende.
 
-Der wichtigste fachliche Ablauf ist:
+Fachlich läuft der Ablauf in sechs Schritten ab:
 
 1. Lehrende legen im Teacher-Frontend Kurse, Textbooks und Seiten an.
 2. Inhalte werden als Assistant-Dokumente synchronisiert und für RAG indexiert.
@@ -43,9 +42,9 @@ Der wichtigste fachliche Ablauf ist:
 5. Lernaktivitäten aktualisieren LearningState, QuizResult und Gamification.
 6. Punkte, Level, Streaks und Skills werden im Dashboard sichtbar.
 
-Die Umsetzung ist nicht als fertiges Produkt zu verstehen. Die Hauptbausteine sind
-vorhanden und integriert, aber die nächste Gruppe sollte Stabilität, Performance,
-Modellwahl, didaktische Regeln und Testdaten gezielt nachziehen.
+Die Umsetzung ist noch kein fertiges Produkt. Die Hauptbausteine sind vorhanden und
+integriert, aber die nächste Gruppe sollte Stabilität, Performance, Modellwahl,
+didaktische Regeln und Testdaten gezielt nachziehen.
 
 .. list-table:: Umgesetzte ELISA-Bausteine
    :header-rows: 1
@@ -92,7 +91,7 @@ Die neuen Microfrontends liegen unter ``src/frontend/dashboard/`` und
 ``src/frontend/teacher/``. Zusätzlich wurden bestehende Content-ViewSets erweitert,
 damit Textbook-Seiten automatisch in Assistant-Dokumente synchronisiert werden.
 
-Der wichtigste Datenfluss ist die Synchronisation von Kursmaterial:
+Kursmaterial wird dabei in mehreren Schritten synchronisiert:
 
 1. Eine Lehrperson erstellt oder importiert Textbook-Seiten.
 2. ``TextbookDocumentSyncService`` rendert daraus eine Markdown-Datei.
@@ -104,10 +103,10 @@ Der wichtigste Datenfluss ist die Synchronisation von Kursmaterial:
 Assistant, RAG und Orchestrator
 -------------------------------
 
-Der Assistant-Bereich bündelt die KI-Funktionen. Im Zentrum steht der
-``AssistantOrchestrator``. Er enthält selbst wenig Fachlogik, sondern löst Eingaben auf,
-prüft Berechtigungen und delegiert an Chat-, Quiz-, Exam-, Learning- und
-Kontextservices.
+Alle KI-Funktionen liegen im Assistant-Bereich, gesteuert vom
+``AssistantOrchestrator``. Viel Fachlogik steckt darin nicht. Er liest die Anfrage,
+prüft die Berechtigung und reicht sie an die passenden Services weiter, etwa für Chat,
+Quiz, Exam, Learning oder Kontext.
 
 .. list-table:: Assistant-Artefakte
    :header-rows: 1
@@ -166,8 +165,8 @@ Learning-App
 ------------
 
 Die Learning-App speichert Lernzustände und stellt den Lernkontext für Assistant und
-Gamification bereit. Sie ist die Verbindung zwischen Kursinhalt, Studierendenaktivität
-und Belohnungssystem.
+Gamification bereit. Sie verbindet Kursinhalt, Studierendenaktivität und
+Belohnungssystem miteinander.
 
 .. list-table:: Learning-Artefakte
    :header-rows: 1
@@ -202,8 +201,8 @@ Course-Chat-WebSocket, weil dort Aufgaben erzeugt, bewertet und belohnt werden.
 Gamification
 ------------
 
-Gamification macht Lernaktivität sichtbar. Die App ist kein Notensystem, sondern eine
-Motivations- und Feedbackschicht. Punkte werden global und pro Kurs geführt. Skills
+Gamification macht Lernaktivität sichtbar, vergibt aber keine Noten. Stattdessen sorgt
+die App für Motivation und Feedback. Punkte werden global und pro Kurs geführt. Skills
 haben zusätzlich eigene Level und Fortschrittswerte.
 
 .. list-table:: Gamification-Artefakte
@@ -261,7 +260,7 @@ bei Kursen, Textbooks und Textbook-Seiten.
      - Aufgabe
    * - ``src/openbook/content/viewsets/course.py``
      - Enthält ``upload_textbook``. Lehrende können ``.md``, ``.markdown``,
-       ``.html``, ``.htm``, ``.txt`` und ``.pdf`` hochladen; daraus entstehen
+       ``.html``, ``.htm``, ``.txt`` und ``.pdf`` hochladen. Daraus entstehen
        Textbook-Seiten und ein Assistant-Dokument.
    * - ``src/openbook/content/viewsets/textbook.py``
      - Synchronisiert Assistant-Dokumente, wenn Textbook-Metadaten geändert werden.
@@ -368,10 +367,10 @@ Einstieg ist für Mitglieder der Django-Gruppe ``Teacher`` geschützt.
    * - ``src/frontend/teacher/src/components/panels/ContentPanel.svelte``
      - Textbook-Anlage, Upload, Seiteneditor, Vorschau, Import und Skill-Tagging.
 
-Der wichtigste Lehrendenworkflow ist die Content-Pflege. Ein gespeichertes Textbook
-oder eine gespeicherte Seite stößt serverseitig die Assistant-Synchronisation an. Das
-ist die Grundlage dafür, dass Studierende im Dashboard kursbezogene Inhalte sehen und
-ELISA sinnvollen Kontext erhält.
+Im Lehrendenworkflow dreht sich das meiste um die Content-Pflege. Ein gespeichertes
+Textbook oder eine gespeicherte Seite stößt serverseitig die Assistant-Synchronisation
+an. Das ist die Grundlage dafür, dass Studierende im Dashboard kursbezogene Inhalte
+sehen und ELISA sinnvollen Kontext erhält.
 
 
 Wichtige Abläufe
@@ -448,9 +447,8 @@ nutzerorientiert und sollte keine Branch-, Modell- oder API-Details enthalten.
 Bekannte Punkte für die Übergabe
 --------------------------------
 
-Die folgenden Punkte beschreiben nicht, dass einzelne Dateien "schlecht" sind. Sie
-markieren fachliche und technische Stellen, an denen die nächste Gruppe wahrscheinlich
-den größten Nutzen erzielt.
+Die folgenden Punkte dienen zur Orientierung und zeigen, wo die nächste Gruppe
+wahrscheinlich den größten Nutzen erzielen kann.
 
 Performance prüfen
 ..................
@@ -565,6 +563,5 @@ Kurzfazit
 ---------
 
 ELISA erweitert OpenBook im aktuellen Stand um mehrere zusammenhängende Lern- und
-KI-Bausteine. Die wichtigste Leistung ist nicht ein einzelnes Feature, sondern die
-integrierte Grundlage aus Assistant/RAG, Learning, Gamification, Dashboard und
-Teacher-Frontend.
+KI-Bausteine. Entscheidend ist dabei weniger das einzelne Feature als die integrierte
+Grundlage aus Assistant/RAG, Learning, Gamification, Dashboard und Teacher-Frontend.
