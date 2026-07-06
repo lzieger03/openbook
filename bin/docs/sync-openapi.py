@@ -37,7 +37,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("-u", default="http://localhost:8000", help="Base URL of the running OpenBook instance.")
     parser.add_argument("-d", default="", help="Django root directory. If provided, runserver is started there.")
     parser.add_argument("-o", default="", help="Output directory for downloaded OpenAPI specs.")
-    parser.add_argument("-p", default="python", help="Python executable to use when starting Django.")
+    parser.add_argument("-p", default=sys.executable, help="Python executable to use when starting Django.")
     return parser.parse_args()
 
 def get_endpoints(args: argparse.Namespace) -> list[Endpoint]:
